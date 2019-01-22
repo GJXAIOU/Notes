@@ -1,0 +1,1204 @@
+---
+二轮整理：2019-1-21
+---
+
+# 第1章 基本对象类型
+
+@toc
+
+**浮点数的所有运算都要注意**
+
+## 1.1 数和四则运算
+
+1.python可以自动处理大**整数问题，不必担心溢出**
+
+2.单精度浮点数（4个字节）在计算机内部存储方式：
+1位为符号位（0为正，1为负），8位用作整数，最后的23位表示有效数字
+
+3.每个**对象**在内存中都有自己的地址，可以使用函数`id()`查看每个对象的内存地址；但是通过`id()`得到的内存地址是只读的，**不能够修改**。
+
+4.使用内建函数`type()`可以查看对象的类型，当然得到的结果也是只读的；
+
+5.==**对象有类型，变量无类型**==
+
+6.四则运算中运算符两侧只要有一个为浮点数，结果就是浮点数，否则为整数
+
+7.浮点数会出现溢出的问题    `*`  表示相乘 ；`**` 表示乘幂 ，等效于`pow()`函数，当然使用的时候要导入math库，   `e-08` 表示10的-8次方；
+
+8.python中的==除法的结果都是浮点数，不论参与运算的数有没有浮点数==
+
+9.`//` 表示两个数相除之后的商（取整），这个商一定为整数
+
+10.python中的已经写好的工具叫做 “库” ，或者“模块”、或者“类库”
+
+11.**导入模块：**
+
+- 单一模块： `import module-name`  表示导入模块：module-name
+- 大模块中的小模块： `from module1 import module11` ,表示从库module1（大模块），里面的子模块 module11
+
+**12.针对python中的浮点数问题**
+python以双精度64位表示浮点数，默认的小数精度为17位，所以电脑中以二进制进行保存的时候会丢掉后面的一部分，造成存储的实际上就有误差；
+
+- 除法会将无限循环小数截断，还不是按照四舍五入的截断
+  解决方法，导入decimal：
+```python
+#Author:GJXAIOU 
+#coding:utf-8 
+#!/usr/bin/env python 
+
+import decimal #导入decimal 模块
+a = decimal.Decimal("10.0") #使用decimal模块中的Decimal函数
+b= decimal.Decimal("3")
+print(a/b)
+```
+程序运行结果：`3.333333333333333333333333333`
+
+- 两个数相除将结果保留为分数：使用`fraction`
+```python
+#Author:GJXAIOU 
+#coding:utf-8 
+#!/usr/bin/env python 
+from fractions import Fraction
+ans = Fraction(10,4)
+print(ans)
+
+```
+程序运行结果：`5/2`
+
+13.取余：`%`
+
+14.同时获得除法的商和余数，使用内建函数`divmod()`
+```python
+#Author:GJXAIOU
+#coding:utf-8 
+#!/usr/bin/env python 
+print(divmod(5,2))
+```
+程序运行结果：`(2, 1)`前面为商，后面为余数
+
+15.对小数进行四舍五入，使用内建函数 `round()`,前一个参数为数字，后一个参数为小数点后的位数
+```python
+#Author:GJXAIOU 
+#coding:utf-8 
+#!/usr/bin/env python 
+print(round(1.256452233 ,3))
+```
+程序运行结果：`1.256`
+
+
+[round（）使用方法](https://blog.csdn.net/gaojixu/article/details/83792109)
+- round()如果只有一个数作为参数，不指定位数的时候：
+  返回的是一个整数，而且是最靠近的整数（这点上类似四舍五入）。但是当出现.5的时候，两边的距离都一样，round()取靠近的偶数。
+- 当指定取舍的小数点位数的时候：
+  一般情况也是使用四舍五入的规则，但是碰到.5的这样情况，如果要取舍的位数前的小数是奇数，则直接舍弃，如果偶数这向上取舍。
+
+
+## 1.3 常见的数学函数以及运算优先级
+- 使用`math`
+```python
+#Author:GJXAIOU 
+#coding:utf-8 
+#!/usr/bin/env python
+import math
+print(math.pi)
+
+print(dir(math))
+```
+程序运行结果：
+`3.141592653589793`
+下面是math中的所有东西（函数）
+`['__doc__', '__loader__', '__name__', '__package__', '__spec__', 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'erf', 'erfc', 'exp', 'expm1', 'fabs', 'factorial', 'floor', 'fmod', 'frexp', 'fsum', 'gamma', 'gcd', 'hypot', 'inf', 'isclose', 'isfinite', 'isinf', 'isnan', 'ldexp', 'lgamma', 'log', 'log10', 'log1p', 'log2', 'modf', 'nan', 'pi', 'pow', 'radians', 'remainder', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tau', 'trunc']`
+
+其中`math.floor()`为取整函数，`math.fabs(-2)`为求绝对值（也可以使用内建函数`abs()`）,求除法的余数：`math.fmod(5,3)`(也可以使用内建的`/`)
+
+
+**2.运算优先级**
+见书P25-26页
+实在不行先加括号
+
+
+## 1.4 一个简单的程序
+
+1.未经编译就可运行的程序称为脚本程序（script）
+
+2.程序前面两行
+```python
+#Author:GJXAIOU 
+
+#coding:utf-8   
+#本程序采用utf-8编码 
+#!/usr/bin/env python   
+#在Linux中必须写，在Windows中可以不写，能够引导程序找到python的解释器
+```
+3.python 中的注释：当行注释：`#` ,多行注释：使用一对`'''`或者一对`"""`
+**能单行注释的就单行注释，尽量避免使用多行注释**
+
+
+
+
+
+## 1.5 字符串
+
+**1.字符串使用单引号或者双引号包裹**
+当字符串内部含有其中一种符号（单引号或者双引号）时候，外面采用另一种符号进行包裹，或者在字符串中出现的的符号前加上`\`,相当于转义字符。
+
+事例说明：
+```python
+#Author:GJXAIOU 
+#coding:utf-8 
+#!/usr/bin/env python 
+str = "what's your name?" #采用双引号包含单引号 
+str1 = 'what\'s your name?' # 使用转义字符  
+print(str)
+print(str1)
+```
+程序运行结果为：
+`what's your name?`
+`what's your name?`
+
+2.可以使用`type()`进行检验类型
+```python
+#Author:GJXAIOU #coding:utf-8 
+#!/usr/bin/env python 
+print(type(330))
+print(type("330"))
+```
+程序运行结果为：
+`<class 'int'>`  对象类型为整型
+`<class 'str'>` 对象类型为字符串类型
+
+
+
+3.使用`+`实现字符串的连接
+首先 **`+`两边的对象给的数据类型必须一致**，例如都是数字就是加法，字符串就是拼接；
+
+- `str()` 实现将整数转换为字符串； #没有返回值
+`repr()是返回一个字符串对象；
+[补充_Python中str()与repr()函数的区别](补充-python中str-与repr-函数的区别)
+- `int()` 实现将字符串转换为整数
+4.一行的结尾加上`\` ，实现续行，对于字符串可以采用字符串开头结尾各加上三个`"`表示字符串的续行
+
+5.键盘输入：使用`input()`获取输入的数据,**input ()返回的结果为字符串类型的对象**
+```python
+#Author:GJXAIOU 
+#coding:utf-8 
+#!/usr/bin/env python
+name = input("what's your name ?")
+age = input("how old are you ?")
+
+print("your name is " + name)
+print("you are " + age + "years old.")
+after_ten = int(age) + 10 
+print("you will be" +str(after_ten) + "years old after ten years.")
+```
+程序运行结果：
+`what's your name ?gaojixu`
+`how old are you ?23`
+`your name is gaojixu`
+`you are 23years old.`
+`you will be33years old after ten years.`
+
+
+6.原始字符串：由`r`开头引起的字符串就是原始字符串，在里面放置任何字符都是原始含义，也就是说没有转义字符的性质
+```python
+a = r"c:\hello"
+print(a)
+```
+程序运行结果：`c:\hello`
+
+
+7.**序列:** 有序排列，例如字符串、列表等等统称为序列
+
+8.**索引：** 序列中每一个都有编号，这个编号即为：索引
+例如：
+```python
+#Author:GJXAIOU 
+#coding:utf-8
+#!/usr/bin/env python 
+
+# 索引 
+lang = "python is beautiful" 
+print("lang = " ,lang)
+print("lang[3] = ",lang[3])
+
+ans1 = lang.index("p")# 在lang字符串中查找字符p的位置  
+print("index('p')= ",ans1)
+
+#字符串的切片：复制字符串的一部分，（不改变原有的字符串）  
+ans2 = lang[2:9]#得到第2到第9个字符（包括第2 个，不包括第9个） 
+print("lang[2:9] = ",ans2)
+
+ans3 = lang[1:]#得到从第一个到最后的字符（包括第一个和最后一个） 
+print("lang[1:] = ",ans3)
+
+ans4 = lang[:] #得到所有的字符,这时候新的字符串（其实本质上这时候并没有生成新的字符串）和原来字符串的地址也是一样的
+print("ans4 = ",ans4)
+print("id(lang) = ",id(lang),"id(ans4) = ",id(ans4))  #id()是查看该对象在内存中的地址   
+**完全复制的时候不产生新的字符串** 
+
+#对比如下的赋值语句 
+ans = lang
+print("id(lang) = ",id(lang),"id(ans4) = ",id(ans4))
+
+ans5 = lang[:9] #得到第9个之前的所有字符（不包括第9个） 
+print("lang[:9] = ",ans5)
+```
+程序运行结果：
+`lang =  python is beautiful`
+`lang[3] =  h`
+`index('p')=  0`
+`lang[2:9] =  thon is`
+`lang[1:] =  ython is beautiful`
+`ans4 =  python is beautiful`
+`id(lang) =  2381962817448 id(ans4) =  2381962817448`
+`id(lang) =  2381962817448 id(ans4) =  2381962817448`
+`lang[:9] =  python is`
+
+
+
+### 1.5.8 字符串的基本操作
+
+- `len() `求字符串的长度  ,返回值为int型
+```python
+str = "hello" 
+print(len(str))
+```
+程序运行结果；`5`
+
+- `+`    连接两个序列
+```python
+str1 = "python" 
+str2 = "lisp" 
+print(str1 + "&"+ str2)
+```
+程序运行结果：`python&lisp`
+
+- `*`   重复序列元素
+```python
+str = "hello"
+print(str *3)
+```
+程序运行结果：`hellohellohello`
+
+- `in`  判断元素是否存在于序列中
+```python
+str1 = "python" 
+print("th" in str1)  #多个元素必须是相邻的
+```
+程序运行结果：`True`
+
+- `max()`  返回最大值  ;   `min()` 返回最小值
+```python
+str1 = "python" 
+print("max(str1)= ",max(str1),"min(str1)=",min(str1))
+```
+程序运行结果：`max(str1)=  y min(str1)= h`
+比较的是字符编码：可以使用内建函数`ord()`获得一个字符对应的数字编码，使用`chr()`实现数字编码向字符的转换
+例如：
+```python
+print("ord('h') = ",ord("h"), "chr(104) = ",chr(104))
+```
+程序运行结果：`ord('h') =  104 chr(104) =  h`
+*字符串的比较是挨个比较，直到得出结果；
+
+ASCII码：A：65  a :97
+
+
+
+
+### 1.5.9 字符串的格式化输出
+- 输出方式
+  - 方法一：使用占位符`%s` ,(不推荐使用)
+```python
+print("I like %s" %  "python")
+```
+  程序运行结果：`I like python`
+
+  - 方法二：使用`format()`方法,使用方法：`string.format()`,format()方法的返回值为一个字符串
+同样是使用占位符`{}`,根据中间的数字序号来对应替换
+```python
+print("I like {1} and {0}".format("lalala","python"))
+```
+  程序运行结果：`I like python and lalala`
+
+- 输出格式：
+  - 对齐：
+```python
+print("I like {1:10} and {0:^15} and{2:>12}".format("lalala","python","hahaha"))
+# 参数含义：第一个位置：占得位置为10个字节，默认左对齐；  第0个位置，占的位置为15个字节，居中对齐；
+第2个位置，占得位置长度为12个字节，右对齐；
+```
+程序运行结果：`I like python     and     lalala      and      hahaha`
+
+  - 长度：
+```python
+print("I like {1:.2} and {0:^15.4} and{2:>12}".format("lalala","python","hahaha"))
+# 参数含义：第1个位置，：后面没有数字表示占得长度自动适应即将放入该位置的字符串，.号后面数字表示对于即将传入的字符串截取前两个字符；
+# 第2个参数的含义；放在第0个位置，占位长度为15个字节，居中对齐，截取将传入的字符串前4个字符
+
+```
+程序运行结果：`I like py and      lala       and      hahaha`
+
+  - 格式符(针对数字（包括整数和浮点数）)
+```python
+print("I like {1:4d} and {0:f} and{2:6.2f} and {3:04f}".format(12345,900897,3434478,368937987))
+#参数含义：第1个位置，长度为4个字节，以整数形式，默认是右对齐
+# 第2个位置：长度自适应，以浮点数形式。默认右对齐
+#第3个位置：长度6个字节，填充到此的浮点数保留2位小数，右对齐
+#第4个位置：数字前面加0表示如果位数不足则补0；
+```
+程序运行结果：`I like 900897 and 12345.000000 and3434478.00 and 368937987.000000`
+
+
+**默认情况下：字符串左对齐，数字右对齐**
+
+### 1.5.10 常用的字符串方法
+- 判断是否全为字母，使用`isalpha()`判断字符串是否全由字母组成
+```python
+str= "python" 
+# 下面两个等价 
+print(str.isalpha())
+print("python".isalpha())
+```
+程序运行结果：
+`True`
+`True`
+
+- 根据分隔符分割字符串,**返回结果形式为列表**
+  - 单一分隔符：使用 `str.split()`
+```python
+str= "python,is a python.lan" 
+print(str.split(" "))#以空格分割 
+print("python,is a python.lan".split("."))#以.进行分割
+print(str.split())#默认的分割符为所有空字符，包括空格、换行、制表符等等
+```
+程序运行结果：
+`['python,is', 'a', 'python.lan']`
+`['python,is a python', 'lan']`
+`['python,is', 'a', 'python.lan']`
+
+  - 多个分割符:导入包`import re`使用`re.split()`
+```pyhton
+import re
+str= "python,is a py?thon.lan"
+print(re.split(r",| ",str)) //多个分隔符之间使用|分开
+print(re.split(r",| |\?",str)) //当有？等时，需要在前面加上\进行转义
+```
+- 去掉字符串两头的空格，会产生新的字符串，原来的字符串不变
+```python
+str = "  hello  " 
+print(id(str))#获得原来的字符串的地址
+ print("star"+str.strip()+ "end")#去除左右 所有  的空格 
+ print(id("star"+str.strip()+ "end"))#获取变换之后的字符串的地址 
+ print("start"+str.lstrip()+ "end")#去除 左边 的空格 
+ print("start"+str.rstrip()+ "end")#去除 右边 的空格 
+ print("start"+str+"end")#去除之后的字符串，原来的值没有变化，这种去除产生了新的字符串
+```
+程序运行结果：
+`1651046031536`
+`starhelloend`
+`1651046258096`
+`starthello  end`
+`start  helloend`
+`start  hello  end`
+
+- 字符大小写的转换，生成一个新的字符串，不改变原有的值
+  - str.upper() :将str中的字母全部转换为大写
+  - str.lower() :将str中的字母全部转换为小写
+  - str.capitalize() :将首字母转换为大写
+  - str.isupper() :判断str中的字母是否全为大写
+  - str.islower() :判断str中的字母是否全为小写
+  - str.istitle() :判断str是否为标题模式，即所有单词首字母大写，其余字母全部小写 
+```python
+str = "hello PyThon" 
+print(str.upper())
+print(str.lower())
+
+```
+程序运行结果：
+`HELLO PYTHON`
+`hello python`
+
+- 用join()拼接字符串,主要用于将列表中的各种类型元素连接，或者使用某个符号来拼接字符串
+```python
+a = ["python","is","the","best"]
+print("*".join(a))
+```
+程序运行结果：`python*is*the*best`
+
+
+
+## 1.6 字符编码
+python 3 中所有字符串均采用Unicode编码，UTF-8只是其实现方法之一(采用可变长度字符编码)，同时可以使用`encode()`将Unicode编码的字符转换为其他编码
+
+
+
+
+## 1.7 列表
+
+### 1.7.1 定义
+- 形式为`[]`
+- 判断列表是否为空：`bool()`  空为false
+- 定义：
+```python
+a = ['2',3,"hello"]#包含字符、数字、字符串
+b= ["python",a]#同时可以套一个列表
+print(a)
+print(b)
+```
+程序运行结果为：
+`['2', 3, 'hello']`
+`['python', ['2', 3, 'hello']]`
+
+
+### 1.7.2 索引和切片
+
+```python
+#索引
+
+#列表元素的索引
+a = ['2',3,"hello","end"]
+print(a[2])
+print(a[:2])
+print(a[2][1:4])
+#列表元素地址的索引
+"""
+编号方式（适用于字符串和列表等所有序列类型）：从左至右0、1、2  或者从右至左-1、-2、-3、-4.。。。
+"""
+print(a.index("hello"))#这样默认返回时是按照从左到右的顺序
+
+
+#切片
+
+#典型的错误读取方式
+print(a[-1:-3]) # 等价于a[(4-1):(4-3)]=a[3:1],又因为序列都是从左到右读取，这里是从右到左的读取，因此返回空值
+#正确用法
+print(a[-3:-1])  #等价于a[1:3]
+
+#根据步长切片，当步长为正数的时候，相当于从左往右看数列，先看到的值为开始的值
+print(a[::2])#从头搜到位，步长为2，实际上中间也就间隔一个字符  [开始：结束：步长]
+
+# 当步长为负数的时候，相当于从右往左看数列，先看到的值为开始的值
+
+print(a[1:3:2])
+print(a[-3:3:2])
+print(a[-2:1:-2])
+```
+程序运行结果：
+`hello`
+`['2', 3]`
+`ell`
+`2`
+`[]`
+`[3, 'hello']`
+`['2', 'hello']`
+`[3]`
+`[3]`
+`['hello']`
+
+
+### 1.7.3  反转（适用于列表以及字符串）
+```python
+lst = [1,2,3,4,5,6]
+str = "python"
+print(lst[: : -1])
+print(str[: : -1])
+
+print(lst)
+print(str)
+
+#可以使用reversed函数进行反转，但是必须加上list，最后的结果也都是列表格式
+print(list(reversed(str)))
+print(list(reversed(lst)))
+#注意比较两个的不同
+```
+程序运行结果：
+`[6, 5, 4, 3, 2, 1]`
+`nohtyp`
+`[1, 2, 3, 4, 5, 6]`
+`python`
+`['n', 'o', 'h', 't', 'y', 'p']`
+`[6, 5, 4, 3, 2, 1]`
+
+
+
+### 1.7.4 操作列表
+- 基本操作
+  - `len()`  
+```python
+lst= ["i","python","lalla"]
+print(len(lst))
+```
+程序运行结果：`3`
+
+  - `+` :连接两个列表
+  - `*` :重复序列元素
+  - `in` :判断元素是否在列表中（完整性的元素，不是字符）
+```python
+lst= ["i","python","lalla"]
+print("python" in lst)
+print("la" in lst)
+```
+程序运行结果：
+`True`
+`False`
+
+  - `max()`和`min()`寻找列表中最大或者最小的元素
+```python
+lst= ["i","python","lalla"]
+print(max(lst))
+print(min(lst))
+```
+程序运行结果：
+`python`
+`i`
+
+
+- 修改列表元素（修改和追加）
+```python
+#修改元素
+
+lst= ["i","python","lalla"]
+lst[1] = "hello"  #将第1个元素修改为“hello”
+print(lst)
+
+#追加元素
+lst.append("hulala")#在结尾追加元素,返回值为None,直接使用print(lst.append("hulala")),结果为None 同时进行的也是原地修改
+print(lst)
+```
+程序运行结果：
+`['i', 'hello', 'lalla']`
+`['i', 'hello', 'lalla', 'hulala']`
+
+**追加元素是原地修改，返回值为None**
+
+
+
+
+### 1.7.5 常见的列表函数
+
+- extend ：将两个列表合并，a:b - >a+b :b,参数可以是列表或者字符串，**但是如果为数值型就会报错**
+  extend的参数必须为iterable(可迭代的（可以重复反馈）)
+  使用`hasattr()`判断类型是否可迭代，判断本质是看类型中是否含有`_iter_()`这个方法，可以使用`dir`查看
+  示例；
+```python
+lst = [1,2]
+lat= 3
+print(hasattr(lst,'__iter__'))
+#hasattr(object，'x') 函数，用于判断对象object是否含有x属性或方法，有则返回True，否则返回False
+print(hasattr(lat,"__iter__"))
+
+```
+程序运行结果：
+`True`
+`False`
+
+```python
+la = ["lala","lblb"]
+lb = [1,2,3]
+print(la.extend(lb))#la.extend(lb)的返回值为none,同时拓展之后的内存位置仍然没有改变，原地修改
+print(la)
+print(lb)
+
+lc= "abcde"#当拓展参数为字符串的时候，结果是将字符串挨个字符拆开形成列表，然后在追加
+la.extend(lc)
+print(la)
+
+la = ["lala","lblb"] # 当拓展为列表的时候，不再拆分然后追加，直接追加
+ld = ["abcde"]
+la.extend(ld)
+print(la)
+```
+程序运行结果：
+`None`
+`['lala', 'lblb', 1, 2, 3]`
+`[1, 2, 3]`
+`['lala', 'lblb', 1, 2, 3, 'a', 'b', 'c', 'd', 'e']`
+`['lala', 'lblb', 'abcde']`
+
+**append（）和extend（）区别：**
+append直接将所有内容整体打包什么都不动（包括列表的[])追加在后面
+extend将追加的内容先拆开（针对列表），然后合并成一个列表
+
+
+- count：查找列表中元素出现的次数(必须是完整的)
+```python
+lst = [1,2,3,2,1,2,1,'a','aaa']
+print(lst.count(1))
+print(lst.count('a'))
+```
+程序运行结果：
+`3`
+`1`
+
+- index :查找列表中的元素（必须是完整的）在列表中第一次出现的位置
+```python
+lst = [1,2,3,2,1,2,1,'a']
+print(lst.index(1))
+print(lst.index('a'))
+```
+程序运行结果：
+`0`
+`7`
+
+- insert ：将元素添加在列表中的任意位置：`list(i,x)`,其中i为想插入的位置，X为插入的元素，该元素插入位置之前
+```python
+lst = [1,2,'a']
+lst.insert(2,"lalala")#insert()函数也是列表的原地修改，没有返回值，或者说返回值为None
+print(lst)
+lst.insert(len(lst),"end") #使用len函数，将插入值放在字符串的最后面
+print(lst)
+
+```
+程序运行结果为：
+`[1, 2, 'lalala', 'a']`
+`[1, 2, 'lalala', 'a', 'end']`
+
+
+- remove 和pop实现删除列表中的元素
+  - remove ：
+```python
+#remove使用方式：
+# 正确就删除第一个符合的对象，没有返回值；对列表进行原地修改
+#如果删除的元素不在列表中，则会报错：X not in list
+
+lst= ["python","hello","lala",1,2]
+print("hello" in lst)#可以在删除之前先判断该元素是否在列表中
+lst.remove("hello")#同样没有返回值，
+print(lst)
+
+```
+程序运行结果：
+`True`
+`['python', 'lala', 1, 2]`
+
+
+  - pop :使用方式: `list.pop([i])` ,其中i为所要删除的元素的位置,实际使用的时候没有[]，如果为空则表示删除最后一个，返回值为删除的元素
+```python
+lst= ["python","hello","lala",1,2]
+print(lst.pop(1))#删除列表中第1个元素，返回值为第1个元素的值
+print(lst)
+
+```
+程序运行结果：
+`hello`
+`['python', 'lala', 1, 2]`
+
+
+
+
+- reverse :将列表的元素顺序返回来，是原地反过来(原来列表的值变化)，没有返回值,
+- reversed :原来列表的值没有变化，有返回值，但是返回值并不是list（），需要转换为list()
+```python
+lst= ["python","hello","lala",1,2]
+#reverse()
+lst.reverse()
+print(lst)#原列表的值改变了
+
+#reversed()
+print(reversed(lst))#返回值不是列表
+print(list(reversed(lst)))#将机返回值转换为列表
+print(lst)#再次打印列表，经过reversed之后的原列表没有变化
+```
+程序运行结果；
+`[2, 1, 'lala', 'hello', 'python']`
+`<list_reverseiterator object at 0x0000029BF3C09160>`
+`['python', 'hello', 'lala', 1, 2]`
+`[2, 1, 'lala', 'hello', 'python']`
+
+
+
+- sort :对列表进行排序，进行原地修改，没有返回值，默认为从小到大进行排序，也可以设置关键字进行排序
+```python
+#使用sort（）不能实现字符串与整数进行排序，只能各自排序
+lst= ["python","hello","lala"]
+lst.sort()
+print(lst)
+
+#按照从大到小进行排序
+lst.sort(reverse = True)#这里的True不能小写
+print(lst)
+
+#按照某个关键词进行排序
+lst.sort(key = len) #按照长度为关键字进行排序
+print(lst)
+```
+程序运行结果：
+`['hello', 'lala', 'python']`
+`['python', 'lala', 'hello']`
+`['lala', 'hello', 'python']`
+
+
+- sorted :产生新的列表，有返回值，可以设置从左到右或者从右到左排序
+```python
+lst= ["python","hello","lala"]
+print(sorted(lst))#默认情况下是从小到大的排序
+print(lst)#可以得到原列表并没有改变
+
+#实现从大到小的排序
+print(sorted(lst,reverse = True))
+
+```
+程序运行结果；
+`['hello', 'lala', 'python']`
+`['python', 'hello', 'lala']`
+`['python', 'lala', 'hello']`
+
+
+
+### 1.7.6 比较字符串和列表
+- 相同点：
+  - 都是序列类型
+  - 都可以按照顺序进行索引
+  - 都可以采用切片得到一个或者多个元素
+
+- 不同点：
+  - 列表是可以改变的，然后字符串是不可以改变的。
+  - 字符串中每个元素只能是字符，列表中都可以，也可以列表套列表，形成多维列表，在多维情况下，里面的列表被当成一个元素来看待
+
+
+### 1.7.7 字符串和列表的转换
+- split()  ：可以根据某个分隔符将字符串转换为列表
+```python
+str = "hello.i am GJXAIOU .welcome you"
+print(str.split(".")) #以.来分割
+print(str.split(".",1))#以第一个.来分割
+print(str.split())# 所有的空字符都是分隔符
+```
+程序运行结果：
+`['hello', 'i am GJXAIOU ', 'welcome you']`
+`['hello', 'i am GJXAIOU .welcome you']`
+`['hello.i', 'am', 'GJXAIOU', '.welcome', 'you']`
+
+
+
+- join :连接list中的元素或者字符串中的字符
+
+```python
+lst = ['hello.i', 'am', 'GJXAIOU', '.welcome', 'you']
+str1 = [1,2,3,'a','b']
+print("".join(lst))#没有连接符，表示紧邻着
+print(",".join(lst))#以英文的.作为连接符
+print(" ".join(str(str1)))#以为list中含有数字，不能直接转换成字符串
+```
+程序运行结果：
+`hello.iamGJXAIOU.welcomeyou`
+`hello.i,am,GJXAIOU,.welcome,you`
+`[ 1 ,   2 ,   3 ,   ' a ' ,   ' b ' ]`
+
+
+
+
+
+
+## 1.8 元组（tuple）
+
+这是一种（数据）或者对象类型,其元素可以包含任何类型的数据,==元组的对象是可以迭代的==
+格式为：用（）括起来，中间的元素使用`,`隔开，==元组是序列，元素不能更改==
+```python
+lst = 1,2,"lalala",["jdjjdfj",1234],("123",12,'abadf')#几乎包含了所有的数据类型
+print(lst)
+print(type(lst))
+```
+程序运行结果：
+`(1, 2, 'lalala', ['jdjjdfj', 1234], ('123', 12, 'abadf'))`
+`<class 'tuple'>`
+
+
+
+
+### 1.8.2 索引和切片
+
+主要的方法和列表以及字符串几乎相同，只是当元组中只有一个元素的时候，元素后面应该加上英文的`,`,
+```python
+lst = (3)
+lat = (3,)
+print(type(lst))
+print(type(lat))
+```
+程序运行结果为：
+`<class 'int'>`
+`<class 'tuple'>`
+
+以为元素是不可修改的，如果需要修改元组可以将元组转换成一个列表，然后在进行修改
+函数为：`list()` 以及 `tuple()`
+
+
+
+
+
+
+### 1.8.3 元组的用途
+- 元组的操作比列表快，所以当定义一个值之后以后只是遍历的话，使用元组
+- 元组可以进行“写保护”，如果要改变的话先转换为列表
+- 元组可以在字典中用作key（因为字典的key是保持不变的）
+
+
+
+
+
+## 1.9 字典
+
+### 1.9.1 创建字典
+```python
+#“A”：“B” ，为一对键/值对,前面为键，后面为值，每一个字典中键都是唯一的，
+person = {"name":"gjxaiou","site":"www.gaojixu.com","language":"python"}
+print(person)
+
+#向已经建立的字典中增加键值对：
+person['name2']= "GJXAIOU"  #字典是进行原地修改
+
+
+#方法二：使用dict()函数
+name = (["first","google"],["second","Yahoo"])
+web = dict(name)
+
+print(web)
+
+
+#方法三：使用fromkeys()
+website = {}.fromkeys(("third","forth"),"facebook")
+print(website)
+
+#注意；元组可以做键值，但是列表不能
+dd = {(1,2):1}
+print(dd)
+#ee = {[1,2],1},会报错
+```
+
+### 1.9.2 访问字典的值，通过键就可以得到值
+```python
+#首先字典中是没有索引的
+person = {"name":"gjxaiou","site":"www.gaojixu.com","language":"python"}
+print(person['name'])
+```
+程序运行结果：`gjxaiou`
+
+
+### 1.9.3 基本操作
+- `len(d)` :返回字典中的键值对数量
+- `d[key]` :返回字典中键对应的值
+- `d[key] = value` :将value赋值给字典中的键
+- `del d[key]` :删除该键对应的键值对
+- `key in d` :检查字典中是否含有键为key的项
+
+
+
+### 1.9.5 字典的方法
+- copy ：对象有类型，变量无类型
+```python
+#基本的赋值操作
+a = 5
+b = a
+print(a)
+print(id(a))
+print(id(b))
+```
+程序运行结果：
+`5`
+`140703865942992`
+`140703865942992`
+
+```python
+#使用copy得到的是新的空间，和原来的各不相干
+person = {"name":"gjxaiou","site":"www.gaojixu.com","language":"python"}
+cd = person.copy()
+
+print(cd)
+print(id(cd))
+print(id(person))
+print(id(person["name"]))
+print(id(cd["name"]))#两个键的值（列表）为同一个对象
+```
+程序运行结果；
+`{'name': 'gjxaiou', 'site': 'www.gaojixu.com', 'language': 'python'}`
+`2246490159576`
+`2246490159504`
+`1341291115664`
+`1341291115664`
+
+- `deepcopy()` ,深拷贝形成一个副本，相当于两个完全无关的字典
+
+```python
+#使用copy得到的是新的空间，和原来的各不相干
+import copy
+person = {"name":"gjxaiou","site":"www.gaojixu.com","language":"python"}
+cd = copy.deepcopy(person)
+
+print(cd)
+print(id(cd))
+print(id(person))
+print(id(person["name"]))
+print(id(cd["name"]))#两个键的值（列表）为同一个对象
+```
+程序运行结果：
+`{'name': 'gjxaiou', 'site': 'www.gaojixu.com', 'language': 'python'}`
+`1652151429808`
+`1652150008208`
+`1652150776976`
+`1652150776976`
+
+
+
+
+
+
+- clear 清空字典中的所有元素,得到空字典，但是对象仍然在内存中，而`del`是直接将字典删除，内存中就没有了
+```python
+#clear 没有返回值，是对字典进行了原地修改
+a = {"name" : "GJXAIOU"}
+a.clear()
+print(a)
+
+```
+程序运行结果：`{}`
+
+
+
+- get 和setdefault
+  - get 的含义是获取该键对应的值，如果没有发现也不报错
+```python
+a = {"name" : "GJXAIOU","age":"lalala"}
+print(a.get("name"))
+print(a.get("gjx","no answer"))#如果找到键的值就返回键的值，如果没有就返回后面的值
+print(a.setdefault("first","second"))#如果找到键的值就返回键的值，如果没有就返回后面的值,并且将这个键值对加入原来的字典中
+print(a)
+```
+程序运行结果：
+`GJXAIOU`
+`no answer`
+`second`
+`{'name': 'GJXAIOU', 'age': 'lalala', 'first': 'second'}`
+
+
+- items .keys  .values
+  - items
+```python
+a ={'name': 'GJXAIOU', 'age': 'lalala', 'first': 'second'}
+print(a.items())
+```
+程序运行结果：`dict_items([('name', 'GJXAIOU'), ('age', 'lalala'), ('first', 'second')])`
+
+  - keys 得到所有的键，value 得到所有的值
+```python
+a ={'name': 'GJXAIOU', 'age': 'lalala', 'first': 'second'}
+print(a.keys())
+print(a.values()) 
+```
+程序运行结果：
+`dict_keys(['name', 'age', 'first'])`
+`dict_values(['GJXAIOU', 'lalala', 'second'])`
+
+
+
+
+
+- pop 和popitem
+  - pop 删除键值对
+```python
+a ={'name': 'GJXAIOU', 'age': 'lalala', 'first': 'second'}
+print(a.pop("name"))#以键为参数，将指定键的键值对删除，返回值为键所对应的值，如果没有找到键，就返回错误
+print(a)
+print(a.pop("name","no find in:'name'")) #pop后面可以是两个参数，以逗号隔开，如果有这个键，就返回对应的值，如果没有就返回后面的这个参数
+print(a)
+```
+程序运行结果：
+`GJXAIOU`
+`{'age': 'lalala', 'first': 'second'}`
+`no find in:'name'`#这里因为上面已经删除了，所以找不到了
+`{'age': 'lalala', 'first': 'second'}`
+
+  - popitem 
+```python
+a ={'name': 'GJXAIOU', 'age': 'lalala', 'first': 'second'}
+print(a.popitem( ))#可以不写参数，就是随机删除一个，然后将删除的值返回，返回的格式为元组
+```
+程序运行结果：`('first', 'second')`
+
+
+
+
+- update :更新字典内容，函数返回值为None即没有返回值
+```python
+a ={'name': 'GJXAIOU', 'age': 'lalala', }
+b = {'first': 'second'}
+a.update(b)
+print(a)
+# 字典b更新纳入字典a 中，函数返回值为None，当然b并没有变化
+```
+程序运行结果：`{'name': 'GJXAIOU', 'age': 'lalala', 'first': 'second'}`
+
+
+
+
+
+## 1.10 集合（set）
+特点：有的可变、有的不可变、元素无次序、不可重复
+集合没有索引，没有顺序，不属于序列
+```python
+#创建集合，这里是将字符串拆后形成集合 ，这里hello中有两个l,但是集合中只有一个l
+
+#通过set函数创建
+a= set("helloworld")
+print(a)
+
+# 直接创建,尽量避免使用这种方法
+b = {"facd",123}
+print(type(b))
+print(b)
+
+
+#unhashable  不可哈希 ：表示该数据时可变的，例如列表、字典都能原地修改
+#使用{} 进行创建的时候，元素要求是可哈希的，随意存在字典、列表就报错
+#但是set（）建立起来的集合是可变集合。可变集合都是不可哈希类型
+```
+程序运行结果；
+`{'e', 'h', 'd', 'r', 'w', 'l', 'o'}`
+`<class 'set'>`
+`{123, 'facd'}`
+
+
+
+
+### 1.10.2 set 的方法
+
+- add和update
+```python
+#如果要创建一个空集合，只能使用set，
+a_set = {}  #这样默认情况下创建的是字典
+print(type(a_set))
+
+s= set()
+print(type(s))#创建一个空集合
+s.add("hello")#为该集合增加一个元素
+print(s)
+```
+程序运行结果：
+`<class 'dict'>`
+`<class 'set'>`
+`{'hello'}`
+
+
+- update 
+```python
+s1= set(['a','b'])
+s2 = set(['c','d'])
+s2.update(s1)
+print(s2)
+s2.update("hello")
+print(s2)
+s2.update((2,3))
+print(s2)
+```
+程序运行结果：
+`{'c', 'd', 'b', 'a'}`
+`{'d', 'e', 'o', 'l', 'c', 'h', 'b', 'a'}`
+`{2, 3, 'd', 'e', 'o', 'l', 'c', 'h', 'b', 'a'}`
+
+
+- pop,remove,discard,clear
+```python
+#pop :没有参数，删除元素也是随机删除，返回值为删除的元素，没有可以删除的元素的时候就会报错
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+print(b_set.pop())
+
+#remove :没有返回值，删除的指定元素不存在时候会报错
+b_set.remove("d")#删除指定的值
+print(b_set)
+
+
+#discard :没有返回值，有就删除，没有就什么都不做
+b_set.discard("r")
+print(b_set)
+
+#clear ：清空所有元素
+b_set.clear()
+print(b_set)
+```
+程序运行结果：
+`e`
+`{'o', 'h', 'l', 'r', 'w'}`
+`{'o', 'h', 'l', 'w'}`
+`set()`
+
+
+
+
+### 1.10.3 使用frozenset创建不可变集合
+
+
+
+### 1.10.4 集合运算
+
+- 元素与集合的关系
+```python
+#判断元素是否在集合中 
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+print("h" in b_set)
+```
+程序运行结果：`True`
+
+
+- 集合与集合的关系
+```python
+#判断两个集合是否完全一样
+
+a_set = {'e','d','g','k'}
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+print(a_set == b_set)
+
+
+#判断A是否是B的子集
+
+a_set = {'e','d','g','k'}
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+print(a_set < b_set)
+#或者：print(a_set.issubset(b_set))
+
+
+#求A与B的并集
+
+a_set = {'e','d','g','k'}
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+c_set = a_set |b_set
+#或者使用  a_set.union(b_set)
+print(c_set)
+
+
+
+#求A与B的交集
+
+a_set = {'e','d','g','k'}
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+c_set = a_set & b_set
+#或者：c_set = a.intersection(b_set)
+print(c_set)
+
+
+
+#A 相对于B的差（补），即A相对于B不同的部分元素    （书P98）
+
+a_set = {'e','d','g','k'}
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+print(a_set - b_set)
+#上面等价于：print(a_set.difference(b_set))
+print(b_set - a_set)
+#上面等价于：print(b_set.difference(a_set))
+
+
+
+# A 与B的对称差集
+a_set = {'e','d','g','k'}
+b_set = {'e', 'h', 'd', 'r', 'w', 'l', 'o'}
+print(a_set.symmetric_difference(b_set))
+
+```
+程序运行结果：
+`False`
+`False`
+`{'w', 'h', 'd', 'r', 'o', 'k', 'l', 'g', 'e'}`
+`{'e', 'd'}`
+`{'g', 'k'}`
+`{'w', 'h', 'r', 'o', 'l'}`
+`{'w', 'h', 'r', 'o', 'k', 'l', 'g'}`
+
