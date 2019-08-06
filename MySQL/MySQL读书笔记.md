@@ -1,0 +1,1147 @@
+---
+tags: [MySQL]
+---
+
+# MySQL读书笔记
+
+@toc
+
+## 章一：了解 SQL
+
+- 数据库软件称为 DBMS（数据库管理系统）；例如 MySQL
+- 数据库是通过 DBMS 创建和操纵的容器；
+- 模式：（schema）是关于数据库和表布局及特性的信息；
+- 主键：（primary key）可以是一列或者一组列，其值能够唯一区分表中每一行；
+  - 表中列成为主键的条件：
+    - 任意两行都不具有相同的主键值；
+    - 每个行都必须有一个主键值（即主键值不能为 null）；
+
+
+## 章二：MySQL 简介
+
+- MySQL 是一种 DBMS，是基于客户机- 服务器的数据库；
+
+## 章三：使用 MySQL
+
+## 章四：检索数据
+- MySQL4.1 之后的版本中 SQL 语句不区分大小写；
+- 使用`DISTINCT`进行去重的时候，作用范围是所有列，不仅仅是前置它的列；
+- 使用`SELECT`检索的结果中，第一行为行 0，即从 0 开始计数；
+- 使用`limit`限制显示行数，如果结果中没有足够的行，则只返回能返回的所有结果；
+
+## 章五：排序检索数据
+- `desc`关键字只应用在直接位于其前面的列名；
+- 子句的位置：从前往后：from -> order by -> limit
+
+
+## 章六：过滤数据
+- `order by` 必须位于`where`之后；
+- where 子句操作符：`= `、`<>``!=``<``<=``>``>=``between and`;
+- MySQL 执行匹配时候默认不区分大小写；
+- 空值检测：使用：`is null`
+  - 注：null 为空值，与字段包含 0、空字符串以及空格是不一样的；
+
+## 章七：数据过滤
+- where 子句中使用 and 和 or 连接子句时候，and 在计算次序中的优先级更高，最好使用（）进行分组操作；
+- in 操作符：`where 列名 in(值 1，值 2，值 3...)`;
+- in 操作符一般比 or 操作符清单执行更快；
+- not 操作符：允许针对：`in、between、exists` 子句进行取反；
+
+
+## 章八：用通配符进行过滤
+
+- `like` 是谓词不是操作符
+- 注意尾空格，例如使用`%hello`，注意文章中 hello 后面是有空格的，造成无法匹配，可以使用：`%hello%`或者使用函数进行去除空格；
+- 通配符不会匹配 `null`；
+- 不要在搜索模式的开始处使用通配符，会造成搜索变慢；
+
+
+## 章九：用正则表达式进行搜索
+
+- 正则表达式是用来匹配文本的特殊的串（字符集合）；
+- MySQL 仅仅支持部分的正则表达式；
+
+### 基本字符匹配
+- `REGEXP`后跟的东西作为正则表达式处理;
+- 使用：`binary`来区分大小写；
+- 使用功能：`|`来进行 OR 操作；
+- 使用`[`和 `]`匹配几个字符之一；
+```sql
+where name REGEXP '1000' // 等效于：like '%1000%'
+where name REGEXP '.000' // 其中.为匹配任意一个字符的通配符
+where name regexp binary 'Hello' // 区分大小写匹配
+where name regexp '1000|2000' // 只要匹配其中之一就可以返回
+where name regexp '[123] Ton' // 表示1 Ton 、2 Ton、3 Ton之一
+// 等价于：[1|2|3] Ton
+where name regexp '[0-9]' // 匹配所有的数字，[a-z]表示匹配任意字母字符
+where name regexp '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
+// 其他空白元字符 \\f 换页； \\n 换行；\\r 回车；\\t 制表；\\v 纵向制表 \\\ 反斜杠\本身；
+```
+
+### 匹配字符串
+|类| 说明|
+|---|---|
+ [:alnum:]  |  任意字母和数字（同[a-zA-Z0-9]）  
+ [:alpha:]   | 任意字符（同[a-zA-Z]） 
+ [:blank:]   | 空格和制表（同[\\t]） 
+ [:cntrl:]   | ASCII控制字符（ASCII 0到31和127） 
+ [:digit:]   | 任意数字（同[0-9]） 
+ [:graph:]  |  与[:print:]相同，但不包括空格 
+ [:lower:]   | 任意小写字母（同[a-z]） 
+ [:print:]  |  任意可打印字符 
+ [:punct:]  |  既不在[:alnum:]又不在[:cntrl:]中的任意字符 
+ [:space:]  |  包括空格在内的任意空白字符（同[\\f\\n\\r\\t\\v]） 
+ [:upper:]  |  任意大写字母（同[A-Z]） 
+ [:xdigit:]   | 任意十六进制数字（同[a-fA-F0-9]）
+
+### 匹配多个实例
+|元字符| 说明 |
+|---|---|
+|*  |     0个或多个匹配 |
+|+  |      1个或多个匹配（等于{1,}）
+|?   |   0个或1个匹配（等于{0,1}）
+|{n}  |     指定数目的匹配 
+|{n,} |   不少于指定数目的匹配
+|{n,m} |  匹配数目的范围（m不超过255）
+`select prod_name from products where prod_name regexp '\\([0-9]sticks?\\)' order by prod_name;`  # 返回了'TNT (1 stick)'和'TNT (5 sticks)'
+`select prod_name from products where prod_name regexp '[[:digit:]]{4}'order by prod_name;`  # [[:digit:]]{4}匹配连在一起的任意4位数字
+
+### 定位符
+|元字符 | 说明
+|---|---|
+^  | 文本的开始 
+$    |   文本的结尾 
+[[:<:]]     |   词的开始 
+[[:>:]]      |  词的结尾
+`select prod_name from products where prod_name regexp '^[0-9\\.]' order by prod_name;` #找出以一个数（包括以小数点开始的数）开始的所有产品
+`select prod_name from products where prod_name regexp '[0-9\\.]' order by prod_name;`  #找出包括小数点和数字的所有产品
+
+- `^`用法：在集合中，即使用`[`和`]`定义的，用来否认该集合，否则就是指串的开始处； `[^123]`表示匹配除了 1,2,3 之外的字符；
+
+## 章十：创建计算字段
+
+### 拼接字段
+- 使用`concat()`函数来拼接两个列；
+实例：`select concat(vend_name,' (',vend_country,')') from vendors order by vend_name;`
+- 去除空格：
+  - 删除数据左侧多余空格 ltrim()
+  - 删除数据两侧多余空格 trim()
+  - 删除数据右侧多余空格 rtrim()
+`select concat(rtrim(vend_name),' (',rtrim(vend_country),')') from vendors order by vend_name; `
+- as赋予别名;
+- 计算实例：`select quantity * item_price as expanded_price from orderitems where order_num = 20005;`  # 计算总价expanded_price
+- 支持的算术操作符：`+`和`-`和`*`和`/`
+
+## 章十一：使用数据处理函数
+减少使用函数，但是函数的可移植性却不强；
+
+### 文本处理函数
+函数 | 说明
+---|---
+left()  |     返回串左边的字符 
+length()  |  返回串的长度 
+locate()   |  找出串的一个子串 
+lower()  |    将串转换为小写
+ltrim()   |   去掉串左边的空格
+right()   |   返回串右边的字符 
+rtrim()    | 去掉串右边的空格  
+soundex() |返回串的soundex值，根据串的发音进行比较而不是根据字母比较
+substring()  |   返回子串的字符 
+upper()   |    将串转换为大写
+
+实例：`select cust_name from customers where soundex(contact) = soundex('Y. Lie');` # 按发音搜索
+
+### 日期和时间处理函数 
+|函数| 说明
+|---|---
+ adddate()      |   增加一个日期（天，周等）
+ addtime()     |    增加一个时间（时、分等）
+curdate()     | 返回当前日期 
+ curtime()     |    返回当前时间 
+ date()         |    返回日期时间的日期部分 
+ datediff()     |    计算两个日期之差 
+ date_add()   |      高度灵活的日期运算函数 
+ date_format()   |  返回一个格式化的日期或时间串 
+ day()           |   返回一个日期的天数部分 
+ dayofweek()    |     对于一个日期，返回对应的星期几 
+ hour()          |    返回一个时间的小时部分 
+ minute()      |    返回一个时间的分钟部分 
+ month()     |         返回一个日期的月份部分 
+ now()       |       返回当前日期和事件 
+ second()   |       返回一个时间的秒部分 
+ time()       |        返回一个日期时间的时间部分 
+ year()       |       返回一个日期的年份部分 |
+
+默认使用日期的格式为：`yyyy-mm-dd`
+
+### 数值处理函数
+仅仅用于处理数值数据
+|函数| 说明|
+|---|---
+abs()          |  返回一个数的绝对值 
+cos()          |  返回一个角度的余弦
+ exp()           | 返回一个数的指数值
+ mod()         |   返回除操作的余数 
+ pi()         |   返回圆周率 
+ sin()         |   返回一个角度的正弦 
+ sqrt()      |      返回一个数的平方根 
+ tan()       |     返回一个角度的正切
+
+## 章十二：汇总数据
+
+聚类函数：运行在行组上，计算和返回单个值的函数
+|SQL 聚集函数 |
+|---|--- 
+avg()      |      返回某列的平均值 
+count()    |   返回某列的行数 
+max()       |     返回某列的最大值 
+min()       |     返回某列的最小值 
+sum()       |     返回某列值之和 
+
+- avg()实例：
+  - AVG()返回products表中所有产品的平均价格
+`select avg(prod_price) as avg_price from products;`
+  - avg()只能作用于单列，获取 多列的平均值，要使用多个avg()
+`select avg(item_price) as avg_itemprice,avg(quantity) as avg_quantity from orderitems;`
+  - avg()函数忽略列值为 null 的行；
+
+- count()实例
+  - COUNT(*)对表中行的数目进行计数，不忽略空值 
+`select count(*) as num_cust from customers; `
+  - 使用COUNT(column)对特定列中具有值的行进行计数，忽略NULL值
+`select count(cust_email) as num_cust from customers;`  
+
+- max() & min()
+  - MAX()返回products表中最贵的物品的价格
+`select max(prod_price) as max_price from products;`
+  - 在用于文本数据时，如果数据按相应的列排序，则MAX()返回最后一行
+`select max(prod_name) from products; `
+  - MIN()返回products表中最便宜物品的价格
+`select min(prod_price) as min_price from products;`
+  - 在用于文本数据时，如果数据按相应的列排序，则MIN()返回最前面一行
+`select min(prod_name) from products;` 
+  - MAX()函数忽略列值为 null 的行；在用于文本数据时，如果数据按相应的列排序，在 max() 返回最后一行；
+
+- sum()
+  - 检索所订购物品的总数（所有quantity值之和）
+ `select sum(quantity) as ordered from orderitems where order_num = 20005;`
+  - 订单20005的总订单金额
+`select sum(quantity * item_price) as total_price from orderitems where order_num = 20005;`
+
+- 聚类不同值 distinct
+  - 使用了DISTINCT参数，因此平均值只考虑各个不同的价格
+`select avg(distinct prod_price) as avg_price from products where vend_id = 1003;`
+  - distinct 只能作用于count(),不能用于count(*)
+  - distinct 同max(),min()的结合使用，没有意义 
+
+
+- 组合聚类函数 
+4个聚集计算:物品的数目，产品价格的最高、最低以及平均值 
+```sql
+SELECT 
+    COUNT(*) AS num_items,
+    MIN(prod_price) AS price_min,
+    MAX(prod_price) AS price_max,
+    AVG(prod_price) AS price_avg
+FROM
+    products;
+```
+
+
+## 章十三： 分组计算    
+允许将数据分为多个逻辑组，以便能对每个组进行聚集计算；
+主要有：group by 和 having 子句；**where过滤行，having过滤分组 **, 
+**WHERE在数据分组前进行过滤，HAVING在数据分组后进行过滤**
+
+- group by 分组 
+  - 如果分组列中具有 null 值，将 null 作为一个分组返回，如果有多组 null 值，则将他们分为一组；
+  - grop by 子句必须出现在 where 子句之后，order by 子句之前；
+  - 示例：
+按vend_id**排序并分组**数据
+`select vend_id, count(*) as num_prods from products group by vend_id;`
+使用WITH ROLLUP关键字，可以得到每个分组的汇总值，下述语句得到所有分组count(*)的和14 
+`select vend_id, count(*) as num_prods from products group by vend_id with rollup;`
+
+- having子句 过滤分组 
+  - where 过滤指定的是行而不是分组，having 过滤的是分组；同时 having 支持所有的 where 操作符；
+COUNT(*) >=2（两个以上的订单）的那些分组
+`select cust_id, count(*) as orders from orders group by cust_id having count(*)>=2;`
+
+- where和having组合使用 
+列出具有2个（含）以上、价格为10（含）以上的产品的供应商
+`select vend_id,count(*) as num_prods from products where prod_price >=10 group by vend_id having count(*)>=2;`
+不加where条件，结果不同 
+`select vend_id,count(*) as num_prods from products group by vend_id having count(*) >=2;`
+
+- 分组和排序 
+检索总计订单价格大于等于50的订单的订单号和总计订单价格
+`select order_num,sum(quantity * item_price) as ordertotal from orderitems group by order_num having sum(quantity * item_price) >=50;`
+按总计订单价格排序输出
+```sql
+SELECT 
+    order_num, SUM(quantity * item_price) AS ordertotal
+FROM
+    orderitems
+GROUP BY order_num
+HAVING SUM(quantity * item_price) >= 50
+ORDER BY ordertotal;
+```
+
+- order by 和 group by 区别
+|order by |group by|
+|---|---|
+|排序产生的输出|分组行，但是输出可能不是分组的顺序|
+|任意列都可以使用（甚至非选择的类也可以）|只能使用选择列或表达式列，而且必须使用每个选择列表达式   |
+|不一定需要|如果和聚集函数一起使用列（或表达式），则必须使用|
+
+**一般在使用 group by 子句时，同时给出 order by 子句，保证数据正确排序；**
+- select子句总结及顺序 
+
+子句      |      说明             |           是否必须使用 
+|---|---|---
+select     |   要返回的列或表达式       |     是 
+from       |     从中检索数据的表     |       仅在从表选择数据时使用 
+where      |      行级过滤           |         否 
+ group by    |    分组说明           |         仅在按组计算聚集时使用 
+having   |     组级过滤             |         否 
+order by   |     输出排序顺序       |         否
+ limit        |    要检索的行数      |           否 
+
+
+# 章十四：使用子查询     
+
+
+-- 利用子查询进行过滤
+列出订购物品TNT2的所有客户
+```sql
+SELECT cust_name, cust_contact
+FROM customers
+WHERE cust_id IN (SELECT cust_id
+                  FROM orders
+                  WHERE order_num IN (SELECT order_num
+                                      FROM orderitems
+                                      WHERE prod_id = 'TNT2'));
+```
+
+- 子查询不要嵌套太多；
+- 子查询不仅可以与 IN 操作符连用，还可以和`=`以及 `<>`等其他操作符连用；
+
+- 作为计算字段使用子查询
+显示customers 表中每个客户的订单总数
+`select cust_name,cust_state, (select count(*) from orders where orders.cust_id = customers.cust_id) as orders from customers order by cust_name;`
+
+
+# 章十五：联结表       
+
+- 关系表的定义
+关系表的设计就是要保证把信息分解成多个表，一类数据一个表，各表通过某些常用的值（即关系设计中的关系）互相连接；
+- 外键(foreign key): 外键为某个表的一列，它包含另一个表的主键值，定义了两个表之间的关系；
+
+- 创建联结 
+ where子句联结 
+```sql
+select vend_name,prod_name,prod_price 
+from vendors,products
+where vendors.vend_id = products.vend_id
+order by vend_name,prod_name;
+```
+在连接两个表时候，实际上是将第一个表中的每一行与第二个表中的每一行匹配，其中 where 子句作为了过滤条件，只包含那些匹配给定条件的行；
+
+
+- 笛卡尔积 / 叉联结 
+**由没有联结条件的表关系返回的结果为笛卡尔积。** 可以相当于不使用 where 子句；
+检索出的行的数目将是第一个表中的行数乘以第二个表的行数。
+
+- 内部联结 inner join ： 表间相等测试 
+```sql
+select vend_name,prod_name,prod_price 
+from vendors inner join products
+on vendors.vend_id = products.vend_id;
+```
+
+- 连接多个表(只连接必要的表，否则性能会下降很多)
+编号为20005的订单中的物品及对应情况 
+```sql
+select prod_name,vend_name,prod_price,quantity
+from orderitems,products,vendors
+where products.vend_id = vendors.vend_id
+and orderitems.prod_id = products.prod_id
+and order_num = 20005;
+```
+
+
+
+
+
+# 章十六： 创建高级联结      
+
+一共三种联结方式：自联结、自然联结、外部联结；
+- 使用表别名
+给列名或计算字段起别名 
+```sql
+select concat(rtrim(vend_name),' (',rtrim(vend_country),')') as vend_title
+ from vendors order by vend_name;
+```
+
+**注意：** 表的别名只能在查询执行中使用，表别名不返回客户机；
+ # 给表起别名 
+```sql
+ select cust_name,cust_contact 
+ from customers as c,orders as o,orderitems as oi
+ where c.cust_id = o.cust_id
+ and oi.order_num = o.order_num
+ and prod_id = 'TNT2';
+```
+
+- 自联结 
+**通常作为外部语句用来替代从相同表中检索数据时候使用的子查询语句；**
+ID为DTNTR该物品的供应商生产的其他物品
+  - 方法：子查询 
+```sql
+select prod_id,prod_name from products
+where vend_id = (select vend_id from products where prod_id = 'DTNTR');
+```
+    - 方法：使用联结 
+```sql
+select p1.prod_id,p1.prod_name
+from products as p1, products as p2
+where p1.vend_id = p2.vend_id
+and p2.prod_id = 'DTNTR';
+```
+
+- 自然联结
+自然联结排除多次出现， 使每个列只返回一次
+方法：通过对表使用通配符*，对所有其他表的列使用明确的子集 
+```sql
+select c.*,o.order_num,o.order_date,oi.prod_id,oi.quantity,oi.item_price
+from customers as c,orders as o,orderitems as oi
+where c.cust_id = o.cust_id
+and oi.order_num = o.order_num
+and prod_id = 'FB';
+```
+
+- 外部联结 
+联结包含了那些在相关表中没有关联行的行，这种联结称为外部联结；
+**注：**在使用 outer join 语法时候，必须使用 right 或者 left 关键字指定包括其所有行的表（right 指出的是 outerjoin 右边的表，而 left 指出的是 outer join 左边的表）。
+
+检索所有客户及其订单,包括那些没有订单的客户
+01 ： 左外部联结
+```sql
+select customers.cust_id,orders.order_num
+from customers left outer join orders
+on customers.cust_id = orders.cust_id;
+```
+
+02 ：若使用 右外部联结 结果不同 
+```sql
+select customers.cust_id,orders.order_num
+from customers right outer join orders
+on customers.cust_id = orders.cust_id;
+```
+
+ 03： 若使用 右外部联结 调换两表位置 结果同01代码相同 
+```sql
+select customers.cust_id,orders.order_num
+from orders right outer join customers
+on customers.cust_id = orders.cust_id;
+```
+
+
+- 使用带聚集函数的联结 
+检索所有客户分别对应的订单数，inner join 
+```sql
+select customers.cust_name,
+       customers.cust_id,
+       count(orders.order_num) as num_ord
+from customers inner join orders 
+on customers.cust_id = orders.cust_id
+group by customers.cust_id; 
+```
+
+检索所有客户分别对应的订单数，包括没有订单的客户，left outer join 
+```sql
+select customers.cust_name,
+       customers.cust_id,
+       count(orders.order_num) as num_ord
+from customers left outer join orders 
+on customers.cust_id = orders.cust_id
+group by customers.cust_id; 
+```
+
+
+# 第17章 组合查询      
+使用 union 将多个 select 语句组合成一个结果集；
+两种基本情况下，需要使用组合查询；
+  - 在单个查询中从不同的表返回类似结构的数据；
+  - 对单个表执行多个查询，按单个查询返回数据；
+ 多数情况下，组合相同表的两个查询完成的工作与具有多个 where 子句条件的单个查询完成的工作相同，即任何具有多个 where 子句的 select 语句都可以作为一个组合查询给出；
+
+- 使用union 
+下面两个单条语句，使用 union 进行组合查询；
+价格小于等于5的所有物品
+`select vend_id,prod_id,prod_price from products where prod_price <=5;`
+供应商1001和1002生产的所有物品
+`select vend_id,prod_id,prod_price from products where vend_id in (1001,1002);`
+价格小于等于5的所有物品的列表，而且包括供应商1001和1002生产的所有物品（不考虑价格）
+  - 方法1 使用union 
+```sql
+select vend_id,prod_id,prod_price from products where prod_price <=5
+union
+select vend_id,prod_id,prod_price from products where vend_id in (1001,1002);
+```
+  - 方法2 使用where 
+```sql
+select vend_id,prod_id,prod_price from products 
+where prod_price <=5 or vend_id in (1001,1002);
+```
+
+**union默认从查询结果中自动去除重复的行；**
+**union 连接的每个查询之间必须包含相同的列、表达式或者聚集函数（不过各个列不需要以相同的次序出现）；**
+**union all，匹配所有行 ，不取消重复行 **
+```sql
+select vend_id,prod_id,prod_price from products where prod_price <=5
+union all
+select vend_id,prod_id,prod_price from products where vend_id in (1001,1002);  # 结果中有一行出现2次 
+```
+
+
+- 对union组合结果进行排序
+**union组合完只能使用一条order by语句，放在最后一个select语句后面 **，但是实际上 MySQL 将用它排序**所有 select 语句**返回的所有结果；
+```sql
+select vend_id,prod_id,prod_price from products where prod_price <=5
+union
+select vend_id,prod_id,prod_price from products where vend_id in (1001,1002)
+order by vend_id,prod_price;
+```
+
+
+# 第18章 全文本搜索       
+**MyISAM 引擎支持全文本搜索，InnoDB 不支持；**
+全文本搜索必须索引被搜索的列，而且随着数据的改变不断的重新索引，在对表进行适当设计之后，MySQL 会自动进行所有的索引和重新索引；
+**默认搜索也是不区分大小写，除非使用：binary 方式；**
+
+- 开启全文本搜索：
+一般在创建表时启动全文搜索，（放在()里面）语句为：`fulltext(字段名)`对该字段名的列进行全文本搜索，当然可以搜索多个指定列；
+**不要在导入数据的时候使用 fulltext**
+- 进行全文本搜索 
+**Match() 指定被搜索的列，against()指定要使用的搜索表达式 **，传递给 match()的值必须与 fulltext 中定义的相同，如果指定多个列，则必须列出它们且次序正确；
+`select note_text from productnotes where match(note_text) against('rabbit');`
+
+如果上面方法用like语句 
+`select note_text from productnotes where note_text like '%rabbit%';`
+
+**使用全文搜索返回以文本匹配的良好程度排序的数据，其对结果进行排序，较高优先级的行先返回；** 优先级较高：搜索的关键字在文本中的位置靠前，或者出现的次数较多；等级是由 MySQL 根据行中词的数目、唯一词的数据、整个索引中词的总数以及包含该词的行的数目进行计算；如果有多个搜索项，则匹配包含多数匹配词的搜索项；
+ 演示排序如何工作 
+
+**注意**：RANK (R)在mysql 8.0.2 (reserved)版本中为keyword保留字
+当字段名与MySQL保留字冲突时,可以用字符‘’将字段名括起来
+或者改为其他名字，比如as rank1等
+
+即`select note_text, match(note_text) against('rabbit') as 'rank' from productnotes; `
+
+- 使用查询扩展 
+含义：搜索所有可能与搜索词相关的数据，即使不含有搜索词；
+在进行查询拓展时，MySQL 对数据和索引进行两遍扫描来完成搜索；
+  - 首先，进行一个基本的全文本搜索，找出与搜索条件匹配的所有行；
+  - 其次，MySQL 检查这些匹配行并选择所有有用的词；
+  - 在其次，MySQL 会再次进行全文本搜索，这次不仅使用原来的条件，还使用所有有用的词；
+进行一个简单的全文本搜索，没有查询扩展
+ `select note_text from productnotes where match(note_text) against('anvils');`
+相同的搜索，这次使用查询扩展
+ `select note_text from productnotes where match(note_text) against('anvils' with query expansion);`
+
+- 布尔文本搜索:**MySQL 支持全文本搜索的另外一种形式**
+**布尔形式可以不需要使用：fulltext 索引，但是速度慢；**
+**布尔方式中，不按照等级值降序排序返回的行，即排列而不排序；**
+-- 全文本布尔操作符 
+布尔操作符    |        说明
+|---|---|
+`+`         |       包含，词必须存在 
+`-`        |      排除，词必须不出现
+`> `        |       包含，而且增加等级值 
+ `<`         |       包含，且减少等级值 
+ `()`         |       把词组成子表达式（允许这些表达式作为一个组被包含、排除、排列等）
+ `~`         |       取消一个词的排序值
+ `*`        |        词尾的通配符(截断操作符)
+`“ ” `        |       定义一个短语（与单个词的列表不一样，它匹配整个短语一边包含或排除这个短语）
+
+全文本搜索检索包含词heavy的所有行
+关键字IN BOOLEAN MODE，实际上没有指定布尔操作符，其结果与没有指定布尔方式的结果相同
+`select note_text from productnotes where match(note_text) against('heavy' in boolean mode);`
+ 排除包含rope*（任何以rope开始的词，包括ropes）的行
+`select note_text from productnotes where match(note_text) against('heavy -rope*' in boolean mode);`
+
+#匹配包含词rabbit和bait的行
+`select note_text from productnotes where match(note_text) against('+rabbit +bait' in boolean mode);`
+
+#不指定操作符，搜索匹配包含rabbit和bait中的至少一个词的行
+`select note_text from productnotes where match(note_text) against('rabbit bait' in boolean mode);`
+
+ 搜索匹配短语rabbit bait而不是匹配两个词rabbit和bait。 
+`select note_text from productnotes where match(note_text) against('"rabbit bait"' in boolean mode);`
+
+#匹配rabbit和carrot，增加前者的等级，降低后者的等级
+`select note_text from productnotes where match(note_text) against('>rabbit <carrot' in boolean mode);`
+
+ 必须匹配词safe和combination，降低后者的等级
+`select note_text from productnotes where match(note_text) against('+safe +(<combination)' in boolean mode);`
+
+
+### 总结
+- 索引全文本数据时候，短词（3 个或者 3 个以下字符）的词会被忽略，当然这个数目可以更改；
+- MySQL 带有一个内建的非用词列表，索引的时候会被忽略；
+- 如果一个词在 50%以上的行中出现，作为非用词忽略，但是在 In boolean mode 中无效；
+- 表中行数少于 3 行则不返回结果；
+- 会忽略词中的单引号，例：`don't`索引为：`dont`
+
+
+
+#############################
+# 第19章 插入数据 
+#############################
+
+-- 插入完整的行 
+# 插入一个新客户到customers表
+# 简单但不安全，如果原来表列结构调整，会有问题 
+insert into customers values (null,'Pep E. LaPew','100 Main Street','Los Angeles','CA','90046','USA',NULL,NULL);
+# 表明括号内明确列名，更安全，稍繁琐 
+insert into customers (cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country,cust_contact,cust_email)
+values ('Pep E. LaPew','100 Main Street','Los Angeles','CA','90046','USA',NULL,NULL);
+
+-- 插入多个行 
+# 方法1： 提交多个insert 语句
+insert into customers(cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
+values('Pep E. LaPew','100 Main Street','Los Angeles','CA','90046','USA');
+insert into customers(cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
+values('M. Martian','42 Galaxy Way','New York','NY','11213','USA');
+# 方法2： 只要每条INSERT语句中的列名（和次序）相同，可以如下组合各语句
+# 单条INSERT语句有多组值，每组值用一对圆括号括起来，用逗号分隔
+insert into customers(cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
+values('Pep E. LaPew','100 Main Street','Los Angeles','CA','90046','USA'),('M. Martian','42 Galaxy Way','New York','NY','11213','USA');
+
+-- 插入检索出来的值 
+# 新建custnew表（非书本内容）
+CREATE TABLE `custnew` (
+  `cust_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cust_name` char(50) NOT NULL,
+  `cust_address` char(50) DEFAULT NULL,
+  `cust_city` char(50) DEFAULT NULL,
+  `cust_state` char(5) DEFAULT NULL,
+  `cust_zip` char(10) DEFAULT NULL,
+  `cust_country` char(50) DEFAULT NULL,
+  `cust_contact` char(50) DEFAULT NULL,
+  `cust_email` char(255) DEFAULT NULL,
+  PRIMARY KEY (`cust_id`)
+) ENGINE=InnoDB;
+
+# 在表custnew中插入一行数据 （非书本内容）
+insert into custnew (cust_id,cust_contact,cust_email,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
+values(null,null,'mysql carsh course@learning.com','Y.CARY','BAKE WAY','NEW YORK','NY','112103','USA');
+
+# 将custnew中内容插入到customers表中 
+# 同书本代码不同，这里省略了custs_id,这样MySQL就会生成新值。
+insert into customers (cust_contact,cust_email,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
+select cust_contact,cust_email,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country from custnew;
+
+#############################
+# 第20章 更新和删除数据 
+#############################
+
+-- update语句 : 删除或更新指定列 
+# 更新： 客户10005现在有了电子邮件地址
+update customers set cust_email = 'elmer@fudd.com' where cust_id = 10005;
+# 更新： 多个列 
+UPDATE customers 
+SET cust_name = 'The Fudds',
+    cust_email = 'elmer@fudd.com'
+WHERE cust_id = 10005;
+
+# 删除： 某个列的值，可设置它为NULL（假如表定义允许NULL值）
+update customers set cust_email = null where cust_id = 10005;
+
+-- delete 语句： 删除整行而不是某列 
+# 从customers表中删除一行
+delete from customers where cust_id = 10006;
+
+-- truncate table语句 
+# 如果想从表中删除 所有行，不要使用DELETE，可使用TRUNCATE TABLE语句
+# TRUNCATE实际是删除原来的表并重新创建一个表，而不是逐行删除表中的数据
+
+#############################
+# 第21章 创建和操纵表  
+#############################
+
+-- 新建表 create table
+# 参书本配套文件create.sql
+
+-- 更新表 alter table 
+# 给vendors表增加一个名为vend_phone的列
+alter table vendors 
+add vend_phone char(20);
+# 删除刚刚添加的列
+alter table vendors
+drop column vend_phone;
+
+# ALTER TABLE的一种常见用途是定义外键
+# 以下为书本配套文件create.sql中定义外键的语句 
+ALTER TABLE orderitems ADD CONSTRAINT fk_orderitems_orders FOREIGN KEY (order_num) REFERENCES orders (order_num);
+ALTER TABLE orderitems ADD CONSTRAINT fk_orderitems_products FOREIGN KEY (prod_id) REFERENCES products (prod_id);
+ALTER TABLE orders ADD CONSTRAINT fk_orders_customers FOREIGN KEY (cust_id) REFERENCES customers (cust_id);
+ALTER TABLE products ADD CONSTRAINT fk_products_vendors FOREIGN KEY (vend_id) REFERENCES vendors (vend_id);
+
+-- 删除表
+# 删除customers2表（假设它存在）
+drop table customers2;
+
+-- 重命名表 
+# 使用RENAME TABLE语句可以重命名一个表 (假设存在下述表)
+rename table customers2 to customers;
+# 对多个表重命名(假设存在下述表)
+rename table backup_customers to customer,
+             backup_vendors to vendors,
+             backup_products to products;
+
+#############################
+# 第22章 使用视图   
+#############################
+
+/*视图提供了一种MySQL的SELECT语句层次的封装，可用来简化数据处理以及重新格式化基础数据或保护基础数据。 */ 
+
+-- 创建视图 create view
+-- 创建视图的语句 show create view viewname
+-- 删除视图 drop view viewname
+-- 更新视图 1\. 先drop后create 2\. 直接用create or repalce view
+
+# 创建一个名为productcustomers的视图
+create view productcustomers as
+select cust_name,cust_contact,prod_id
+from customers,orders,orderitems
+where customers.cust_id = orders.cust_id
+and orders.order_num = orderitems.order_num;
+# 检索订购了产品TNT2的客户
+select cust_name,cust_contact from productcustomers where prod_id = 'TNT2';
+
+# 用视图重新格式化检索出的数据
+# (来自第10章）在单个组合计算列中返回供应商名和位置
+select concat(rtrim(vend_name),' (',rtrim(vend_country),')') as vend_title from vendors order by vend_name;
+# 若经常使用上述格式组合，可以创建视图 
+create view vendorlocations as
+select concat(rtrim(vend_name),' (',rtrim(vend_country),')') as vend_title from vendors order by vend_name;
+# 检索出以创建所有邮件标签的数据
+select * from vendorlocations;
+
+# 用视图过滤不想要的数据
+# 定义customeremaillist视图，它过滤没有电子邮件地址的客户
+create view customeremaillist as 
+select cust_id,cust_name,cust_email from customers
+where cust_email is not null;
+select * from customeremaillist;
+
+# 使用视图与计算字段
+# (来自第10章）检索某个特定订单中的物品，计算每种物品的总价格
+select prod_id,quantity,item_price,quantity*item_price as expanded_price from orderitems where order_num = 20005;
+# 将其转换为一个视图
+create view orderitemsexpanded as 
+select order_num,prod_id,quantity,item_price,quantity*item_price as expanded_price from orderitems;
+# 创建视图的时候select添加了列名order_num,否则无法按照order_num进行过滤查找 
+select * from orderitemsexpanded where order_num = 20005;
+
+# 更新视图 
+# 视图中虽然可以更新数据，但是有很多的限制。
+# 一般情况下，最好将视图作为查询数据的虚拟表，而不要通过视图更新数据
+
+#############################
+# 第23章 使用存储过程    
+#############################
+
+-- 创建存储过程 
+# 返回产品平均价格的存储过程
+delimiter //
+create procedure productpricing()
+begin
+    select avg(prod_price) as priceaverage from products;
+end //
+delimiter ;
+# 调用上述存储过程 
+call productpricing();
+
+-- 删除存储过程,请注意:没有使用后面的()，只给出存储过程名。
+drop procedure productpricing;
+
+-- 使用参数 out
+# 重新定义存储过程productpricing
+delimiter //
+create procedure productpricing(out pl decimal(8,2), out ph decimal(8,2), out pa decimal(8,2))
+begin
+    select min(prod_price) into pl from products;
+    select max(prod_price) into ph from products;
+    select avg(prod_price) into pa from products;
+end //
+delimiter ;
+
+# 为调用上述存储过程，必须指定3个变量名
+call productpricing(@pricelow,@pricehigh,@priceaverage);
+# 显示检索出的产品平均价格
+select @priceaverage;
+# 获得3个值
+select @pricehigh,@pricelow,@priceaverage;
+
+-- 使用参数 in 和 out
+# 使用IN和OUT参数,存储过程ordertotal接受订单号并返回该订单的合计
+delimiter //
+create procedure ordertotal(
+    in onumber int,                   # onumber定义为IN，因为订单号被传入存储过程
+    out ototal decimal(8,2)            # ototal为OUT，因为要从存储过程返回合计
+)
+begin
+    select sum(item_price*quantity) from orderitems 
+    where order_num = onumber
+    into ototal;
+end //
+delimiter ;
+# 给ordertotal传递两个参数；
+# 第一个参数为订单号，第二个参数为包含计算出来的合计的变量名
+call ordertotal(20005,@total);
+# 显示此合计
+select @total;
+# 得到另一个订单的合计显示
+call ordertotal(20009,@total);
+select @total;
+
+-- 建立智能存储过程 
+# 获得与以前一样的订单合计，但只针对某些顾客对合计增加营业税
+
+-- Name:ordertotal
+-- Parameters: onumber = order number
+--                taxable = 0 if not taxable, 1 if taxable
+--                ototal  = order total variable
+delimiter //
+create procedure ordertotal(
+    in onumber int,
+    in taxable boolean,
+    out ototal decimal(8,2)
+) comment 'obtain order total, optionally adding tax'
+begin
+    -- declare variable for total 定义局部变量total
+    declare total decimal(8,2);
+    -- declare tax percentage 定义局部变量税率 
+    declare taxrate int default 6;
+    -- get the order total 获得订单合计
+    SELECT SUM(item_price * quantity)
+    FROM orderitems
+    WHERE order_num = onumber INTO total;
+    -- is this taxable? 是否要增加营业税？ 
+    if taxable then
+        -- Yes,so add taxrate to the total 给订单合计增加税率
+        select total+(total/100*taxrate) into total;
+    end if;
+    -- and finally,save to out variable 最后，传递给输出变量 
+    SELECT total INTO ototal;
+END //
+delimiter ;
+# 调用上述存储过程，不加税 
+call ordertotal(20005,0,@total);
+select @total;
+# 调用上述存储过程，加税 
+call ordertotal(20005,1,@total);
+select @total;
+
+# 显示用来创建一个存储过程的CREATE语句
+show create procedure ordertotal;
+
+# 获得包括何时、由谁创建等详细信息的存储过程列表
+# 该语句列出所有存储过程
+show procedure status;
+# 过滤模式 
+show procedure status like 'ordertotal';
+
+#############################
+# 第24章 使用游标     
+#############################
+
+-- 创建、打开、关闭游标 
+# 定义名为ordernumbers的游标，检索所有订单
+delimiter //
+create procedure processorders()
+begin
+    -- decalre the cursor 声明游标 
+    declare ordernumbers cursor
+    for
+    select order_num from orders;
+
+    -- open the cursor 打开游标
+    open ordernumbers;
+    -- close the cursor 关闭游标
+    close ordernumbers;
+end //
+delimiter ;
+
+-- 使用游标数据 
+# 例1：检索 当前行 的order_num列，对数据不做实际处理
+delimiter //
+create procedure processorders()
+begin
+
+    -- declare local variables 声明局部变量
+    declare o int;
+
+    -- decalre the cursor 声明游标 
+    declare ordernumbers cursor
+    for
+    select order_num from orders;
+
+    -- open the cursor 打开游标
+    open ordernumbers;
+
+    -- get order number 获得订单号 
+    fetch ordernumbers into o;
+    /*fetch检索 当前行 的order_num列（将自动从第一行开始）到一个名为o的局部声明变量中。
+    对检索出的数据不做任何处理。*/
+
+    -- close the cursor 关闭游标
+    close ordernumbers;
+
+END //
+delimiter ;
+
+# 例2：循环检索数据，从第一行到最后一行，对数据不做实际处理
+delimiter //
+create procedure processorders()
+begin
+    -- declare local variables 声明局部变量
+    declare done boolean default 0;
+    declare o int;
+
+    -- decalre the cursor 声明游标 
+    declare ordernumbers cursor
+    for
+    select order_num from orders;
+
+    -- declare continue handler
+    declare continue handler for sqlstate '02000' set done =1;
+    -- SQLSTATE '02000'是一个未找到条件，当REPEAT由于没有更多的行供循环而不能继续时，出现这个条件。
+
+    -- open the cursor 打开游标
+    open ordernumbers;
+
+    -- loop through all rows 遍历所有行 
+    repeat
+
+    -- get order number 获得订单号 
+    fetch ordernumbers into o;
+    -- FETCH在REPEAT内，因此它反复执行直到done为真
+
+    -- end of loop
+    until done end repeat;
+
+    -- close the cursor 关闭游标
+    close ordernumbers;
+
+end //
+delimiter ;
+
+# 例3：循环检索数据，从第一行到最后一行，对取出的数据进行某种实际的处理
+delimiter //
+create procedure processorders()
+begin
+    -- declare local variables 声明局部变量 
+    declare done boolean default 0;
+    declare o int;
+    declare t decimal(8,2);
+
+    -- declare the cursor 声明游标
+    declare ordernumbers cursor
+    for
+    select order_num from orders;
+
+    -- declare continue handler
+    declare continue handler for sqlstate '02000' set done = 1;
+
+    -- create a table to store the results 新建表以保存数据
+    create table if not exists ordertotals
+    (order_num int,total decimal(8,2));
+
+    -- open the cursor 打开游标
+    open ordernumbers;
+
+    -- loop through all rows 遍历所有行
+    repeat
+
+    -- get order number 获取订单号
+    fetch ordernumbers into o;
+
+    -- get the total for this order 计算订单金额
+    call ordertotal(o,1,t);  # 参见23章代码，已创建可使用
+
+    -- insert order and total into ordertotals 将订单号、金额插入表ordertotals内
+    insert into ordertotals(order_num,total) values(o,t);
+
+    -- end of loop
+    until done end repeat;
+
+    -- close the cursor 关闭游标
+    close ordernumbers;
+
+end // 
+delimiter ;
+# 调用存储过程 precessorders()
+call processorders();
+# 输出结果
+select * from ordertotals;
+
+#############################
+# 第25章 使用触发器      
+#############################
+
+-- 创建触发器 
+create trigger newproduct after insert on products for each row select 'product added' into @new_pro;
+# mysql 5.0以上版本在TRIGGER中不能返回结果集，定义了变量 @new_pro;
+insert into products(prod_id,vend_id,prod_name,prod_price) values ('ANVNEW','1005','3 ton anvil','6.09'); # 插入一行 
+select @new_pro;  # 显示Product added消息
+
+-- 删除触发器 
+drop trigger newproduct;
+
+-- 使用触发器 
+# insert触发器
+create trigger neworder after insert on orders for each row select new.order_num into @order_num;
+insert into orders(order_date,cust_id) values (now(),10001);
+select @order_num;
+
+# delete触发器
+# 使用OLD保存将要被删除的行到一个存档表中 
+delimiter //
+create trigger deleteorder before delete on orders for each row
+begin
+    insert into archive_orders(order_num,order_date,cust_id)
+    values(old.order_num,old.order_date,old.cust_id); # 引用一个名为OLD的虚拟表，访问被删除的行
+end //
+delimiter ;
+
+# update触发器
+# 在更新vendors表中的vend_state值时，插入前先修改为大写格式 
+create trigger updatevendor before update on vendors 
+for each row set new.vend_state = upper(new.vend_state);
+# 更新1001供应商的州为china
+update vendors set vend_state = 'china' where vend_id =1001;
+# 查看update后数据，1001供应商对应的vend_state自动更新为大写的CHINA
+select * from vendors;
+
+#############################
+# 第26章 管理事务处理 
+#############################
+
+-- 事务 transaction 指一组sql语句
+-- 回退 rollback 指撤销指定sql语句的过程
+-- 提交 commit 指将未存储的sql语句结果写入数据库表
+-- 保留点 savepoint 指事务处理中设置的临时占位符，可以对它发布回退（与回退整个事务处理不同）
+
+-- 控制事务处理
+# 开始事务及回退 
+select * from ordertotals;   # 查看ordertotals表显示不为空
+start transaction;           # 开始事务处理 
+delete from ordertotals;     # 删除ordertotals表中所有行
+select * from ordertotals;   # 查看ordertotals表显示 为空
+rollback;                     # rollback语句回退 
+select * from ordertotals;   # rollback后，再次查看ordertotals表显示不为空
+
+# commit 提交 
+start transaction;
+delete from orderitems where order_num = 20010;
+delete from orders where order_num = 20010;
+commit;   # 仅在上述两条语句不出错时写出更改 
+
+# savepoint 保留点 
+# 创建保留点
+savepoint delete1;
+# 回退到保留点 
+rollback to delete1;
+# 释放保留点 
+release savepoint delete1;
+
+-- 更改默认的提交行为 
+set autocommit = 0;  # 设置autocommit为0（假）指示MySQL不自动提交更改
+
+#############################
+# 第27章 全球化和本地化
+#############################
+
+-- 字符集和校对顺序
+# 查看所支持的字符集完整列表
+show character set;
+# 查看所支持校对的完整列表,以及它们适用的字符集
+show collation;
+# 确定所用系统的字符集和校对
+show variables like 'character%';
+show variables like 'collation%';
+# 使用带子句的CREATE TABLE，给表指定字符集和校对
+create table mytable
+(
+    column1 int,
+    column2 varchar(10)
+) default character set hebrew 
+  collate hebrew_general_ci;
+# 除了能指定字符集和校对的表范围外，MySQL还允许对每个列设置它们
+create table mytable
+(
+    column1 int,
+    column2 varchar(10),
+    column3 varchar(10) character set latin1 collate latin1_general_ci
+)default character set hebrew 
+ collate hebrew_general_ci;
+# 校对collate在对用ORDER BY子句排序时起重要的作用
+# 如果要用与创建表时不同的校对顺序排序,可在SELECT语句中说明 
+select * from customers order by lastname,firstname collate latin1_general_cs;
+
+#############################
+# 第28章 安全管理
+#############################
+
+-- 管理用户
+# 需要获得所有用户账号列表时
+# mysql数据库有一个名为user的表，它包含所有用户账号。user表有一个名为user的列
+use mysql;
+select user from user;
+
+-- 创建用户账号 
+# 使用create user
+create user ben identified by 'p@$$w0rd';
+# 重命名一个用户账号
+rename user ben to bforta;
+# 删除用户账号 
+drop user bforta;
+# 查看赋予用户账号的权限
+show grants for bforta;
+# 允许用户在（crashcourse数据库的所有表）上使用SELECT，只读
+grant select on crashcourse.* to bforta;
+# 重新查看赋予用户账号的权限，发生变化 
+show grants for bforta;
+# 撤销特定的权限
+revoke select on crashcourse.* from bforta;
+# 简化多次授权
+grant select,insert on crashcourse.* to bforta;
+
+-- 更改口令
+
+# 原来课本中使用的password()加密函数，在8.0版本中已经移除 
+# password() :This function was removed in MySQL 8.0.11.
+set password for bforta = 'n3w p@$$w0rd';  
+
+-- 如果不指定用户名，直接修改当前登录用户的口令 
+set password = 'n3w p@$$w0rd';
+
+#############################
+# 第29章 数据库维护 
+#############################
+
+# 分析表 键状态是否正确
+analyze table orders;
+# 检查表是否存在错误 
+check table orders,orderitems;
+check table orders,orderitems quick; # QUICK只进行快速扫描
+# 优化表OPTIMIZE TABLE，消除删除和更新造成的磁盘碎片，从而减少空间的浪费
+optimize table orders;
+
+
+
+
