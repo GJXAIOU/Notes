@@ -20,21 +20,22 @@ Contributor：GJXAIOU  :mailbox: gjx169004820@163.com
 
 ## 笔记目录  :notebook_with_decorative_cover:
 所有笔记都会逐步整理上传 :laughing:
-* C++ 
-* Git&GitHub  :open_file_folder:
-* Java
-* Linux  :open_file_folder:
-* MATLAB
-* MPLS_VPN实验视频
-* MySQL  :open_file_folder:
-* NS3
-* PPT 
-* TCP&IP详解
-* Tools :open_file_folder:
-* 数据结构
-* 算法
-* 计算机网络  :open_file_folder:
-* 设计模式
-* 超级搜索
-* 跟老齐学python :open_file_folder:
+- Algorithm
+- C++
+- CET-6
+- ComputerNetwork  :open_file_folder:
+- DataStructure 
+- DesignPattrens
+- Git&GitHub :open_file_folder:
+- Java :open_file_folder:
+- Linux :open_file_folder:
+- MATLAB
+- MPLS_VPN
+- MySQL :open_file_folder:
+- NS3
+- PPT
+- Python :open_file_folder:
+- SuperSearch
+- TCP&IP
+- Tools
 
