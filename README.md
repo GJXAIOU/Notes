@@ -20,8 +20,8 @@ Contributor：GJXAIOU  :mailbox: gjx169004820@163.com
 
 ## 笔记目录  :notebook_with_decorative_cover:
 所有笔记都会逐步整理上传 :laughing:
-- Algorithm
-- C++
+- Algorithm :open_file_folder:
+- C++ :open_file_folder:
 - CET-6
 - ComputerNetwork  :open_file_folder:
 - DataStructure 
