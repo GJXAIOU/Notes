@@ -389,7 +389,7 @@ public class PersonView {
 ```
 
 ## 批处理操作
-
+如果通过ps.executeUpdate的方式一条条 地执行语句 ， 那么每次执行语句都包括 “ 连 数据库＋执行语句＋释放数据库 连接" 3个动作。相比之下 ，如果用批处理的方式， 那么耗费的代价是 “—次连接＋多次执行＋一次释放 ” ，这样就能省去多次连接和释放数据库 资源从而提升操作性能。
 一般针对于批量插入操作；BatchPractice.java
 ```java
 package jdbc.batching;
@@ -435,7 +435,7 @@ public class BatchPratice {
                  preparedStatement.setString(4, home);
                  preparedStatement.setString(5, hobby);
 
-                 // 4.添加批处理
+                 // 4.添加批处理，addBatch会将所有记录先放入缓存
                  preparedStatement.addBatch();
                  flag++;
                  // 设置每5条批处理一次
@@ -450,6 +450,7 @@ public class BatchPratice {
 
              // 处理批处理中剩余的SQL语句，即剩余不够5个的倍数
             if (flag > 0){
+                // 执行批处理
                 preparedStatement.executeBatch();
                 preparedStatement.clearBatch();
             }

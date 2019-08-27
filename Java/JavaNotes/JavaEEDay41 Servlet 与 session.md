@@ -1,12 +1,12 @@
-## Servlet实现记录你是当前第几个访问者
+#  JavaEEDay41 Servlet 与session
 
+## 一、Servlet
 注意事项：
  1 . 防止线程安全问题
  2 . 在使用同步代码块选择锁对象，通常会使用当前servlet程序对象
 
 ```java
 package a_thread;
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 统计你是当前页面的第几个访问者
- * 利用一个计数器，每一次有一个人访问就  + 1
+ * 利用一个计数器，每一次有一个人访问就 + 1
  */
 public class VisitedCount extends HttpServlet {
     int count = 1;
@@ -33,7 +33,7 @@ public class VisitedCount extends HttpServlet {
 		
         synchronized (this) { 
 			/*
-			 这里因为操作的了共享资源计数器count，为了避免线程的安全问题，这里采用加锁的方式(同步代码块)
+			 这里因为操作了共享资源计数器count，为了避免线程的安全问题，这里采用加锁的方式(同步代码块)
 			锁对象用this，this表示当前Servlet程序类VisitedCount的对象，因为在Tomcat服务器
 			上当VisitedCount对象被创建和init之后，不会在创建新的VisitedCount对象，满足锁对象
 			的基本要求
@@ -42,12 +42,10 @@ public class VisitedCount extends HttpServlet {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             count++;
         }
-
     }
 
     @Override
@@ -56,23 +54,21 @@ public class VisitedCount extends HttpServlet {
         doGet(req, resp);
     }
 }
-
 ```
 
-
-
-## ServletConfig对象
+### ServletConfig对象
 在 web.xml 中补充以下信息：
-
 ```xml
 <servlet>
  <servlet-name>ConfigServlet</servlet-name>
  <servlet-class>b_servletconfig.ConfigServlet</servlet-class>
+ 
  <!-- servlet程序的初始化参数 -->
  <init-param>
  <param-name>user</param-name>
  <param-value>root</param-value>
  </init-param>
+ 
  <init-param>
  <param-name>password</param-name>
  <param-value>123456</param-value>
@@ -88,10 +84,8 @@ public class VisitedCount extends HttpServlet {
  在一个Servlet 对应一个ServletConfig
 ```java
 package b_servletconfig;
-
 import java.io.IOException;
 import java.util.Enumeration;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -109,16 +103,6 @@ public class ConfigServlet extends HttpServlet {
         //获取当前Servlet程序的名字
         System.out.println(config.getServletName());
 		
-		/*
-		<init-param>
-	    	<param-name>user</param-name>
-	    	<param-value>root</param-value>
-	    </init-param>
-	    <init-param>
-	    	<param-name>password</param-name>
-	    	<param-value>123456</param-value>
-	    </init-param>
-		 */
         //根据param-name获取对应的param-value值
         String value = config.getInitParameter("user");
         System.out.println(value);
@@ -138,7 +122,6 @@ public class ConfigServlet extends HttpServlet {
         doGet(req, resp);
     }
 }
-
 ```
 用于获取参数值以及属性；
 
