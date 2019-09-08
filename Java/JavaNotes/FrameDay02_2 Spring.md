@@ -163,8 +163,8 @@ public class MyThrowAdvice{
 ```
 
 - 然后在 spring 配置文件中配置
-  - <aop:aspect>的 ref 属性表示:方法在哪个类中.
-  - <aop: xxxx/> XXX表示什么通知
+  - `<aop:aspect>`的 ref 属性表示:方法在哪个类中.
+  - `<aop: xxxx/>` XXX表示什么通知
   -  method: 当触发这个通知时,调用哪个方法
   -  throwing: 表示异常对象名,必须和通知中方法参数名相同(可以不在通知中声明异常对象)
 ```applicationContext_xml
@@ -190,16 +190,16 @@ public class MyThrowAdvice{
 ## 四、异常通知(Schema-based 方式)
 
 -  步骤一：首先新建一个类实现 throwsAdvice 接口
-  - 必须自己写方法,且必须叫 afterThrowing ，都写的话会报下面那一个
+  - 必须自己写方法,且方法名必须为 afterThrowing ，都写的话会报下面那一个
   - 有两种参数方式
     -  必须是 1 个或 4 个
-- 异常类型要与切点报的异常类型一致
+- **异常类型要与切点报的异常类型一致**
 ```MyThrow_java
 public class MyThrow implements ThrowsAdvice{
-// public void afterThrowing(Method m, Object[] args,Object target, Exception ex) {
-// System.out.println("执行异常通知");
-// }
-  public void afterThrowing(Exception ex) throws Throwable {
+   public void afterThrowing(Method m, Object[] args,Object target, Exception ex) {
+       System.out.println("执行异常通知");
+   }
+   public void afterThrowing(Exception ex) throws Throwable {
       System.out.println("执行异常通过-schema-base 方式");
     }
 }
@@ -228,7 +228,7 @@ public class MyArround implements MethodInterceptor {
     @Override
     public Object invoke(MethodInvocation arg0) throws Throwable {
         System.out.println("环绕-前置");
-        //放行,调用切点方式，语句前就相当于前置通知
+        //放行,调用切点方式，语句前就相当于前置通知，语句后为后置通知
         Object result = arg0.proceed();
         System.out.println("环绕-后置");
         return result;
@@ -237,7 +237,7 @@ public class MyArround implements MethodInterceptor {
 ```
 
 - 步骤二：配置 applicationContext.xml
-```xml
+```applicationContext_xml
 <bean id="demo" class="com.bjsxt.test.Demo"></bean>
 <bean id="myarround" class="com.bjsxt.advice.MyArround"></bean>
 
@@ -249,243 +249,188 @@ public class MyArround implements MethodInterceptor {
 
 ## 六、使用 AspectJ 方式实现
 
-1. 新建类,不用实现
+- 步骤一：新建类,不用实现
 ```MyAdvice_java
 public  class  MyAdvice  {
     public  void  mybefore(String  name1,int  age1){
-    System.out.println("前置"+name1  );
+       System.out.println("前置"+name1 );
+    }
+    public void mybefore1(String name1){
+        System.out.println("前置:"+name1);
+    }
+    public void myaftering(){
+        System.out.println("后置2");
+    }
+    public void myafter(){
+        System.out.println("后置1");
+    }
+    public void mythrow(){
+        System.out.println("异常");
+    }
+    public Object myarround(ProceedingJoinPoint p) throws Throwable{
+        System.out.println("执行环绕");
+        System.out.println("环绕-前置");
+        Object result = p.proceed();
+        System.out.println("环绕后置");
+        return result;
+    }
+}
+```
+
+- 步骤二：配置 spring 配置文件
+  - `<aop:after/>` 后置通知,是否出现异常都执行 
+  -  `<aop:after-returing/>` 后置通知,只有当切点正确执行时执行
+  -  `<aop:after/>` 和 `<aop:after-returing/>` 和`<aop:after-throwing/>`执行顺序都和在 Spring 配置文件中的配置顺序有关 
+  -  `execution()` 括号不能扩上 args  
+  -  中间使用 and 不能使用&& 由 spring 把 and 解析成&&
+  -  args(名称) 名称自定义的.顺序和 demo1(参数,参数)对应
+  -  `<aop:before/>  arg-names=” 名  称 ”` 名 称 来 源  于 expression=”” 中 args(),名称必须一样
+  - args() 有几个参数,arg-names 里面必须有几个参数
+  - `arg-names=””` 里面名称必须和通知方法参数名对应
+```applicationContext_xml
+<aop:config>
+    <aop:aspect  ref="myadvice">
+    <!-- 这里的name1 和 age1 仅仅是对参数进行赋值，然后将这些值赋值给通知，因此上面 advice 参数名称和他们相同-->
+        <aop:pointcut  expression="execution(* com.bjsxt.test.Demo.demo1(String,int)) and args(name1,age1)"  id="mypoint"/>
+      <aop:pointcut  expression="execution(* com.bjsxt.test.Demo.demo1(String))  and  args(name1)" id="mypoint1"/>
+      
+      <aop:before method="mybefore"pointcut-ref="mypoint" arg-names="name1,age1"/>
+      <aop:before method="mybefore1" pointcut-ref="mypoint1" arg-names="name1"/>
+     <aop:after method="myafter" pointcut-ref="mypoint"/>
+     <aop:after-returning method="myaftering" pointcutref="mypoint"/>
+     <aop:after-throwing method="mythrow" pointcutref="mypoint"/>
+     <aop:around method="myarround" pointcut-ref="mypoint"/>
+</aop:aspect>
+</aop:config>
 ```
 
 
-](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image021.gif) | 
-类中方法名任意
 
-![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image022.gif)
 
-}
+## 七、 使用注解(基于 Aspect)
 
-**pub****li****c** **void**mybefore1(String name1){
+- spring 不会自动去寻找注解,必须告诉 spring 哪些包下的类中可能有注解
+  - 在spring配置文件中引入 xmlns:context命名空间
+```applicationContext_xml
+xmlns:context="http://www.springframework.org/schema/context"
+xsi:http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd">
+```
 
-System.**_out_**.println("前置:"+name1);
+- @Component
+  - 相当于<bean/>
+  - 如果没有参数,把类名首字母变小写,相当于<bean  id=””/>
+  - @Component(“自定义名称”)
 
-}
+ **实现步骤:**
 
-**pub****li****c** **voi****d**myaftering(){ System.**_ou_****_t_**.println("后置  2");
-
-}
-
-**pub****li****c** **void**myafter(){
-
-System.**_out_**.println("后置  1");
-
-}
-
-**pub****li****c** **voi****d**mythrow(){ System.**_ou_****_t_**.println("异常");
-
-}
-
-**pub****li****c**Object  myarround(ProceedingJoinPoint  p)  **t****h****r****o****w****s**
-
-Throwable{
-
-System.**_out_**.println("执行环绕");
-
-System.**_out_**.println("环绕-前置"); Object result  =  p.proceed();
-
-System.**_out_**.println("环绕后置");
-
-**r****e****t****u****r****n**result;
-
-}
-
-![文本框: }](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image023.gif)
-
-1.2 配置 spring 配置文件
-
-1.2.1 <aop:after/> 后置通知,是否出现异常都执行
-
-1.2.2 <aop:after-returing/> 后置通知,只有当切点正确执行时执行
-
-1.2.3 <aop:after/> 和 <aop:after-returing/> 和
-
-<aop:after-throwing/>执行顺序和配置顺序有关
-
-1.2.4 execution() 括号不能扩上 args
-
-1.2.5 中间使用 and 不能使用&& 由 spring 把 and 解析成&&
-
-1.2.6 args(名称) 名称自定义的.顺序和 demo1(参数,参数)对应
-
-1.2.7 <aop:before/>  arg-names=” 名  称 ” 名 称 来 源  于
-
-expression=”” 中 args(),名称必须一样
-
-1.2.7.1 args() 有几个参数,arg-names 里面必须有几个参数
-
-1.2.7.2   |  |
-|  | ![文本框: <aop:config>
-
-<aop:aspect  ref="myadvice">
-
-<aop:pointcut  expression="execution(* com.bjsxt.test.Demo.demo1(String,int))  and args(name1,age1)"  id="mypoint"/>
-<aop:pointcut  expression="execution(* com.bjsxt.test.Demo.demo1(String))  and  args(name1)"
-id="mypoint1"/>
-](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image024.gif) | 
-arg-names=”” 里面名称必须和通知方法参数名对应
-
-上面的name1 和 age1 仅仅是对参数进行赋值，然后将这些值赋值给通知，因此上面 advice 参数名称和他们相同
-
-![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image025.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image026.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image027.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image028.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image029.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image030.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image031.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image032.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image033.gif)![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image034.gif)
-
-![文本框: <aop:before  method="mybefore"
-
-pointcut-ref="mypoint"  arg-names="name1,age1"/>
-
-<aop:before  method="mybefore1" pointcut-ref="mypoint1" arg-names="name1"/>
-<!-- <aop:after method="myafter" pointcut-ref="mypoint"/>
-
-<aop:after-returning method="myaftering" pointcut- ref="mypoint"/>	
-<aop:after-throwing method="mythrow" pointcut- ref="mypoint"/>
-<aop:around method="myarround" pointcut-ref="mypoint"/>--
-
->
-
-</aop:aspect>
-
-</aop:config>
-](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image035.gif)
-
-七**.** 使用注解**(**基于 **Aspect)**
-
-1. spring 不会自动去寻找注解,必须告诉 spring 哪些包下的类中可能有注解
-
-1.1 在spring配置文件中引入 xmlns:context命名空间
-
-[xmlns:context="http://www.springframework.org/schema/context"](http://www.springframework.org/schema/context)
-
-[xsi:schemaLocation="http://www.springframework.org/schema/beans](http://www.springframework.org/schema/beans)  [http://www.springframework.org/schema/beans/spring-beans.xsd](http://www.springframework.org/schema/beans/spring-beans.xsd) [http://www.springframework.org/schema/context](http://www.springframework.org/schema/context)  [http://www.springframework.org/schema/context/spring-context.xsd">](http://www.springframework.org/schema/context/spring-context.xsd)
-
-2. @Component
-
-2.1 相当于<bean/>
-
-2.2 如果没有参数,把类名首字母变小写,相当于<bean  id=””/>
-
-2.3 @Component(“自定义名称”)
-
-3. 实现步骤:
-
-3.1 ![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image036.gif)在 spring 配置文件中设置注解在哪些包中（使用组件扫描）
+- 步骤一：在 spring 配置文件中设置注解在哪些包中（使用组件扫描）
+`<context:component-scan base-package="com.bjsxt.advice,com.bjsxt.test"></context:component-scan>`
 
 同时要添加动态代理： proxy-target-class值为 true表示使用 cglib动态代理，值为 false 表示使用 jdk 动态代理；
+`<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>`
 
-<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
-
-3.2 在 Demo.java 类中添加@Componet,可以加参数用于别名，直接替代了bean标签
-
-3.2.1 在方法上添加@Pointcut(“”) 定义切点（必要步骤）
-
-![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image037.gif)
-
-3.3 在通知类中配置MyAdvice.java 中
-
-3.3.1 @Component 类被 spring 管理
-
-3.3.2 ![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image038.gif)@Aspect 相当于<aop:aspect/>这个标签，表示通知方法在当前类中
-
- |  |
-|  | ![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image039.gif) | 
-
-![文本框: Object  result  =  p.proceed();
-System.out.println("环绕-后置");
-return  result;
-
+- 步骤二：在 Demo.java 类中添加@Componet,可以加参数用于别名，直接替代了bean标签
+  - 在方法上添加@Pointcut(“”) 定义切点（必要步骤）
+```Demo_java
+@Component（"dd"）
+public class Demo {
+    @Pointcut("execution(* com.bjsxt.test.Demo.demo1())")
+    public void demo1() throws Exception{
+        // int i = 5/0;
+      System.out.println("demo1");
+    }
 }
+```
 
+- 步骤三：在通知类中配置MyAdvice.java 中
+  -  @Component 类被 spring 管理
+  - @Aspect 相当于<aop:aspect/>这个标签，表示通知方法在当前类中
+```MyAdvice_java
+@Component
+@Aspect // 表示该类为通知切面类
+public class MyAdvice {
+    @Before("com.bjsxt.test.Demo.demo1()")
+    public void mybefore(){
+        System.out.println("前置");
+    }
+    @After("com.bjsxt.test.Demo.demo1()")
+    public void myafter(){
+        System.out.println("后置通知");
+    }
+    @AfterThrowing("com.bjsxt.test.Demo.demo1()")
+    public void mythrow(){
+        System.out.println("异常通知");
+    }
+    @Around("com.bjsxt.test.Demo.demo1()")
+    public Object myarround(ProceedingJoinPoint p) throws Throwable{
+        System.out.println("环绕-前置");
+        Object result = p.proceed();
+        System.out.println("环绕-后置");
+        return result;
+    }
 }
-](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image040.gif)
+```
 
-# 下面是AOP底层原理
 
-八**.**代理设计模式
 
-1. 设计模式:前人总结的一套解决特定问题的代码.
+下面是AOP底层原理
 
-2. 代理设计模式优点:
+## 八、代理设计模式
 
-2.1 保护真实对象
+- 设计模式:前人总结的一套解决特定问题的代码.
 
-2.2 让真实对象职责更明确.
+- 代理设计模式优点:
+  - 保护真实对象
+  - 让真实对象职责更明确.
+  -  扩展
 
-2.3 扩展
+- 代理设计模式
+  - 真实对象(老总)
+  - 代理对象(秘书)
+  - 抽象对象(抽象功能),谈小目标
 
-3. 代理设计模式
+### （一）静态代理设计模式
 
-3.1 真实对象.(老总)
+- 由代理对象代理所有真实对象的功能.
+  - 自己编写代理类
+  - 每个代理的功能需要单独编写
 
-3.2 代理对象(秘书)
+- 静态代理设计模式的缺点:
+  - 当代理功能比较多时,代理类中方法需要写很多.
 
-3.3 抽象对象(抽象功能),谈小目标
+### （二）动态代理
 
-# 九**.** 静态代理设计模式
+- 为了解决静态代理频繁编写代理功能缺点.
 
-1. 由代理对象代理所有真实对象的功能.
+- 分类:
+  - JDK 提供的
+  - cglib 动态代理
 
-1.1 自己编写代理类
+#### JDK 动态代理
+- 优点:jdk 自带,不需要额外导入 jar
 
-1.2 每个代理的功能需要单独编写
+- 缺点:
+  - 真实对象必须实现接口
+  - 利用反射机制.效率不高.
 
-2. 静态代理设计模式的缺点:
+- 使用 JDK 动态代理时可能出现下面异常
+![异常]($resource/%E5%BC%82%E5%B8%B8.png)
+出现原因:希望把接口对象转换为具体真实对象
 
-2.1 当代理功能比较多时,代理类中方法需要写很多.
+ 
 
-十**.** 动态代理
+#### cglib 动态代理
 
-1. 为了解决静态代理频繁编写代理功能缺点.
+- cglib 优点:
+  - 基于字节码,生成真实对象的子类.
+    - 运行效率高于 JDK 动态代理.
+  - 不需要实现接口
+- cglib 缺点:
+  - 非 JDK 功能,需要额外导入 jar
 
-2. 分类:
-
-2.1 JDK 提供的
-
-2.2 cglib 动态代理
-
-十一**. JDK** 动态代理
-
-1. 和 cglib 动态代理对比
-
-1.1 优点:jdk 自带,不需要额外导入 jar
-
-1.2 缺点:
-
-1.2.1 真实对象必须实现接口
-
-1.2.2 利用反射机制.效率不高.
-
-2. 使用 JDK 动态代理时可能出现下面异常
-
-2.1 出现原因:希望把接口对象转换为具体真实对象
-
- |  |
-|  | ![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image042.jpg) | 
-
-十二**: cglib** 动态代理
-
-1. cglib 优点:
-
-1.1 基于字节码,生成真实对象的子类.
-
-1.1.1 运行效率高于 JDK 动态代理.
-
-1.2 不需要实现接口
-
-2. cglib 缺点:
-
-2.1 非 JDK 功能,需要额外导入 jar
-
-3. 使用 spring  aop 时,只要出现 Proxy  和真实对象转换异常
-
-3.1 设置为 true 使用 cglib
-
-3.2     |  |
-|  | ![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image043.gif) | 
+- 使用 spring  aop 时,只要出现 Proxy  和真实对象转换异常
+设置为 true 使用 cglib
 设置为 false 使用 jdk(默认值)
+`<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>`
+
