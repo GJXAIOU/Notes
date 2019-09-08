@@ -249,328 +249,255 @@ public class SingleTon {
 
 ##  五、声明式事务
 
-1.编程式事务:
+- 编程式事务:
+  - 由程序员编程事务控制代码，比如：OpenSessionInView 属于编程式事务（事务控制自己写）事务控制主要指就是事务的提交、回滚等等）
 
-1.1 由程序员编程事务控制代码.
+- 声明式事务:
+ **事务控制代码已经由 spring 写好，程序员只需要声明出哪些方法需要进行事务控制和如何进行事务控制**然后 Spring 会帮助我们管理。
 
-1.2 比如：OpenSessionInView 属于编程式事务（事务控制自己写：就是事
+- **声明式事务都是针对于 ServiceImpl 类下方法的**。
+- **事务管理器基于通知(advice)的**，即本质上就是通知；
 
-务的提交、回滚等等）
+- 在 spring 配置文件中配置声明式事务
+```applicationContext_java
+<?xml version="1.0" encoding="UTF-8"?> <beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+  <!--需要引入 tx 命名空间，加上下面两个-->
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"  
+ default-autowire="byName">
 
-2.声明式事务:
+<context:property-placeholder location="classpath:db.properties,classpath:second.properties"/>
 
-2.1 事务控制代码已经由 spring 写好.程序员只需要声明出哪些方法需要进行事务控制和如何进行事务控制.
-
-3.声明式事务都是针对于 ServiceImpl 类下方法的.
-
-4.事务管理器基于通知(advice)的，即本质上就是通知
-
-5.在 spring 配置文件中配置声明式事务
-
- |  | 
-
-<context:property-placeholder location=_"__c__l__a__ss__p__a__t__h__:__db__.__p__r__ope__r__t__i__e__s__，__c__l__a__ss__pa__t__h__:__s__e__c__ond__.__p__r_ _ope__r__t__i__e__s__"_/>
-
-<bean id=_"__da__t__a__S__o__u__r__c__e__"_
-
- |   | 这 里 需 要 引 入 t x 的 命 名 空 间
-
-因为声明式事务需要提交给数据库，因此需要dataSource
-
-![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image011.gif)class=_"org.springframework.jdbc.datasource.DriverMa nagerDataSource"_>
-
-<property name=_"driverClassName"_ value=_"${jdbc.driver}"_></property>
-
-<property name=_"url"_ value=_"${jdbc.url}"_></property>
-
-<property name=_"username"  _value=_"${jdbc.username}"_></property>
-
-<property name=_"password"  _value=_"${jdbc.password}"_></property>
-
+<!-- 因为事务最终都是要提交给数据库的，因此需要 DataSource -->
+<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverMa nagerDataSource">
+    <property name="driverClassName" value="${jdbc.driver}"></property>
+    <property name="url" value="${jdbc.url}"></property>
+    <property name="username" value="${jdbc.username}"></property>
+    <property name="password" value="${jdbc.password}"></property>
 </bean>
 
-<!-- 通知类在spring-jdbc.jar 中 --> <bean id=_"txManager"_
-
-class=_"org.springframework.jdbc.datasource.DataSour ceTransactionManager"_>
-
-<property name=_"dataSource"_ ref=_"dataSource"_></property>
-
+<!-- 通知类在spring-jdbc.jar 中 --> 
+<bean id="txManager" class="org.springframework.jdbc.datasource.DataSour
+ceTransactionManager">
+    <property name="dataSource" ref="dataSource"></property>
 </bean>
 
 <!-- 配置声明式事务，确认具体哪些方法有事务 -->
-
-![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image012.gif)<tx:advice id=_"txAdvice"_
-
-首先新建POJO类：com.bjsxt.pojo.People.java public class People{
-
-int id;
-
-String username; String password;
-
-// 省略get和 set 方法
-
-}
-
-然后新建 com.bjsxt.service包里面有一个接口：UsersService public interface UsersService{
-
-int insert(Users user);
-
-}
-
-还有一个对应的实现类：
-
-public class UsersServiceImpl implements UsersService{ @override
-
-// 声明式事务是基于通知的，要将下面的方法实现事务，要配置其切点public int insert(Users users){
-
-return 0;
-
-}
-
-}
-
-这里配置就是为了但我们使用 service下面的 insert方法的时候，由Spring帮助我们管理
-
-![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image013.gif)transaction-manager=_"__t__x__M__an__a__ge__r__"_>
-
-<tx:attributes>
-
-<!-- 哪些方法需要有事务控制 --> <!-- 名字里面可以是用* 方法以 ins 开头事务管理 -->
-
-<tx:method name=_"__i__n__s__*__"_/>
-
-<tx:method name=_"__de__l__*__"_/>
-
-<tx:method name=_"__upd__*__"_/>
-
-<tx:method name=_"__*__"_/>
-
-</tx:attributes>
-
+<tx:advice id="txAdvice" transaction-manager="txManager">
+    <tx:attributes>
+        <!-- 哪些方法需要有事务控制 -->
+         <!-- 名字里面可以是用 * 方法以ins 开头事务管理 -->
+        <tx:method name="ins*" />
+        <tx:method name="del*" />
+        <tx:method name="upd*" />
+        <tx:method name="*" />
+    </tx:attributes>
 </tx:advice>
 
 <aop:config>
-
 <!--切点范围设置大一些，仅仅设置哪些有切点即可，和事务控制没有关系 -->
-
-<aop:pointcut expression=_"execution(* com.bjsxt.service.impl.*.*(..))"_
-
-id=_"mypoint"_ />
-
-<aop:advisor advice-ref=_"txAdvice"_ pointcut-ref=_"mypoint"_ />
-
+<aop:pointcut expression="execution(* com.bjsxt.service.impl.*.*(..))"
+id="mypoint" />
+<aop:advisor advice-ref="txAdvice" pointcut-ref="mypoint" />
 </aop:config>
+```
 
-# 六**.**声明式事务中属性解释
+ 使用：
+```com_gjxaiou_pojo_People_java
+public class People{
+    int id;
+    String username;
+    String password;
+    // 省略get和 set 方法
+}
+```
 
-1. name=”” 表示哪些方法需要有事务控制
+```com_gjxaiou_service_UsersService_java
+public interface UsersService{
+    int insert(Users user);
+}
+```
 
-1.1 支持*通配符
+```com_gjxaiou_service_UsersServiceImpl_java
+public class UsersServiceImpl implements UsersService{
+    @override
+    // 声明式事务是基于通知的，要将下面的方法实现事务，要配置其切点
+    public int insert(Users users){
+    return 0;
+    }
+}
+```
 
-2. readonly=”boolean” 表示是否是只读事务.
 
-2.1 如果为 true，告诉数据库此事务为只读事务.是一种数据库优化，会对性能有一定提升，所以只要是查询的方法，建议使用此属性.
 
-2.2 如果为 false(默认值)，表示事务需要提交的事务.建议新增，删除，修改情况下使用.
 
-3. propagation 控制事务传播行为.
+## 六、声明式事务中属性解释
 
-3.1 当一个具有事务控制的方法被另一个有事务控制的方法调用后，需要如何管理事务(新建事务?在事务中执行?把事务挂起?报异常?)
+- `name=””` 表示哪些方法需要有事务控制
+支持*通配符
 
-3.2 REQUIRED (默认值): （针对被调用的）如果当前有事务，就在事务中执行，如果当前没有事务，新建一个事务.
+- `readonly=”boolean”` 表示是否是只读事务.
+  - 如果为 true，告诉数据库此事务为只读事务.是一种数据库优化，会对性能有一定提升，所以只要是查询的方法，建议使用此属性.
+  - 如果为 false(默认值)，表示事务需要提交的事务.建议新增，删除，修改情况下使用.
 
-3.3 SUPPORTS:如果当前有事务就在事务中执行，如果当前没有事务，就在非事务状态下执行.
+- propagation 控制事务传播行为.
+  - 当一个具有事务控制的方法被另一个有事务控制的方法调用后，需要如何管理事务(新建事务?在事务中执行?把事务挂起?报异常?)  
+  - REQUIRED (默认值): （针对被调用的）如果当前有事务，就在事务中执行，如果当前没有事务，新建一个事务.
 
-3.4 MANDATORY:必须在事务内部执行，如果当前有事务，就在事务中执行，如果没有事务，报错.
+  -  SUPPORTS:如果当前有事务就在事务中执行，如果当前没有事务，就在非事务状态下执行.
 
-3.5 REQUIRES_NEW:必须在事务中执行，如果当前没有事务，新建事
+  - MANDATORY:必须在事务内部执行，如果当前有事务，就在事务中执行，如果没有事务，报错.
 
-务，如果当前有事务，把当前事务挂起（执行自己的事务）.
+  - REQUIRES_NEW:必须在事务中执行，如果当前没有事务，新建事务，如果当前有事务，把当前事务挂起（执行自己的事务）.
+  - NOT_SUPPORTED:必须在非事务下执行，如果当前没有事务，正 常执行，如果当前有事务，把当前事务挂起.
 
-3.6 NOT_SUPPORTED:必须在非事务下执行，如果当前没有事务，正 常执行，如果当前有事务，把当前事务挂起.
+  - NEVER:必须在非事务状态下执行，如果当前没有事务，正常执行，如果当前有事务，报错.
 
-3.7 NEVER:必须在非事务状态下执行，如果当前没有事务，正常执行，
+  - NESTED:必须在事务状态下执行.如果没有事务，新建事务，如果当前有事务，创建一个嵌套事务.
 
-如果当前有事务，报错.
 
-3.8 NESTED:必须在事务状态下执行.如果没有事务，新建事务，如果
+- `isolation=””` 事务隔离级别（4.5开始是其值的可选项）
+在多线程或并发访问下如何保证访问到的数据具有完整性的.
+- DEFAULT: 默认值，由底层数据库自动判断应该使用什么隔离级别
 
-当前有事务，创建一个嵌套事务.
+- READ_UNCOMMITTED: 可以读取未提交数据，可能出现脏读，不重复读，幻读.
+ 效率最高.
 
-4. isolation=”” 事务隔离级别（4.5开始是其值的可选项）
+-  READ_COMMITTED:只能读取其他事务已提交数据.可以防止脏读，可能出现不可重复读和幻读.
 
-4.1 在多线程或并发访问下如何保证访问到的数据具有完整性的.
+- REPEATABLE_READ: 读取的数据会被添加锁，防止其他事务修改此数据，可以防止不可重复读.脏读，可能出现幻读.
 
-4.2 脏读:
+- SERIALIZABLE: 排队操作，对整个表添加锁.一个事务在操作数据时，另一个事务等待事务操作完成后才能操作这个表.
+  -  最安全的
+  - 效率最低的.
 
-4.2.1 一个事务(A)读取到另一个事务(B)中未提交的数据，另一 个事务中数据可能进行了改变，此时A 事务读取的数据可能和数据库中数据是不一致的，此时认为数据是脏数据，读取脏数据过程叫做脏读.
+- rollback-for=”异常类型全限定路径”
+表示当出现什么异常时需要进行回滚
 
-4.3 不可重复读:
+  - 建议:给定该属性值.
+  - 手动抛异常一定要给该属性值.
 
-4.3.1 主要针对的是某行数据.(或行中某列)
+- no-rollback-for=””
+ 当出现什么异常时不滚回事务.
 
-4.3.2 主要针对的操作是修改操作.
 
-4.3.3 两次读取在同一个事务内
+**补充知识**
 
-4.3.4 当事务 A 第一次读取事务后，事务 B 对事务 A 读取的数据进行修改，事务 A 中再次读取的数据和之前读取的数据不一致，这个过程称为不可重复读.
+- 脏读:
+一个事务(A)读取到另一个事务(B)中未提交的数据，另一 个事务中数据可能进行了改变，此时A 事务读取的数据可能和数据库中数据是不一致的，此时认为数据是脏数据，读取脏数据过程叫做脏读.
 
-4.4 幻读:
+- 不可重复读:
+当事务 A 第一次读取事务后，事务 B 对事务 A 读取的数据进行修改，事务 A 中再次读取的数据和之前读取的数据不一致，这个过程称为不可重复读.
+  - 主要针对的是某行数据.(或行中某列)
+  - 主要针对的操作是修改操作.
+  -  两次读取在同一个事务内
 
-4.4.1 主要针对的操作是新增或删除
+- 幻读:
+事务 A 按照特定条件查询出结果，事务 B 新增了一条符合条件的数据.事务 A 中查询的数据和数据库中的数据不一致的，事务 A 好像出现了幻觉，这种情况称为幻读.
+- 主要针对的操作是新增或删除
+- 两次事务的结果.
 
-4.4.2 两次事务的结果.
+## 七、Spring 中常用注解
 
-4.4.3 事务 A 按照特定条件查询出结果，事务 B 新增了一条符合条件的数据.事务 A 中查询的数据和数据库中的数据不一致的，事务 A 好像出现了幻觉，这种情况称为幻读.
+- @Component 创建类对象，相当于配置<bean/>
 
-4.5 DEFAULT: 默认值，由底层数据库自动判断应该使用什么隔离界
+- @Service 与@Component 功能相同.
+ 但是@service写在 ServiceImpl 类上.
 
-别
+- @Repository 与@Component 功能相同.
+ 写在数据访问层类上.
 
-4.6 READ_UNCOMMITTED: 可以读取未提交数据，可能出现脏读，不
+- @Controller 与@Component 功能相同.
+ 写在控制器类上.
 
-重复读，幻读.
+- @Resource(不需要写对象的 get/set)
+是 java 中自带的注解
+  - 默认按照 byName 注入，如果没有名称对象，按照 byType  注入
+    -  建议把对象名称和 spring 容器中对象名相同
 
-4.6.1 效率最高.
+- @Autowired(不需要写对象的 get/set)
+是 spring 的注解
+  - 默认按照 byType  注入.
 
-4.7 READ_COMMITTED:只能读取其他事务已提交数据.可以防止脏读，可能出现不可重复读和幻读.
+- @Value() 获取 properties 文件中内容
 
-4.8 REPEATABLE_READ: 读取的数据会被添加锁，防止其他事务修改此数据，可以防止不可重复读.脏读，可能出现幻读.
+* @Pointcut() 定义切点
 
-4.9 SERIALIZABLE: 排队操作，对整个表添加锁.一个事务在操作数据时，另一个事务等待事务操作完成后才能操作这个表.
+* @Aspect() 定义切面类
 
-4.9.1 最安全的
+* @Before() 前置通知
 
-4.9.2 效率最低的.
+* @After 后置通知
 
-5. rollback-for=”异常类型全限定路径”
+* @AfterReturning 后置通知，必须切点正确执行
 
-5.1 表示当出现什么异常时需要进行回滚
+* @AfterThrowing 异常通知
 
-5.2 建议:给定该属性值.
+* @Arround 环绕通知
 
-5.2.1 手动抛异常一定要给该属性值.
-
-6. no-rollback-for=””
-
-6.1 当出现什么异常时不滚回事务.
-
-七**.  Spring** 中常用注解**.**
-
-1. @Component 创建类对象，相当于配置<bean/>
-
-2. @Service 与@Component 功能相同.
-
-2.1 但是@service写在 ServiceImpl 类上.
-
-3. @Repository 与@Component 功能相同.
-
-3.1 写在数据访问层类上.
-
-4. @Controller 与@Component 功能相同.
-
-4.1 写在控制器类上.
-
-5. @Resource(不需要写对象的 get/set)
-
-5.1 java  中的注解
-
-5.2 默认按照 byName 注入，如果没有名称对象，按照 byType  注入
-
-5.2.1 建议把对象名称和 spring 容器中对象名相同
-
-6. @Autowired(不需要写对象的 get/set)
-
-6.1 spring 的注解
-
-6.2 默认按照 byType  注入.
-
-7. @Value() 获取 properties 文件中内容
-
-8. @Pointcut() 定义切点
-
-9. @Aspect() 定义切面类
-
-10. @Before() 前置通知
-
-11. @After 后置通知
-
-12. @AfterReturning 后置通知，必须切点正确执行
-
-13. @AfterThrowing 异常通知
-
-14. @Arround 环绕通知
-
-八**.Ajax**
-
+## 八、Ajax
 使用Ajax绝不会有跳转语句，都是写的输出语句，即响应回来的结果是什么
 
-1. 标准请求响应时浏览器的动作(同步操作)
+- 标准请求响应时浏览器的动作(同步操作)
+  - 浏览器请求什么资源，跟随显示什么资源
 
-1.1 浏览器请求什么资源，跟随显示什么资源
+* ajax:异步请求.【有请求的时候，浏览器开启一个子线程进行数据请求，获取到数据之后，根据脚本对主线程中东西进行修改，主线程在子线程进行请求的过程中是不发生改变的；】
 
-2. ajax:异步请求.【有请求的时候，浏览器开启一个子线程进行数据请求，获取到数据之后，根据
+  - 局部刷新，通过异步请求，请求到服务器资源数据后，通过脚本修改页面中部分内容.
 
-脚本对主线程中东西进行修改，主线程在子线程进行请求的过程中是不发生改变的；】
+* ajax 由 javascript 推出的.
+  *  由 jquery 对 js 中 ajax 代码进行的封装，达到使用方便的效果.
 
-2.1 局部刷新，通过异步请求，请求到服务器资源数据后，通过脚本修改页面中部分内容.
+###   jquery 中 ajax 分类
+ 
+*  第一层 $.ajax({ 属性名:值，属性名:值})
+  * 是 jquery 中功能最全的.代码写起来相对最麻烦的.
 
-3. ajax 由 javascript 推出的.
-
-3.1 由 jquery 对 js 中 ajax 代码进行的封装，达到使用方便的效果.
-
-4. jquery 中 ajax 分类
-
-4.1 第一层 $.ajax({ 属性名:值，属性名:值})
-
-4.1.1 是 jquery 中功能最全的.代码写起来相对最麻烦的.
-
-4.1.2     |  |
-|  | ![文本框: /*
+示例代码
 url:  请求服务器地址
 data:请求参数
 dataType:服务器返回数据类型
 error 请求出错执行的功能
 success 请求成功执行的功能，表达式function(data)中的
 data是服务器返回的数据
-](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image014.gif) | 
-示例代码
-
 type:请求方式
+```index_js
+// 这里配置 script type 等等
+$(function(){
+    $("a").click(function(){
+        $.ajax({
+            url:'demo',
+            data:{"name":"张三"},
+            dataType:'html',
+            error:function(){
+                alert("请求出错.")
+            },
+            success:function(data){
+                alert("请求成功"+data)
+            },
+            type:'POST'
+        });
+        return false;
+    })
+});
+```
 
- |  |
-|  | ![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image015.gif) | 
+- 第二层(简化$.ajax)
+  相当于上面的代码中 设置好了type，只有成功返回等
+  - $.get(url,data,success,dataType))
+  - $.post(url,data,success,dataType)
 
-4.2 第二层(简化$.ajax)
+- 第三层(简化$.get())
+  - $.getJSON(url,data,success). 相 当 于 设  置  $.get 中dataType=”json”
+  -  $.getScript(url,data,success) 相 当 于 设  置  $.get 中dataType=”script”
 
-4.2.1 $.get(url,data,success,dataType))
+- 如果服务器返回数据是从表中取出.为了方便客户端操作返回的数据，服务器端返回的数据设置成 json
+  - 客户端把 json 当作对象或数组操作.
 
-4.2.2 $.post(url,data,success,dataType)
-
-4.3 第三层(简化$.get())
-
-相当于上面的代码中 设置好了type，只有成功返回等
-
-4.3.1 $.getJSON(url,data,success). 相 当 于 设  置  $.get 中
-
-![](file:///C:/Users/gjx16/AppData/Local/Temp/msohtmlclip1/01/clip_image017.jpg)
-
-dataType=”json”
-
-4.3.2 $.getScript(url,data,success) 相 当 于 设  置  $.get 中
-
-dataType=”script”
-
-5. 如果服务器返回数据是从表中取出.为了方便客户端操作返回的数据，服务器端返回的数据设置成 json
-
-5.1 客户端把 json 当作对象或数组操作.
-
-6. json：是一种数据格式.
-
-6.1 JsonObject ： json 对象，理解成 java  中对象
-
-6.1.1 {“key”:value,”key”:value}
-
-6.2 JsonArray:json 数组
-
-6.2.1 [{“key”:value,”key”:value},{}]
+- json：是一种数据格式.
+  - JsonObject ： json 对象，理解成 java  中对象
+ 格式为： `{“key”:value,”key”:value}`
+  - JsonArray:json 数组
+格式为： `[{“key”:value,”key”:value},{}]`
