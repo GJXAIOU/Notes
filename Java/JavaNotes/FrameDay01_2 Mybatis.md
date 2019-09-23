@@ -1,11 +1,5 @@
 # FrameDay01_2 Mybatis
 
-
-## 逐步总结
-1. mybatis.xml 中的 <mappers>中配置的 resource 是整个项目中的所有其他 `实体类Mapper.xml` 文件；
-
-
-
 **主要内容：**
 * MyBatis 接口绑定方案及多参数传递动态 SQL
 * 缓存
@@ -15,17 +9,17 @@
 ## 一、MyBatis 接口绑定方案及多参数传递
 
 ### （一）接口绑定
-- **作用**: 实现创建一个接口后把 mapper.xml  由mybatis 生成接口的实现类,通过调用接口对象就可以获取 mapper.xml 中编写的 sql。后面 mybatis 和 spring 整合时使用的是这个方案.
+- **作用**: 实现创建一个接口后把 mapper.xml  由mybatis 生成接口的实现类,**通过调用接口对象就可以获取 mapper.xml 中编写的 sql**。后面 mybatis 和 spring 整合时使用的是这个方案.
 
-- 实现步骤:
-3.1 创建一个接口 ：例如：`LogMapper`
-3.1.1 接口包名和接口名与 mapper.xml  中<mapper>namespace 相同
+- **实现步骤**:
+  - 创建一个接口 ：例如：`LogMapper`
+    - **接口 Mapper 名和接口名与 mapper.xml  中<mapper>namespace 相同**
 目录示例：`com.gjxaiou.mapper`包下面包含一个接口：`LogMapper`和`LogMapper.xml`，然后 `LogMapper.xml` 中的<mapper>namespace 标签格式为：
 `<mapper namespace = "com.gjxaiou.mapper.LogMapper>   </mapper>`
-3.1.2 接口中方法名和 mapper.xml  标签的 id 属性相同
-3.2 在 mybatis.xml 中使用<package>进行扫描接口和 mapper.xml
+    - **接口中方法名和 mapper.xml  标签的 id 属性相同；**
+  - 在 mybatis.xml 中使用<package>进行扫描接口和 mapper.xml；
 
-- 代码实现步骤:
+- **代码实现步骤**:
   - 首先在 mybatis.xml 中全局配置文件中的`<mappers>`下使用`<package>`
 ```java
 <mappers>
@@ -56,12 +50,7 @@ public class Test {
 		InputStream is = Resources.getResourceAsStream("mybatis.xml");
 		SqlSessionFactory factory = new SqlSessionFactoryBuilder().build(is);
 		SqlSession session = factory.openSession();		
-		/*
-		 * 接口,为什么能实例化?
-		 * 需要给接口一个实例化对象.
-		 * 使用的JDK的动态代理设计模式.
-		 * 这是一个面向接口的代理设计模式(必须有接口)
-		 */
+
 		LogMapper logMapper = session.getMapper(LogMapper.class);
 		List<Log> list = logMapper.selAll();
 		for (Log log : list) {
@@ -69,19 +58,20 @@ public class Test {
 		}
 ```
 
-### （二）多参数实现办法
-一共有两种方法
-  - 方法一：一般方法
+### （二）**多参数实现办法**
+一共有两种方法：一般方法和使用注解
+
+- 方法一：一般方法
 首先在在接口 `LogMapper` 中声明方法
 `List<Log>  selByAccInAccout(String accin, String accout);`
-然后在 LogMapper.xml  中添加即可，`#{}`中可以使用 0,1,2 或 param1,param2
+然后在 LogMapper.xml  中添加即可，`#{}`中可以使用 param1,param2
 ```xml
 <select id="selByAccInAccout" resultType="log">
-     select * from log where accin=#{0}	and accout=#{1}
+     select * from log where accin=#{param1} and accout=#{param2}
 </select>
 ```
 
-  -   方法二：可以使用注解方式
+-   方法二：可以使用注解方式
   首先在接口中声明方法
 ```java
 /**
@@ -124,7 +114,7 @@ public class Test {
 ## 二、动态 SQL
 
 1. 根据不同的条件需要执行不同的 SQL 命令，称为动态 SQL
-2. MyBatis 中动态 SQL 的实现是在 实体类mapper.xml  中添加逻辑判断即可。
+2. **MyBatis 中动态 SQL 的实现是在 `实体类mapper.xml`  中添加逻辑判断即可**。
 注：以下的 xml 配置均在 LogMapper.xml 中；
 ### （一）If 使用
 ```xml
@@ -185,7 +175,7 @@ public class Test {
 </select>
 ```
 
-###  （三）set 使用
+###  （四）set 使用
 
 - 作用:去掉最后一个逗号
 <set>用在修改 SQL 中 set 从句，如果<set>里面有内容则生成 set 关键字,没有就不生成
