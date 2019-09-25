@@ -11,37 +11,21 @@
 - Ajax 复习
 
 
-自动注入：
-
-类 ：People.java public class People{
-
-  private Teacher teacher;
-
-  public Teacher getTeacher(){
-
-声 明 式 事 务 事务传播行为事务隔离级别只读事务
-
-事务回滚常用注解
-
-**Ajax** 复习
-
-**[**知识点详解**]**
-
 ##  一、自动注入
 
  - 前提：在 Spring 配置文件中对象名和 ref=”id” 即 id 名相同，可以使用自动注入，就是可以不配置`<property/>`
 
 **两种配置办法**
 - 在`<bean>`中通过 `autowire=””` 配置，只对这个 <bean> 生效；
-- 在`<beans>`中通过 `default-autowire=””`配置，表示当前文件中所有 <bean> 都是全局配置内容；
+- 在`<beans>`中通过 `default-autowire=””`配置，表示当前文件中所有 <bean> 都生效，是全局配置内容；
 
 **参数配置**
 - autowire=”” 可取值如下：
-  - default: 默认值，根据全局 default-autowire=””值.默认全局和局部都没有配置情况下，相当于 no；
+  - default: 默认值，根据全局 `default-autowire=””`值。**默认全局和局部都没有配置情况下，相当于 no；**
   - no: 不自动注入；
-  - byName: 通过名称自动注入.在 Spring 容器中找类的 Id；因为在容器中找，因此就是Teacher不在配置文件中配置，使用component注解也是可以的；
+  - byName: 通过名称自动注入，**在 Spring 容器中找类的 Id**；因为在容器中找，因此就是Teacher不在配置文件中配置，使用component注解也是可以的；
   - byType: 根据类型注入；
-    - spring 容器中不可以出现两个相同类型的<bean>；
+    - spring 容器中不可以出现两个相同类型的<bean>，否则不能根据类型注入；
   - constructor: 根据构造方法注入；必须在People类中提供 Teacher类的构造方法；
     - 提供对应参数的构造方法(构造方法参数中包含注入对象)；
     - 底层使用 byName， 构造方法参数名和其他<bean>的 id相同；
@@ -89,44 +73,47 @@ properties 文件中的后面的值中间不能有空格
 `<context:property-placeholder location="classpath:db.properties", location="classpath:abc.properties"/>`
 对应的 db.properties 配置示例为：
 ```db_properties
-jdbc.driver=com.mysql.jdbc.Driver 
-jdbc.url=jdbc:mysql://localhost:3306/ssm 
-jdbc.password=GJXAIOU 
+jdbc.driverClassName = com.mysql.cj.jdbc.Driver
+jdbc.url = jdbc:mysql://localhost:3306/lianxi
 jdbc.username = root
+jdbc.password = GJXAIOU
 ```
 然后对于其中的属性值，可以spring在配置文件的 bean ：id= DataSource中的value= ${key}取值
 ```applicationContext_xml
-<context:property-placeholder location="classpath:db.properties,classpath:second.properties"/>
-   
-<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-	<property name="driverClassName" value="${jdbc.driver}"></property>
-	<property name="url" value="${jdbc.url}"></property>
-	<property name="username" value="${jdbc.username}"></property>
-	<property name="password" value="${jdbc.password}"></property>
-</bean>
+<context:property-placeholder location="classpath:db.properties"></context:property-placeholder>
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
 ```
-原来的 Spring 配置文件
+原来的 Spring 配置方式：
 ```applicationContext_java
-<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
- <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
- <property name="url" value="jdbc:mysql://localhost:3306/lianxi"></property>
- <property name="username" value="root"></property>
- <property name="password" value="GJXAIOU"></property> </bean>
+<bean id = "dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+      <property name="url" value="jdbc:mysql://localhost:3306/lianxi"></property>
+      <property name="username" value="root"></property>
+      <property name="password" value="GJXAIOU"></property>
+  </bean>
 ```
 
 - 添加了属性文件加载，并且在<beans>中开启自动注入需要注意的地方
-  部分属性配置当配置全局开启自动注入之后需要进行限定：当 <beans>使用`default-sutowire = "byName"` 开启自动注入的时候，当同时使用 扫描器的时候；
+  部分属性配置**当配置全局开启自动注入**之后需要进行限定：当 <beans>使用`default-sutowire = "byName"` 开启自动注入的时候，当同时使用 扫描器的时候；
   - SqlSessionFactoryBean（对象） 的 id 不能叫做 sqlSessionFactory，因为会在加载db.property的属性文件之前，就加载了其他文件，导致 ${jdbc.username}等等无法取到值
   - 修改：把原来通过ref 引用替换成value 赋值，因为自动注入只能影响ref，不会影响 value 赋值
 正确的配置为：
 ```applicationContext_xml
-<!-- 扫描器 --> <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+<!-- 扫描器 --> 
+<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
  <property name="basePackage" value="com.bjsxt.mapper"></property>
  <property name="sqlSessionFactoryBeanName" value="factory"></property> </bean>
 ```
 
 
 ### Spring 使用注解
+
 下面被 Spring 管理的类使用注解，首先需要在 Spring 中使用 <bean> 新建对象。
 在**被Spring 管理的类中**通过 `@Value(“${key}”)` 取出properties 中内容，就不需要全部在Spring配置文件中使用 `value=  “${}”`进行取值；**Servlet 没有被 Spring 容器管理**
 
@@ -153,8 +140,8 @@ public class Demo{
 }
 ```
 
-- 步骤三：配置 properties 文件
-```second_properties
+- 步骤三：配置 second.properties 文件
+```properties
 my.demo = 123
 ```
 
@@ -177,7 +164,7 @@ scope 是<bean>的属性，**作用:控制对象有效范围(例如单例，多�
 
 ## 四、单例设计模式
 
-- 作用: 在应用程序有保证最多只能有一个实例；
+- 作用: 在应用程序中保证最多只能有一个实例；
 
 - 好处:
   - 提升运行效率; 因为只需要 new 一次；
@@ -245,29 +232,25 @@ public class SingleTon {
 ```
 
 
-
-
 ##  五、声明式事务
 
 - 编程式事务:
-  - 由程序员编程事务控制代码，比如：OpenSessionInView 属于编程式事务（事务控制自己写）事务控制主要指就是事务的提交、回滚等等）
+  - 由程序员编程事务控制代码，比如：OpenSessionInView 属于编程式事务（事务控制自己写）事务控制主要指就是事务的提交、回滚等等；
 
 - 声明式事务:
- **事务控制代码已经由 spring 写好，程序员只需要声明出哪些方法需要进行事务控制和如何进行事务控制**然后 Spring 会帮助我们管理。
+ **事务控制代码已经由 spring 写好，程序员只需要声明出哪些方法需要进行事务控制和如何进行事务控制**然后 Spring 会帮助我们管理；
 
-- **声明式事务都是针对于 ServiceImpl 类下方法的**。
+- **声明式事务都是针对于 ServiceImpl 类下方法的**；
 - **事务管理器基于通知(advice)的**，即本质上就是通知；
 
 - 在 spring 配置文件中配置声明式事务
-```applicationContext_java
-<?xml version="1.0" encoding="UTF-8"?> <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
-  <!--需要引入 tx 命名空间，加上下面两个-->
-  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
- http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"  
- default-autowire="byName">
-
+需要引入 tx 命名空间
+```xml
+xmlns:tx="http://www.springframework.org/schema/tx" 
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"  
+```
+因此配置文件 applicationContext.xml 中的内容为：
+```
 <context:property-placeholder location="classpath:db.properties,classpath:second.properties"/>
 
 <!-- 因为事务最终都是要提交给数据库的，因此需要 DataSource -->
@@ -288,7 +271,7 @@ ceTransactionManager">
 <tx:advice id="txAdvice" transaction-manager="txManager">
     <tx:attributes>
         <!-- 哪些方法需要有事务控制 -->
-         <!-- 名字里面可以是用 * 方法以ins 开头事务管理 -->
+         <!-- 名字里面可以是用 *，表示方法以ins 开头事务管理 -->
         <tx:method name="ins*" />
         <tx:method name="del*" />
         <tx:method name="upd*" />
@@ -306,11 +289,15 @@ id="mypoint" />
 
  使用：
 ```com_gjxaiou_pojo_People_java
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@toString
 public class People{
     int id;
     String username;
     String password;
-    // 省略get和 set 方法
 }
 ```
 
@@ -388,16 +375,16 @@ public class UsersServiceImpl implements UsersService{
 - 脏读:
 一个事务(A)读取到另一个事务(B)中未提交的数据，另一 个事务中数据可能进行了改变，此时A 事务读取的数据可能和数据库中数据是不一致的，此时认为数据是脏数据，读取脏数据过程叫做脏读.
 
+- 幻读:
+事务 A 按照特定条件查询出结果，事务 B 新增了一条符合条件的数据.事务 A 中查询的数据和数据库中的数据不一致的，事务 A 好像出现了幻觉，这种情况称为幻读.
+  - 主要针对的操作是新增或删除
+  - 两次事务的结果.
+
 - 不可重复读:
 当事务 A 第一次读取事务后，事务 B 对事务 A 读取的数据进行修改，事务 A 中再次读取的数据和之前读取的数据不一致，这个过程称为不可重复读.
   - 主要针对的是某行数据.(或行中某列)
   - 主要针对的操作是修改操作.
   -  两次读取在同一个事务内
-
-- 幻读:
-事务 A 按照特定条件查询出结果，事务 B 新增了一条符合条件的数据.事务 A 中查询的数据和数据库中的数据不一致的，事务 A 好像出现了幻觉，这种情况称为幻读.
-- 主要针对的操作是新增或删除
-- 两次事务的结果.
 
 ## 七、Spring 中常用注解
 
