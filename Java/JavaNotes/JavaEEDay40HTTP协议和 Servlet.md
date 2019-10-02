@@ -4,15 +4,15 @@
 ## 一、 HTTP协议
 
 - HTTP是 HyperText Tranfer Protocol 超文本传输协议
-  - 是一个规范，是用来约束WEB服务器和浏览器直接的通讯协议
-  - 基于TCP/IP的一个协议，用于连接WEB服务器和WEB浏览器
+  - 是一个规范，是用来约束 WEB 服务器和浏览器直接的通讯协议；
+  - 基于 TCP/IP 的一个协议，用于连接 WEB 服务器和 WEB 浏览器；
 ​
-- HTTP的协议版本：
- HTTP/1.0 HTTP/1.1
+- HTTP 的协议版本：
+ HTTP/1.0 和 HTTP/1.1
 
-- HTTP协议对应浏览器来说可以分为两大类：
-  - HTTP请求:从浏览器发送给服务器的请求内容
-  - HTTP响应:浏览器接受服务器发送的数据内容
+- HTTP 协议对应浏览器来说可以分为两大类：
+  - HTTP 请求：从浏览器发送给服务器的请求内容；
+  - HTTP 响应：浏览器接受服务器发送的数据内容；
 
 ### （一）HTTP请求：
   - HTTP请求头示例
@@ -30,11 +30,11 @@ Cookie: BAIDUID=2010BC084DE91EB2B0EDD6EE92330BE1:FG=1; BIDUPSID=2010BC084DE91EB2
 ```
 
 - 请求方式
-    - 使用GET请求方式：
+    - 使用 GET 请求方式：
     示例`GET /Day40/TestHttp?name=12345&password=12345678 HTTP/1.1`，其中?之后就是GET请求的数据参数
 ​
-    - 使用POST请求方式：**在URL中没有看到任何的参数**, 而且请求的方式也略有不同
-示例：`POST /Day40/TestHttp HTTP/1.1`, 请求的数据在 POST请求特有的请求体内保存，也就是谷歌浏览器 From Data
+    - 使用 POST 请求方式：**在URL中没有看到任何的参数**, 而且请求的方式也略有不同
+示例：`POST /Day40/TestHttp HTTP/1.1`, 请求的数据在 POST 请求特有的请求体内保存，也就是谷歌浏览器 From Data
 
 ### （二）HTTP 响应 
 
@@ -55,27 +55,36 @@ HTTP/1.1 200 OK
 | 400 ~ 499 | 客户请求错误，常用404 |
 | 500 ~ 599 | 服务器GG了！！！ 常用500 |
 
+例如：Servlet-name= GJXAIOU，Servlet-class = com.gjxaiou.servlet.servletGJXAIOU;
+404：服务器中根本没有 name = GJXAIOU，就是客户端请求错误；
+500：服务器中有 name = GJXAIOU，但是对应的 class 资源不存在了，就是服务器错误；
+
+
 ## 二、Servlet
 
-全称Java Servlet，是用Java编写的服务器端程序。 其主要功能在于交互式地浏览和修改数据，生成动态Web内容。
+服务器本质上是一个容器，动态的根据用户请求调用不同的执行代码，一般使用是 Tomcat；
+Tomcat 运行的是编译之后的 class 文件，该文件放在 WEB-INF 下面的 classes 文件夹中。
+
+Servlet 全称 Java Servlet，是用 Java 编写的**服务器端程序**。 其主要功能在于交互式地浏览和修改数据，生成动态 Web 内容。
+狭义的Servlet 是指 Java 语言实现的一个接口，广义的 **Servlet 是指任何实现了这个Servlet 接口的类**，一般情况下，人们将 Servlet 理解为后者。Servlet 运行于支持 Java 的应用服务器中。从原理上讲，Servlet 可以响应任何类型的请求，但绝大多数情况下Servlet 只用来扩展基于 HTTP 协议的 Web 服务器。按照 Servlet 样式编写的程序就可以被 Tomcat 处理。
 
 Tomcat服务器启动之后输入： http://localhost:8080/Day40/TestHttp
-```xml
- <servlet>
- <!-- 自定义的名字 -->
- <servlet-name>TestHttp</servlet-name>
- <!-- Servlet程序完整的包名.类名 -->
- <servlet-class>com.qfedu.http.TestHttp</servlet-class>
- </servlet>
- <servlet-mapping>
- <!-- 要求和上面servlet-name完全一致 -->
- <servlet-name>TestHttp</servlet-name>
- <!-- 映射路径 -->
- <url-pattern>/TestHttp</url-pattern>
- </servlet-mapping>
+```web_xml
+<servlet>
+      <!-- 自定义的名字 -->
+      <servlet-name>TestHttp</servlet-name>
+      <!-- Servlet程序完整的包名.类名 -->
+      <servlet-class>com.gjxaiou.http.TestHttp</servlet-class>
+</servlet>
+<servlet-mapping>
+      <!-- 要求和上面servlet-name完全一致 -->
+      <servlet-name>TestHttp</servlet-name>
+      <!-- 映射路径 -->
+      <url-pattern>/TestHttp</url-pattern>
+</servlet-mapping>
 ```
-- 浏览器访问服务器的URL分析
- 1 . 浏览器根据输入的URL来访问Tomcat服务器 http://localhost:8080
+- 浏览器访问服务器的 URL 分析
+ 1 . 浏览器根据输入的 URL 来访问 Tomcat 服务器 http://localhost:8080
  2 . /Day40 访问在 Tomcat 服务器下 webapps 里面的 Day40 项目文件夹
  3 . /TestHttp 用来匹配在【WEB-INF】下的【web.xml】文件里面的 url-pattern,服务器开始工作；
 ​
@@ -113,14 +122,12 @@ Tomcat服务器启动之后输入： http://localhost:8080/Day40/TestHttp
 ### （二）Tomcat默认的Servlet程序 
 
 在URL中输入 http://localhost:8080/Day40/有以下的流程
-
-  1 . 在Day40的项目目录下【WEB-INF】里面的web.xml中匹配 url-pattern为 / 的标签 【精确匹配】
-  2 . 如果没有匹配到这个 / 映射路径，这个时候Tomcat会把这个映射路径交给 在Tomcat中
-  默认的Servlet程序中，程序名为： DefaultServlet，文件见下面的代码；
-  3 . DefaultServlet会首先在Day40的项目目录下找有没有对应的index.**文件 
-      这里可以支持index.html index.htm index.jsp
-  4 . 如果有，将对应的index.html发送给浏览器
-  5 . 如果没有报状态码 404 跳转到默认的404页面
+- 在Day40的项目目录下【WEB-INF】里面的web.xml中匹配 url-pattern为 / 的标签 【精确匹配】
+- 如果没有匹配到这个 / 映射路径，这个时候Tomcat会把这个映射路径交给 在Tomcat中默认的Servlet程序中，程序名为： DefaultServlet，文件见下面的代码；
+- DefaultServlet 会首先在 Day40 的项目目录下找有没有对应的 index.** 文件 
+      这里可以支持index.html 或者 index.htm 或者 index.jsp；
+-  如果有，将对应的 index.html 发送给浏览器
+- 如果没有报状态码 404 跳转到默认的 404 页面；
 ```html
 <servlet>
       <servlet-name>default</servlet-name>
@@ -153,9 +160,9 @@ Tomcat服务器启动之后输入： http://localhost:8080/Day40/TestHttp
 - Servlet 生命周期的四个主要方法：
   - 构造方法：用于创建 Servlet 对象:有且只执行一次;
   - init 方法 : 初始化构造方法创建好的 Servlet 对象;有且只执行一次；
-  -  service 方法：提供 Servlet 程序的服务 :想用几次用几次
+  - service 方法：提供 Servlet 程序的服务 :想用几次用几次
   当指定的 Servlet 程序被创建，初始化之后，并没有销毁，而且从任何的浏览器任何的IP地址访问
-  当前的 Servlet 程序，都不会重新创建，而是始终执行这一个 Servlet 程序，所以 **Servlet就是一个单例对象**。
+  当前的 Servlet 程序，都不会重新创建，而是始终执行这一个 Servlet 程序，所以 **Servlet 就是一个单例对象**。
    - destroy 方法 :销毁 Servlet 对象，在 Tomcat 服务器关闭时执行 :有且只执行一次
 
 ![Servlet生命周期时序图]($resource/Servlet%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%97%B6%E5%BA%8F%E5%9B%BE.png)
@@ -177,3 +184,13 @@ Tomcat服务器启动之后输入： http://localhost:8080/Day40/TestHttp
   </servlet>
 ```
 用来在Tomcat服务器上提前加载一些重要的servlet
+
+
+### 注：Tomcat 目录结构
+\bin 存放启动和关闭Tomcat 的可执行文件
+\conf 存放Tomcat 的配置文件
+\lib 存放库文件
+\logs 存放日志文件
+\temp 存放临时文件
+\webapps 存放web 应用
+\work 存放JSP 转换后的Servlet 文件
