@@ -1,15 +1,36 @@
 # FrameDay03_3 SpringMVC
 
-
 **重要知识点**
 * 自定义拦截器
 * 登录状态验证
 
-
 ## 一、自定义拦截器
 
-**AOP拦截的是方法，SpringMVC 拦截器拦截的是请求**
+### （一）使用背景
+Web 项目中需要判断 http 接口用户 Post 上来的数据是否合法，如果不合法要另做处理，**用户 Post 上来的数据是 Json 形式的**，我们用了 @RequestBody 标记自动将 json 形式的提交封装为一个 Model 对象，这样一来，我们就不能判断在自动封装过程中是否出现了异常，此时便想起了springMVC 中的 interceptor，可以用于处理请求之前，做一些处理，我们可以取消 @RequestBody标记，然后在 interceptor 中取得请求体，检查是否符合 json 要求，即是不是一个 valid interceptor，但是这里出现了一个问题： 
+**httpServletRequest 的请求内容，只能被读取一次**，在 Interceptor 中读取了的话，在controller 中便不能读取了，解决方式是：读取到的请求内容存起来，然后在 controller 中直接使用。 
+这里用到了 interceptor 的一种，HandlerInterceptor；
 
+### （二）HandlerInterceptor概述
+
+在 SpringMVC 中定义一个 Interceptor 是比较非常简单，主要有两种方式： 
+- **第一种**：实现 HandlerInterceptor 接口，或者是继承实现了 HandlerInterceptor 接口的类，例如HandlerInterceptorAdapter； 
+- 第二种：实现 Spring 的 WebRequestInterceptor 接口，或者是继承实现了 WebRequestInterceptor 的类。 
+
+下面主要结合一个例子说一下第一种方式：实现HandlerInterceptor接口。 
+HandlerInterceptor 接口主要定义了三个方法： 
+- `boolean preHandle (HttpServletRequest request, HttpServletResponse response, Object handle)`方法：该方法将在请求处理之前进行调用，只有该方法返回true，才会继续执行后续的 Interceptor 和 Controller，当返回值为true 时就会继续调用下一个Interceptor的 preHandle 方法，如果已经是最后一个 Interceptor 的时候就会是调用当前请求的 Controller 方法； 
+- `void postHandle (HttpServletRequest request, HttpServletResponse response, Object handle, ModelAndView modelAndView)`方法：该方法将在请求处理之后，DispatcherServlet 进行视图返回渲染之前进行调用，可以在这个方法中对 Controller 处理之后的ModelAndView 对象进行操作。 
+- `void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handle, Exception ex)`方法：该方法也是需要当前对应的 Interceptor 的preHandle 方法的返回值为 true 时才会执行，该方法将在整个请求结束之后，也就是在DispatcherServlet 渲染了对应的视图之后执行。用于进行资源清理。
+
+
+**单个拦截器执行顺序：**
+preHandle ->进入控制器（controller）-> postHandler -> JSP -> afterCompletion
+
+
+### （三）具体实现
+
+**AOP拦截的是方法，SpringMVC 拦截器拦截的是请求**
 - 跟过滤器比较像的技术；
 - 发送**请求**时被拦截器拦截，拦截之后可以在控制器的前后添加额外功能；
 -  跟 AOP 区分开
@@ -32,7 +53,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** 自定义类，同时实现 HandlerInterceptor，同时添加未实现的方法
+/** 
+ * 自定义类，同时实现 HandlerInterceptor，同时添加未实现的方法
  * @author GJXAIOU
  * @create 2019-09-20-19:34
  */
@@ -83,12 +105,11 @@ public class InterceptorDemo implements HandlerInterceptor {
      * @param request
      * @param response
      * @param handler
-     * @param ex
+     * @param ex ：值为 NULL 表示没有异常，反之有异常；
      * @throws Exception
      */
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        // 参数 Exception ex 值为 NULL 表示没有异常，反之有异常；
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {       
         System.out.println("是否有异常：ex = " + ex + "   异常信息为：" + ex.getMessage());
         System.out.println("afterCompletion");
     }

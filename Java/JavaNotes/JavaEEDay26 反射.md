@@ -381,7 +381,6 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * 通过反射获取Class类对象里面所有的成员变量
  * Field 成员变量类
- * @author 刘晓磊
  *
  */
 

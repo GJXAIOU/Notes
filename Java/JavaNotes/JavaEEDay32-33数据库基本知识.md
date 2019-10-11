@@ -7,9 +7,9 @@ style: summer
 ---
 @toc
 
-# JavaEEDay32数据库
+# JavaEEDay32 数据库
+全篇总结：2019-8-1
 
-# 全篇总结：2019-8-1
 ##  针对库：
   - 创库：`create database demo;`
   - 查库：

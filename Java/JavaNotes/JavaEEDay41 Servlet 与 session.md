@@ -129,7 +129,7 @@ public class ConfigServlet extends HttpServlet {
 
 ## ServletContext
 
-表示当前整个WEB应用，一个WEB应用有且只有一个ServletContext对象
+**表示当前整个WEB应用，一个WEB应用有且只有一个ServletContext对象**
 ​
 1 获取WEB应用的路径
  ServletContext context = this.getServletContext();

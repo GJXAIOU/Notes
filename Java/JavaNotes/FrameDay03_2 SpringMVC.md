@@ -1,4 +1,4 @@
-# FrameDay03_1 SpringMVC 
+# FrameDay03_2 SpringMVC 
 
 **主要内容：**
 
@@ -156,7 +156,7 @@ public class DemoController {
 ## 三、文件下载
 
 **注意在 springmvc.xml 中配置放行 files 文件夹**
-
+`<mvc:resources location="/files/" mapping="/files/**"></mvc:resources>`
 - 访问资源时，响应头如果没有设置 Content-Disposition 的值，浏览器默认按照 inline 值进行处理；
   - inline 作用是能显示就显示,不能显示就下载；
 - 只需要修改相应头中 `Context-Disposition= ”attachment;filename=文件名”`；

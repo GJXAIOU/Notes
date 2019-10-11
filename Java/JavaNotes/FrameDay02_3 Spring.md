@@ -89,7 +89,7 @@ jdbc.password = GJXAIOU
         <property name="password" value="${jdbc.password}"></property>
     </bean>
 ```
-原来的 Spring 配置方式：
+原来的直接在 Spring 配置的配置方式：
 ```applicationContext_java
 <bean id = "dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
       <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>

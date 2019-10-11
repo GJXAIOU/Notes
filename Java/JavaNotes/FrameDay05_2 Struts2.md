@@ -48,7 +48,7 @@
 
 ### （一）全局结果页面
  配置 result 标签，可以根据 action 方法的返回值到不同的路径里面；
-
+result 标签中的 name、type 属性都不是必选的，name 属性的默认值为 success、type 属性默认值为 dispatcher；
 示例：
 创建两个action：StudentAction 和 TeacherAction，执行默认的方法 execute() 方法，让两个 action 的方法都返回 success，返回 success 之后，配置到同一个页面里面；
 
@@ -71,7 +71,7 @@ public class TeacherAction extends ActionSupport{
     }
 }
 ```
-struts 全局配置文件：
+struts.xml 全局配置文件：
 ```struts_xml
 <struts>
     <package name="global" extends="struts-default" namespace="/">
@@ -130,21 +130,24 @@ result标签里面除了name属性之外，还有一个属性 type属性
 `<result name = "teacher" type = "dispatcher">/hello.jsp</result>` 
  访问的时候，页面 URL 不跳转到 hello.jsp，但是显示 hello.jsp 中的内容； 
 
-  - 做重定向操作，值是 redirect
+  - 做重定向操作，值是 redirect，被跳转的页面中丢失传递的信息；
 `<result name = "student" type = "redirect">/hello.jsp</result>`
  访问的时候，页面 URL 跳转到 hello.jsp， 同时显示 hello.jsp 中的内容； 
 
 上面两个值dispatcher、redirect，这两个值一般针对到页面中配置；
 - 配置到其他的action里面
-  - chain：转发到其他 action，一般不用，因为缓存问题
+  - chain：转发到其他 action，一般不用，因为缓存问题，被跳转的 Action 中仍能获取上个页面的值，如 request 信息；
 `<result name = "success" type = "chain">class</result>`
 这里的 class 是配置过的其他 action，它可以有其他操作，可以执行； 
-  - redirectAction：重定向到其他 action
+  - redirectAction：重定向到其他 action，跳转的页面中丢失传递的信息；
 `<result name = "success" type = "redirectAction">class</result>` 
 这里 Action 的访问名称就是上面 action 中name 属性配置的；
 
+还有其他等等，都在 struts-default.xml 中。
 
 ## 二、Action中获取表单提交数据
+一方面如果表单中有参数如何接收或者我们需要向页面保存一些数据；通过 struts2 访问 Servlet 的 API 实现该功能；
+Action 不能直接访问 Servlet，只能通过下面三种方式；
 之前web阶段，提交表单到 servlet 里面，在 servlet 里面使用 request 对象里面的方法获取，例如： getParameter，getParameterMap；
 
 在这里是提交表单到 action，但是 action 没有 request 对象，不能直接使用 request 对象；
@@ -155,6 +158,7 @@ result标签里面除了name属性之外，还有一个属性 type属性
   - 使用接口注入方式（不常用）
 
 ### （一）使用ActionContext类获取（推荐）
+通过 ActionContext 类进行访问 Servlet，ActionContext 是 Action 执行的上下文对象，在 ActionContext 中保存了 Action 执行所需要的所有对象，包括：parameters、request、session、application；
  获取当前线程的 ActionContext 对象方法：`static ActionContext getContext();`
 - 因为方法不是静态的方法，需要创建ActionContext类的对象
 - 这个ActionContext类对象不是new出来的；
@@ -179,6 +183,14 @@ result标签里面除了name属性之外，还有一个属性 type属性
 </html>
 ```
 （2）在action使用ActionContext获取数据（来自文件 Form1Action），别忘了在 structs.xml中配置
+```java
+// 分别在 request、application、session 中放入下面值；
+ActionContext context ActionContext.getContext();
+context.put("name", "GJXAIOU");
+context.getApplication.put("name", "GJXAIOU");
+context.getSession.put("name", "GJXAIOU");
+```
+==上面代码有问题==
  
 
 ### （二）使用ServletActionContext类获取（常用）
@@ -260,7 +272,7 @@ public class Form2Action extends ActionSupport {
  
 
 ## 三、Struts2 封装获取表单数据方式
-**原始方式获取表单封装到实体类对象**
+### （一）原始方式获取表单封装到实体类对象
 
 首先创建实体类：User，生成对应的 get、set方法，然后在 form4Demo...写下面的代码，同时在 struts.xml 中配置 form4Demo......（）
 ```User_java
@@ -307,18 +319,18 @@ public class Form4Action extends ActionSupport {
 然后在 struts.xml 中配置上面即可；
 
 
-属性封装（会用）
-1 直接把表单提交属性封装到action的属性里面
+### （二）属性封装（会用）
+直接把表单提交属性封装到action的属性里面
 
-2 实现步骤（见 DataDemo1Action.java,同样需要在配置文件中配置）
+-实现步骤（见 DataDemo1Action.java,同样需要在配置文件中配置）
 （1）在action成员变量位置定义变量
-- 变量名称和表单输入项的name属性值一样
+变量名称和表单输入项的name属性值一样
 （2）生成变量的set方法（把set和get方法都写出来）
  
 
-3 使用属性封装获取表单数据到属性里面，不能把数据直接封装到实体类对象里面，放入还是得写上面的新建对象，然后使用 setParm....
+-使用属性封装获取表单数据到属性里面，不能把数据直接封装到实体类对象里面，放入还是得写上面的新建对象，然后使用 setParm....
 
-模型驱动封装（重点）
+### （三）模型驱动封装（重点）
 1 使用模型驱动方式，可以直接把表单数据封装到实体类对象里面 -> DataDemo2Action.java
 
 2 实现步骤
@@ -336,7 +348,7 @@ public class Form4Action extends ActionSupport {
 不能同时使用属性封装和模型驱动封装获取同一个表单数据
 如果同时使用，只会执行模型驱动
 
-表达式封装（会用）- dateDemo3
+### （三）表达式封装（会用）- dateDemo3
 1 实现过程
 （1）使用表达式封装可以把表单数据封装到实体类对象里面
 
@@ -347,7 +359,7 @@ public class Form4Action extends ActionSupport {
  
 2 把表达式封装归类到属性封装里面
 
-比较表达式封装和模型驱动封装
+### （四）比较表达式封装和模型驱动封装
 1 使用表达式封装和模型驱动封装都可以把数据封装到实体类对象里面
 
 2 不同点：
@@ -357,8 +369,8 @@ public class Form4Action extends ActionSupport {
 （2）使用表达式封装可以把数据封装到不同的实体类对象里面
  
  
-获取表单数据封装到集合里面
-封装数据到List集合
+## 四、获取表单数据封装到集合里面
+### （一）封装数据到List集合
 ListAction.java 和 list.jsp
 第一步 在action声明List
 第二步 生成list变量的set和get方法
@@ -366,7 +378,7 @@ ListAction.java 和 list.jsp
 第三步 在表单输入项里面写表达式
  
 
-封装数据到Map集合
+### （二）封装数据到Map集合
 mapAction.java 和 map.jsp
 第一步 声明map集合
 第二步 生成get和set方法

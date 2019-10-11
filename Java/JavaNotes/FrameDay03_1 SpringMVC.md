@@ -419,5 +419,6 @@ public String demo12() throws IOException{
 
 3. 底层使用Jackson 进行json 转换,在项目中一定要导入 jackson 的 jar
 
-3.1 spring4.1.6 对 jackson 不支持较高版本,jackson  2.7 无效.
+3.1 **spring4.1.6 对 jackson 不支持较高版本,jackson  2.7 无效**.
+spring5要使用jackson 2.9.X的版本，低于会报错版本不匹配
 

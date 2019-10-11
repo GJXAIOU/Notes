@@ -101,8 +101,8 @@ Tomcat不是一个完整意义上的Jave EE服务器，它甚至都没有提供�
   - web.xml 非常重要【现在非常重要】
 ​
 注意事项：
- 1 . WEB-INF目录的下内容不能通过浏览器目录方式访问
- 2 . 如果需要访问WEB-INF里面的资源内容，需要配置web.xml
+ 1 . **WEB-INF目录的下内容不能通过浏览器目录方式访问**
+ 2 . **如果需要访问WEB-INF里面的资源内容，需要配置web.xml**
 
 
 
@@ -140,8 +140,8 @@ Tomcat不是一个完整意义上的Jave EE服务器，它甚至都没有提供�
  在Tomcat服务器软件根目录下webapps中创建一个Web项目文件夹，要按照Web项目要求创建
   - 项目目录如下：
 
-Day39
-     WEB-INF：【固定写法】
+
+  WEB-INF：【固定写法】
           classes:    找到当前Servlet程序的class文件，要把这个文件放入到classes文件中
  【注意】要求放入的class文件要带有完整的包名
            web.xml 按照Servlet程序的规范书写XML文件
