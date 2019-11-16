@@ -55,7 +55,7 @@ public class Person{ //代码形式->类图
 只要是在**类中用到了对方，那么他们之间就存在依赖关系**。如果没有对方，连编绎都通过不了。
 
 ```java
-package com.atguigu.uml.dependence;
+package com.gjxaiou.uml.dependence;
 
 public class PersonServiceBean {
 	private PersonDao personDao;// 类
@@ -94,7 +94,7 @@ public class  Department{}
 - **泛化关系实际上就是继承关系**，他是**依赖关系的特例**
 
 ```java
-package com.atguigu.uml.generalization;
+package com.gjxaiou.uml.generalization;
 
 public abstract class DaoSupport{
 	public void save(Object entity){
