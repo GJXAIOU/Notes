@@ -1,167 +1,188 @@
 # Web开发
 
-## 1、简介
+[TOC]
 
 
 
-使用SpringBoot；
-
-**1）、创建SpringBoot应用，选中我们需要的模块；**
-
-**2）、SpringBoot已经默认将这些场景配置好了，只需要在配置文件中指定少量配置就可以运行起来**
-
-**3）、自己编写业务代码；**
+## 一、简介
 
 
 
-**自动配置原理？**
+- 使用SpringBoot 进行 WEB 开发步骤：
+    - **创建SpringBoot应用，选中我们需要的模块；**
+    - **SpringBoot已经默认将这些场景配置好了，只需要在配置文件中指定少量配置就可以运行起来**
+    - **自己编写业务代码；**
 
-使用自动配置原理还应该考虑一下这个场景SpringBoot帮我们配置了什么？能不能修改？能修改哪些配置？能不能扩展？xxx
 
+
+- **自动配置原理**
+
+    使用自动配置原理还应该考虑一下这个场景SpringBoot帮我们配置了什么？能不能修改？能修改哪些配置？能不能扩展？
+
+    - xxxxAutoConfiguration：帮我们给容器中自动配置组件；
+    - xxxxProperties:配置类来封装配置文件的内容；
+
+
+
+## 二、Spring Boot 对静态资源的映射规则
+
+在springboot 中关于 springMVC 的所有配置都在 WebMvcAutoConfiguration.java （使用 Ctrl + n 全局搜索该文件名即可）中，下面仅仅是静态资源配置的相关代码
+
+```java
+public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    if (!this.resourceProperties.isAddMappings()) {
+        logger.debug("Default resource handling disabled");
+    } else {
+        Integer cachePeriod = this.resourceProperties.getCachePeriod();
+        if (!registry.hasMappingForPattern("/webjars/**")) {
+            this.customizeResourceHandlerRegistration(
+                registry.addResourceHandler(new String[]{"/webjars/**"})
+                .addResourceLocations(new String[]{"classpath:/META-INF/resources/webjars/"})
+                .setCachePeriod(cachePeriod));
+        }
+
+        String staticPathPattern = this.mvcProperties.getStaticPathPattern();
+        //静态资源文件夹映射
+        if (!registry.hasMappingForPattern(staticPathPattern)) {
+            this.customizeResourceHandlerRegistration(
+                registry.addResourceHandler(new String[]{staticPathPattern})
+                .addResourceLocations(this.resourceProperties.getStaticLocations())
+                .setCachePeriod(cachePeriod));
+                }
+            }
+        }
+		
+
+//配置欢迎页映射
+@Bean
+public WelcomePageHandlerMapping welcomePageHandlerMapping(
+    ResourceProperties resourceProperties) {
+    return new WelcomePageHandlerMapping(resourceProperties.getWelcomePage(),
+                                         this.mvcProperties.getStaticPathPattern());
+}
+
+//配置喜欢的图标
+@Configuration
+@ConditionalOnProperty(
+    value = {"spring.mvc.favicon.enabled"},
+    matchIfMissing = true
+)
+public static class FaviconConfiguration {
+    private final ResourceProperties resourceProperties;
+
+    public FaviconConfiguration(ResourceProperties resourceProperties) {
+        this.resourceProperties = resourceProperties;
+    }
+
+    @Bean
+    public SimpleUrlHandlerMapping faviconHandlerMapping() {
+        SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+        mapping.setOrder(-2147483647);
+        mapping.setUrlMap(Collections.singletonMap("**/favicon.ico", this.faviconRequestHandler()));
+        return mapping;
+    }
+
+    @Bean
+    public ResourceHttpRequestHandler faviconRequestHandler() {
+        ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
+        requestHandler.setLocations(this.resourceProperties.getFaviconLocations());
+        return requestHandler;
+    }
+}
 ```
-xxxxAutoConfiguration：帮我们给容器中自动配置组件；
-xxxxProperties:配置类来封装配置文件的内容；
 
-```
-
-
-
-## 2、SpringBoot对静态资源的映射规则；
-
-下下面代码第8行中可以在resourceProperties 中进行相关设置配置，例如下面的设置（点击resourcesProperties 文件即可） 
+上面代码中的设置配置在 resourceProperties.java 中，例如下面的部分文件设置（点击resourcesProperties 文件即可） ，可以设置其所有的属性值，例如： 可以设置和静态资源有关的参数，缓存时间等
 
 ```java
 @ConfigurationProperties(prefix = "spring.resources", ignoreUnknownFields = false)
 public class ResourceProperties implements ResourceLoaderAware {
-  //可以设置和静态资源有关的参数，缓存时间等
-```
+    private static final String[] SERVLET_RESOURCE_LOCATIONS = { "/" };
+	private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
+			"classpath:/META-INF/resources/", "classpath:/resources/",
+			"classpath:/static/", "classpath:/public/" };
 
-在springboot 中关于 springMVC 的所有配置都在 WebMvcAutoConfiguration.java 中，下面仅仅是静态资源配置的相关代码
+	private static final String[] RESOURCE_LOCATIONS;
 
-```java
-	WebMvcAuotConfiguration：
-		@Override
-		public void addResourceHandlers(ResourceHandlerRegistry registry) {
-			if (!this.resourceProperties.isAddMappings()) {
-				logger.debug("Default resource handling disabled");
-				return;
-			}
-			Integer cachePeriod = this.resourceProperties.getCachePeriod();
-			if (!registry.hasMappingForPattern("/webjars/**")) {
-				customizeResourceHandlerRegistration(
-						registry.addResourceHandler("/webjars/**")
-								.addResourceLocations(
-										"classpath:/META-INF/resources/webjars/")
-						.setCachePeriod(cachePeriod));
-			}
-			String staticPathPattern = this.mvcProperties.getStaticPathPattern();
-          	//静态资源文件夹映射
-			if (!registry.hasMappingForPattern(staticPathPattern)) {
-				customizeResourceHandlerRegistration(
-						registry.addResourceHandler(staticPathPattern)
-								.addResourceLocations(
-										this.resourceProperties.getStaticLocations())
-						.setCachePeriod(cachePeriod));
-			}
-		}
+	static {
+		RESOURCE_LOCATIONS = new String[CLASSPATH_RESOURCE_LOCATIONS.length
+				+ SERVLET_RESOURCE_LOCATIONS.length];
+		System.arraycopy(SERVLET_RESOURCE_LOCATIONS, 0, RESOURCE_LOCATIONS, 0,
+				SERVLET_RESOURCE_LOCATIONS.length);
+		System.arraycopy(CLASSPATH_RESOURCE_LOCATIONS, 0, RESOURCE_LOCATIONS,
+				SERVLET_RESOURCE_LOCATIONS.length, CLASSPATH_RESOURCE_LOCATIONS.length);
+	}
 
-        //配置欢迎页映射
-		@Bean
-		public WelcomePageHandlerMapping welcomePageHandlerMapping(
-				ResourceProperties resourceProperties) {
-			return new WelcomePageHandlerMapping(resourceProperties.getWelcomePage(),
-					this.mvcProperties.getStaticPathPattern());
-		}
-
-       //配置喜欢的图标
-		@Configuration
-		@ConditionalOnProperty(value = "spring.mvc.favicon.enabled", matchIfMissing = true)
-		public static class FaviconConfiguration {
-
-			private final ResourceProperties resourceProperties;
-
-			public FaviconConfiguration(ResourceProperties resourceProperties) {
-				this.resourceProperties = resourceProperties;
-			}
-
-			@Bean
-			public SimpleUrlHandlerMapping faviconHandlerMapping() {
-				SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-				mapping.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
-              	//所有  **/favicon.ico 
-				mapping.setUrlMap(Collections.singletonMap("**/favicon.ico",
-						faviconRequestHandler()));
-				return mapping;
-			}
-
-			@Bean
-			public ResourceHttpRequestHandler faviconRequestHandler() {
-				ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
-				requestHandler
-						.setLocations(this.resourceProperties.getFaviconLocations());
-				return requestHandler;
-			}
-
-		}
+	private String[] staticLocations = RESOURCE_LOCATIONS;
+	private Integer cachePeriod;
+	private boolean addMappings = true;
+	private final Chain chain = new Chain();
+	private ResourceLoader resourceLoader;
 
 ```
 
 
 
-==1）、所有 /webjars/**的请求 ，都去 classpath:/META-INF/resources/webjars/ 找资源；==
+### （一）映射规则一（WebJars）
 
-​	webjars：以jar包的方式引入静态资源；以前是使用 webapp 目录下面
+从第一段代码中得出：==所有 `/webjars/**`的请求 ，都去 `classpath:/META-INF/resources/webjars/` 找资源；==
 
-http://www.webjars.org/
+- webjars：以jar包的方式引入静态资源；以前是放在 webapp 目录下面即可；
 
-需要使用什么，从上面网站中引入响应的 jar 包即可，这里以 jQuery 为例，需要引入下面的jar包，下图为该jar 包中具体的内容；
+- 需要使用什么，从[官方网站](http://www.webjars.org/)中引入响应的 jar 包即可，这里以 jQuery 为例，需要引入下面的jar包，下图为该jar 包中具体的内容；
 
 ```xml
 <!--引入jquery-webjar-->在访问的时候只需要写webjars下面资源的名称即可
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.3.1</version>
-		</dependency>
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>jquery</artifactId>
+    <version>3.4.1</version>
+</dependency>
 ```
 
 
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180203181751.png)
 
-如果访问：localhost:8080/webjars/jquery/3.3.1/jquery.js 就能访问这里面的 js 了
+测试：如果访问：localhost:8080/webjars/jquery/3.3.1/jquery.js 就能访问这里面的 js 了
 
+### （二）映射规则二：（项目任意路径）
 
+代码块一种第13行中：mvcProperties 文件中的 staticPathPattern 值为：`/**`，这就是第二种映射规则；
 
-上面代码第16行中：mvcProperties文件中的 staticPathPattern 值为：`/**`，这就是第二种映射规则
+`private String staticPathPattern = "/**";` 这里是 WebMvcProperties.java 中对应的代码；
 
-==2）、"/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射== 如果该路径没有人进行处理就去下面文件夹中找
+=="/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射== 即如果该路径没有人进行处理就去下面文件夹中找（"/"：表示当前项目的根路径）
 
 ```
 "classpath:/META-INF/resources/", 
 "classpath:/resources/",
 "classpath:/static/", 
 "classpath:/public/" 
-"/"：当前项目的根路径
 ```
 
 ![image-20191122111352927](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191122111352927.png)
 
 例如访问：localhost:8080/static/asserts/css/signin.css  就是可以访问到资源的；
 
+### （三）映射规则三：欢迎页
+
 ==3）、欢迎页； 静态资源文件夹下的所有index.html页面；被"/**"映射；==
 
 ​	localhost:8080/   找index页面
 
+### （四）映射规则四：网页标签的小图标
+
 ==4）、所有的 **/favicon.ico  都是在静态资源文件下找；==
 
-
+### （五）自定义映射规则
 
 当然可以自己在 application.properties 中通过 `spring.resource.static-locations=classpath:/hello/`设置路径在 /hello/下面
 
-## 3、模板引擎
 
-因为springboot 使用内嵌的 tomcat，不支持jsp等等，因此可以使用模板引擎。
+
+## 三、模板引擎
+
+因为 springboot 使用内嵌的 tomcat，不支持 jsp 等等，因此可以使用模板引擎。
 
 现有的模板引擎包括：JSP、Velocity、Freemarker、Thymeleaf
 
@@ -169,32 +190,33 @@ http://www.webjars.org/
 
 
 
-SpringBoot推荐的Thymeleaf；
-
-语法更简单，功能更强大；
+==**SpringBoot 推荐的 Thymeleaf**==，因为其语法更简单，功能更强大；
 
 
 
-### 1、引入thymeleaf；
+### （一）引入thymeleaf
 
 ```xml
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
 <!--切换thymeleaf版本-->
 <properties>
-		<thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
-		<!-- 下面是布局功能的支持程序，针对thymeleaf3主程序需要layout2以上版本 -->
-		<thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
-  </properties>
+    <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
+  
+     <thymeleaf-extras-java8time.version>3.0.4.RELEASE</thymeleaf-extras-java8time.version>
+    <thymeleaf-extras-springsecurity.version>3.0.4.RELEASE</thymeleaf-extras-springsecurity.version>
+      <!-- 下面是布局功能的支持程序，针对thymeleaf3主程序需要layout2以上版本 -->
+    <thymeleaf-layout-dialect.version>2.4.1</thymeleaf-layout-dialect.version>
+</properties>
 ```
 
 
 
-### 2、Thymeleaf使用
+### （二）Thymeleaf 使用
 
-自动配置规则在 spring-boot-autoconfigure.jar 中的org.thymeleaf.ThymleafAutoConfiuration.java 中，下面是其对应的 ThymeleafProperties.java 中封装着其默认规则，下面是部分代码
+自动配置规则在`spring-boot-autoconfigure-2.2.1.RELEASE.jar!\org\springframework\boot\autoconfigure\thymeleaf\ThymeleafAutoConfiguration.java `中，下面是其对应的 ThymeleafProperties.java 中封装着其默认规则，下面是部分代码
 
 ```java
 @ConfigurationProperties(prefix = "spring.thymeleaf")
@@ -209,22 +231,12 @@ public class ThymeleafProperties {
 	public static final String DEFAULT_SUFFIX = ".html";
 ```
 
-上面的含义：只要我们把HTML页面放在classpath:/templates/，thymeleaf就能自动渲染；
+上面的含义：只要我们把HTML页面放在 `classpath:/templates/`目录下，thymeleaf 就能自动渲染；
 
 例如在 helloController.java 中输入：
 
 ```java
 package com.atguigu.springboot.controller;
-
-
-import com.atguigu.springboot.exception.UserNotExistException;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.Arrays;
-import java.util.Map;
 
 @Controller
 public class HelloController {
@@ -236,17 +248,16 @@ public class HelloController {
 }
 ```
 
-上面代码在 templates文件夹下面新建：success.html ，访问;localhost:8080/success就可以到达该页面；
+上面代码在 templates文件夹下面新建：success.html ，访问：`localhost:8080/success`就可以到达该页面；
 
-使用：
+- 在 HTML 中的使用
+    -  导入thymeleaf的名称空间（下面两段代码都在在 sucess.html 中）	
 
-1、导入thymeleaf的名称空间（下面两段代码都在在 sucess.html 中）
+        ```html
+        <html lang="en" xmlns:th="http://www.thymeleaf.org">
+        ```
 
-```xml
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-```
-
-2、使用thymeleaf语法；
+    - 使用thymeleaf语法；
 
 ```html
 <!DOCTYPE html>
@@ -269,16 +280,6 @@ public class HelloController {
 ```java
 package com.atguigu.springboot.controller;
 
-
-import com.atguigu.springboot.exception.UserNotExistException;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.Arrays;
-import java.util.Map;
-
 @Controller
 public class HelloController {
 
@@ -286,34 +287,30 @@ public class HelloController {
     @RequestMapping("/success")
     public String success(Map<String,Object> map){
         map.put("hello","<h1>你好</h1>");
-        map.put("users",Arrays.asList("zhangsan","lisi","wangwu"));
         return "success";
     }
 }
-
 ```
 
 
 
+### （三）语法规则
 
+- `th：任意html属性`：来替换原生属性（即 HTML 中默认的属性）的值
 
-### 3、语法规则
-
-1）、th:text；改变当前元素里面的文本内容；
-
-​	`th：任意html属性`；来替换原生属性（即 HTML 中默认的属性）的值
+    示例：th:text：改变当前元素里面的文本内容；
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/2018-02-04_123955.png)
 
 
 
-2）、支持的表达式语法：
+- 支持的表达式语法：
 
 ```properties
 Simple expressions:（表达式语法）
     Variable Expressions: ${...}：获取变量值；底层就是OGNL；
-    		1）、获取对象的属性、调用方法
-    		2）、使用内置的基本对象：（即在 {}中可以加入下面这些）
+    		1）、可以获取对象的属性、调用方法
+    		2）、使用内置的基本对象：（即在 ${}中可以加入下面这些）
     			#ctx : the context object.
     			#vars: the context variables.
                 #locale : the context locale.
@@ -347,12 +344,12 @@ Simple expressions:（表达式语法）
            		 <p>Surname: <span th:text="*{lastName}">Pepper</span>.</p>
                   <p>Nationality: <span th:text="*{nationality}">Saturn</span>.</p>
             </div>
-          对应于使用上面的 ${...}写法为：
-           <div>
-               <p>Name: <span th:text="${session.user.firstName}">Sebastian</span>.</p>
-               <p>Surname: <span th:text="${session.user.lastName}">Pepper</span>.</p>
-               <p>Nationality: <span th:text="${session.user.nationality}">Saturn</span>.</p>
-           </div>
+         对应于使用上面的 ${...}写法为：
+          <div>
+             <p>Name: <span th:text="${session.user.firstName}">Sebastian</span>.</p>
+             <p>Surname: <span th:text="${session.user.lastName}">Pepper</span>.</p>
+             <p>Nationality: <span th:text="${session.user.nationality}">Saturn</span>.</p>
+          </div>
     
     Message Expressions: #{...}：获取国际化内容
     Link URL Expressions: @{...}：定义URL；
@@ -392,19 +389,8 @@ Special tokens:
 ```java
 package com.atguigu.springboot.controller;
 
-
-import com.atguigu.springboot.exception.UserNotExistException;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.Arrays;
-import java.util.Map;
-
 @Controller
 public class HelloController {
-
 
     //查出用户数据，在页面展示
     @RequestMapping("/success")
@@ -429,7 +415,6 @@ public class HelloController {
 </head>
     
 <body>
-   
     <div th:text="${hello}"></div>
     <div th:utext="${hello}"></div>
     <hr/>
@@ -447,15 +432,19 @@ public class HelloController {
 </html>
 ```
 
-## 4、SpringMVC自动配置
 
-[关于springMVC 的说明](https://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/#boot-features-developing-web-applications)
 
-### 1. Spring MVC auto-configuration
 
-Spring Boot 自动配置好了SpringMVC
 
-以下是SpringBoot对SpringMVC的默认配置:**==下面的所有都在（WebMvcAutoConfiguration）文件中==**
+## 四、SpringMVC 自动配置
+
+[关于springMVC 的说明](  https://docs.spring.io/spring-boot/docs/2.2.1.RELEASE/reference/htmlsingle/#boot-features-spring-mvc  )
+
+### （一）Spring MVC 的 auto-configuration
+
+Spring Boot 自动配置好了 SpringMVC
+
+以下是SpringBoot 对 SpringMVC的默认配置:**==下面的所有都在（WebMvcAutoConfiguration）文件中==**
 
 - Inclusion of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
 
