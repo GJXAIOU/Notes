@@ -237,7 +237,7 @@ public class DemoController {
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
     <!-- 扫描注解 -->
-	<context:component-scan base-package="com.bjsxt.controller"></context:component-scan>
+	<context:component-scan base-package="com.gjxaiou.controller"></context:component-scan>
 	<!-- 注解驱动 -->
 	<!-- org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping -->
 	<!-- org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter -->

@@ -78,7 +78,7 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
     <!-- 步骤一：扫描注解，必须在 SpringMVC 的配置文件中配置，不能在 web.xml 中配置 -->
-	<context:component-scan base-package="com.bjsxt.controller"></context:component-scan>
+	<context:component-scan base-package="com.gjxaiou.controller"></context:component-scan>
 	<!-- 注解驱动 -->
 	<!-- org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping -->
 	<!-- org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter -->
@@ -95,9 +95,9 @@
 ### （四）编写控制器类
 
 ```java
-package com.bjsxt.controller;
+package com.gjxaiou.controller;
 
-import com.bjsxt.pojo.Demo;
+import com.gjxaiou.pojo.Demo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

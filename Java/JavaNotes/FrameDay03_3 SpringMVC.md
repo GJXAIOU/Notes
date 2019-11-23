@@ -196,9 +196,9 @@ public class ControllerDemo {
 preHandle(A)  --> preHandle(B)  -->  控制器方法  -->  postHandle(B)-->  postHanle(A)  -->  JSP  -->  afterCompletion(B)  -->  afterCompletion(A)
 
 **代码示例：**
-同时在包 com.bjsxt.interceptor 包下面实现两个拦截器：interceptor1 和 interceptor2，两者的示例代码相同，但是 print 函数结果不同作为区分；
+同时在包 com.gjxaiou.interceptor 包下面实现两个拦截器：interceptor1 和 interceptor2，两者的示例代码相同，但是 print 函数结果不同作为区分；
 ```java
-package com.bjsxt.interceptor;
+package com.gjxaiou.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -233,8 +233,8 @@ public class DemoInterceptor1 implements HandlerInterceptor {
 <!-- 拦截器 -->
 <mvc:interceptors>
 	<!--拦截顺序和配置顺序有关-->
-	<bean class="com.bjsxt.interceptor.DemoInterceptor1"></bean>
-	<bean class="com.bjsxt.interceptor.DemoInterceptor2"></bean>
+	<bean class="com.gjxaiou.interceptor.DemoInterceptor1"></bean>
+	<bean class="com.gjxaiou.interceptor.DemoInterceptor2"></bean>
 </mvc:interceptors>
 ```
 假设 controller 中只有一个控制器：
@@ -284,7 +284,7 @@ springmvc.xml 内容为：
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 	<!-- 扫描注解 -->
-	<context:component-scan base-package="com.bjsxt.controller"></context:component-scan>
+	<context:component-scan base-package="com.gjxaiou.controller"></context:component-scan>
 	<!-- 注解驱动 -->
 	<mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
 

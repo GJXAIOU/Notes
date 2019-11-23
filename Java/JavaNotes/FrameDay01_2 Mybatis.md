@@ -113,7 +113,7 @@ public class Test {
 
 ## 二、动态 SQL
 
-1. 根据不同的条件需要执行不同的 SQL 命令，称为动态 SQL
+1. **根据不同的条件需要执行不同的 SQL 命令，称为动态 SQL**
 2. **MyBatis 中动态 SQL 的实现是在 `实体类mapper.xml`  中添加逻辑判断即可**。
 注：以下的 xml 配置均在 LogMapper.xml 中；
 ### （一）If 使用

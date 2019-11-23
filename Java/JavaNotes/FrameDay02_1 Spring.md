@@ -442,7 +442,7 @@ public class People {
 }
 ```
   -  如果属性是基本数据类型或 String 等简单的，首先创建People类对象，下面是给对象的属性进行赋值
- **<property> 标签用来描述一个类的属性，基本类型封装类、 String 等需要值的类型使用 value 赋值，引用类型使用 ref 赋值；**
+ **<property> 标签用来描述一个类的属性，基本类型封装类、 String 等需要值的类型使用 value 赋值，引用类型使用 ref 赋值；** 
 ```java
 <bean id="people" class="com.gjxaiou.pojo.People">
     <property name="id" value="12"></property>
@@ -454,7 +454,7 @@ public class People {
 ```
 上面代码等效于：（一般使用上面方式）
 ```java
-<bean id="peo" class="com.bjsxt.pojo.People">
+<bean id="peo" class="com.gjxaiou.pojo.People">
     <property name="id">
         <value>12</value>
     </property>
@@ -553,10 +553,10 @@ public class B{
 代码体现：
 ```xml
 // 先对 A 对象进行实例化
-<bean id="a" class="com.bjsxt.pojo.A">
+<bean id="a" class="com.gjxaiou.pojo.A">
     <property name="b" ref="b"></property> </bean>
     // 然后对 A 类中的 B 对象进行实例化
-    <bean id="b" class="com.bjsxt.pojo.B">
+    <bean id="b" class="com.gjxaiou.pojo.B">
       <property name="id" value="1"></property>
       <property name="price" value="12"></property>
 </bean>
@@ -639,18 +639,18 @@ standard-1.1.2.jar
   <property name="dataSource" ref="dataSouce"></property>
   </bean>
   
-  <!-- 扫描器相当于mybatis.xml 中mappers 下package 标签,扫描com.bjsxt.mapper 包后会给对应接口创建对象-->
+  <!-- 扫描器相当于mybatis.xml 中mappers 下package 标签,扫描com.gjxaiou.mapper 包后会给对应接口创建对象-->
   <bean
       class="org.mybatis.spring.mapper.MapperScannerConfigurer">
   <!-- 要扫描哪个包-->
-      <property name="basePackage" value="com.bjsxt.mapper"></property>
+      <property name="basePackage" value="com.gjxaiou.mapper"></property>
   <!-- 和factory 产生关系-->
       <property name="sqlSessionFactory" ref="factory"></property>
   </bean>
 
   <!-- 由spring 管理service 实现类-->
   <bean id="airportService"
-      class="com.bjsxt.service.impl.AirportServiceImpl">
+      class="com.gjxaiou.service.impl.AirportServiceImpl">
       <property name="airportMapper" ref="airportMapper"></property>
   </bean>
 </beans>

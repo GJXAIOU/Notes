@@ -113,7 +113,7 @@ public class Student {
 
 <!-- 如果关联一个对象，使用 association 标签，调用 teacher 中的查询，如果关联多个对象，使用 collection 标签 -->
 // 老师查询中需要一个 Int 类型的参数，这里要通过 column 告诉他传入哪一列的值
-    <association property="teacher" select="com.bjsxt.mapper.TeacherMapper.selById"  column="tid">
+    <association property="teacher" select="com.gjxaiou.mapper.TeacherMapper.selById"  column="tid">
     </association>
 </resultMap>
 
@@ -129,7 +129,7 @@ public class Student {
     <result column="tid" property="tid"/>
     <!-- 如果关联一个对象-->
     <association property="teacher"
-select="com.bjsxt.mapper.TeacherMapper.selById"
+select="com.gjxaiou.mapper.TeacherMapper.selById"
 column="tid"></association>
 </resultMap>
 
@@ -218,7 +218,7 @@ public class Teacher {
     <id column="id" property="id"/>
     <result column="name" property="name"/>
 
-    <collection property="list" select="com.bjsxt.mapper.StudentMapper.selByTid" column="id">
+    <collection property="list" select="com.gjxaiou.mapper.StudentMapper.selByTid" column="id">
     </collection>    
 </resultMap>
 
@@ -332,7 +332,7 @@ List<Student> selByTid(int tid);
 @Results(value={
     @Result(id=true,property="id",column="id"),
     @Result(property="name",column="name"),
-@Result(property="list",column="id",many=@Many(select="com.bjsxt.mapper.StudentMapper.selByTid"))
+@Result(property="list",column="id",many=@Many(select="com.gjxaiou.mapper.StudentMapper.selByTid"))
     })
     @Select("select * from teacher")
     List<Teacher> selTeacher();

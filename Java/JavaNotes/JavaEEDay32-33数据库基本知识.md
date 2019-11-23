@@ -8,7 +8,46 @@ style: summer
 @toc
 
 # JavaEEDay32 数据库
-全篇总结：2019-8-1
+
+## 一、数据库的组成
+- 数据库服务器：装有数据库软件的一个电脑
+- 数据库：软件：MySQL、Oracle
+- 数据表：一个表格，里面放着一条一条的数据，类似于 Excel
+- 字段：表示该数据时什么数据，例如：姓名、年龄、性别；
+- 数据行：一个完整的数据
+
+## 二、数据库分类
+关系型数据库，非关系型数据库
+- 关系型数据库：MySQL
+
+## 三、SQL 语句
+结构化查询语句：Structured Query Language
+
+
+## 四、SQL 语句分类
+* DDL（Data Definition Lanuage）：数据定义
+主要是创建数据库各种对象，如表、视图、索引、同义词等等；语句：`create table/...`
+* DML（Data Manipulation Language）：数据操作（纵）
+如增删改操作：insert，delete，update；
+* DQL（Data Query Language）：数据查询
+由 select 子句，from 子句，where 自己构成；
+* DCL（Data Control Language）：数据控制
+主要用来设置或者修改数据库用户或者角色权限的语句；以及数据库操作事务发生时间及其效果；
+* TPL（Transaction Processing Language）：事务处理
+
+CRUD 对应于：create，read，update，delete
+
+
+## 五、从命令行连接数据库
+需要：数据库服务器地址  数据库访问用户名  当前访问用户名的密码  （本地连接 第一个可以不输入）
+例如完整的数据库连接命名：`mysql -hlocalhost -uroot -p12345`
+建议使用方式：`mysql -hlocalhost -uroot -p`然后输入的是加密的密码
+- sql 语句以`;`结尾
+- 退出命令：`quit`或者`exit`
+- 清楚本次错误输入：`\c`
+
+
+
 
 ##  针对库：
   - 创库：`create database demo;`
@@ -118,51 +157,6 @@ couse 表格中有：couseID couseName
 
 - 查询某一个学生选了哪些课程：`select * from student s inner join stuToCouse sc on s.stuID = sc.stuID inner join couse c on sc.couseID = c.couseID where s.stuName = "XXX";`
 - 查询某一课程有哪些学生选择：`select * from couse c inner join stuToCouse sc on c.couseID = sc.couseID inner join student s on sc.stuID = s.stuID where c.couseName = "XXXX";`
-
-
-
-
-
-
-
-## 一、数据库的组成
-- 数据库服务器：装有数据库软件的一个电脑
-- 数据库：软件：MySQL、Oracle
-- 数据表：一个表格，里面放着一条一条的数据，类似于 Excel
-- 字段：表示该数据时什么数据，例如：姓名、年龄、性别；
-- 数据行：一个完整的数据
-
-## 二、数据库分类
-关系型数据库，非关系型数据库
-- 关系型数据库：MySQL
-
-## 三、SQL 语句
-结构化查询语句：Structured Query Language
-
-
-## 四、SQL 语句分类
-DDL：数据定义
-DML：数据操作
-DQL：数据查询
-DCL：数据控制
-DTL：事务处理
-
-CRUD 对应于：
-create
-read
-update
-delete
-
-
-## 五、从命令行连接数据库
-需要：数据库服务器地址  数据库访问用户名  当前访问用户名的密码  （本地连接 第一个可以不输入）
-例如完整的数据库连接命名：`mysql -hlocalhost -uroot -p12345`
-建议使用方式：`mysql -hlocalhost -uroot -p`然后输入的是加密的密码
-- sql 语句以`;`结尾
-- 退出命名：`quit`或者`exit`
-- 清楚本次错误输入：`\c`
-
-
 
 ## 六、基本命令
 
@@ -318,71 +312,7 @@ insert into testSet(likes) values(3);
 #set值以二进制表示：1 2 4 8 16  ；要的值加起来就行
 ```
 
+**没有布尔类型** 虽然 `create table test(isPage boolean)` 可以正常执行，但是最终生成的字段的类型并不是布尔类型，是一个 tinyint 类型，使用数字来表示布尔类型，0 表示 false，1 表示 true；
 
 
-### （二）查询语句 DQL 
-
-- 查看所有数据：`select * from 表名;`
-- 只查某个表中某些字段数据：`select 字段1，字段2 from 表名;`
-- 查询带有条件的数据（以字段值>10 为例）：`select 字段1，字段2 from 表名 where 字段3>10;`
-- 查询字段去重之后的数据：`select distinct 字段 from 表名;`
-- 获取表中某些字段的值，并且改变展示的字段名称，同时多条限制条件；`select stuName as "姓名" ,stuAge as "年龄" from stuInfo where stuAge >= 20 and stuScore <90;`或者的话可以使用 or;
-
-- 排序查询（默认升序）：`select * from stuInfo order by stuScore asc;`降序改为 desc;
-- 多重条件查询：优先主条件，主条件相同按照附条件；`select stuName,stuAge from stuInfo order by stuAge asc, stuScore desc;`
-- 模糊查询：
-  - 查询 某个字段以某个字符结尾的数据：`select * from 表名 where stuName like "%看";` 其中%为通配符，表示 0 到 n 个字符；
-  - 查询某个字段以 看 字结尾，且前面只有一个字符的数据：`select * from 表名 where stuName like "_看";` 其中`_`为通配符，表示 有且仅有 1 个字符；
-  - 查询某个字段包含 看 字字符：`select * from 表名 where stuName like "%看%";`
-
-- 模拟分页显示数据：
-  - 只获取前 3 条数据：`select * from 表名 limit 3;`
-  - 从某个数据开始，向后获取几个数据：`select * from 表名 limit 0, 5;`从 第 0 个数据开始，向后获取 5 个数据；
-
-- 内置函数：不推荐使用，应该是从数据库获取数据，然后使用 Java 代码处理数据；
-  - 获取最大值：`select max(stuAge) as "最大年龄" from stuInfo;` 最小值为：min,平均值为：avg
-  - 获取总数：`select count(*) as "总数" from stuInfo where stuAge > 20;`中间的 as 和 where 都是可用可以不用；
-
-
-
-
-### （三）删除数据
- - 删除数据表中的所有数据行：`delete from 表名;`
- - 删除带有条件的数据行:`delete from 表名 where stuId = 3;`where 后面的条件可以是：`>` `<` `>=` `<=` `=` `!=` `<>` `between and`
- - 使用 truncate 会清空整个数据表，但是不会影响数据表结构，同时会影响原来的自增条件，会从 1 开始；`truncate table 表名;`
-
-
-### （四）修改更新数据
-例如更新一些值为空的字段数据：`update 表名 set stuAge = 12,stuName = "赵六" where stuId = 2;` 注意增加 where 语句，否则会将这个表数据进行更新；
-
-
-
-### （五）连表查询
-
-#### 1. 一对一查询
-man 表中有 manID   manName  girlID; girl 表中有 girlID  girlName;
-- 通过 man 和 girl 两表中通过 grilID 进行匹配展示数据:
-`select * from man ,girl where man.girlID = girl.girlID;`
-另一种方式：内联查询：可以是实现多个表联合查询，其中 on 和 where 类似 【推荐使用】
-`select * from man inner join girl on man.girlID = girl.girlID;`
-
-
-#### 2. 一对多查询
-father 表中有：fatherID fatherName; son 表中有：sonID  sonName  fatherID;
-- 查询某一个父亲下的孩子：`select * from father inner join son on son.fatherID = father.fatherID where fatherName = "XXX";`
-将上面使用别名进行简化书写：`select * from father f inner join son s on s.fatherID = f.fatherID where fatherName = "XXX";`
-
-
-#### 3. 多对多查询
-**多对多查询需要使用中间表格**
-student 表格中有：stuID  stuName ;
-中间表格 stuToCouse 中有：stuToCouseID stuID couseID
-couse 表格中有：couseID couseName
-
-- 查询某一个学生选了哪些课程：`select * from student s inner join stuToCouse sc on s.stuID = sc.stuID inner join couse c on sc.couseID = c.couseID where s.stuName = "XXX";`
-- 查询某一课程有哪些学生选择：`select * from couse c inner join stuToCouse sc on c.couseID = sc.couseID inner join student s on sc.stuID = s.stuID where c.couseName = "XXXX";`
-
-
-
-![总结]($resource/%E6%80%BB%E7%BB%93.png)
 

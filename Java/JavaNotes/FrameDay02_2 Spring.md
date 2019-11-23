@@ -54,7 +54,7 @@ style: summer
 【在切点方法之前和之后分别执行了一个方法】
 - 步骤一：首先导入 jar，除了 spring 核心功能包外，注意添加两个额外的包：aopalliance.jar 和 aspectjweaver.jar
 
-- 步骤二：然后新建通知类并重写 before 或者 after 方法（通知类有了两种：前置通知类和后置通知类，根据需要使用）
+- 步骤二：然后新建通知类并重写 before 或者 after 方法（通知类有两种：前置通知类和后置通知类，根据需要使用）
   - 新建前置通知类
     - arg0：切点方法对 Method 对象
     - arg1：切点方法参数
@@ -90,7 +90,7 @@ public class MyAfterAdvice implements AfterReturningAdvice {
     - `*` 为通配符,匹配任意方法名,任意类名,任意一级包名
     - 如果希望匹配任意方法参数 `(..)`，就是下面 expression中的最后demo2(..)
 通配符的使用范例：
-`<aop:pointcut expression="execution(* com.bjsxt.test.*.*(..))" id="mypoint"/>` 表示test 这个包下面的任意类的任意方法的任意参数都需要形成切面，本质上任意位置都可以使用 * 表示任意；
+`<aop:pointcut expression="execution(* com.gjxaiou.test.*.*(..))" id="mypoint"/>` 表示test 这个包下面的任意类的任意方法的任意参数都需要形成切面，本质上任意位置都可以使用 * 表示任意；
 ==下面 代码中直接配置 bean，但是方法中并没有 return 对象，能够实例化对象吗？==
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -205,11 +205,11 @@ public class MyThrow implements ThrowsAdvice{
 
 - 步骤二：然后在 ApplicationContext.xml 配置
 ```xml
-<bean id="demo" class="com.bjsxt.test.Demo"></bean>
-<bean id="mythrow" class="com.bjsxt.advice.MyThrow"></bean>
+<bean id="demo" class="com.gjxaiou.test.Demo"></bean>
+<bean id="mythrow" class="com.gjxaiou.advice.MyThrow"></bean>
 
 <aop:config>
-    <aop:pointcut expression="execution(*com.bjsxt.test.Demo.demo1())" id="mypoint"/>
+    <aop:pointcut expression="execution(*com.gjxaiou.test.Demo.demo1())" id="mypoint"/>
     <aop:advisor advice-ref="mythrow"  pointcut-ref="mypoint" />
 </aop:config>
 ```
@@ -236,11 +236,11 @@ public class MyArround implements MethodInterceptor {
 
 - 步骤二：配置 applicationContext.xml
 ```applicationContext_xml
-<bean id="demo" class="com.bjsxt.test.Demo"></bean>
-<bean id="myarround" class="com.bjsxt.advice.MyArround"></bean>
+<bean id="demo" class="com.gjxaiou.test.Demo"></bean>
+<bean id="myarround" class="com.gjxaiou.advice.MyArround"></bean>
 
 <aop:config>
-    <aop:pointcut expression="execution(*com.bjsxt.test.Demo.demo1())" id="mypoint"/>
+    <aop:pointcut expression="execution(*com.gjxaiou.test.Demo.demo1())" id="mypoint"/>
     <aop:advisor advice-ref="myarround" pointcut-ref="mypoint" />
 </aop:config>
 ```
@@ -289,8 +289,8 @@ public  class  MyAdvice  {
 <aop:config>
     <aop:aspect  ref="myadvice">
     <!-- 这里的name1 和 age1 仅仅是对参数进行赋值，然后将这些值赋值给通知，因此上面 advice 参数名称和他们相同-->
-        <aop:pointcut  expression="execution(* com.bjsxt.test.Demo.demo1(String,int)) and args(name1,age1)"  id="mypoint"/>
-      <aop:pointcut  expression="execution(* com.bjsxt.test.Demo.demo1(String))  and  args(name1)" id="mypoint1"/>
+        <aop:pointcut  expression="execution(* com.gjxaiou.test.Demo.demo1(String,int)) and args(name1,age1)"  id="mypoint"/>
+      <aop:pointcut  expression="execution(* com.gjxaiou.test.Demo.demo1(String))  and  args(name1)" id="mypoint1"/>
       
       <aop:before method="mybefore"pointcut-ref="mypoint" arg-names="name1,age1"/>
       <aop:before method="mybefore1" pointcut-ref="mypoint1" arg-names="name1"/>
@@ -323,7 +323,7 @@ http://www.springframework.org/schema/context/spring-context.xsd">
  **实现步骤:**
 
 - 步骤一：在 spring 配置文件中设置注解在哪些包中（使用组件扫描）
-`<context:component-scan base-package="com.gjxaiou.advice,com.bjsxt.test"></context:component-scan>`
+`<context:component-scan base-package="com.gjxaiou.advice,com.gjxaiou.test"></context:component-scan>`
 
 同时要添加动态代理： proxy-target-class值为 true表示使用 cglib动态代理，值为 false 表示使用 jdk 动态代理；
 `<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>`
@@ -333,7 +333,7 @@ http://www.springframework.org/schema/context/spring-context.xsd">
 ```Demo_java
 @Component（"dd"）
 public class Demo {
-    @Pointcut("execution(* com.bjsxt.test.Demo.demo1())")
+    @Pointcut("execution(* com.gjxaiou.test.Demo.demo1())")
     public void demo1() throws Exception{
         // int i = 5/0;
       System.out.println("demo1");
@@ -348,19 +348,19 @@ public class Demo {
 @Component
 @Aspect // 表示该类为通知切面类
 public class MyAdvice {
-    @Before("com.bjsxt.test.Demo.demo1()")
+    @Before("com.gjxaiou.test.Demo.demo1()")
     public void mybefore(){
         System.out.println("前置");
     }
-    @After("com.bjsxt.test.Demo.demo1()")
+    @After("com.gjxaiou.test.Demo.demo1()")
     public void myafter(){
         System.out.println("后置通知");
     }
-    @AfterThrowing("com.bjsxt.test.Demo.demo1()")
+    @AfterThrowing("com.gjxaiou.test.Demo.demo1()")
     public void mythrow(){
         System.out.println("异常通知");
     }
-    @Around("com.bjsxt.test.Demo.demo1()")
+    @Around("com.gjxaiou.test.Demo.demo1()")
     public Object myarround(ProceedingJoinPoint p) throws Throwable{
         System.out.println("环绕-前置");
         Object result = p.proceed();

@@ -19,7 +19,7 @@ Createtable 表名(
 ## 二、命名规范
 
 * 项目名:没有要求，不起中文
-* 包:公司域名倒写 com.bjsxt
+* 包:公司域名倒写 com.gjxaiou
 * 数据访问层:dao， persist， **mapper**
 * 实体:entity， model， bean，javabean， **pojo**
 * 业 务 逻 辑 : **service**，biz 
@@ -337,7 +337,7 @@ public class Test {
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="a.b" >
-	<select id="selAll" resultType="com.bjsxt.pojo.Flower">
+	<select id="selAll" resultType="com.gjxaiou.pojo.Flower">
 		select id,name name123,price,production from flower
 	</select>
 	
@@ -346,7 +346,7 @@ public class Test {
 		select count(*) from flower
 	</select>
 	
-	<select id="c" resultType="com.bjsxt.pojo.Flower">
+	<select id="c" resultType="com.gjxaiou.pojo.Flower">
 		select id,name name123,price,production from flower
 	</select>
 	
@@ -453,7 +453,7 @@ logger.debug("这是调试信息");
 
 -  log4j 中可以输出指定内容的日志(控制某个局部内容的日志级别) ：直接在 log4j.properties 中设置；
     -  命名级别(包级别): `<mapper>namespace 属性中除了最后一个类名`
-例如 `namespace=”com.bjsxt.mapper.PeopleMapper”` 其中包级别为 `com.bjsxt.mapper` ，需要在 `log4j.propeties` 中做两件事情  
+例如 `namespace=”com.gjxaiou.mapper.PeopleMapper”` 其中包级别为 `com.gjxaiou.mapper` ，需要在 `log4j.propeties` 中做两件事情  
       - 先在总体级别调成 Error，这样可以不输出无用信息
       -  在设置某个指定位置级别为 DEBUG
 
@@ -486,7 +486,7 @@ System.out.println(p);
       -  如果参数是 map， 写成`#{key}` ：当需要传递多个参数时候，目前只能使用 map 或者对象
 ```java
 <select id="selById"
-  resultType="com.bjsxt.pojo.People"  parameterType="int">
+  resultType="com.gjxaiou.pojo.People"  parameterType="int">
   select * from people where id=#{0}
 </select>
 ```
@@ -497,7 +497,7 @@ System.out.println(p);
 配置示例：
 PeopleMapper.xml
 ```java
-<select id="test" resultType="com.bjsxt.pojo.People" parameterType="com.bjsxt.pojo.People"> 
+<select id="test" resultType="com.gjxaiou.pojo.People" parameterType="com.gjxaiou.pojo.People"> 
   select * from people where id =  ${id}
 </select>
 ```
@@ -527,7 +527,7 @@ List<People> p = session.selectList("a.b.page",map);
 ```
 mapper.xml 中代码为：
 ```xml
-<select id="page" resultType="com.bjsxt.pojo.People" parameterType="map">
+<select id="page" resultType="com.gjxaiou.pojo.People" parameterType="map">
     select * from people limit #{pageStart},#{pageSize}
 </select>
 ```
@@ -542,7 +542,7 @@ mapper.xml 中代码为：
     - 同时 mapper.xml  中 peo 引用 People 类
 ```java
 <typeAliases>
-    <typeAlias type="com.bjsxt.pojo.People" alias="peo"/>
+    <typeAlias type="com.gjxaiou.pojo.People" alias="peo"/>
 </typeAliases>
 ```
 mapper.xml 中内容为：  
@@ -556,7 +556,7 @@ mapper.xml 中内容为：
   - mybatis.xml 中配置
 ```java
 <typeAliases>
-    <package name="com.bjsxt.pojo" />
+    <package name="com.gjxaiou.pojo" />
 </typeAliases>
 ```
 - mapper.xml  中通过类名引用

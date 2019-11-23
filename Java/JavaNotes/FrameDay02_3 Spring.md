@@ -101,13 +101,13 @@ jdbc.password = GJXAIOU
 
 - 添加了属性文件加载，并且在<beans>中开启自动注入需要注意的地方
   部分属性配置**当配置全局开启自动注入**之后需要进行限定：当 <beans>使用`default-sutowire = "byName"` 开启自动注入的时候，当同时使用 扫描器的时候；
-  - SqlSessionFactoryBean（对象） 的 id 不能叫做 sqlSessionFactory，因为会在加载db.property的属性文件之前，就加载了其他文件，导致 ${jdbc.username}等等无法取到值
+  - ==SqlSession==FactoryBean（对象） 的 id 不能叫做 sqlSessionFactory，因为会在加载db.property的属性文件之前，就加载了其他文件，导致 ${jdbc.username}等等无法取到值
   - 修改：把原来通过ref 引用替换成value 赋值，因为自动注入只能影响ref，不会影响 value 赋值
 正确的配置为：
 ```applicationContext_xml
 <!-- 扫描器 --> 
 <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
- <property name="basePackage" value="com.bjsxt.mapper"></property>
+ <property name="basePackage" value="com.gjxaiou.mapper"></property>
  <property name="sqlSessionFactoryBeanName" value="factory"></property> </bean>
 ```
 
@@ -281,7 +281,7 @@ ceTransactionManager">
 
 <aop:config>
 <!--切点范围设置大一些，仅仅设置哪些有切点即可，和事务控制没有关系 -->
-<aop:pointcut expression="execution(* com.bjsxt.service.impl.*.*(..))"
+<aop:pointcut expression="execution(* com.gjxaiou.service.impl.*.*(..))"
 id="mypoint" />
 <aop:advisor advice-ref="txAdvice" pointcut-ref="mypoint" />
 </aop:config>
@@ -317,8 +317,9 @@ public class UsersServiceImpl implements UsersService{
 }
 ```
 
+==对应的注解方式：== @Transactional
 
-
+[https://www.ibm.com/developerworks/cn/java/j-master-spring-transactional-use/index.html](https://www.ibm.com/developerworks/cn/java/j-master-spring-transactional-use/index.html)
 
 ## 六、声明式事务中属性解释
 
