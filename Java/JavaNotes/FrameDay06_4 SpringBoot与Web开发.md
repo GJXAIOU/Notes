@@ -1,3 +1,13 @@
+---
+
+style: summer
+flag: purple
+date: '2019-11-24'
+custom: GJXAIOU
+---
+
+
+
 # Web开发
 
 [TOC]
@@ -236,7 +246,7 @@ public class ThymeleafProperties {
 例如在 helloController.java 中输入：
 
 ```java
-package com.atguigu.springboot.controller;
+package com.gjxaiou.springboot.controller;
 
 @Controller
 public class HelloController {
@@ -278,7 +288,7 @@ public class HelloController {
 对应的controller 修改为：
 
 ```java
-package com.atguigu.springboot.controller;
+package com.gjxaiou.springboot.controller;
 
 @Controller
 public class HelloController {
@@ -387,7 +397,7 @@ Special tokens:
 使用示例：
 
 ```java
-package com.atguigu.springboot.controller;
+package com.gjxaiou.springboot.controller;
 
 @Controller
 public class HelloController {
@@ -444,29 +454,20 @@ public class HelloController {
 
 Spring Boot 自动配置好了 SpringMVC
 
-以下是SpringBoot 对 SpringMVC的默认配置:**==下面的所有都在（WebMvcAutoConfiguration）文件中==**
+以下是SpringBoot 对 SpringMVC的默认配置（见 Reference 文档 P107/519）:**==下面的所有都在（WebMvcAutoConfiguration）文件中==**
 
 - Inclusion of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
 
   - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
 
-  - ContentNegotiatingViewResolver：组合所有的视图解析器的；
+  - ContentNegotiatingViewResolver：这个类是组合所有的视图解析器的；
 
-  - ==如何定制：我们可以自己给容器中添加一个视图解析器；然后ContentNegotiatingViewResolver自动的将其组合进来；==
+  - 如何定制视图解析器：==我们可以自己给容器中添加一个视图解析器；然后ContentNegotiatingViewResolver 自动的将其组合进来；==
 
-    验证：在主类中自定义视图解析器
+    验证：在主类中自定义视图解析器，然后使用 @Bean 就将其加入容器中；
 
     ```java
-    package com.atguigu.springboot;
-    
-    import org.springframework.boot.SpringApplication;
-    import org.springframework.boot.autoconfigure.SpringBootApplication;
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.web.servlet.View;
-    import org.springframework.web.servlet.ViewResolver;
-    
-    import java.util.Locale;
-    
+    package com.gjxaiou.springboot;
     
     @SpringBootApplication
     public class SpringBoot04WebRestfulcrudApplication {
@@ -482,7 +483,6 @@ Spring Boot 自动配置好了 SpringMVC
     	}
     
     	public static class MyViewResolver implements ViewResolver{
-    
     		@Override
     		public View resolveViewName(String viewName, Locale locale) throws Exception {
     			return null;
@@ -491,22 +491,22 @@ Spring Boot 自动配置好了 SpringMVC
     }
     
     ```
-
-    然后全局搜索：`DispatcherServlet`，来到 924(410) 行（ctrl + G ） 的 doDispatch() 方法上打断点然后调试，访问任意路径看自定义的视图解析器是否在里面；
-
+    
+    然后全局搜索：`DispatcherServlet`，来到 1000行（ctrl + G ） 的 doDispatch() 方法上打断点然后调试，访问任意路径看自定义的视图解析器是否在里面；
+    
     查看 Valiables 中的 viewResolvers 中就应该有自己定义的视图解析器
-
+    
+    ![image-20191123214440623](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191123214440623.png)
+  
 - Support for serving static resources, including support for WebJars (see below).静态资源文件夹路径,webjars
 
 - Static `index.html` support. 静态首页访问
 
-- Custom `Favicon` support (see below).  favicon.ico
+- Custom `Favicon` support (see below).  支持 favicon.ico自定义
 
-  
+- Automatic use of `Converter`, `GenericConverter`, `Formatter` beans；就是页面带来的数据格式要转换成其他格式，例如页面带来一个 18（文本类型）要转换为 integer 类型等等；
 
-- 自动注册了 of `Converter`, `GenericConverter`, `Formatter` beans.就是页面带来的数据格式要转换成其他格式，例如页面带来一个 18（文本类型）要转换为 integer 类型等等；
-
-  - Converter：转换器；  public String hello(User user)：类型转换使用Converter
+  - `Converter`：转换器；  public String hello(User user)：类型转换使用Converter
   - `Formatter`  格式化器；  2017.12.17===Date；
 
 ```java
@@ -537,15 +537,9 @@ public Formatter<Date> dateFormatter() {
 
   
 
-**org.springframework.boot.autoconfigure.web：web的所有自动场景都在这里；**
+### （二）扩展SpringMVC
 
-If you want to keep Spring Boot MVC features, and you just want to add additional [MVC configuration](https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/htmlsingle#mvc) (interceptors, formatters, view controllers etc.) you can add your own `@Configuration` class of type `WebMvcConfigurerAdapter`, but **without** `@EnableWebMvc`. If you wish to provide custom instances of `RequestMappingHandlerMapping`, `RequestMappingHandlerAdapter` or `ExceptionHandlerExceptionResolver` you can declare a `WebMvcRegistrationsAdapter` instance providing such components.
-
-If you want to take complete control of Spring MVC, you can add your own `@Configuration` annotated with `@EnableWebMvc`.
-
-### 2、扩展SpringMVC
-
-
+Spring MVC 中拓展方式： 
 
 ```xml
     <mvc:view-controller path="/hello" view-name="success"/>
@@ -557,7 +551,7 @@ If you want to take complete control of Spring MVC, you can add your own `@Confi
     </mvc:interceptors>
 ```
 
-**==编写一个配置类（@Configuration），该类是WebMvcConfigurerAdapter类型；不能标注@EnableWebMvc==**;
+Spring Boot 中方式：**==编写一个配置类（@Configuration），该类是WebMvcConfigurerAdapter类型；但是不能标注@EnableWebMvc==**;
 
 既保留了所有的自动配置，也能用我们扩展的配置；
 
@@ -569,48 +563,48 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
        // super.addViewControllers(registry);
-        //浏览器发送 /atguigu 请求来到 success
-        registry.addViewController("/atguigu").setViewName("success");
+        //浏览器发送 /gjxaiou 请求来到 success
+        registry.addViewController("/gjxaiou").setViewName("success");
     }
 }
 ```
 
 原理：
 
-​	1）、WebMvcAutoConfiguration是SpringMVC的自动配置类
+- WebMvcAutoConfiguration 是 Spring MVC 的自动配置类
 
-​	2）、在做其他自动配置时会导入；@Import(**EnableWebMvcConfiguration**.class)
+- 在做其他自动配置时会导入：@Import(**EnableWebMvcConfiguration**.class)
 
 ```java
-    @Configuration
-	public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration {
-      private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
+@Configuration
+public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration {
+    private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
 
-	 //从容器中获取所有的WebMvcConfigurer
-      @Autowired(required = false)
-      public void setConfigurers(List<WebMvcConfigurer> configurers) {
-          if (!CollectionUtils.isEmpty(configurers)) {
-              this.configurers.addWebMvcConfigurers(configurers);
-            	//一个参考实现；将所有的WebMvcConfigurer相关配置都来一起调用；  
-            	@Override
-             // public void addViewControllers(ViewControllerRegistry registry) {
-              //    for (WebMvcConfigurer delegate : this.delegates) {
-               //       delegate.addViewControllers(registry);
-               //   }
-              }
-          }
-	}
+    //从容器中获取所有的WebMvcConfigurer
+    @Autowired(required = false)
+    public void setConfigurers(List<WebMvcConfigurer> configurers) {
+        if (!CollectionUtils.isEmpty(configurers)) {
+            this.configurers.addWebMvcConfigurers(configurers);
+            //一个参考实现；将所有的WebMvcConfigurer相关配置都来一起调用；  
+            @Override
+            // public void addViewControllers(ViewControllerRegistry registry) {
+            //    for (WebMvcConfigurer delegate : this.delegates) {
+            //       delegate.addViewControllers(registry);
+            //   }
+        }
+    }
+}
 ```
 
-​	3）、容器中所有的WebMvcConfigurer都会一起起作用；
+- 容器中所有的 WebMvcConfigurer 都会一起起作用；
 
-​	4）、我们的配置类也会被调用；
+- 我们的配置类也会被调用；
 
-​	效果：SpringMVC的自动配置和我们的扩展配置都会起作用；
+​	效果：SpringMVC 的自动配置和我们的扩展配置都会起作用；
 
-### 3、全面接管SpringMVC（不推荐）
+### 全面接管SpringMVC（不推荐）
 
-SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配置；所有的SpringMVC的自动配置都失效了，例如基本的静态资源不能使用了，所有路径都需要自己进行配置；
+SpringBoot 对 SpringMVC 的自动配置都不需要，所有都是我们自己配置；例如基本的静态资源不能使用了，所有路径都需要自己进行配置；
 
 **我们需要在配置类中添加@EnableWebMvc即可；**
 
@@ -622,9 +616,8 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-       // super.addViewControllers(registry);
-        //浏览器发送 /atguigu 请求来到 success
-        registry.addViewController("/atguigu").setViewName("success");
+        // 浏览器发送 /gjxaiou 请求来到 success
+        registry.addViewController("/gjxaiou").setViewName("success");
     }
 }
 ```
@@ -633,21 +626,25 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 为什么@EnableWebMvc自动配置就失效了；
 
-1）@EnableWebMvc的核心
+- @EnableWebMvc 的代码为：（点击）
 
 ```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
 @Import(DelegatingWebMvcConfiguration.class)
 public @interface EnableWebMvc {
+}
 ```
 
-2）、
+- 由上面的 @Import() 中的 DelegatingWebMvcConfiguration.class ，其代码为：
 
 ```java
 @Configuration
 public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 ```
 
-3）、
+- 下面是 Spring Boot 的自动配置类：WebMvcAutoConfiguration
 
 ```java
 @Configuration
@@ -662,44 +659,48 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 public class WebMvcAutoConfiguration {
 ```
 
-4）、@EnableWebMvc将WebMvcConfigurationSupport组件导入进来，所有相当于`@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)`就是不符合的，因此自动配置类就失效了 ；
+- 总结：`@EnableWebMvc` 里面的 `@Import(DelegatingWebMvcConfiguration.class)` 将 里面类的父类：`WebMvcConfigurationSupport` 组件导入进来，所有相当于`@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)` 就是不符合的，因此自动配置类就失效了 ；
 
-5）、导入的WebMvcConfigurationSupport只是SpringMVC最基本的功能；
+- 导入的WebMvcConfigurationSupport 只是 SpringMVC 最基本的功能；
 
 
 
-## 5、如何修改SpringBoot的默认配置
+## 五、如何修改SpringBoot的默认配置
 
-模式：
+- 方式一：SpringBoot 在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来；
 
-​	1）、SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来；
+- 方式二：在SpringBoot中会有非常多的 xxxConfigurer 帮助我们进行扩展配置；
 
-​	2）、在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置；
+- 方式三：在SpringBoot中会有很多的 xxxCustomizer 帮助我们进行定制配置；
 
-​	3）、在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置
 
-## 6、RestfulCRUD 项目
 
-### 1）、默认访问首页
+## 六、RestfulCRUD 项目
 
-这里 resources.public 包下面有一个 index.html ，同时在 resources.templates 包下面也有一个 index.html 文件，要求默认是访问后者的 index.html 文件；
+### （一）设置默认访问首页
 
-方法一：在 HelloController.java  中配置
+项目中有两个 index.html 文件，位置分别为：`resources.public.index.html` 和`resources.templates.index.html`，要求默认是访问后者的 index.html 文件；
+
+**下面的两种方式都是默认使用了 thymeleaf 模板引擎**；
+
+- 方法一：编写单独的控制器进行路径映射
 
 ```java
-// 不管是访问当前项目还是访问当前项目的index.html  
-@RequestMapping({"/","/index.html"})
-    public String index(){
-        return "index";
-   }
+@Controller
+public class HelloController {
+	// 不管是访问当前项目还是访问当前项目的 index.html  
+	@RequestMapping({"/","/index.html"})
+    	public String index(){
+        	return "index";
+   		}
+}    
 ```
 
-方法二：添加视图映射
+- 方法二：添加视图映射（只需要将组件注册到容器中即可）
 
 ```java
 @Configuration
 public class MyMvcConfig extends WebMvcConfigurerAdapter {
-
 
     //所有的WebMvcConfigurerAdapter组件都会一起起作用
     @Bean //将组件注册在容器
@@ -717,66 +718,51 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 ```
 
-### 2）、国际化
+### （二）国际化
 
-以前springmvc 配置方式：
+- 以前springmvc 配置方式：
+    - 编写国际化配置文件；
+    - 使用ResourceBundleMessageSource管理国际化资源文件；
+    - 在页面使用fmt:message取出国际化内容；
 
-**1）、编写国际化配置文件；**
+- 使用 Spring Boot 实现步骤：
+    - 首先编写国际化配置文件，抽取页面需要显示的国际化消息（然后分别配置属性文件）
 
-2）、使用ResourceBundleMessageSource管理国际化资源文件
+    ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180211130721.png)
 
-3）、在页面使用fmt:message取出国际化内容
+    ![image-20191122184748011](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191122184748011.png)
 
+    - SpringBoot自动配置好了管理国际化资源文件的组件；
 
+    ```java
+    @ConfigurationProperties(prefix = "spring.messages")
+    public class MessageSourceAutoConfiguration {
+         //我们的配置文件可以直接放在类路径下叫messages.properties；（因为默认名为 message）
+    	private String basename = "messages";  
+        
+        @Bean
+    	public MessageSource messageSource() {
+    		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+    		if (StringUtils.hasText(this.basename)) {
+                //设置国际化资源文件的基础名（去掉语言国家代码的）
+    			messageSource.setBasenames(StringUtils.commaDelimitedListToStringArray(
+    					StringUtils.trimAllWhitespace(this.basename)));
+    		}
+    		if (this.encoding != null) {
+    			messageSource.setDefaultEncoding(this.encoding.name());
+    		}
+    		messageSource.setFallbackToSystemLocale(this.fallbackToSystemLocale);
+    		messageSource.setCacheSeconds(this.cacheSeconds);
+    		messageSource.setAlwaysUseMessageFormat(this.alwaysUseMessageFormat);
+    		return messageSource;
+    	}
+    ```
 
-步骤：
+    因为没有使用系统默认的文件名，因此需要在 application.properties 中配置：`spring.messages.basename=i18n.login`，注意后面是去掉国家代码的部分（即取所有配置文件去掉后面的语言和国家的前面公共部分）；
 
-1）、编写国际化配置文件，抽取页面需要显示的国际化消息
+    - 在页面获取国际化的值；
 
-![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180211130721.png)
-
-![image-20191122184748011](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191122184748011.png)
-
-2）、SpringBoot自动配置好了管理国际化资源文件的组件；
-
-```java
-@ConfigurationProperties(prefix = "spring.messages")
-public class MessageSourceAutoConfiguration {
-    
-    /**
-	 * Comma-separated list of basenames (essentially a fully-qualified classpath
-	 * location), each following the ResourceBundle convention with relaxed support for
-	 * slash based locations. If it doesn't contain a package qualifier (such as
-	 * "org.mypackage"), it will be resolved from the classpath root.
-	 */
-	private String basename = "messages";  
-    //我们的配置文件可以直接放在类路径下叫messages.properties；（因为这个默认名）
-    
-    @Bean
-	public MessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		if (StringUtils.hasText(this.basename)) {
-            //设置国际化资源文件的基础名（去掉语言国家代码的）
-			messageSource.setBasenames(StringUtils.commaDelimitedListToStringArray(
-					StringUtils.trimAllWhitespace(this.basename)));
-		}
-		if (this.encoding != null) {
-			messageSource.setDefaultEncoding(this.encoding.name());
-		}
-		messageSource.setFallbackToSystemLocale(this.fallbackToSystemLocale);
-		messageSource.setCacheSeconds(this.cacheSeconds);
-		messageSource.setAlwaysUseMessageFormat(this.alwaysUseMessageFormat);
-		return messageSource;
-	}
-```
-
-这里因为自己自定义了配置文件名，因此需要在 application.properties 中配置：`spring.messages.basename=i18n.login`，注意后面是去掉国家代码的部分
-
-3）、去页面获取国际化的值；
-
-![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180211134506.png)
-
-在页面中取值，例如 18行的：th:text="#{login.tip}"
+    在页面中（login.html）取值，例如 19行的：`th:text="#{login.username}"`（如果出现乱码，注意配置在 IDEA 中配置编码）
 
 ```html
 <!DOCTYPE html>
@@ -821,11 +807,11 @@ public class MessageSourceAutoConfiguration {
 
 
 
-国际化实现原理：
+- **国际化实现原理**：
 
-​	国际化Locale（区域信息对象）；springMVC 中的LocaleResolver（获取区域信息对象）；
+​	国际化 Locale（区域信息对象）；springMVC 中的LocaleResolver（获取区域信息对象）；
 
-springboot 默认也配置了区域信息解析器，如下：默认的就是根据请求头（浏览器 F12 中的Request Header 中的 Accept-Language中可以看出）带来的区域信息获取Locale进行国际化
+springboot 默认也配置了区域信息解析器，如下：默认的就是根据请求头（浏览器 F12 中的Request Header 中的 Accept-Language中可以看出）带来的区域信息获取 Locale 进行国际化
 
 ```java
 @Bean
@@ -890,13 +876,9 @@ public class MyLocaleResolver implements LocaleResolver {
 		</form>
 ```
 
+### （三）登陆
 
-
-
-
-### 3）、登陆
-
-首先修改 html 中的路径，下面取自15行；
+首先修改 html 中的路径，下面是从 index.html 的15行开始；
 
 ```java
              
@@ -928,14 +910,14 @@ public class MyLocaleResolver implements LocaleResolver {
 
 开发期间模板引擎页面修改以后，要实时生效
 
-1）、禁用模板引擎的缓存（applicationl.properties），否则前端页面修改之后也没有变化
+- 禁用模板引擎的缓存（applicationl.properties），否则前端页面修改之后也没有变化
 
 ```
 # 禁用缓存
 spring.thymeleaf.cache=false 
 ```
 
-2）、页面修改完成以后ctrl+f9：重新编译；因为idea在运行期间不会重新编译页面
+- 页面修改完成以后ctrl+f9：重新编译；因为idea在运行期间不会重新编译页面
 
 
 
@@ -948,14 +930,7 @@ spring.thymeleaf.cache=false
 控制器代码：
 
 ```java
-package com.atguigu.springboot.controller;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
-import java.util.Map;
+package com.gjxaiou.springboot.controller;
 
 @Controller
 public class LoginController {
@@ -984,19 +959,7 @@ public class LoginController {
 为了能够解析出上面的 redirect:/main.html，需要在上面的自定义视图配置中添加上对应的语句；
 
 ```java
-package com.atguigu.springboot.config;
-
-import com.atguigu.springboot.component.LoginHandlerInterceptor;
-import com.atguigu.springboot.component.MyLocaleResolver;
-import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+package com.gjxaiou.springboot.config;
 
 @Configuration
 public class MyMvcConfig extends WebMvcConfigurerAdapter {
@@ -1024,12 +987,12 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 
 
-### 4）、拦截器进行登陆检查
+### （四）拦截器进行登陆检查
 
 首先需要编写拦截器：
 
 ```java
-package com.atguigu.springboot.component;
+package com.gjxaiou.springboot.component;
 
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -1100,11 +1063,11 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     }
 ```
 
-### 5）、CRUD-员工列表
+### （五）CRUD-员工列表
 
 实验要求：
 
-1）、RestfulCRUD：CRUD要满足Rest风格；
+- RestfulCRUD：CRUD要满足Rest风格；
 
 Rest风格为：URI：  /资源名称/资源标识      并且使用 HTTP请求方式区分对资源CRUD操作
 
@@ -1147,19 +1110,11 @@ Rest风格为：URI：  /资源名称/资源标识      并且使用 HTTP请求�
 
 然后对应 /emps 请求需要对应的处理，EmployeeController.java
 
-视频 P38
+通过访问：` http://localhost:8083/crud/main.html ` 点击左边的 Employee 就能跳转到员工列表面；
 
+#### thymeleaf 公共页面元素抽取
 
-
-
-
-
-
-
-
-
-
-#### thymeleaf公共页面元素抽取
+例如主页面和员工列表页面的左边和上面都是一样的
 
 ```html
 1、抽取公共片段
@@ -1167,8 +1122,9 @@ Rest风格为：URI：  /资源名称/资源标识      并且使用 HTTP请求�
 &copy; 2011 The Good Thymes Virtual Grocery
 </div>
 
-2、引入公共片段
+2、引入公共片段（重用）相当于有一个 footer 页面中引入 copy 片段；
 <div th:insert="~{footer :: copy}"></div>
+insert 之后表达式有两种：这里是第二种；
 ~{templatename::selector}：模板名::选择器
 ~{templatename::fragmentname}:模板名::片段名
 
@@ -1178,29 +1134,50 @@ insert的公共片段在div标签中
 行内写法可以加上：[[~{}]];[(~{})]；
 ```
 
-
-
-三种引入公共片段的th属性：
-
-**th:insert**：将公共片段整个插入到声明引入的元素中
-
-**th:replace**：将声明引入的元素替换为公共片段
-
-**th:include**：将被引入的片段的内容包含进这个标签中
-
-
+以顶部为例，使用 F12 看到该部分对应的代码：为 html  中的 <nav > 标签，然后在该标签后面添加：`th:fragment="topbar"`，具体名字自定
 
 ```html
+<body>
+		<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0" th:fragment="topbar">
+			<a class="navbar-brand col-sm-3 col-md-2 mr-0" href="http://getbootstrap.com/docs/4.0/examples/dashboard/#">Company name</a>
+			<input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+			<ul class="navbar-nav px-3">
+				<li class="nav-item text-nowrap">
+					<a class="nav-link" href="http://getbootstrap.com/docs/4.0/examples/dashboard/#">Sign out</a>
+				</li>
+			</ul>
+		</nav>
+```
+
+然后在 List.html 将上面这个一样的代码删除，只要引入抽取的 topbar 即可；
+
+```html
+<!--引入抽取的topbar-->
+<!--模板名：会使用thymeleaf的前后缀配置规则进行解析，因此只需要写 dashboasrd 即可，会自动加上 /templs 和后缀 .html-->
+<div th:replace="dashboard::topbar"></div>
+```
+
+
+
+- 三种方法引入公共片段的 th 属性：
+    - **th:insert**：将公共片段整个插入到声明引入的元素中
+    - **th:replace**：将声明引入的元素替换为公共片段
+    - **th:include**：将被引入的片段的内容包含进这个标签中
+
+下面代码中比较了三种方式的区别：
+
+```html
+<!--首先是抽取公共片段-->
 <footer th:fragment="copy">
 &copy; 2011 The Good Thymes Virtual Grocery
 </footer>
 
-引入方式
+<!--分别采用三种不同的方式比较-->
 <div th:insert="footer :: copy"></div>
 <div th:replace="footer :: copy"></div>
 <div th:include="footer :: copy"></div>
 
-效果
+<!--下面是对应的三种效果-->
 <div>
     <footer>
     &copy; 2011 The Good Thymes Virtual Grocery
@@ -1218,7 +1195,7 @@ insert的公共片段在div标签中
 
 
 
-引入片段的时候传入参数： 
+引入片段的时候传入参数： 这里使用的是选择器（从第一行中加上：`id="sidebar"`）
 
 ```html
 <nav class="col-md-2 d-none d-md-block bg-light sidebar" id="sidebar">
@@ -1236,9 +1213,13 @@ insert的公共片段在div标签中
                 </a>
             </li>
 
-<!--引入侧边栏;传入参数-->
+<!--引入侧边栏;同时传入参数-->
 <div th:replace="commons/bar::#sidebar(activeUri='emps')"></div>
 ```
+
+如果仅仅是在 list.html 中引入侧边栏没有参数的话，使用 `#id`
+
+`<div th:replace="dashbar::#sidebar"></div>`
 
 ### 6）、CRUD-员工添加
 
@@ -1252,7 +1233,7 @@ insert的公共片段在div标签中
     </div>
     <div class="form-group">
         <label>Email</label>
-        <input type="email" class="form-control" placeholder="zhangsan@atguigu.com">
+        <input type="email" class="form-control" placeholder="zhangsan@gjxaiou.com">
     </div>
     <div class="form-group">
         <label>Gender</label><br/>
@@ -1314,7 +1295,7 @@ insert的公共片段在div标签中
     </div>
     <div class="form-group">
         <label>Email</label>
-        <input name="email" type="email" class="form-control" placeholder="zhangsan@atguigu.com" th:value="${emp!=null}?${emp.email}">
+        <input name="email" type="email" class="form-control" placeholder="zhangsan@gjxaiou.com" th:value="${emp!=null}?${emp.email}">
     </div>
     <div class="form-group">
         <label>Gender</label><br/>
@@ -1370,13 +1351,13 @@ insert的公共片段在div标签中
 
 
 
-## 7、错误处理机制
+## 错误处理机制
 
-### 1）、SpringBoot默认的错误处理机制
+### （一）SpringBoot 默认的错误处理机制
 
-默认效果：
+Spring Boot 报错的默认效果：
 
-​		1）、浏览器，返回一个默认的错误页面
+- 浏览器：返回一个默认的错误页面
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180226173408.png)
 
@@ -1384,22 +1365,21 @@ insert的公共片段在div标签中
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180226180347.png)
 
-​		2）、如果是其他客户端，默认响应一个json数据
+- 如果是其他客户端：默认响应一个json数据
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180226173527.png)
 
 ​		![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180226180504.png)
 
-原理：
+能够报错的原理：
 
-​	可以参照ErrorMvcAutoConfiguration；错误处理的自动配置；
+​	可以参照 `org.springframework.boot.autoconfigure.web.ErrorMvcAutoConfiguration`这是错误处理的自动配置；
 
-  	给容器中添加了以下组件
+  	该自动配置列给容器中添加了以下组件
 
-​	1、DefaultErrorAttributes：
+​	1、DefaultErrorAttributes：（L97）帮我们在页面共享信息；
 
 ```java
-帮我们在页面共享信息；
 @Override
 	public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes,
 			boolean includeStackTrace) {
@@ -1414,13 +1394,17 @@ insert的公共片段在div标签中
 
 
 
-​	2、BasicErrorController：处理默认/error请求
+​	2、BasicErrorController：处理用来默认 `/error`路径请求（L103），下面是其代码
 
 ```java
 @Controller
+// 如果我们没有配置 server.error.path:，就默认处理 /error 的请求
 @RequestMapping("${server.error.path:${error.path:/error}}")
 public class BasicErrorController extends AbstractErrorController {
     
+    
+// BasicErrorController 是怎么处理这个请求呢？见这里的代码  
+    // 它有两种处理 /error 路径的请求的方式，分别产生 HTML 类型数据和 json数据；（可以通过上面图片中的请求头中内容判断是否为浏览器）
     @RequestMapping(produces = "text/html")//产生html类型的数据；浏览器发送的请求来到这个方法处理
 	public ModelAndView errorHtml(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -1429,7 +1413,7 @@ public class BasicErrorController extends AbstractErrorController {
 				request, isIncludeStackTrace(request, MediaType.TEXT_HTML)));
 		response.setStatus(status.value());
         
-        //去哪个页面作为错误页面；包含页面地址和页面内容
+        //去哪个页面作为错误页面由这里得到，具体的 resolverErrorView 的代码见下面流程；其中 modelAndView 中包含页面地址和页面内容
 		ModelAndView modelAndView = resolveErrorView(request, response, status, model);
 		return (modelAndView == null ? new ModelAndView("error", model) : modelAndView);
 	}
@@ -1446,16 +1430,26 @@ public class BasicErrorController extends AbstractErrorController {
 
 
 
-​	3、ErrorPageCustomizer：
+​	3、ErrorPageCustomizer：（L110）系统出现错误以后来到 error 请求进行处理；（类似于之前使用 web.xml 注册的错误页面规则）
 
 ```java
+// 点击 ErrorPageCustomizer之后在 L312 中的有个 getpath() 方法，该方法内容如下	
+public class ErrorProperties {
+
+	/**
+	 * Path of the error controller.
+	 */
 	@Value("${error.path:/error}")
-	private String path = "/error";  系统出现错误以后来到error请求进行处理；（web.xml注册的错误页面规则）
+	private String path = "/error";
+
+	public String getPath() {
+		return this.path;
+	} 
 ```
 
 
 
-​	4、DefaultErrorViewResolver：
+​	4、DefaultErrorViewResolver：（L134）
 
 ```java
 @Override
@@ -1469,33 +1463,34 @@ public class BasicErrorController extends AbstractErrorController {
 	}
 
 	private ModelAndView resolve(String viewName, Map<String, Object> model) {
-        //默认SpringBoot可以去找到一个页面？  error/404
+        //默认SpringBoot可以去找到一个页面？ 找到：error/404（不仅这一个状态码，这里这是一个示例）
 		String errorViewName = "error/" + viewName;
         
-        //模板引擎可以解析这个页面地址就用模板引擎解析
+        // 如果模板引擎可以解析这个页面地址就用模板引擎解析
 		TemplateAvailabilityProvider provider = this.templateAvailabilityProviders
 				.getProvider(errorViewName, this.applicationContext);
 		if (provider != null) {
-            //模板引擎可用的情况下返回到errorViewName指定的视图地址
+            // 模板引擎可用的情况下返回到 errorViewName 指定的视图地址
 			return new ModelAndView(errorViewName, model);
 		}
-        //模板引擎不可用，就在静态资源文件夹下找errorViewName对应的页面   error/404.html
+        // 模板引擎不可用，就在静态资源文件夹下找 errorViewName 对应的页面   error/404.html（状态码.html）
 		return resolveResource(errorViewName, model);
 	}
 ```
 
 
 
-​	步骤：
+以上四个主要组件执行步骤：
 
-​		一但系统出现4xx或者5xx之类的错误；ErrorPageCustomizer就会生效（定制错误的响应规则）；就会来到/error请求；就会被**BasicErrorController**处理；
+​		一但系统出现4xx或者5xx之类的错误；ErrorPageCustomizer就会生效（用来定制错误的响应规则），就会来到 /error 请求；该请求就会被**BasicErrorController**处理，结果就是两种：响应页面或者响应json数据；
 
-​		1）响应页面；去哪个页面是由**DefaultErrorViewResolver**解析得到的；
+​		1）响应页面；去哪个页面作为错误页面是由**DefaultErrorViewResolver**解析得到的（见上面代码 BasicXXXX）；
 
 ```java
+// 这里是解析页面的方法：resolveErrorView 的具体代码
 protected ModelAndView resolveErrorView(HttpServletRequest request,
       HttpServletResponse response, HttpStatus status, Map<String, Object> model) {
-    //所有的ErrorViewResolver得到ModelAndView
+    // 通过调用 ErrorViewResolver（异常视图解析器），通过拿到所有的异常视图解析器 得到ModelAndView，有就放回，没有就返回 null，这里的 ErrorViewResolver 就是上面注入的DefaultErrorViewResolver，所以具体解析过程见它
    for (ErrorViewResolver resolver : this.errorViewResolvers) {
       ModelAndView modelAndView = resolver.resolveErrorView(request, status, model);
       if (modelAndView != null) {
@@ -1506,43 +1501,70 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 }
 ```
 
-### 2）、如果定制错误响应：
+### （二）如果定制错误响应：
 
-#### 	**1）、如何定制错误的页面；**
+#### 	1.如何定制错误的页面（针对浏览器）
 
-​			**1）、有模板引擎的情况下；error/状态码;** 【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面；
+- 有模板引擎的情况下，视图地址为：error/状态码;** 【将错误页面命名为  `错误状态码.html` 放在模板引擎文件夹（templates）里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面；
+    - 我们可以使用4xx和5xx作为错误页面的文件名来匹配这种类型的所有错误，精确优先（优先寻找精确的状态码.html，如果没有就是 4 开头的就都到 4XX.html）；		
 
-​			我们可以使用4xx和5xx作为错误页面的文件名来匹配这种类型的所有错误，精确优先（优先寻找精确的状态码.html）；		
+    - 页面能获取的信息；（因为返回的是 modelAndView，其中能使用的是后面参数中的model ，而model 是通过getErrorAttributes 来获取（其又调用了 errorAttributes.getErrorAttributes() 方法）最终的实现类就是上面第一个代码：DefaultErrorAttributes），然后在跳转的页面中可以使用：`status值：[[${status}]]`等等取出；
+        - timestamp：时间戳
+        - status：状态码
+        - error：错误提示
+        - exception：异常对象
+        - message：异常消息
+        - errors：JSR303数据校验的错误都在这里
 
-​			页面能获取的信息；
+- 没有模板引擎（即模板引擎找不到这个对应的错误页面），还是在静态资源文件夹下找页面，就是上面的值不能获取了；
 
-​				timestamp：时间戳
+- 以上都没有（模板引擎和静态资源里面都没有）对应的错误页面，就是默认来到SpringBoot默认的错误提示页面；
 
-​				status：状态码
+**定制示例**：
 
-​				error：错误提示
+自定义异常：
 
-​				exception：异常对象
+```java
+package com.atguigu.springboot.exception;
 
-​				message：异常消息
+public class UserNotExistException extends RuntimeException {
 
-​				errors：JSR303数据校验的错误都在这里
+    public UserNotExistException() {
+        super("用户不存在");
+    }
+}
+```
 
-​			2）、没有模板引擎（模板引擎找不到这个错误页面），静态资源文件夹下找；
+对应的controller：访问路径：`localhost:8083/crud/hello?user=aaa`
 
-​			3）、以上都没有错误页面，就是默认来到SpringBoot默认的错误提示页面；
+```java
+@Controller
+public class HelloController {
+
+    @ResponseBody
+    @RequestMapping("/hello")
+    public  String hello(@RequestParam("user") String user){
+        if(user.equals("aaa")){
+            throw new UserNotExistException();
+        }
+        return "Hello World";
+    }
+}    
+```
 
 
 
-#### 	2）、如何定制错误的json数据；
+#### 	2.如何定制错误的json数据（针对其他客户端）
 
-​		1）、自定义异常处理&返回定制json数据；
+- 方式一：使用 @ExceptionHandler 捕获指定的异常，然后给出自定义异常处理&返回定制json数据（不返回默认的json数据）；缺点：没有自适应效果（浏览器和其他设备返回的都是纯 JSON 数据）
 
 ```java
 @ControllerAdvice
+// 异常处理类
 public class MyExceptionHandler {
-
+	// 因为返回值要将 Map 转换为 JSON 数据
     @ResponseBody
+    // 指明要处理的异常（该异常同上），可以写 Exception.class 就会处理所有异常
     @ExceptionHandler(UserNotExistException.class)
     public Map<String,Object> handleException(Exception e){
         Map<String,Object> map = new HashMap<>();
@@ -1551,55 +1573,81 @@ public class MyExceptionHandler {
         return map;
     }
 }
-//没有自适应效果...
+
 ```
 
-
-
-​		2）、转发到/error进行自适应响应效果处理
+- 转发到 /error 请求使用 BasicErrorController 进行自适应响应效果处理
 
 ```java
  @ExceptionHandler(UserNotExistException.class)
     public String handleException(Exception e, HttpServletRequest request){
         Map<String,Object> map = new HashMap<>();
-        //传入我们自己的错误状态码  4xx 5xx，否则就不会进入定制错误页面的解析流程
-        /**
+        // 传入我们自己的错误状态码例如4xx 5xx，因为默认是 2XX，这样就不会进入定制错误页面的解析流程
+        /** 下面是获取状态码代码
          * Integer statusCode = (Integer) request
          .getAttribute("javax.servlet.error.status_code");
          */
         request.setAttribute("javax.servlet.error.status_code",500);
         map.put("code","user.notexist");
         map.put("message",e.getMessage());
-        //转发到/error
+        // 转发到 /error ，使用 BasicErrorController,因为它是有自适应的返回页面
         return "forward:/error";
     }
 ```
 
-#### 	3）、将我们的定制数据携带出去；
+#### 	3.将我们的定制数据携带出去（带到页面上或者 JSON 中）
 
-出现错误以后，会来到/error请求，会被BasicErrorController处理，响应出去可以获取的数据是由getErrorAttributes得到的（是AbstractErrorController（ErrorController）规定的方法）；
+借助于 Spring Boot 的默认错误请求方式：出现错误以后，会来到 /error 请求，会被BasicErrorController处理，其做了自适应效果，返回了页面/ Json 数据，即返回 modelAndView (主要是后面的 model 参数)或者 Map 数据（主要是后面的 body 参数中内容）；但是两者（model 和 body 都是通过 getErrorAttributes()方法得到），因此响应出去可以获取的数据是由getErrorAttributes得到的（该方法是AbstractErrorController（ErrorController）规定的方法），其本质上是通过调用：`errorAttributes.getErrorAttributes方法得到数据`；
 
-​	1、完全来编写一个ErrorController的实现类【或者是编写AbstractErrorController的子类】，放在容器中；
+- 方式一：编写一个ErrorController的实现类【或者是编写AbstractErrorController的子类】，当然可能只需要重写返回浏览器、其他设备的自适应方法那两块代码即可，然后放在容器中；
 
-​	2、页面上能用的数据，或者是json返回能用的数据都是通过errorAttributes.getErrorAttributes得到；
+- 方式二：因为页面上能用的数据或者是json返回能用的数据都是通过 errorAttributes.getErrorAttributes 得到；因为 DefaultErrorAttributes 是 errorAttributes 的实现类，而且通过 errorAttributes 上面注解可以看出，如果容器中没有 errorAttributes 就新建一个DefaultErrorAttributes，因此本质上是使用容器中DefaultErrorAttributes.getErrorAttributes()；默认进行数据处理的；
 
-​			容器中DefaultErrorAttributes.getErrorAttributes()；默认进行数据处理的；
+    
 
-自定义ErrorAttributes
+    实现：首先自定义 ErrorAttributes
 
-```java
-//给容器中加入我们自己定义的ErrorAttributes
-@Component
-public class MyErrorAttributes extends DefaultErrorAttributes {
-
-    @Override
-    public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
-        Map<String, Object> map = super.getErrorAttributes(requestAttributes, includeStackTrace);
-        map.put("company","atguigu");
-        return map;
+    ```java
+    // 给容器中加入我们自己定义的ErrorAttributes
+    @Component
+    public class MyErrorAttributes extends DefaultErrorAttributes {
+    // 通过下面代码的 return "forward:/error"; 最终转发给错误处理器，而错误处理器是从该方法中获取 map，该 map 就是页面和 json 能获取到的所有字段，
+            @Override
+        public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
+            Map<String, Object> map = super.getErrorAttributes(requestAttributes, includeStackTrace);
+            map.put("company","atguigu");
+    
+            //我们的异常处理器携带的数据，getAttribute()中两个参数，第一个为下面放入request 作用域的 key 值，第二个表示是什么请求：其中request对应0（完整的看该方法代码即可）；最后放入 map 中
+            Map<String,Object> ext = (Map<String, Object>) requestAttributes.getAttribute("ext", 0);
+            map.put("ext",ext);
+            return map;
+        }
     }
-}
-```
+    ```
+
+    如果想将之前自己定制的异常处理类（MyExceptionHandler）中的参数也传递过来，只需要将整个 map 值放在 request 作用域中即可：
+
+    ```java
+    package com.atguigu.springboot.controller;
+    
+    @ControllerAdvice
+    public class MyExceptionHandler {
+    
+        @ExceptionHandler(UserNotExistException.class)
+        public String handleException(Exception e, HttpServletRequest request){
+            Map<String,Object> map = new HashMap<>();
+          
+            request.setAttribute("javax.servlet.error.status_code",500);
+            map.put("code","user.notexist");
+            map.put("message","用户出错啦");
+    		// 将整个 map 值放在 request 作用域中即可
+            request.setAttribute("ext",map);
+            return "forward:/error";
+        }
+    }
+    ```
+
+    
 
 最终的效果：响应是自适应的，可以通过定制ErrorAttributes改变需要返回的内容，
 
@@ -1607,19 +1655,21 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
 
 
 
-## 8、配置嵌入式Servlet容器
+## 配置嵌入式Servlet容器
 
-SpringBoot默认使用Tomcat作为嵌入式的Servlet容器；
+之前项目：写好 web 项目之后打成 war 包，然后放入 Tomcat（就是一个 Servlet 容器）；
+
+SpringBoot 默认使用 Tomcat 作为嵌入式的 Servlet 容器：下面是 pom 文件中的依赖关系
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180301142915.png)
 
 
 
-问题？
+问题：外部的 Tomcat 可以修改 config 配置来修改，内置怎么修改；
 
-### 1）、如何定制和修改Servlet容器的相关配置；
+### （一）如何定制和修改Servlet容器的相关配置；
 
-1、修改和server有关的配置（ServerProperties【也是EmbeddedServletContainerCustomizer】）；
+- 方式一：修改和server有关的配置（点击下面的属性跳转到对应的配置类中，可以看到有个 ServerProperties.java 里面都是可以配置的属性【继承了EmbeddedServletContainerCustomizer】）；
 
 ```properties
 server.port=8081
@@ -1633,14 +1683,15 @@ server.xxx
 server.tomcat.xxx
 ```
 
-2、编写一个**EmbeddedServletContainerCustomizer**：嵌入式的Servlet容器的定制器；来修改Servlet容器的配置
+- 方式二：编写一个**EmbeddedServletContainerCustomizer**：嵌入式的Servlet容器的定制器；来修改Servlet容器的配置
 
 ```java
-@Bean  //一定要将这个定制器加入到容器中
+// 一定要将这个定制器加入到容器中
+@Bean  
 public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
     return new EmbeddedServletContainerCustomizer() {
 
-        //定制嵌入式的Servlet容器相关的规则
+        // 定制嵌入式的Servlet容器相关的规则
         @Override
         public void customize(ConfigurableEmbeddedServletContainer container) {
             container.setPort(8083);
@@ -1649,51 +1700,137 @@ public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
 }
 ```
 
-### 2）、注册Servlet三大组件【Servlet、Filter、Listener】
+### （二）注册 Servlet 三大组件【Servlet、Filter、Listener】
 
-由于SpringBoot默认是以jar包的方式启动嵌入式的Servlet容器来启动SpringBoot的web应用，没有web.xml文件。
+由于SpringBoot默认是以jar包的方式启动嵌入式的Servlet容器来启动SpringBoot的web应用，没有web.xml文件（以前的 Web 应用是通过 web.xml 注册组件）。
 
 注册三大组件用以下方式
 
-ServletRegistrationBean
+- ServletRegistrationBean ：注册 Servlet
 
-```java
-//注册三大组件
-@Bean
-public ServletRegistrationBean myServlet(){
-    ServletRegistrationBean registrationBean = new ServletRegistrationBean(new MyServlet(),"/myServlet");
-    return registrationBean;
-}
+    首先自己写一个 servlet
 
-```
+    ```java
+    package com.atguigu.springboot.servlet;
+    
+    public class MyServlet extends HttpServlet {
+    
+        //处理get请求
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            doPost(req,resp);
+        }
+    
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.getWriter().write("Hello MyServlet");
+        }
+    }
+    ```
 
-FilterRegistrationBean
+    让自定义的 Servlet 起作用，即注册 Servlet
 
-```java
-@Bean
-public FilterRegistrationBean myFilter(){
-    FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-    registrationBean.setFilter(new MyFilter());
-    registrationBean.setUrlPatterns(Arrays.asList("/hello","/myServlet"));
-    return registrationBean;
-}
-```
+    ```java
+    //注册三大组件
+    @Configuration
+    public class MyServerConfig {
+        @Bean
+        public ServletRegistrationBean myServlet(){
+            // 参数：传入自己的 Servlet ，该Servlet 要映射的路径（即发送 /myServlet 请求就会到 MyServlet）
+            ServletRegistrationBean registrationBean = new ServletRegistrationBean(new MyServlet(),"/myServlet");
+            return registrationBean;
+        }
+    }
+    ```
 
-ServletListenerRegistrationBean
+    
 
-```java
-@Bean
-public ServletListenerRegistrationBean myListener(){
-    ServletListenerRegistrationBean<MyListener> registrationBean = new ServletListenerRegistrationBean<>(new MyListener());
-    return registrationBean;
-}
-```
+    - FilterRegistrationBean
+
+        首先自定义 Filter
+
+        ```java
+        package com.atguigu.springboot.filter;
+        
+        import javax.servlet.*;
+        import java.io.IOException;
+        
+        public class MyFilter implements Filter {
+            @Override
+            public void init(FilterConfig filterConfig) throws ServletException {
+            }
+        
+            @Override
+            public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+                System.out.println("MyFilter process...");
+               // 将该请求放行
+                chain.doFilter(request,response);
+            }
+        
+            @Override
+            public void destroy() {
+            }
+        }
+        
+        ```
+
+        然后将自定义的 Servlet 注册
+
+        ```java
+        @Configuration
+        public class MyServerConfig {
+            @Bean
+            public FilterRegistrationBean myFilter(){
+                FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+                registrationBean.setFilter(new MyFilter());
+                // 该 Filter 拦截哪些请求，这里参数要求是 List，因此使用 Arrays.asList 进行转换
+                registrationBean.setUrlPatterns(Arrays.asList("/hello","/myServlet"));
+                return registrationBean;
+            }
+        }
+        ```
+
+    - ServletListenerRegistrationBean
+
+        首先自定义自己的 Listener				
+
+        ```java
+        package com.atguigu.springboot.listener;
+        
+        import javax.servlet.ServletContextEvent;
+        import javax.servlet.ServletContextListener;
+        
+        public class MyListener implements ServletContextListener {
+            @Override
+            public void contextInitialized(ServletContextEvent sce) {
+                System.out.println("contextInitialized...web应用启动");
+            }
+        
+            @Override
+            public void contextDestroyed(ServletContextEvent sce) {
+                System.out.println("contextDestroyed...当前web项目销毁");
+            }
+        }
+        ```
+
+        将 Listener 注册
+
+        ```java
+        @Configuration
+        public class MyServerConfig {
+            @Bean
+            public ServletListenerRegistrationBean myListener(){
+                ServletListenerRegistrationBean<MyListener> registrationBean = new ServletListenerRegistrationBean<>(new MyListener());
+                return registrationBean;
+            }
+        }
+        ```
 
 
 
-SpringBoot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器；DIspatcherServlet；
+SpringBoot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器：DIspatcherServlet；
 
-DispatcherServletAutoConfiguration中：
+具体的配置见：DispatcherServletAutoConfiguration.java
 
 ```java
 @Bean(name = DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
@@ -1702,7 +1839,7 @@ public ServletRegistrationBean dispatcherServletRegistration(
       DispatcherServlet dispatcherServlet) {
    ServletRegistrationBean registration = new ServletRegistrationBean(
          dispatcherServlet, this.serverProperties.getServletMapping());
-    //默认拦截： /  所有请求；包静态资源，但是不拦截jsp请求；   /*会拦截jsp
+    //默认拦截：从serverProperties里面 getServletMapping() ServletPath 的值，就是 `/` ，即所有请求；包括静态资源，但是不拦截jsp请求；   /*会拦截jsp
     //可以通过server.servletPath来修改SpringMVC前端控制器默认拦截的请求路径
     
    registration.setName(DEFAULT_DISPATCHER_SERVLET_BEAN_NAME);
@@ -1718,23 +1855,25 @@ public ServletRegistrationBean dispatcherServletRegistration(
 
 2）、SpringBoot能不能支持其他的Servlet容器；
 
-### 3）、替换为其他嵌入式Servlet容器
+### （三）替换为其他嵌入式Servlet容器
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180302114401.png)
 
-默认支持：
+默认支持下面三个：
 
-Tomcat（默认使用）
+- Tomcat（默认使用）
+
+默认使用 Tomcat 是因为引入web的模块默认含有：spring-boot-starter-tomcat，因此就是使用嵌入式的Tomcat作为Servlet容器；
 
 ```xml
 <dependency>
    <groupId>org.springframework.boot</groupId>
    <artifactId>spring-boot-starter-web</artifactId>
-   引入web模块默认就是使用嵌入式的Tomcat作为Servlet容器；
+   
 </dependency>
 ```
 
-Jetty
+- Jetty（适合长连接）
 
 ```xml
 <!-- 引入web模块 -->
@@ -1756,7 +1895,7 @@ Jetty
 </dependency>
 ```
 
-Undertow
+- Undertow（不支持 JSP）
 
 ```xml
 <!-- 引入web模块 -->
@@ -1778,34 +1917,37 @@ Undertow
 </dependency>
 ```
 
-### 4）、嵌入式Servlet容器自动配置原理；
+### （四）嵌入式Servlet容器自动配置原理；
 
-
-
-EmbeddedServletContainerAutoConfiguration：嵌入式的Servlet容器自动配置？
+嵌入式的Servlet容器自动配置类见：`org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration`，下面是其部分代码：
 
 ```java
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @Configuration
 @ConditionalOnWebApplication
+//导入BeanPostProcessorsRegistrar；作用是给容器中导入一些组件
+//利用 registerBeanDefinitions() 方法导入了EmbeddedServletContainerCustomizerBeanPostProcessor这个组件：具体分析见下面
+//这是一个后置处理器：作用是在bean初始化前后（即创建完对象，还没赋值赋值）执行初始化工作
 @Import(BeanPostProcessorsRegistrar.class)
-//导入BeanPostProcessorsRegistrar：Spring注解版；给容器中导入一些组件
-//导入了EmbeddedServletContainerCustomizerBeanPostProcessor：
-//后置处理器：bean初始化前后（创建完对象，还没赋值赋值）执行初始化工作
+
 public class EmbeddedServletContainerAutoConfiguration {
+   
+   
+// -------到底怎么能实现自动切换的呢------------------------  
+    // 通过下面三个方法上的 @ConditionalOnClass 来判断具体导入的是什么依赖，导入什么依赖就符合那个条件，就返回对应的嵌入式 Servlet 容器
     
     @Configuration
-	@ConditionalOnClass({ Servlet.class, Tomcat.class })//判断当前是否引入了Tomcat依赖；
-	@ConditionalOnMissingBean(value = EmbeddedServletContainerFactory.class, search = SearchStrategy.CURRENT)//判断当前容器没有用户自己定义EmbeddedServletContainerFactory：嵌入式的Servlet容器工厂；作用：创建嵌入式的Servlet容器
-	public static class EmbeddedTomcat {
-
+    //判断当前是否引入了Tomcat依赖；
+	@ConditionalOnClass({ Servlet.class, Tomcat.class })
+    //判断当前容器没有用户自己定义的嵌入式的Servlet容器工厂：EmbeddedServletContainerFactory；该工场作用：创建嵌入式的Servlet容器；具体解释见下面
+	@ConditionalOnMissingBean(value = EmbeddedServletContainerFactory.class, search = SearchStrategy.CURRENT)
+	public static class EmbeddedTomcat { 
 		@Bean
 		public TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory() {
 			return new TomcatEmbeddedServletContainerFactory();
 		}
+	}   
 
-	}
-    
     /**
 	 * Nested configuration if Jetty is being used.
 	 */
@@ -1819,7 +1961,6 @@ public class EmbeddedServletContainerAutoConfiguration {
 		public JettyEmbeddedServletContainerFactory jettyEmbeddedServletContainerFactory() {
 			return new JettyEmbeddedServletContainerFactory();
 		}
-
 	}
 
 	/**
@@ -1834,31 +1975,34 @@ public class EmbeddedServletContainerAutoConfiguration {
 		public UndertowEmbeddedServletContainerFactory undertowEmbeddedServletContainerFactory() {
 			return new UndertowEmbeddedServletContainerFactory();
 		}
-
 	}
 ```
 
-1）、EmbeddedServletContainerFactory（嵌入式Servlet容器工厂）
+- EmbeddedServletContainerFactory（嵌入式Servlet容器工厂）【接上面的，具体解释如下：】
 
 ```java
 public interface EmbeddedServletContainerFactory {
 
-   //获取嵌入式的Servlet容器
+   // 获取嵌入式的Servlet容器
    EmbeddedServletContainer getEmbeddedServletContainer(
          ServletContextInitializer... initializers);
 
 }
 ```
 
+嵌入式的 Servlet 容器工厂有：
+
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180302144835.png)
 
-2）、EmbeddedServletContainer：（嵌入式的Servlet容器）
+- EmbeddedServletContainer：（嵌入式的Servlet容器）
+
+    对应的三种嵌入式容器：
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180302144910.png)
 
 
 
-3）、以**TomcatEmbeddedServletContainerFactory**为例
+- 以**TomcatEmbeddedServletContainerFactory**为例，具体说明如果导入对应的依赖，怎么实现自动切换的；下面为其部分代码
 
 ```java
 @Override
@@ -1876,30 +2020,34 @@ public EmbeddedServletContainer getEmbeddedServletContainer(
    customizeConnector(connector);
    tomcat.setConnector(connector);
    tomcat.getHost().setAutoDeploy(false);
+    // 配置引擎
    configureEngine(tomcat.getEngine());
    for (Connector additionalConnector : this.additionalTomcatConnectors) {
       tomcat.getService().addConnector(additionalConnector);
    }
    prepareContext(tomcat.getHost(), initializers);
     
-    //将配置好的Tomcat传入进去，返回一个EmbeddedServletContainer；并且启动Tomcat服务器
+    //将配置好的Tomcat传入进去，调用getTomcatEmbeddedServletContainer返回一个EmbeddedServletContainer；
+    // 同时 getTomcatXXXX 判断只要端口 > 0 就自动启动Tomcat服务器；
    return getTomcatEmbeddedServletContainer(tomcat);
 }
 ```
 
-4）、我们对嵌入式容器的配置修改是怎么生效？
+- 我们对嵌入式容器的配置修改是怎么生效？
 
-```
-ServerProperties、EmbeddedServletContainerCustomizer
-```
+    - 通过 application.properties 属性文件修改的方式是通过：ServerProperties.java 来生效的；
+
+    - 通过自己设置一个 Servlet 容器定制器：EmbeddedServletContainerCustomizer
 
 
 
-**EmbeddedServletContainerCustomizer**：定制器帮我们修改了Servlet容器的配置？
+
+
+**EmbeddedServletContainerCustomizer**：该定制器帮我们修改了Servlet容器的配置（因为ServerProperties 也是实现了该定制器）即ServerProperties也是定制器
 
 怎么修改的原理？
 
-5）、容器中导入了**EmbeddedServletContainerCustomizerBeanPostProcessor**
+- 容器中导入了**EmbeddedServletContainerCustomizerBeanPostProcessor**这个组件（是上面定制器的对应的后置处理器）（由上上面的@import 导入），下面代码只有第一部分是该组件的，剩余的都是调用方法的具体内容代码；
 
 ```java
 //初始化之前
@@ -1908,12 +2056,13 @@ public Object postProcessBeforeInitialization(Object bean, String beanName)
       throws BeansException {
     //如果当前初始化的是一个ConfigurableEmbeddedServletContainer类型的组件
    if (bean instanceof ConfigurableEmbeddedServletContainer) {
-       //
+       // 下面这个方法见下面
       postProcessBeforeInitialization((ConfigurableEmbeddedServletContainer) bean);
    }
    return bean;
 }
 
+// 这是上面的那个方法
 private void postProcessBeforeInitialization(
 			ConfigurableEmbeddedServletContainer bean) {
     //获取所有的定制器，调用每一个定制器的customize方法来给Servlet容器进行属性赋值；
@@ -1922,13 +2071,14 @@ private void postProcessBeforeInitialization(
     }
 }
 
+// 下面是 getCustomizers 具体代码
 private Collection<EmbeddedServletContainerCustomizer> getCustomizers() {
     if (this.customizers == null) {
         // Look up does not include the parent context
         this.customizers = new ArrayList<EmbeddedServletContainerCustomizer>(
             this.beanFactory
-            //从容器中获取所有这葛类型的组件：EmbeddedServletContainerCustomizer
-            //定制Servlet容器，给容器中可以添加一个EmbeddedServletContainerCustomizer类型的组件
+            //从容器中获取所有这个类型的组件：EmbeddedServletContainerCustomizer
+            //因此定制Servlet容器，需要给容器中可以添加一个EmbeddedServletContainerCustomizer类型的组件
             .getBeansOfType(EmbeddedServletContainerCustomizer.class,
                             false, false)
             .values());
@@ -1938,32 +2088,38 @@ private Collection<EmbeddedServletContainerCustomizer> getCustomizers() {
     return this.customizers;
 }
 
-ServerProperties也是定制器
+
 ```
 
-步骤：
+上面总结步骤：
 
-1）、SpringBoot根据导入的依赖情况，给容器中添加相应的EmbeddedServletContainerFactory【TomcatEmbeddedServletContainerFactory】
+- SpringBoot根据导入的依赖情况，给容器中添加相应的嵌入式容器工厂XXXEmbeddedServletContainerFactory【比如TomcatEmbeddedServletContainerFactory】
 
-2）、容器中某个组件要创建对象就会惊动后置处理器；EmbeddedServletContainerCustomizerBeanPostProcessor；
+- 容器中某个组件要创建对象（就是上面工厂创建对象）就会惊动后置处理器：EmbeddedServletContainerCustomizerBeanPostProcessor；后置处理器会判断是不是 ConfigurableEmbeddedServletContaioner（在 postProcessBeforeInitialization()方法中进行判断），而三大嵌入式 Servlet 容器工厂都是 ConfigurableEmbeddedServletContaioner（见下面图片）
 
-只要是嵌入式的Servlet容器工厂，后置处理器就工作；
+    ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180302144835.png)
 
-3）、后置处理器，从容器中获取所有的**EmbeddedServletContainerCustomizer**，调用定制器的定制方法
+    所以只要是嵌入式的Servlet容器工厂，后置处理器就工作；
+
+- 后置处理器，是从容器中获取所有的 **EmbeddedServletContainerCustomizer**，调用定制器的定制方法（定制端口号啥的等等）；
 
 
 
-###5）、嵌入式Servlet容器启动原理；
+### （五）嵌入式Servlet容器启动原理
 
-什么时候创建嵌入式的Servlet容器工厂？什么时候获取嵌入式的Servlet容器并启动Tomcat；
+因为从上面的步骤可以得出，一起都是从创建嵌入式 Servlet 容器工厂开始的，那什么时候创建嵌入式的Servlet容器工厂？和什么时候获取嵌入式的Servlet容器并启动Tomcat；
+
+下面过程通过 debug 方式得到：
+
+分别在：`EnbeddedServletContainerAutoConfiguration`的 `TomcatEmbeddedServletContainerFactory()`方法的 `return new tomcatEmbeddedServletContainerFactory`前面和 `TomcatEmbeddedServletContainerFactory`类的 `getEmbeddedServletContainer()`方法前面打断点；
 
 获取嵌入式的Servlet容器工厂：
 
-1）、SpringBoot应用启动运行run方法
+- 步骤一：SpringBoot应用启动运行run方法（在主配置类中的 run(）方法，下一步：run方法分为两步：首先创建一个 spring 应用，然后执行run 方法，然后调用run 的时候，在代码（SpringApplication.java）的 L303  使用了 refreshContext(context)刷新容器，而其中的参数 context是由 L299 的 createApplicationContext() 方法创建的，该方法会判断是否是 web 环境，如果是创建一个 web的 IOC 容器，反之创建一个默认的IOC 容器；
 
-2）、refreshContext(context);SpringBoot刷新IOC容器【创建IOC容器对象，并初始化容器，创建容器中的每一个组件】；如果是web应用创建**AnnotationConfigEmbeddedWebApplicationContext**，否则：**AnnotationConfigApplicationContext**
+- 接上面的 refreshContext(context);SpringBoot刷新IOC容器【即创建IOC容器对象，并初始化容器，包括创建容器中的每一个组件】；如果是web应用创建**AnnotationConfigEmbeddedWebApplicationContext**容器，否则：**AnnotationConfigApplicationContext**
 
-3）、refresh(context);**刷新刚才创建好的ioc容器；**
+- 然后调用 refresh(context);**刷新刚才创建好的ioc容器；**本质上调用父类的refresh() 方法下面是该父类具体的刷新过程（AbstractApplicationContext.java）
 
 ```java
 public void refresh() throws BeansException, IllegalStateException {
@@ -2031,19 +2187,15 @@ public void refresh() throws BeansException, IllegalStateException {
 }
 ```
 
-4）、  onRefresh(); web的ioc容器重写了onRefresh方法
+- onRefresh(); web的ioc容器重写了onRefresh方法（在 EmbeddedWebApplication.java 中）
 
-5）、webioc容器会创建嵌入式的Servlet容器；**createEmbeddedServletContainer**();
+- web的ioc容器会创建嵌入式的Servlet容器（就在上面的 onRefresh() 方法中）；**createEmbeddedServletContainer**();
+    - **创建的第一步：获取嵌入式的Servlet容器工厂：**
 
-**6）、获取嵌入式的Servlet容器工厂：**
+    `EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFactory();`getEmbeddedServletContainerFactory() 就是从ioc容器中获取EmbeddedServletContainerFactory 组件；	**TomcatEmbeddedServletContainerFactory**创建对象，后置处理器一看是这个对象，就获取所有的定制器来先定制Servlet容器的相关配置；
+    -  **使用上面的容器工厂获取嵌入式的Servlet容器**：`this.embeddedServletContainer = containerFactory.getEmbeddedServletContainer(getSelfInitializer());`该方法中就创建了 Tomcat 对象同时
 
-EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFactory();
-
-​	从ioc容器中获取EmbeddedServletContainerFactory 组件；**TomcatEmbeddedServletContainerFactory**创建对象，后置处理器一看是这个对象，就获取所有的定制器来先定制Servlet容器的相关配置；
-
-7）、**使用容器工厂获取嵌入式的Servlet容器**：this.embeddedServletContainer = containerFactory      .getEmbeddedServletContainer(getSelfInitializer());
-
-8）、嵌入式的Servlet容器创建对象并启动Servlet容器；
+- 同时（接上）嵌入式的Servlet容器创建对象并启动Servlet容器；
 
 **先启动嵌入式的Servlet容器，再将ioc容器中剩下没有创建出的对象获取出来；**
 
@@ -2051,19 +2203,19 @@ EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFa
 
 
 
-## 9、使用外置的Servlet容器
+## 九、使用外置的Servlet容器
 
-嵌入式Servlet容器：应用打成可执行的jar
+- 嵌入式Servlet容器：应用打成可执行的jar
+    - 优点：简单、便携；
+    - 缺点：默认不支持JSP、优化定制Servlet 容器比较复杂（
+        - 方法一：使用定制器【ServerProperties、自定义EmbeddedServletContainerCustomizer】，
+        - 方法二：自己编写嵌入式Servlet容器的创建工厂【EmbeddedServletContainerFactory】）；
 
-​		优点：简单、便携；
+- 外置的Servlet容器：外面安装Tomcat---应用war包的方式打包；
 
-​		缺点：默认不支持JSP、优化定制比较复杂（使用定制器【ServerProperties、自定义EmbeddedServletContainerCustomizer】，自己编写嵌入式Servlet容器的创建工厂【EmbeddedServletContainerFactory】）；
+### （一）步骤
 
-
-
-外置的Servlet容器：外面安装Tomcat---应用war包的方式打包；
-
-### 步骤
+==P51==
 
 1）、必须创建一个war项目；（利用idea创建好目录结构）
 
