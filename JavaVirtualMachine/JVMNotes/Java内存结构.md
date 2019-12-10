@@ -1,12 +1,21 @@
 # Java内存结构
 
-### java JVM内部结构
+### 一、java JVM 内存划分
 
+jdk 中 1.7 和 1.8 中间有区别
 
+- 虚拟机栈：栈帧：每一个方法执行的时候都会创建一个与该方法有关并且独有的栈帧（JVM 是基于栈执行的），里面存储操作数栈中数据，局部变量表、方法的返回地址（出口）等，即主要存储与方法执行相关的内容；
 
-### java对象创建过程
+- 程序计数器（Program Counter）：描述线程在执行字节码时候，执行完当前字节码之后，指定下一行字节码的位置在哪；
+- 本地方法栈：方法上加上 Native 关键字，表示该方法是有 C/C++ 实现，不是 Java 实现的，即主要用于执行本地方法；
+- 堆（Heap）：对所有线程共享，存放绝大部分的对象实例，Java 中不能直接使用对象，只能通过引用方式获取该对象然后使用它，引用作为一个变量是在栈中。
+- 方法区：对所有线程共享，存储元信息，包括常量、静态变量、类中（Class ）固有的信息； **永久代（Permanent Generation）从 JDK 1.8 中已经废弃 **
+    - 常量池：方法区的一部分
+    - 直接内存：不是 JVM 管理的内存，由操作系统进行管理；
 
-```
+### 二、java 对象创建过程
+
+```java
 /**
  * Created BY poplar ON 2019/11/25
  * 关于Java对象创建的过程:
@@ -40,7 +49,7 @@ public class MemoryTest1 {
 
 ### 虚拟机栈溢出测试
 
-```
+```java
 /**
  * Created BY poplar ON 2019/11/25
  * 虚拟机栈溢出测试
@@ -74,7 +83,7 @@ public class MemoryTest2 {
 
 ### 元空间溢出测试
 
-```
+```java
 /**
  * Created BY poplar ON 2019/11/26
  * 元空间内存溢出测试
@@ -97,7 +106,7 @@ public class MemoryTest3 {
 
 ### JVM命令使用
 
-```
+```java
 /**
  * Created BY poplar ON 2019/11/26
  * jmam命令的使用 -clstats<pid>进程id  to print class loader statistics
@@ -125,7 +134,7 @@ public class MemoryTest4 {
 
 ### JVM常用命令
 
-```
+```java
 jcmd (从JDK 1. 7开始增加的命令)
 1. jcmd pid VM.flags: 查看JVM的启动参数
 2. jcmd pid help: 列出当前运行的Java进程可以执行的操作
@@ -140,7 +149,9 @@ jcmd (从JDK 1. 7开始增加的命令)
 
 ### JVM内存举例说明
 
-```
+
+
+```java
    public void method() {
         Object object = new Object();
 
