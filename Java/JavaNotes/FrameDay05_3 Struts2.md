@@ -127,7 +127,7 @@
 - 值栈存储位置
   - 每次访问action时候，都会创建action对象，
   - 在每个action对象里面都会有一个值栈对象（只有一个）
-![值栈存储位置]($resource/%E5%80%BC%E6%A0%88%E5%AD%98%E5%82%A8%E4%BD%8D%E7%BD%AE.png)
+![值栈存储位置](FrameDay05_3%20Struts2.resource/%E5%80%BC%E6%A0%88%E5%AD%98%E5%82%A8%E4%BD%8D%E7%BD%AE.png)
 
 
 ## 四、获取值栈对象（UserAction中代码）
@@ -252,7 +252,7 @@ public class ValueStackAction extends ActionSupport {
 
 访问 URL：http://localhost:8080/StandardStrutsProject3_war_exploded/valueStackAction 点击超链接 `[Debug]` 可以看到结构，下面是 root 结构,Context 结构忽略
 
-![Root结构]($resource/Root%E7%BB%93%E6%9E%84.png)
+![Root结构](FrameDay05_3%20Struts2.resource/Root%E7%BB%93%E6%9E%84.png)
 
 如图所示：在action没有做任何操作，栈顶元素就是 action引用；
 - action对象里面有值栈对象
@@ -277,7 +277,8 @@ public class PutValueAction extends ActionSupport {
 }
 ```
 配置 struts.xml 文件和 debug.jsp 文件（和上面一样）；
-![使用 set 放入数据 2]($resource/%E4%BD%BF%E7%94%A8%20set%20%E6%94%BE%E5%85%A5%E6%95%B0%E6%8D%AE%202.png)
+![使用 set 放入数据 2](FrameDay05_3%20Struts2.resource/%E4%BD%BF%E7%94%A8%20set%20%E6%94%BE%E5%85%A5%E6%95%B0%E6%8D%AE%202.png)
+
 这是栈顶元素了；root是 list结构，但是 list中可以放入一个 map集合，用来存储使用 set方法设置的值；
 
 - 第二种：获取值栈对象，调用值栈对象里面的 push 方法
@@ -296,7 +297,8 @@ public class PutValueAction extends ActionSupport {
 }
 ```
 配置 struts.xml 文件和 debug.jsp 文件（和上面一样）；
-![调用 push 方法]($resource/%E8%B0%83%E7%94%A8%20push%20%E6%96%B9%E6%B3%95.png)
+![调用 push 方法](FrameDay05_3%20Struts2.resource/%E8%B0%83%E7%94%A8%20push%20%E6%96%B9%E6%B3%95.png)
+
 这是栈顶元素，上面的set是上一部分的；
 
 - **第三种：在 action 定义变量，生成变量的 get 方法（最常用）**
@@ -320,7 +322,9 @@ public class PutValueAction extends ActionSupport {
 }
 ```
 
-![第三种方式]($resource/%E7%AC%AC%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F.png)
+![第三种方式](FrameDay05_3%20Struts2.resource/%E7%AC%AC%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F.png)
+
+
 
 
 ### （二）向值栈放对象
@@ -360,7 +364,9 @@ public class putObjectAction extends ActionSupport {
 }
 ```
 然后同上配置 struts.xml 和 debug.jsp
-![值栈中放入对象]($resource/%E5%80%BC%E6%A0%88%E4%B8%AD%E6%94%BE%E5%85%A5%E5%AF%B9%E8%B1%A1.png)
+![值栈中放入对象](FrameDay05_3%20Struts2.resource/%E5%80%BC%E6%A0%88%E4%B8%AD%E6%94%BE%E5%85%A5%E5%AF%B9%E8%B1%A1.png)
+
+
 
 
 ### （三）向值栈放list集合
@@ -399,7 +405,9 @@ public class putListAction extends ActionSupport{
 ```
 其他配置参照上面；
 
-![堆栈中放入 List]($resource/%E5%A0%86%E6%A0%88%E4%B8%AD%E6%94%BE%E5%85%A5%20List.png)
+![堆栈中放入 List](FrameDay05_3%20Struts2.resource/%E5%A0%86%E6%A0%88%E4%B8%AD%E6%94%BE%E5%85%A5%20List.png)
+
+
 
 
 ## 七、从值栈获取数据
