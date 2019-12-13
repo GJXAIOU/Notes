@@ -62,7 +62,7 @@
     - 效率不高，需要扫描所有对象。堆越大，GC越慢 
     - 存在内存碎片问题。GC次数越多，碎片越为严重
 
-    [![标记一清除算法(Mark-Sweep)](https://github.com/weolwo/jvm-learn/raw/master/src/resources/images/1574823017674.gif)](https://github.com/weolwo/jvm-learn/blob/master/src/resources/images/1574823017674.gif)
+    ![1574823017674](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/1574823017674.gif)
 
     上图中，左侧是运行时虚拟机栈，箭头表示引用，则绿色就是不能被回收的
 
@@ -76,7 +76,7 @@
 - 复制收集算法在对象存活率高的时候，效率有所下降；
 - 如果不想浪费 50% 的空间，就需要有额外的空间进行分配担保用于应付半区内存中所有对象都 100% 存活的极端情况，所以在老年代一般不能直接选用这种算法
 
-[![复制(Copying) 搜集算法](https://github.com/weolwo/jvm-learn/raw/master/src/resources/images/1574824343266.gif)](https://github.com/weolwo/jvm-learn/blob/master/src/resources/images/1574824343266.gif)
+![1574824343266](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/1574824343266.gif)
 
 - 只需要扫描存活的对象，效率更高
 - 不会产生碎片
@@ -248,6 +248,7 @@ class Foo{
 代码示例二：
 
 ```java
+// 方式一：如果 doSomeStuff() 中抛出异常，则 rs.close() 和 conn.close() 不会被调用，导致内存泄露和 DB 连接泄露
 Connection conn = DriverManager.getConnection(url, name, passwd);
 
 try{
@@ -262,7 +263,123 @@ try{
 }catch(Exception e){
 
 }
+
+
+// 方式二：修改如下，将资源关闭操作放在 finally 语句中
+Connection conn = null; 
+ResultSet rs = null;
+
+try{
+	String sql = "do a query sql";
+    stmt = conn.prepareStatement(sql);
+    ResultSet rs = stmt.executeQuery();
+    while (rs.next()){
+    	doSomeStuff();
+    }
+}catch(Exception e){
+
+} finally {
+	if (rs != null){
+		rs.close();
+	}
+    if(stmt != null){
+  		stmt.close();
+  	}  
+	conn.close();
+}
 ```
+
+代码示例三：
+
+- 当我们使用基于数组的数据结构（如 ArrayList，HashMap 的时候），尽量较少 resize 操作，因为一旦重新指定大小或者扩容则必定带来复制操作，成本较高；
+    - 比如在创建 ArrayList 时候尽量估计 Size，在创建的时候就将size 估算好；
+    - 减少 resize 可以避免没有必要的数组拷贝、GC 碎片等问题；
+- 如果一个 List 只需要进行顺序访问，不需要随机访问，则使用 Linkedlist 代替 ArrayList，因为 Linkedlist 本质上链表，不需要 resize，但是只适用于顺序操作；
+
+### 代码示例验证
+
+代码示例一：
+
+VM Options：
+
+-  `-verbose:gc` ：会输出详细的垃圾回收的日志
+-  `-Xms20M`：设置虚拟机启动时候堆初始大小为 20 M
+- `-Xmx20M`：设置虚拟机中堆最大值为 20 M
+- `-Xmn10M`：设置堆中新生代大小为 10 M
+- `-XX:+PrintGCDetails`：打印出 GC 详细信息
+- `-XX:SurvivorRatio=8`：表示 Eden 空间和 survivor 空间占比为 8:1
+
+```java
+package com.gjxaiou.gc;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2019/12/13 20:50
+ */
+public class MyTest1 {
+    public static void main(String[] args) {
+        int size = 1024 * 1024;
+        // 这种情况下只有 GC，如果数组大小都是 3 * size，则还会包括 Full GC
+        byte[] myAlloc1 = new byte[2 * size];
+        byte[] myAlloc2 = new byte[2 * size];
+        byte[] myAlloc3 = new byte[3 * size];
+        System.out.println("hello world");
+    }
+}
+```
+
+输出结果：
+
+```java
+// (触发 GC 的原因)[新生代使用 Parallel Scavenge 收集器：垃圾回收之前新生代存活对象占用的空间->垃圾回收之后新生代存活对象占用的空间（新生代总的空间容量，因为这里包括 Eden 和 survivor 区域，survivor 包括 FromSurvivor 和 toSurvivor，两者只有一个可以被使用）] 执行 GC 之前总的堆中存活对象占空间的大小，包括新生代和老年代 -> GC 之后堆中活着占空间大小（总的堆中可用容量），执行 GC 花费时间
+[GC (Allocation Failure) [PSYoungGen: 5751K->824K(9216K)] 5751K->4928K(19456K), 0.0018545 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+hello world
+Heap
+ PSYoungGen      total 9216K, used 4219K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+  eden space 8192K, 41% used [0x00000000ff600000,0x00000000ff950ce0,0x00000000ffe00000)
+  from space 1024K, 80% used [0x00000000ffe00000,0x00000000ffece030,0x00000000fff00000)
+  to   space 1024K, 0% used [0x00000000fff00000,0x00000000fff00000,0x0000000100000000)
+ ParOldGen       total 10240K, used 4104K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+  object space 10240K, 40% used [0x00000000fec00000,0x00000000ff002020,0x00000000ff600000)
+ Metaspace       used 3135K, capacity 4496K, committed 4864K, reserved 1056768K
+  class space    used 342K, capacity 388K, committed 512K, reserved 1048576K
+```
+
+上面运算结果示例：
+
+`PSYoungGen: 5751K->824K(9216K)] 5751K->4928K(19456K)`：5646 - 624 = 5022K，表示执行完 GC 之后，新生代释放的空间（包括真正释放的空间和晋升到老年代的空间）， 5646 - 4728 = 918k，表示执行完 GC 之后，总的堆空间释放的容量（真正释放的空间），所以 5022k - 918 = 4104k ，表示从新生代晋升到老年代的空间，正好和 ：`ParOldGen       total 10240K, used 4104K` 符合。
+
+输出结果二：将创建数组大小均改为： 3 * size 之后会产生 Full GC
+
+```java
+[GC (Allocation Failure) [PSYoungGen: 7963K->824K(9216K)] 7963K->6976K(19456K), 0.0026002 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+[Full GC (Ergonomics) [PSYoungGen: 824K->0K(9216K)] [ParOldGen: 6152K->6759K(10240K)] 6976K->6759K(19456K), [Metaspace: 3132K->3132K(1056768K)], 0.0051304 secs] [Times: user=0.00 sys=0.00, real=0.01 secs] 
+hello world
+Heap
+ PSYoungGen      total 9216K, used 3396K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+  eden space 8192K, 41% used [0x00000000ff600000,0x00000000ff9512a0,0x00000000ffe00000)
+  from space 1024K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x00000000fff00000)
+  to   space 1024K, 0% used [0x00000000fff00000,0x00000000fff00000,0x0000000100000000)
+ ParOldGen       total 10240K, used 6759K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+  object space 10240K, 66% used [0x00000000fec00000,0x00000000ff299e18,0x00000000ff600000)
+ Metaspace       used 3151K, capacity 4496K, committed 4864K, reserved 1056768K
+  class space    used 343K, capacity 388K, committed 512K, reserved 1048576K
+
+Process finished with exit code 0
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
