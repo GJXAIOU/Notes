@@ -353,6 +353,7 @@ Heap
 
 ```java
 [GC (Allocation Failure) [PSYoungGen: 7963K->824K(9216K)] 7963K->6976K(19456K), 0.0026002 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+// Full GC 会对老年代和元空间进行回收
 [Full GC (Ergonomics) [PSYoungGen: 824K->0K(9216K)] [ParOldGen: 6152K->6759K(10240K)] 6976K->6759K(19456K), [Metaspace: 3132K->3132K(1056768K)], 0.0051304 secs] [Times: user=0.00 sys=0.00, real=0.01 secs] 
 hello world
 Heap
@@ -360,6 +361,7 @@ Heap
   eden space 8192K, 41% used [0x00000000ff600000,0x00000000ff9512a0,0x00000000ffe00000)
   from space 1024K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x00000000fff00000)
   to   space 1024K, 0% used [0x00000000fff00000,0x00000000fff00000,0x0000000100000000)
+ // Par：Parallel Old（老年代垃圾收集器）
  ParOldGen       total 10240K, used 6759K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
   object space 10240K, 66% used [0x00000000fec00000,0x00000000ff299e18,0x00000000ff600000)
  Metaspace       used 3151K, capacity 4496K, committed 4864K, reserved 1056768K
@@ -371,7 +373,330 @@ Process finished with exit code 0
 
 
 
+### 新生代和老年代
 
+- 打印默认的 JVM 参数 `java -XX:+PrintCommandLineFlags -version`
+
+控制台输出结果为：
+
+```java
+-XX:InitialHeapSize=266067584 -XX:MaxHeapSize=4257081344 -XX:+PrintCommandLineFlags -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC
+java version "1.8.0_221"
+Java(TM) SE Runtime Environment (build 1.8.0_221-b11)
+Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)
+```
+
+`-XX:+UseParallelGC` 表示默认对新生代使用 `Parallel Scavenge` ，对老年代使用 `Parallel Old`垃圾收集器；
+
+测试程序：
+
+`-verbose:gc -Xms20M  -Xmx20M -Xmn10M -XX:+PrintGCDetails -XX:SurvivorRatio=8 -XX:PretenureSizeThreshold=4194304 -XX:+UseSerialGC`
+
+其中 `-XX:PretenureSizeThreshold=4194304` 表示当我们创建对象的字节大于 `PretenureSizeThreshold` 的数值（单位：字节），对象将不会在新生代分配而是直接进入老年代；**该参数需要和串行垃圾收集器配合使用**，因此在上面参数中同时制定了使用 Serial 垃圾收集器
+
+```java
+package com.gjxaiou.gc;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2019/12/15 10:27
+ */
+public class MyTest2 {
+    public static void main(String[] args) {
+        int size = 1024 * 1024;
+        byte[] bytes = new byte[5 * size];
+    }
+}
+
+```
+
+从下面结果中：` tenured generation   total 10240K, used 5120K` 可以看出是直接在老年代进行了分配；
+
+```java
+Heap
+ def new generation   total 9216K, used 1983K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+  eden space 8192K,  24% used [0x00000000fec00000, 0x00000000fedefd20, 0x00000000ff400000)
+  from space 1024K,   0% used [0x00000000ff400000, 0x00000000ff400000, 0x00000000ff500000)
+  to   space 1024K,   0% used [0x00000000ff500000, 0x00000000ff500000, 0x00000000ff600000)
+ tenured generation   total 10240K, used 5120K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+   the space 10240K,  50% used [0x00000000ff600000, 0x00000000ffb00010, 0x00000000ffb00200, 0x0000000100000000)
+ Metaspace       used 3149K, capacity 4496K, committed 4864K, reserved 1056768K
+  class space    used 343K, capacity 388K, committed 512K, reserved 1048576K
+```
+
+- 测试二：去掉上面程序中 VM Options 中的 `-XX:+UseSerialGC`，同时将字节数组空间改为 `8 * size`，结果如下：
+
+    ```java
+    Heap
+     PSYoungGen      total 9216K, used 1983K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+      eden space 8192K, 24% used [0x00000000ff600000,0x00000000ff7efd20,0x00000000ffe00000)
+      from space 1024K, 0% used [0x00000000fff00000,0x00000000fff00000,0x0000000100000000)
+      to   space 1024K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x00000000fff00000)
+     ParOldGen       total 10240K, used 8192K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+      object space 10240K, 80% used [0x00000000fec00000,0x00000000ff400010,0x00000000ff600000)
+     Metaspace       used 3202K, capacity 4496K, committed 4864K, reserved 1056768K
+      class space    used 346K, capacity 388K, committed 512K, reserved 1048576K
+    ```
+
+    因为 Eden 空间的大小为 8 * size，但是因为新创建的对象大小为 8 * size，因此 Eden 空间容纳不了，因此直接进入老年代（对象是不可能拆分放入两个代的）
+
+- 测试三：同上，但是将空间大小改为 10 * size
+
+    ```java
+    [GC (Allocation Failure) [PSYoungGen: 1819K->808K(9216K)] 1819K->816K(19456K), 0.0006639 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [GC (Allocation Failure) [PSYoungGen: 808K->808K(9216K)] 816K->816K(19456K), 0.0005789 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [Full GC (Allocation Failure) [PSYoungGen: 808K->0K(9216K)] [ParOldGen: 8K->612K(10240K)] 816K->612K(19456K), [Metaspace: 3116K->3116K(1056768K)], 0.0037378 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [GC (Allocation Failure) [PSYoungGen: 0K->0K(9216K)] 612K->612K(19456K), 0.0002203 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [Full GC (Allocation Failure) [PSYoungGen: 0K->0K(9216K)] [ParOldGen: 612K->594K(10240K)] 612K->594K(19456K), [Metaspace: 3116K->3116K(1056768K)], 0.0041631 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    Heap
+     PSYoungGen      total 9216K, used 410K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+      eden space 8192K, 5% used [0x00000000ff600000,0x00000000ff666800,0x00000000ffe00000)
+      from space 1024K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x00000000fff00000)
+      to   space 1024K, 0% used [0x00000000fff00000,0x00000000fff00000,0x0000000100000000)
+     ParOldGen       total 10240K, used 594K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+      object space 10240K, 5% used [0x00000000fec00000,0x00000000fec94b58,0x00000000ff600000)
+     Metaspace       used 3200K, capacity 4496K, committed 4864K, reserved 1056768K
+      class space    used 347K, capacity 388K, committed 512K, reserved 1048576K
+    Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+    	at com.gjxaiou.gc.MyTest2.main(MyTest2.java:10)
+    ```
+
+    
+
+- 测试四：恢复原来参数 `-XX:+UseSerialGC`，代码更改如下：
+
+    ```java
+    package com.gjxaiou.gc;
+    
+    /**
+     * @Author GJXAIOU
+     * @Date 2019/12/15 10:27
+     */
+    public class MyTest2 {
+        public static void main(String[] args) {
+            int size = 1024 * 1024;
+            byte[] bytes = new byte[5 * size];
+            try {
+                Thread.sleep(1000000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    ```
+
+    程序执行过程中使用 JVisualVM 观察堆空间状况：
+
+    ![image-20191215104352640](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191215104352640.png)
+
+
+
+程序输出结果和对应的监控图片为：
+
+```java
+// 该 GC 是因为当启动一个检测工具（这里为 JVisualVM），会对原有的进程进行一次 Touch 动作，会创建一些对象从而造成内存空间不够从而会进行 GC（Minor GC），
+[GC (Allocation Failure) [DefNew: 8192K->1024K(9216K), 0.0218174 secs] 13312K->6779K(19456K), 0.0218597 secs] [Times: user=0.01 sys=0.00, real=0.02 secs] 
+[GC (Allocation Failure) [DefNew: 9216K->494K(9216K), 0.1351672 secs] 14971K->7272K(19456K), 0.1351873 secs] [Times: user=0.00 sys=0.00, real=0.13 secs] 
+[Full GC (System.gc()) [Tenured: 6777K->7059K(10240K), 0.0075978 secs] 13027K->7059K(19456K), [Metaspace: 9186K->9186K(1058816K)], 0.3133278 secs] [Times: user=0.01 sys=0.00, real=0.31 secs] 
+```
+
+
+
+![image-20191215104636489](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191215104636489.png)
+
+因为默认情况下只有创建对象的时候才会可能出现垃圾回收的操作，但是调用 `System.gc()`，会告诉 JVM 需要进行垃圾回收，JVM 会自行决定什么时候进行垃圾回收，同时可能在没有创建对象情况下执行垃圾回收；
+
+同时可以使用 jmc 查看运行结果，可以看出 Eden 空间大小变化情况；
+
+`jps -l` 查看当前进程对应的进程编号
+
+`jcmd 进程号 VM.flags` 查看运行参数
+
+
+
+### 新生代到老年代晋升
+
+`-verbose:gc -Xms20M  -Xmx20M -Xmn10M -XX:+PrintGCDetails -XX:+PrintCommandLineFlags -XX:SurvivorRatio=8 -XX:MaxTenuringThreshold=5   -XX:+PrintTenuringDistribution`
+
+- 其中：`-XX:MaxTenuringThreshold=5` ：在可以自动调节对象晋升（Promote）到老年代阈值的 GC 中，设置该阈值的最大值；默认情况下新生代中对象经过一次 GC 对应的年龄就 + 1，这里当年龄  >5 的时候该对象就晋升到老年代。这只是一个最大值，但是可能没有到达该阈值 JVM 也会将其晋升到老年代。
+
+    并且该参数的默认值为：15，其中在 CMS 中默认值为：6，在 G1 中默认值为：15，因为在 JVM 中该数值由 4 个 bit 来标识，所以最大值为 1111，即为 15；
+
+- 经历过多次 GC 之后，新生代中存活的对象会在 From Survivor 和 To Survivor 之间来回存放，而前提是这两个空间有足够的的大小来存放这些数据，在 GC 算法中会计算每个对象年龄的大小，如果到达某个年龄后发现该年龄的对象总大小已经大于 Survivor（其中一个 Survivor） 空间的 50 %，这个时候就需要调整阈值，不能在继续等到默认的 15 次 GC 之后才完成晋升，因为会导致 Survivor 空间不足，所有需要调整阈值，让这些存活的对象尽快完成晋升来释放 Survivor 空间。
+
+示例代码：
+
+```java
+package com.gjxaiou.gc;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2019/12/15 12:43
+ */
+public class MyTest3 {
+    public static void main(String[] args) {
+        int size = 1024 * 1024;
+        byte[] myAlloc1 = new byte[2 * size];
+        byte[] myAlloc2 = new byte[2 * size];
+        byte[] myAlloc3 = new byte[2 * size];
+        byte[] myAlloc4 = new byte[2 * size];
+        System.out.println("hello world");
+    }
+}
+
+```
+
+
+
+结果显示：
+
+```java
+-XX:InitialHeapSize=20971520 -XX:InitialTenuringThreshold=5 -XX:MaxHeapSize=20971520 -XX:MaxNewSize=10485760 -XX:MaxTenuringThreshold=5 -XX:NewSize=10485760 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintTenuringDistribution -XX:SurvivorRatio=8 -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC 
+[GC (Allocation Failure) 
+ // new threshold 5 是动态计算的阈值，该值 <= 后面设置的最大值 5
+ // 所需 Survivor 空间为 1048576/1024/1024 = 1M,和设置的一样
+Desired survivor size 1048576 bytes, new threshold 5 (max 5)
+[PSYoungGen: 7799K->808K(9216K)] 7799K->6960K(19456K), 0.0028644 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+[Full GC (Ergonomics) [PSYoungGen: 808K->0K(9216K)] [ParOldGen: 6152K->6754K(10240K)] 6960K->6754K(19456K), [Metaspace: 3104K->3104K(1056768K)], 0.0049277 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+hello world
+Heap
+ PSYoungGen      total 9216K, used 2372K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+  eden space 8192K, 28% used [0x00000000ff600000,0x00000000ff851200,0x00000000ffe00000)
+  from space 1024K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x00000000fff00000)
+  to   space 1024K, 0% used [0x00000000fff00000,0x00000000fff00000,0x0000000100000000)
+ ParOldGen       total 10240K, used 6754K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+  object space 10240K, 65% used [0x00000000fec00000,0x00000000ff298bd0,0x00000000ff600000)
+ Metaspace       used 3126K, capacity 4496K, committed 4864K, reserved 1056768K
+  class space    used 338K, capacity 388K, committed 512K, reserved 1048576K
+
+Process finished with exit code 0
+
+```
+
+#### 动态阈值设置原理
+
+综合测试代码
+
+`-verbose:gc -Xmx200M -Xmn50M -XX:TargetSurvivorRatio=60 -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:MaxTenuringThreshold=3 -XX:+UseParNewGC -XX:+UseConcMarkSweepGC`
+
+- `-XX:TargetSurvivorRatio=60`表示当一个 Survivor 空间中存活的对象占据了 60% 的空间，就会重新计算晋升的阈值（不在使用配置或者默认的阈值）
+
+```java
+package com.gjxaiou.gc;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2019/12/15 13:27
+ */
+public class MyTest4 {
+    public static void main(String[] args) throws InterruptedException {
+        // 下面两个字节数组在 main() 方法中，不会被GC
+        byte[] byte1 = new byte[512 * 1024];
+        byte[] byte2 = new byte[512 * 1024];
+
+        myGC();
+        Thread.sleep(1000);
+        System.out.println("----111111111------");
+        myGC();
+        Thread.sleep(1000);
+        System.out.println("----22222222------");
+        myGC();
+        Thread.sleep(1000);
+        System.out.println("----333333333------");
+        myGC();
+        Thread.sleep(1000);
+        System.out.println("----444444444------");
+
+        byte[] byte3 = new byte[1024 * 1024];
+        byte[] byte4 = new byte[1024 * 1024];
+        byte[] byte5 = new byte[1024 * 1024];
+        myGC();
+        Thread.sleep(1000);
+        System.out.println("----555555555------");
+        myGC();
+        Thread.sleep(1000);
+        System.out.println("----666666666------");
+
+        System.out.println("hello world");
+
+    }
+
+    // 方法中定义的变量当方法执行完成之后生命周期就结束了，下次垃圾回收时候就可以回收了
+    private static void myGC() {
+        for (int i = 0; i < 40; i++) {
+            byte[] byteArray = new byte[1024 * 1024];
+        }
+    }
+}
+
+```
+
+程序运行结果为：
+
+```java
+2019-12-15T14:18:18.013+0800: [GC (Allocation Failure) 2019-12-15T14:18:18.022+0800: [ParNew
+Desired survivor size 3145728 bytes, new threshold 3 (max 3)
+- age   1:    1712592 bytes,    1712592 total
+: 40346K->1706K(46080K), 0.0091928 secs] 40346K->1706K(199680K), 0.0186267 secs] [Times: user=0.00 sys=0.00, real=0.02 secs] 
+----111111111------
+2019-12-15T14:18:19.032+0800: [GC (Allocation Failure) 2019-12-15T14:18:19.032+0800: [ParNew
+// 3145728（3M），因为默认 8:1:1，即 Survivor 空间为 5M，对应的 60% 即为 3M；                                                                         
+Desired survivor size 3145728 bytes, new threshold 3 (max 3)
+- age   1:     342632 bytes,     342632 total
+- age   2:    1762376 bytes,    2105008 total
+: 41847K->2413K(46080K), 0.0007192 secs] 41847K->2413K(199680K), 0.0007452 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+----22222222------
+2019-12-15T14:18:20.034+0800: [GC (Allocation Failure) 2019-12-15T14:18:20.034+0800: [ParNew
+Desired survivor size 3145728 bytes, new threshold 3 (max 3)
+- age   1:         80 bytes,         80 total
+- age   2:     342096 bytes,     342176 total
+- age   3:    1761160 bytes,    2103336 total
+: 42927K->2424K(46080K), 0.0006154 secs] 42927K->2424K(199680K), 0.0006435 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+----333333333------
+2019-12-15T14:18:21.037+0800: [GC (Allocation Failure) 2019-12-15T14:18:21.037+0800: [ParNew
+                                                                                      // 上面 age = 3 的这里垃圾回收之后变成 4 晋升为老年代了
+Desired survivor size 3145728 bytes, new threshold 3 (max 3)
+- age   1:         80 bytes,         80 total
+- age   2:         80 bytes,        160 total
+- age   3:     341992 bytes,     342152 total
+: 43144K->1050K(46080K), 0.0017927 secs] 43144K->2738K(199680K), 0.0018190 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+----444444444------
+2019-12-15T14:18:22.040+0800: [GC (Allocation Failure) 2019-12-15T14:18:22.040+0800: [ParNew
+                                                                                      // 这里阈值变成了 1，因为对象空间超过 Survivor 空间的 60% 即为 3M，重新计算了阈值，计算公式为取当前年龄和 MaxThreshold 的最小值，因为新创建数组，当前年龄为 1，所以最终为 1；
+Desired survivor size 3145728 bytes, new threshold 1 (max 3)
+- age   1:    3145856 bytes,    3145856 total
+- age   2:         80 bytes,    3145936 total
+- age   3:         80 bytes,    3146016 total
+: 41777K->3128K(46080K), 0.0009780 secs] 43465K->5151K(199680K), 0.0010024 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+----555555555------
+2019-12-15T14:18:23.042+0800: [GC (Allocation Failure) 2019-12-15T14:18:23.042+0800: [ParNew
+                                                                                      // 上面的 age 为 1,2,3 的经过一次 GC 之后全部晋升到老年代了，下面是新加入新生代的对象
+Desired survivor size 3145728 bytes, new threshold 3 (max 3)
+- age   1:         80 bytes,         80 total
+: 43859K->14K(46080K), 0.0011804 secs] 45882K->5109K(199680K), 0.0012060 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+----666666666------
+hello world
+Heap
+ par new generation   total 46080K, used 18015K [0x00000000f3800000, 0x00000000f6a00000, 0x00000000f6a00000)
+  eden space 40960K,  43% used [0x00000000f3800000, 0x00000000f49946a8, 0x00000000f6000000)
+  from space 5120K,   0% used [0x00000000f6000000, 0x00000000f6003840, 0x00000000f6500000)
+  to   space 5120K,   0% used [0x00000000f6500000, 0x00000000f6500000, 0x00000000f6a00000)
+ concurrent mark-sweep generation total 153600K, used 5095K [0x00000000f6a00000, 0x0000000100000000, 0x0000000100000000)
+ Metaspace       used 3735K, capacity 4536K, committed 4864K, reserved 1056768K
+  class space    used 410K, capacity 428K, committed 512K, reserved 1048576K
+
+Process finished with exit code 0
+
+```
+
+
+
+## CMS 垃圾收集器
+
+### 安全点和安全区域
+
+==P83 CMS 垃圾回收器==
 
 
 
