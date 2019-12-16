@@ -1,10 +1,16 @@
-# JVM 垃圾回收
+JVM 垃圾回收
+
+哪些内存需要回收、什么时候回收、如何回收；
+
+首先程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，大体上都是在边编译期可知的（运行期会由  JIT 编译期进行优化），因此它们在方法或者线程结束之后对应的内存空间就回收了，下面只考虑 Java 堆和方法区，因为一个接口中的各个实现类需要的内存可能各不相同，一个方法的各个分支需要的内存也不一样，只能在程序运行期才能知道会创建哪些对象和回收都是动态的，需要关注这部分内存变化。
 
 一般使用 new 语句创建对象的时候消耗 12 个字节，其中引用在栈上占 4 个字节，空对象在堆中占 8 个字节。如果该语句所在方法执行结束之后，对应 Stack 中的变量会马上进行回收，但是 Heap 中的对象要等到 GC 来回收。
 
 
 
 ## 一、方法区
+
+JVM 规范中不要求虚拟机在方法区实现垃圾回收，同时在方法区进行垃圾收集的性价比较低
 
 - Java虛拟机规范表示可以不要求虚拟机在这区实现 GC，这区 GC 的“性价比”一般比较低 在堆中，尤其是在新生代，常规应用进行I次 GC 一般可以回收70%~95%的空间，而方法区的 GC 效率远小于此
 - 当前的商业 JVM 都有实现方法区的 GC ,主要回收两部分内容:废弃常量与无用类
@@ -22,13 +28,48 @@
     
         - 给对象添加一个引用计数器，当有一个地方引用它则计数器 +1，当引用失效的时候计数器 -1，任何时刻计数器为 0 的对象就是不可能再被使用的；
     
-        **- 引用计数算法无法解决对象循环引用的问题**。==问题：循环引用能不能解决==
+        - ** 引用计数算法无法解决对象循环引用的问题**。==问题：循环引用能不能解决==
     
-    - 根搜索算法( GC RootsTracing )
+          ​	如下面代码中两个对象处理互相引用对方，再无任何引用
+    
+          ```java
+          package chapter3;
+          
+          import org.junit.jupiter.api.Test;
+          
+          public class ReferenceCountingGC {
+              public Object instance = null;
+              private static final int memory = 1024 * 1024;
+              /**
+               * 该成员属性作用为：占用内存，以便能在 GC 日志中看清楚是否被回收过
+               */
+              private byte[] bigSize = new byte[2 * memory];
+          
+              @Test
+              public static void testGC() {
+                  ReferenceCountingGC objA = new ReferenceCountingGC();
+                  ReferenceCountingGC objB = new ReferenceCountingGC();
+                  objA.instance = objB;
+                  objB.instance = objA;
+                  objA = null;
+                  objB = null;
+          
+                  // 直接进行 GC
+                  System.gc();
+              }
+          }
+          
+          ```
+    
+          testGC()方法的前四行执行之后，objA对象被objA和objB.instance引用着，objB也类似；执行objA=null和objB=null之后，objA对象的objA引用失效，但是objB.instance引用仍然存在，因此如果采用单纯的引用计数法，objA并不会被回收，除非在执行objB=null时，遍历objB对象的属性，将里面的引用全部置为无效。
+    
+          
+    
+    - 根搜索算法( GC RootsTracing )【可达性】
     
         - 在实际的生产语言中(Java、 C#等)都是使用根搜索算法判定对象是否存活
     
-        - 算法基本思路就是通过一一系列的称为GCRoots"的点作为起始进行向下搜索，当一个对象到GC Roots没有任何引用链(Reference Chain)相连，则证明此对象是不可用的
+        - 算法基本思路就是通过一一系列的称为 GCRoots 的点作为起始进行向下搜索，当一个对象到 GC Roots 没有任何引用链(Reference Chain)相连，则证明此对象是不可用的。下图中 object5/6/7 之间虽然互相有引用，但是它们到 GC Roots 是不可达的，因此会被判定为是可回收对象。
 - 在Java语言中，可作为GC Roots的对象包括下面几种：
     - 虚拟机栈（栈帧中的本地变量表）中引用的对象。
     - 方法区中类静态属性引用的对象。
@@ -38,6 +79,115 @@
 ![image-20191212212156641](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191212212156641.png)
 
  
+
+### 引用
+
+在JDK 1.2之后，Java对引用的概念进行了扩充，将引用分为强引用（StrongReference）、 软引用（SoftReference）、 弱引用（Weak Reference）、 虚引用（PhantomReference）4种，这4种引用强度依次逐渐减弱
+
+- 强引用就是指在程序代码之中普遍存在的，类似`Object obj=new Object（）`这类的引用，只要强引用还存在，垃圾收集器永远不会回收掉被引用的对象。
+
+- 软引用是用来描述一些还有用但并非必需的对象。 对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围之中进行第二次回收。 **如果这次回收还没有足够的内存，才会抛出内存溢出异常**。 在 JDK 1.2 之后，提供了 SoftReference 类来实现软引用。
+
+- 弱引用也是用来描述非必需对象的，但是它的强度比软引用更弱一些，**被弱引用关联的对象只能生存到下一次垃圾收集发生之前**。 当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。 在JDK 1.2 之后，提供了 WeakReference 类来实现弱引用。
+
+- 虚引用也称为幽灵引用或者幻影引用，它是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用关联的唯一目的就是希望能在这个对象被收集器回收时收到一个系统通知。在JDK 1.2之后，提供了 PhantomReference 类来实现虚引用。
+
+  示例：
+
+  ```java
+  MyObject aRef = new MyObject();
+  SoftReference aSoftRef=new SoftReference(aRef);
+  ```
+
+  一旦SoftReference保存了对一个Java对象的软引用后，在垃圾线程对这个Java对象回收前，SoftReference类所提供的 get()方法返回Java对象的强引用。另外，一旦垃圾线程回收该Java对象之后，get()方法将返回null。在Java集合中有一种特殊的Map类型：WeakHashMap， 在这种Map中存放了键对象的弱引用，当一个键对象被垃圾回收，那么相应的值对象的引用会从Map中删除。WeakHashMap能够节约存储空间，可用来缓存那些非必须存在的数据。
+
+
+
+### 对象回收过程
+
+即使在可达性分析算法中不可达的对象，也并非是“非死不可”的，这时候它们暂时处于“缓刑”阶段，要真正宣告一个对象死亡，至少要经历两次标记过程：
+
+- 如果对象在进行可达性分析后发现没有与GC Roots相连接的引用链，那它将会被第一次标记并且进行一次筛选，**筛选的条件是**此对象是否有必要执行 finalize() 方法。当对象没有覆盖 finalize() 方法，或者 finalize() 方法已经被虚拟机调用过，虚拟机将这两种情况都视为“没有必要执行”。如果这个对象被判定为有必要执行finalize() 方法，那么这个对象将会放置在一个叫做 F-Queue 的队列之中，并在稍后由一个由虚拟机自动建立的、低优先级的 Finalizer 线程去执行它。**这里所谓的“执行”是指虚拟机会触发这个方法，但并不承诺会等待它运行结束**，这样做的原因是，如果一个对象在 finalize() 方法中执行缓慢，或者发生了死循环（更极端的情况），将很可能会导致 F-Queue 队列中其他对象永久处于等待，甚至导致整个内存回收系统崩溃。
+
+- finalize() 方法是对象逃脱死亡命运的最后一次机会，稍后 GC 将对 F-Queue 中的对象进行第二次小规模的标记，如果对象要在 finalize() 中成功拯救自己——只要重新与引用链上的任何一个对象建立关联即可，譬如把自己（this关键字）赋值给某个类变量或者对象的成员变量，那在第二次标记时它将被移除出“即将回收”的集合；如果对象这时候还没有逃脱,那基本上它就真的被回收了。
+
+
+
+代码示例：
+
+```java
+package chapter3;
+
+/**
+ * 此代码演示两点：
+ * 1.对象可以在GC时自我救赎。
+ * 2.这种自我救赎的机会只有一次，因为finalize()方法最多只会被调用一次。
+ */
+public class FinalizeEscapeGC {
+    public static FinalizeEscapeGC saveMe = null;
+
+    public void isLive() {
+        System.out.println("我还活着！");
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.out.println("执行finalize()方法中……");
+        // 完成自我救赎
+        saveMe = this;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        saveMe = new FinalizeEscapeGC();
+
+        // 对象第一次拯救自己
+        saveMe = null;
+        System.gc();
+
+        // 因为finalize方法优先级比较低，所以暂停进行等待
+        Thread.sleep(5000);
+
+        if (saveMe == null) {
+            System.out.println("我已经死亡！");
+        } else {
+            saveMe.isLive();
+        }
+
+        // 对象第二次自我救赎，失败
+        saveMe = null;
+        System.gc();
+        Thread.sleep(5000);
+
+        if (saveMe == null) {
+            System.out.println("我已经死亡！");
+        } else {
+            saveMe.isLive();
+        }
+    }
+}
+
+```
+
+执行结果：
+
+```java
+执行finalize()方法中……
+我还活着！
+我已经死亡！
+```
+
+从结果可以看出 saveMe 对象的 finalize() 方法确实被 GC 收集器触发过，但是在被收集前逃脱了；
+
+同时程序中两段相同的代码执行结果一次逃脱一次失败，因为任何一个对象的 finalize() 方法都只会被系统自动调用一次，如果对象面临下一次回收，它的 finalize() 方法不会被再次执行，因此第二段代码中自救失败。
+
+
+
+![img](https:////upload-images.jianshu.io/upload_images/8244809-77cb93ab491a1e3f.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+- 需要特别说明的是，上面关于对象死亡时finalize（）方法的描述可能带有悲情的艺术色彩，并不鼓励大家使用这种方法来拯救对象。相反，建议大家尽量避免使用它，因为它不是C/C++中的析构函数，而是Java刚诞生时为了使C/C++程序员更容易接受它所做出的一个妥协。它的运行代价高昂，不确定性大，无法保证各个对象的调用顺序。有些教材中描述它适合做“关闭外部资源”之类的工作“，这完全是对这个方法用途的一种自我安慰。finalize()能做的所有工作，使用try-finally或者其他方式都可以做得更好、更及时，所以建议大家完全可以忘掉Java语言中有这个方法的存在。
+
+
 
 ## 三、JVM 常见的 GC 算法
 
@@ -57,16 +207,14 @@
 
 - 缺点：
 
-    - 效率问题，标记和清理两个过程效率都不高 
-    - 空间问题， 标记清理之后会产生大量不连续的内存碎片，空间碎片太多可能会导致后续使用中无法找到足够的连续内存而提前触发另一次的垃圾搜集动作
-    - 效率不高，需要扫描所有对象。堆越大，GC越慢 
-    - 存在内存碎片问题。GC次数越多，碎片越为严重
-
+    - 效率问题，标记和清理两个过程效率都不高 ：效率不高，需要扫描所有对象。堆越大，GC越慢 
+    - 空间问题， 标记清理之后会产生大量不连续的内存碎片，空间碎片太多可能会导致后续使用中无法找到足够的连续内存而提前触发另一次的垃圾搜集动作；存在内存碎片问题。GC次数越多，碎片越为严重
+    
     ![1574823017674](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/1574823017674.gif)
 
     上图中，左侧是运行时虚拟机栈，箭头表示引用，则绿色就是不能被回收的
 
-### （二）复制(Copying) 搜集算法
+### （二）复制(Copying) 搜集算法（解决上面的效率问题）
 
 - 将可用内存划分为两块，每次只使用其中的一块，当一半区内存用完了，仅将还存活 的对象复制到另外一块上面，然后就把原来整块内存空间一次性清理掉；
 - 这样使得每次内存回收都是对整个半区的回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存就可以了，实现简单，运行高效。只是这种算法的代价是将内存缩小为原来的一半，代价高昂；
@@ -894,7 +1042,7 @@ Process finished with exit code 0
 
 ### G1日志解析:
 
-```
+```java
 /**
  * Created BY poplar ON 2019/11/30
  * G1日志分析
@@ -974,3 +1122,4 @@ public class G1LogAnalysis {
  * class space    used 350K, capacity 388K, committed 512K, reserved 1048576K
  */
 ```
+
