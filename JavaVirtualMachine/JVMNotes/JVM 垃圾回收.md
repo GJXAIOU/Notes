@@ -1,25 +1,28 @@
-JVM 垃圾回收
+# JVM 垃圾回收
 
-哪些内存需要回收、什么时候回收、如何回收；
+[TOC]
 
-首先程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，大体上都是在边编译期可知的（运行期会由  JIT 编译期进行优化），因此它们在方法或者线程结束之后对应的内存空间就回收了，下面只考虑 Java 堆和方法区，因为一个接口中的各个实现类需要的内存可能各不相同，一个方法的各个分支需要的内存也不一样，只能在程序运行期才能知道会创建哪些对象和回收都是动态的，需要关注这部分内存变化。
+## 一、垃圾收集区域
 
-一般使用 new 语句创建对象的时候消耗 12 个字节，其中引用在栈上占 4 个字节，空对象在堆中占 8 个字节。如果该语句所在方法执行结束之后，对应 Stack 中的变量会马上进行回收，但是 Heap 中的对象要等到 GC 来回收。
+### （一）概述
 
+- 考虑哪些内存需要回收、什么时候回收、如何回收；
 
+- 首先**程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭**，大体上都是在编译期可知的（运行期会由  JIT 编译期进行优化），因此它们在方法或者线程结束之后对应的内存空间就回收了
 
-## 一、方法区
+- 下面只考虑 Java 堆和方法区，因为一个接口中的各个实现类需要的内存可能各不相同，一个方法的各个分支需要的内存也不一样，只能在程序运行期才能知道会创建哪些对象和回收都是动态的，需要关注这部分内存变化。
 
-JVM 规范中不要求虚拟机在方法区实现垃圾回收，同时在方法区进行垃圾收集的性价比较低
+- 一般使用 new 语句创建对象的时候消耗 12 个字节，其中引用在栈上占 4 个字节，空对象在堆中占 8 个字节。如果该语句所在方法执行结束之后，对应 Stack 中的变量会马上进行回收，但是 Heap 中的对象要等到 GC 来回收。
 
-- Java虛拟机规范表示可以不要求虚拟机在这区实现 GC，这区 GC 的“性价比”一般比较低 在堆中，尤其是在新生代，常规应用进行 I 次 GC 一般可以回收70%~95%的空间，而方法区的 GC 效率远小于此
-- 当前的商业 JVM 都有实现方法区的 GC ,主要回收两部分内容:废弃常量与无用类
-- 主要回收两部分内容:废弃常量与无用类
-- 类回收需要满足如下3个条件：
-    - 该类所有的实例都已经被 GC，也就是JVM中不存在该 Class 的任何实例
-    - 加载该类的 ClassLoader 已经被GC（因为类加载器和该类加载器加载的 Class 对象之间是双向引用的）
-    - 该类对应的 java.lang.Class 对象没有在任何地方被引用，如不能在任何地方通过反射访问该类的方法
-- 在大量使用反射、动态代理、CGLib 等字节码框架、动态生成 JSP 以及 OSGi 这类频繁自定义 Classloader 的场景都需要JVM具备类卸载的支持以保证方法区不会溢出
+### （二）方法区
+
+- **Java 虛拟机规范表示可以不要求虚拟机在这区实现 GC，该区 GC 的“性价比”一般比较低**。在堆中，尤其是在新生代，常规应用进行 I 次 GC 一般可以回收 70%~95% 的空间，而方法区的 GC 效率远小于此；
+- 当前的商业 JVM 都有实现方法区的 GC ,主要回收两部分内容：**废弃常量与无用类**；
+- ==方法区的类回收需要同时满足如下三个条件==：（可以回收但是不一定回收）
+    - 该类所有的实例都已经被 GC，也就是JVM中不存在该 Class 的任何实例；
+    - 加载该类的类加载器已经被GC（因为类加载器和该类加载器加载的 Class 对象之间是双向引用的）；
+    - 该类对应的 `java.lang.Class` 对象没有在任何地方被引用，且不能在任何地方通过反射访问该类的方法；
+- 在大量使用反射、动态代理、CGLib 等字节码框架、动态生成 JSP 以及 OSGi 这类频繁自定义类加载器的场景都需要 JVM 具备类卸载的支持以保证方法区不会溢出。
 
 ## 二、垃圾判断
 
@@ -62,15 +65,15 @@ JVM 规范中不要求虚拟机在方法区实现垃圾回收，同时在方法�
       
       ```
 
-      testGC() 方法的前四行执行之后，objA 对象被 objA 和 objB.instance 引用着，objB 也类似；执行objA=null 和 objB=null 之后，objA 对象的 objA 引用失效，但是 objB.instance 引用仍然存在，因此如果采用单纯的引用计数法，objA 并不会被回收，除非在执行 objB=null 时，遍历 objB 对象的属性，将里面的引用全部置为无效。
+      分析：testGC() 方法的前四行执行之后，objA 对象被 objA 和 objB.instance 引用着，objB 也类似；执行objA=null 和 objB=null 之后，objA 对象的 objA 引用失效，但是 objB.instance 引用仍然存在，因此如果采用单纯的引用计数法，objA 并不会被回收，除非在执行 objB=null 时，遍历 objB 对象的属性，将里面的引用全部置为无效。
 
       
+    
+- 根搜索算法( GC Roots Tracing )【可达性】
 
-- 根搜索算法( GC RootsTracing )【可达性】
+    - 在实际的生产语言中(Java、 C#等)都是使用根搜索算法判定对象是否存活；
 
-    - 在实际的生产语言中(Java、 C#等)都是使用根搜索算法判定对象是否存活
-
-    - 算法基本思路就是通过一一系列的称为 GCRoots 的点作为起始进行向下搜索，当一个对象到 GC Roots 没有任何引用链(Reference Chain)相连，则证明此对象是不可用的。下图中 object5/6/7 之间虽然互相有引用，但是它们到 GC Roots 是不可达的，因此会被判定为是可回收对象。
+    - 算法基本思路就是通过一系列的称为 GC Roots 的点作为起始点进行向下搜索，当一个对象到 GC Roots 没有任何引用链(Reference Chain)相连，则证明此对象是不可用的。下图中 object5/6/7 之间虽然互相有引用，但是它们到 GC Roots 是不可达的，因此会被判定为是可回收对象。
 
 ### （二）可作为GC Roots的对象
 
@@ -81,38 +84,40 @@ JVM 规范中不要求虚拟机在方法区实现垃圾回收，同时在方法�
 
 <img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191212212156641.png" alt="image-20191212212156641" style="zoom:50%;" />
 
-### 三、引用
 
-在JDK 1.2之后，Java对引用的概念进行了扩充，将引用分为强引用（Strong Reference）、 软引用（Soft Reference）、 弱引用（Weak Reference）、 虚引用（Phantom Reference）4种，这4种引用强度依次逐渐减弱
 
-- 强引用就是指在程序代码之中普遍存在的，类似`Object obj=new Object（）`这类的引用，只要强引用还存在，垃圾收集器永远不会回收掉被引用的对象。
+-----------
+
+## 三、引用
+
+在JDK 1.2之后，Java 对引用的概念进行了扩充，将引用分为强引用（Strong Reference）、 软引用（Soft Reference）、 弱引用（Weak Reference）、 虚引用（Phantom Reference）4种，这4种引用强度依次逐渐减弱
+
+- 强引用就是指在程序代码之中普遍存在的，类似`Object obj = new Object（）`这类的引用，只要强引用还存在，垃圾收集器永远不会回收掉被引用的对象。
 
 - 软引用是用来描述一些还有用但并非必需的对象。 对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围之中进行第二次回收。 **如果这次回收还没有足够的内存，才会抛出内存溢出异常**。 在 JDK 1.2 之后，提供了 SoftReference 类来实现软引用。
 
 - 弱引用也是用来描述非必需对象的，但是它的强度比软引用更弱一些，**被弱引用关联的对象只能生存到下一次垃圾收集发生之前**。 当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。 在JDK 1.2 之后，提供了 WeakReference 类来实现弱引用。
 
-- 虚引用也称为幽灵引用或者幻影引用，它是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用关联的唯一目的就是希望能在这个对象被收集器回收时收到一个系统通知。在JDK 1.2之后，提供了 PhantomReference 类来实现虚引用。
+- 虚引用也称为幽灵引用或者幻影引用，它是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。**为一个对象设置虚引用关联的唯一目的就是希望能在这个对象被收集器回收时收到一个系统通知**。在 JDK 1.2 之后，提供了 PhantomReference 类来实现虚引用。
 
   示例：
 
   ```java
   MyObject aRef = new MyObject();
-  SoftReference aSoftRef=new SoftReference(aRef);
+  SoftReference aSoftRef = new SoftReference(aRef);
   ```
 
-  一旦 Soft Reference 保存了对一个Java对象的软引用后，在垃圾线程对这个Java对象回收前，Soft Reference类所提供的 get()方法返回Java对象的强引用。另外，一旦垃圾线程回收该Java对象之后，get()方法将返回null。在Java集合中有一种特殊的Map类型：WeakHashMap， 在这种Map中存放了键对象的弱引用，当一个键对象被垃圾回收，那么相应的值对象的引用会从Map中删除。WeakHashMap能够节约存储空间，可用来缓存那些非必须存在的数据。
+  **一旦 SoftReference 保存了对一个 Java 对象的软引用后，在垃圾线程对这个 Java 对象回收前，SoftReference 类所提供的 get() 方法返回 Java 对象的强引用**。另外，一旦垃圾线程回收该 Java 对象之后，get() 方法将返回 null。在 Java 集合中有一种特殊的 Map 类型：WeakHashMap， 在这种 Map 中存放了键对象的弱引用，当一个键对象被垃圾回收，那么相应的值对象的引用会从 Map 中删除。WeakHashMap 能够节约存储空间，可用来缓存那些非必须存在的数据。
 
+----
 
+## 四、对象回收过程
 
-### 四、对象回收过程
+**即使在可达性分析算法中不可达的对象，也并非是“非死不可”的**，这时候它们暂时处于“缓刑”阶段，要真正宣告一个对象死亡，至少要经历两次标记过程：
 
-即使在可达性分析算法中不可达的对象，也并非是“非死不可”的，这时候它们暂时处于“缓刑”阶段，要真正宣告一个对象死亡，至少要经历两次标记过程：
+- 如果对象在进行可达性分析后发现没有与 GC Roots 相连接的引用链，那它将会被第一次标记并且进行一次筛选，**筛选的条件是**此对象是否有必要执行 finalize() 方法。当对象没有覆盖 finalize() 方法，或者 finalize() 方法已经被虚拟机调用过，虚拟机将这两种情况都视为“没有必要执行”。**如果这个对象被判定为有必要执行finalize() 方法，那么这个对象将会放置在一个叫做 F-Queue 的队列之中，并在稍后由一个由虚拟机自动建立的、低优先级的 Finalizer 线程去执行它**。**这里所谓的“执行”是指虚拟机会触发这个方法，但并不承诺会等待它运行结束**，这样做的原因是，如果一个对象在 finalize() 方法中执行缓慢或者发生了死循环，将很可能会导致 F-Queue 队列中其他对象永久处于等待，甚至导致整个内存回收系统崩溃。
 
-- 如果对象在进行可达性分析后发现没有与GC Roots相连接的引用链，那它将会被第一次标记并且进行一次筛选，**筛选的条件是**此对象是否有必要执行 finalize() 方法。当对象没有覆盖 finalize() 方法，或者 finalize() 方法已经被虚拟机调用过，虚拟机将这两种情况都视为“没有必要执行”。如果这个对象被判定为有必要执行finalize() 方法，那么这个对象将会放置在一个叫做 F-Queue 的队列之中，并在稍后由一个由虚拟机自动建立的、低优先级的 Finalizer 线程去执行它。**这里所谓的“执行”是指虚拟机会触发这个方法，但并不承诺会等待它运行结束**，这样做的原因是，如果一个对象在 finalize() 方法中执行缓慢，或者发生了死循环（更极端的情况），将很可能会导致 F-Queue 队列中其他对象永久处于等待，甚至导致整个内存回收系统崩溃。
-
-- finalize() 方法是对象逃脱死亡命运的最后一次机会，稍后 GC 将对 F-Queue 中的对象进行第二次小规模的标记，如果对象要在 finalize() 中成功拯救自己——只要重新与引用链上的任何一个对象建立关联即可，譬如把自己（this关键字）赋值给某个类变量或者对象的成员变量，那在第二次标记时它将被移除出“即将回收”的集合；如果对象这时候还没有逃脱,那基本上它就真的被回收了。
-
-
+- finalize() 方法是对象逃脱死亡命运的最后一次机会，稍后 GC 将对 F-Queue 中的对象进行第二次小规模的标记，如果对象要在 finalize() 中成功拯救自己——**只要重新与引用链上的任何一个对象建立关联即可，譬如把自己（this关键字）赋值给某个类变量或者对象的成员变量**，那在第二次标记时它将被移除出“即将回收”的集合；如果对象这时候还没有逃脱,那基本上它就真的被回收了。
 
 代码示例：
 
@@ -182,11 +187,9 @@ public class FinalizeEscapeGC {
 
 同时程序中两段相同的代码执行结果一次逃脱一次失败，因为任何一个对象的 finalize() 方法都只会被系统自动调用一次，如果对象面临下一次回收，它的 finalize() 方法不会被再次执行，因此第二段代码中自救失败。
 
+![finalize 执行过程](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/finalize%20%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.jpg)
 
-
-![img](https:////upload-images.jianshu.io/upload_images/8244809-77cb93ab491a1e3f.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
-
-- 需要特别说明的是，上面关于对象死亡时finalize（）方法的描述可能带有悲情的艺术色彩，并不鼓励大家使用这种方法来拯救对象。相反，建议大家尽量避免使用它，因为它不是C/C++中的析构函数，而是Java刚诞生时为了使C/C++程序员更容易接受它所做出的一个妥协。它的运行代价高昂，不确定性大，无法保证各个对象的调用顺序。有些教材中描述它适合做“关闭外部资源”之类的工作“，这完全是对这个方法用途的一种自我安慰。finalize()能做的所有工作，使用try-finally或者其他方式都可以做得更好、更及时，所以建议大家完全可以忘掉Java语言中有这个方法的存在。
+- 需要特别说明的是，**建议大家尽量避免使用这种方法来拯救对象**，因为它不是 C/C++ 中的析构函数，而是Java刚诞生时为了使C/C++程序员更容易接受它所做出的一个妥协。它的运行代价高昂，不确定性大，无法保证各个对象的调用顺序。有些教材中描述它适合做“关闭外部资源”之类的工作“，这完全是对这个方法用途的一种自我安慰。finalize()能做的所有工作，使用try-finally或者其他方式都可以做得更好、更及时，所以建议大家完全可以忘掉Java语言中有这个方法的存在。
 
 
 
@@ -200,7 +203,7 @@ public class FinalizeEscapeGC {
 
 - 分代算法(Generational)
 
-  新生使用复制算法，老年代一般采用标记-清除算法或者标记-整理算法；
+  **新生使用复制算法，老年代一般采用标记-清除算法或者标记-整理算法**；
 
 ### （一）标记一清除算法(Mark-Sweep)
 
@@ -209,126 +212,128 @@ public class FinalizeEscapeGC {
 - 缺点：
 
     - 效率问题，标记和清理两个过程效率都不高，需要扫描所有对象，因此堆越大，GC 越慢； 
-    - 空间问题， 标记清理之后会产生大量不连续的内存碎片，空间碎片太多可能会导致后续使用中无法找到足够的连续内存来分配给对象而提前触发另一次的垃圾搜集动作；GC 次数越多，碎片越为严重
+    - 空间问题， **标记清理之后会产生大量不连续的内存碎片，空间碎片太多可能会导致后续使用中无法找到足够的连续内存来分配给对象而提前触发另一次的垃圾收集动作**；GC 次数越多，碎片越为严重
     
-    ![1574823017674](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/1574823017674.gif)
+    <img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/1574823017674.gif" alt="1574823017674" style="zoom:50%;" />
 
     上图中，左侧是运行时虚拟机栈，箭头表示引用，则绿色就是不能被回收的
+    
+    ### （二）标记一整理( Mark-Compact )算法
+    
+    - 标记过程仍然一样，但后续步骤不是进行直接清理，而是令所有存活的对象一端移动，然后直接清理掉这端边界以外的内存
+    
+    - **没有内存碎片**；
+    
+    - 比标记清理耗费更多的时间进行整理；
+    
+      <img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191212212328669.png" alt="image-20191212212328669" style="zoom:50%;" />
 
-### （二）复制(Copying) 搜集算法（解决上面的效率问题）
+### （三）复制搜集算法（解决上面的效率问题）
 
-- 将可用内存划分为两块，每次只使用其中的一块，当一半区内存用完了，仅将还存活 的对象复制到另外一块上面，然后就把原来整块内存空间一次性清理掉；
-- 这样使得每次内存回收都是对整个半区的回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存就可以了，实现简单，运行高效。只是这种算法的代价是将内存缩小为原来的一半，代价高昂；
-- 现在的商业虚拟机中都是用了这一种收集算法来回收新生代；
-- 将内存分为一块较大的 eden 空间和 2 块较少的 survivor 空间，每次使用 eden 和其中一块 survivor, 当回收时将 eden 和 survivor 还存活的对象一次性拷贝到另外一块 survivor 空间上，然后清理掉 eden 和用过的survivor；
-- Oracle Hotspot 虚拟机默认 eden 和 survivor 的大小比例是 8:1，也就是每次只有10%的内存是“浪费”的；
+- 将可用内存划分为两块，每次只使用其中的一块，当一半区内存用完了，仅将还存活 的对象复制到另外一块上面，然后就把原来整块内存空间一次性清理掉；这样使得每次内存回收都是对整个半区的回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存就可以了，实现简单，运行高效。只是这种算法的代价是将内存缩小为原来的一半，代价高昂；
+- **现在的商业虚拟机中都使用该种收集算法来回收新生代**；
+- 算法优化，减少浪费的空间：
+  - 将内存分为一块较大的 eden 空间和 2 块较少的 survivor 空间（两个空间大小一样），每次使用 eden 和其中一块 survivor,，当回收时将 eden 和 survivor 还存活的对象一次性拷贝到另外一块 survivor 空间上，然后清理掉 eden 和用过的survivor；
+  - Oracle HotSpot 虚拟机默认 eden 和 survivor 的大小比例是 8:1，也就是每次只有10%的内存是“浪费”的；
 - 复制收集算法在对象存活率高的时候，效率有所下降；
-- 如果不想浪费 50% 的空间，就需要有额外的空间进行分配担保用于应付半区内存中所有对象都 100% 存活的极端情况，所以在老年代一般不能直接选用这种算法
+- 如果不想浪费 50% 的空间（而采用上面优化方法），就需要有额外的空间进行分配担保用于应付半区内存中所有对象都 100% 存活的极端情况，**所以在老年代一般不能直接选用这种算法**；
 
-![1574824343266](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/1574824343266.gif)
+<img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/1574824343266.gif" alt="1574824343266" style="zoom:50%;" />
 
-- 只需要扫描存活的对象，效率更高
-- 不会产生碎片
-- 需要浪费额外的内存作为复制区
-- 复制算法非常适合生命周期比较短的对象，因为每次GC总能回收大部分的对象，复制的开销比较小
-- 根据IBM的专i研究，98%的Java对象只会存活1个GC周期，对这些对象很适合用复制算法。而且 不用1: 1的划分工作区和复制区的空间
+- 优点：
+  - 只需要扫描存活的对象，效率更高；
+  - 不会产生碎片；
+  - 复制算法非常适合生命周期比较短的对象，因为每次GC总能回收大部分的对象，复制的开销比较小；
+  - 根据 IBM 的专项研究，98% 的 Java 对象只会存活 1 个 GC 周期，对这些对象很适合用复制算法。而且不用 1: 1 的划分工作区和复制区的空间；
 - 缺点：
-  - 如果回收之后存活的对象大于 10%，即 Survior 区域放置不下的时候，需要依赖其他内存（这里是指老年代）进行分配担保（Handle Promotion）【如果另外一块 Survive 空间没有足够空间存放上一次新生代收集下来的存活对象，这些对象将直接通过分配担保机制进入老年代】
+  - 需要浪费额外的内存作为复制区； 
+  - 如果回收之后存活的对象大于 10%，即 Survivor 区域放置不下的时候，需要依赖其他内存（这里是指老年代）进行分配担保（Handle Promotion）【**因此如果另外一块 Survive 空间没有足够空间存放上一次新生代收集下来的存活对象，这些对象将直接通过分配担保机制进入老年代**】。
   - 对象存活率较高时候复制操作较多，同时需要额外的空间分配担保，因此**老年代不适用该算法**；
-
-### （三）标记一整理( Mark-Compact )算法
-
-- 标记过程仍然一样，但后续步骤不是进行直接清理，而是令所有存活的对象一端移动，然后直接清理掉这端边界以外的内存。
-
-    ![image-20191212212328669](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191212212328669.png)
-
-- 没有内存碎片
-
-- 比 Mark-Sweep 耗费更多的时间进行 compact
 
 ### （四）分代收集( Generational Collecting)算法
 
 - 当前商业虚拟机的垃圾收集都是采用“分代收集”( Generational Collecting)算法，根据对象不同的存活周期将内存划分为几块。
-- 一般是把 Java 堆分作新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法，譬如新生代每次 GC 都有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本，就可以完成收集。同时老年代中对象存活率较高，没有额外空间对其进行担保，必须使用“标记-清理” 或者 “标记-整理” 进行回收。
+- **一般是把 Java 堆分作新生代和老年代**，这样就可以根据各个年代的特点采用最适当的收集算法，譬如新生代每次 GC 都有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本，就可以完成收集。同时老年代中对象存活率较高，没有额外空间对其进行担保，必须使用“标记-清理” 或者 “标记-整理” 进行回收。
 
-### Hotspot JVM 6中共划分为三个代:
+- HotSpot JVM 6中共划分为三个代:
+  - 年轻代(Young Generation)
+  - 老年代(Old Generation)
+  - 永久代( Permanent Generation)
 
-- 年轻代(Young Generation)
-- 老年代(Old Generation)和
-- 永久代( Permanent Generation)
-
-[<img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/drrrr.png" alt="Hotspot JVM 6中共划分为三个代" style="zoom:80%;" />
+<img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/drrrr.png" alt="Hotspot JVM 6中共划分为三个代" style="zoom: 50%;" />
 
 - 年轻代
-    - 年轻代(Young Generation) 新生成的对象都放在新生代。年轻代用复制算法进行 GC (理论上年轻代对象的生命周期非常短，所以适合复制算法)
-    - 年轻代分三个区。一个 Eden 区，两个 Survivor 区(可以通过参数设置 Survivor 个数)。对象在Eden区中生成。当 Eden 区满时，还存活的对象将被复制到一个 Survivor 区，当这个 Survivor 区满时，此区的存活对象将被复制到另外一个 Survivor 区，当第二个 Survivor 区也满了的时候，从第一个 Survivor 区复制过来的并且此时还存活的对象，将被复制到老年代。2 个 Survivor 是完全对称，轮流替换。
-    - Eden 和2个 Survivor 的缺省比例是 8:1:1，也就是 10% 的空间会被浪费。可以根据 GC log 的信息调整大小的比例
+    - 年轻代(Young Generation) 新生成的对象都放在新生代。年轻代用复制算法进行 GC (理论上年轻代对象的生命周期非常短，所以适合复制算法)；
+    - 年轻代分三个区。一个 Eden 区，两个 Survivor 区(可以通过参数设置 Survivor 个数)。对象在Eden区中生成。当 Eden 区满时，还存活的对象将被复制到一个 Survivor 区，当这个 Survivor 区满时，此区的存活对象将被复制到另外一个 Survivor 区，当第二个 Survivor 区也满了的时候，从第一个 Survivor 区复制过来的并且此时还存活的对象，将被复制到老年代。2 个 Survivor 是完全对称，轮流替换；
+    - Eden 和2个 Survivor 的缺省比例是 8:1:1，也就是 10% 的空间会被浪费。可以根据 GC 日志的信息调整大小的比例；
 - 老年代(Old Generation)
-    - 存放了经过一次或多次 GC 还存活的对象
-    - 一般采用 Mark-Sweep 或者 Mark-Compact 算法进行 GC
+    - 存放了经过一次或多次 GC 还存活的对象；
+    - 一般采用 Mark-Sweep 或者 Mark-Compact 算法进行 GC；
     - 有多种垃圾收集器可以选择。每种垃圾收集器可以看作一个 GC 算法的具体实现。可以根据具体应用的需求选用合适的垃圾收集器(例如追求吞吐量?追求最短的响应时间?)
 - ~~永久代~~
-    - 并不属于堆(Heap)，但是 GC 也会涉及到这个区域
-    - 存放了每个 Class 的结构信息， 包括常量池、字段描述、方法描述。与垃圾收集要收集的 Java 对象关系不大
+    - 并不属于堆(Heap)，但是 GC 也会涉及到这个区域；
+    - 存放了每个 Class 的结构信息， 包括常量池、字段描述、方法描述。与垃圾收集要收集的 Java 对象关系不大；
 
 ## 六、内存分配与回收
 
-- 堆上分配： 大多数情况在 eden 上分配，偶尔会直接在 old 上分配细节取决于 GC 的实现
-- 栈上分配： 原子类型的局部变量
-- GC 要做的是将那些 dead 的对象所占用的内存回收掉
-    - Hotspot 认为没有引用的对象是 dead 的
-    - Hotspot 将引用分为四种: Strong、 Soft、Weak、Phantom， Strong 即默认通过`Object o=new Object()`这种方式赋值的引用 ，Soft、Weak、 Phantom 这 三种则都是继承Reference
+### （一）内存分配和回收方案
+
+- 堆上分配： 大多数情况在 eden 上分配，偶尔会直接在 old 上分配，细节取决于 GC 的实现；
+- 栈上分配： 原子类型的局部变量；
+- GC 要做的是将那些死亡的对象所占用的内存回收掉
+    - HotSpot 认为没有引用的对象是死亡的；
+    - HotSpot 将引用分为四种: Strong、 Soft、Weak、Phantom， Strong 即默认通过`Object o=new Object()`这种方式赋值的引用 ，Soft、Weak、 Phantom 这 三种则都是继承 Reference；
 - 在 Full GC 时会对 Reference 类型的引用进行特殊处理
     - Soft：内存不够时一定会被 GC、长期不用也会被 GC
-    - Weak：一定会被 GC， 当被标记为 dead, 会在 ReferenceQueue 中通知
-    - Phantom：本来就没引用，当从 jvm heap 中释放时会通知
+    - Weak：一定会被 GC， 当被标记为 dead, 会在 Reference Queue 中通知
+    - Phantom：本来就没引用，当从 JVM 堆中释放时会通知
 
 常见的垃圾收集算法：
 
-[<img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/qqq.png" alt="垃圾回收器" style="zoom:67%;" />
+<img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/qqq.png" alt="垃圾回收器" style="zoom: 50%;" />
 
 ### （二）GC 回收的时机
 
 在分代模型（新生代和老年代）的基础上，GC 从时机上分为两种: Scavenge GC 和 Full GC
 - Scavenge GC (Minor GC)
     -  触发时机：新对象生成时，Eden 空间满了
-    - 理论上 Eden 区大多数对象会在 ScavengeGC 回收，复制算法的执行效率会很高，ScavengeGC 时间比较短。
+    - 理论上 Eden 区大多数对象会在 Scavenge GC 回收，复制算法的执行效率会很高，Scavenge GC 时间比较短。
 - Full GC 
-    - 对整个 JVM 进行整理，包括 Young、Old 和Perm
+    - 对整个 JVM 进行整理，包括 Young、Old 和 Perm
     - 主要的触发时机
-        -  Old满了
-        - Perm满了
-        - 执行 system.gc()
+        -  Old 满了
+        - Perm 满了
+        - 执行 `system.gc()`
     - 效率很低，尽量减少 Full GC。
 
 ## 七、垃圾回收器(Garbage Collector)
 
 - 分代模型: GC 的宏观愿景;
 - 垃圾回收器: GC 的具体实现
-- Hotspot JVM提供多种垃圾回收器，我们需要根据具体应用的需要采用不同的回收器
+- HotSpot JVM提供多种垃圾回收器，我们需要根据具体应用的需要采用不同的回收器
 - 没有万能的垃圾回收器，每种垃圾回收器都有自己的适用场景
 
-### 垃圾收集器的‘并行”和并发
+**垃圾收集器的‘并行”和并发**
 
 - 并行(Parallel)：指多个收集器的线程同时工作，但是用户线程处于等待状态
 - 并发(Concurrent)：指收集器在工作的同时，可以允许用户线程工作。并发不代表解决了GC 停顿的问题，在关键的步骤还是要停顿。比如在收集器标记垃圾的时候。但在清除垃圾的时候，用户线程可以和 GC 线程并发执行。
 
 ### （一）Serial 收集器
 
-- 单线程收集器，收集使会暂停所有工作线程（StopThe World，STW），使用复制收集算法，虚拟机运行在 Client 模式时的默认新生代收集器；
+- **单线程收集器**，收集使会暂停所有工作线程（Stop The World，STW），使用**复制收集算法**，虚拟机运行**在 Client 模式时的默认新生代收集器；**
 
-- 最早的收集器，单线程进行 GC， 新生代和老年代都可以使用
+- 最早的收集器，单线程进行 GC， **新生代和老年代都可以使用**；
 - 在新生代，采用复制算法;
-- 在老年代，采用 Mark-Compact 算法，因为是单线程 GC，没有多线程切换的额外开销，简单实用，是Hotspot Client模式默认的收集器
+- 在老年代，采用标记-整理算法，因为是单线程 GC，没有多线程切换的额外开销，简单实用，是HotSpot Client模式默认的收集器
 
 ![Serial收集器](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/serial.png)
 
 ### （二）ParNew 收集器
 
-- ParNew 收集器就是 Serial 的多线程版本，除了使用多个收集线程外，其余行为包括算法、STW、对象分配规则、回收策略等都与 Seria 收集器一模一样。
-- 对应的这种收集器是虚拟机运行在 Server 模式的默认新生代收集器，在单 CPU 的环境中，ParNew 收集器并不会比 Serial 收集器有更好的效果
-- 是 Serial 收集器在新生代的多线程版本
-- 使用复制算法(因为针对新生代)，只有在多 CPU 的环境下，效率才会比 Serial 收集器高
+- ParNew 收集器就是 Serial 的多线程版本，除了使用多个收集线程外，其余行为包括算法、STW、对象分配规则、回收策略等都与 Serial 收集器一模一样。
+- 对应的这种收集器是虚拟机运行**在 Server 模式的默认新生代收集器**，在单 CPU 的环境中，ParNew 收集器并不会比 Serial 收集器有更好的效果；
+- 是 Serial 收集器在新生代的多线程版本；
+- 使用复制算法(因为针对新生代)，只有在多 CPU 的环境下，效率才会比 Serial 收集器高；
 - 可以通过 `-XX:ParallelGCThreads` 来控制 GC 线程数的多少。需要结合具体 CPU 的个数 Server 模式下新生代的缺省收集器
 
 ![ParNew收集器](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/parnew.png)
@@ -349,28 +354,27 @@ public class FinalizeEscapeGC {
 
 ### （六）CMS ( Concurrent Mark Sweep )收集器
 
-- CMS 是一种以**最短停顿时间为目标**的收集器，使用 CMS 并不能达到 GC 效率最高(总体 GC 时间最小)，但它能尽可能降低 GC 时服务的停顿时间，CMS 收集器使用的是标记一清除算法
+- CMS 是一种以**最短停顿时间为目标**的收集器，使用 CMS 并不能达到 GC 效率最高(总体 GC 时间最小)，但它能尽可能降低 GC 时服务的停顿时间，**CMS 收集器使用的是标记一清除算法**；
 - 特点：
     - 追求最短停顿时间，非常适合 Web 应用
-    - 只针对老年区，一般结合 ParNew 使用
-    - Concurrent, GC 线程和用户线程并发工作(尽量并发 )
-    - Mark-Sweep
+    - **只针对老年区**，一般结合 ParNew 使用
+    - GC 线程和用户线程并发工作(尽量并发 )
     - 只有在多 CPU 环境下才有意义
     - 使用`-XX:+UseConcMarkSweepGC`打开
 - CMS 收集器的缺点
-    - CMS 以牺牲 CPU 资源的代价来减少用户线程的停顿。当 CPU 个数少于4的时候，有可能对吞吐量影响非常大
-    - CMS 在并发清理的过程中，用户线程还在跑。这时候需要预留一部分空间给用户线程
-    - CMS 用 Mark-Sweep,会带来碎片问题。碎片过多的时候会容易频繁触发 FullGC
+    - CMS 以牺牲 CPU 资源的代价来减少用户线程的停顿。当 CPU 个数少于4的时候，有可能对吞吐量影响非常大；
+    - CMS 在并发清理的过程中，用户线程还在跑。这时候需要预留一部分空间给用户线程；
+    - CMS 用标记清除算法会带来碎片问题。碎片过多的时候会容易频繁触发 Full GC；
 
 [![CMS收集器](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/cms.png)](https://github.com/weolwo/jvm-learn/blob/master/src/resources/images/cms.png)
 
-### 八、常见 Java  内存泄露的经典原因
+##  八、常见 Java 内存泄露的经典原因
 
 - 对象定义在错误的范围
 - 异常（Exception）处理不当
 - 集合数据管理不当
 
-代码示例一：
+代码示例一：对象定义在错误范围
 
 ```java
 // 方式一：如果 Foo 实例对象的生命周期较长，会导致临时性内存泄露（这里的 names 变量其实就是临时作用）
@@ -389,7 +393,7 @@ Class Foo{
 // 修改方式二： JVM 喜欢生命周期短的对象，更加的高效
 class Foo{
 	public void doIt(int length){
-    // 将 names 从成员变量变成局部变量，当 doIt 方法执行完成之后里面的局部变量都会被回收，所以不断 Foo 这个实例存活多长时间，都不会影响 names 被回收
+    // 将 names 从成员变量变成局部变量，当 doIt 方法执行完成之后里面的局部变量都会被回收，所以不论 Foo 这个实例存活多长时间，都不会影响 names 被回收
     	String[] names = new String[length];
         populate(names);
         print(names);
@@ -397,7 +401,7 @@ class Foo{
 }
 ```
 
-代码示例二：
+代码示例二：异常处理不当
 
 ```java
 // 方式一：如果 doSomeStuff() 中抛出异常，则 rs.close() 和 conn.close() 不会被调用，导致内存泄露和 DB 连接泄露
@@ -441,16 +445,14 @@ try{
 }
 ```
 
-代码示例三：
+代码示例三：数据集合管理不当
 
 - 当我们使用基于数组的数据结构（如 ArrayList，HashMap 的时候），尽量较少 resize 操作，因为一旦重新指定大小或者扩容则必定带来复制操作，成本较高；
     - 比如在创建 ArrayList 时候尽量估计 Size，在创建的时候就将size 估算好；
     - 减少 resize 可以避免没有必要的数组拷贝、GC 碎片等问题；
 - 如果一个 List 只需要进行顺序访问，不需要随机访问，则使用 Linkedlist 代替 ArrayList，因为 Linkedlist 本质上链表，不需要 resize，但是只适用于顺序操作；
 
-**对应的代码示例验证**
-
-代码示例一：
+## 九、垃圾回收示例
 
 VM Options：
 
@@ -497,9 +499,9 @@ Heap
   class space    used 342K, capacity 388K, committed 512K, reserved 1048576K
 ```
 
-上面运算结果示例：
+上面运算结果计算比较：
 
-`PSYoungGen: 5751K->824K(9216K)] 5751K->4928K(19456K)`：5646 - 624 = 5022K，表示执行完 GC 之后，新生代释放的空间（包括真正释放的空间和晋升到老年代的空间）， 5646 - 4728 = 918k，表示执行完 GC 之后，总的堆空间释放的容量（真正释放的空间），所以 5022k - 918 = 4104k ，表示从新生代晋升到老年代的空间，正好和 ：`ParOldGen       total 10240K, used 4104K` 符合。
+`PSYoungGen: 5751K->824K(9216K)] 5751K->4928K(19456K)`：5751 - 824 = 4927K，表示执行完 GC 之后，新生代释放的空间（包括真正释放的空间和晋升到老年代的空间）， 5751 - 4928 = 823k，表示执行完 GC 之后，总的堆空间释放的容量（真正释放的空间），所以 4927 - 823 = 4104k ，表示从新生代晋升到老年代的空间，正好和 ：`ParOldGen       total 10240K, used 4104K` 符合。
 
 输出结果二：将创建数组大小均改为： 3 * size 之后会产生 Full GC
 
@@ -538,7 +540,7 @@ Java(TM) SE Runtime Environment (build 1.8.0_221-b11)
 Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)
 ```
 
-`-XX:+UseParallelGC` 表示默认对新生代使用 `Parallel Scavenge` ，对老年代使用 `Parallel Old`垃圾收集器；
+其中`-XX:+UseParallelGC` 表示默认对新生代使用 `Parallel Scavenge` ，对老年代使用 `Parallel Old`垃圾收集器；
 
 测试程序：
 
@@ -844,7 +846,7 @@ Process finished with exit code 0
 
 
 
-## CMS 垃圾收集器（Concurrent Mark Sweep）
+##  九、CMS 垃圾收集器（Concurrent Mark Sweep）
 
 CMS 垃圾收集器属于老年代的收集器
 
@@ -907,7 +909,7 @@ CMS收集器有３个明显的缺点：
 在发生Minor GC之前，虚拟机会检查**老年代最大可用的连续空间**是否大于**新生代所有对象的总空间**，
 
 - 如果大于，则此次**Minor GC是安全的**
-- 如果小于，则虚拟机会查看**HandlePromotionFailure**设置值是否允许担保失败。
+- 如果小于，则虚拟机会查看 **HandlePromotionFailure**设置值是否允许担保失败。
     如果HandlePromotionFailure=true，那么会继续检查老年代最大可用连续空间是否大于**历次晋升到老年代的对象的平均大小**，如果大于，则尝试进行一次Minor GC，但这次Minor GC依然是有风险的；如果小于或者HandlePromotionFailure=false，则改为进行一次Full GC。
 
 上面提到了Minor GC依然会有风险，是因为新生代采用**复制收集算法**，假如大量对象在Minor GC后仍然存活（最极端情况为内存回收后新生代中所有对象均存活），而Survivor空间是比较小的，这时就需要老年代进行分配担保，把Survivor无法容纳的对象放到老年代。**老年代要进行空间分配担保，前提是老年代得有足够空间来容纳这些对象**，但一共有多少对象在内存回收后存活下来是不可预知的，**因此只好取之前每次垃圾回收后晋升到老年代的对象大小的平均值作为参考**。使用这个平均值与老年代剩余空间进行比较，来决定是否进行Full GC来让老年代腾出更多空间。
@@ -964,6 +966,12 @@ CMS收集器有３个明显的缺点：
 
 ### 阶段三：并发预清理阶段
 
+- 这也是一个并发阶段，与应用的线程并发运行，并不会 Stop 应用的线程，在并发运行的过程中，一些对象的引用可能会发生改变，但是这种情况发生时， JVM 会将包含这个对象的区域（Card）标记为 Dirty，这就是 Card marking
+
+- 在 Pre-clean 阶段，那些能够从 Dirty 对象到达的对象也会被标记，这个标记做完之后， Dirty Card 标记就会被清除了。
+
+
+
 前一个阶段已经说明，不能标记出老年代全部的存活对象，是因为标记的同时应用程序会改变一些对象引用，这个阶段就是用来处理前一个阶段因为引用关系改变导致没有标记到的存活对象的，它会扫描所有标记为Direty的Card
 如下图所示，在并发清理阶段，节点3的引用指向了6；则会把节点3的card标记为Dirty；
 ![这里写图片描述](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/20170502211600103.png)
@@ -974,30 +982,26 @@ CMS收集器有３个明显的缺点：
 
 
 
-![image-20191218131221209](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218131221209.png)
-
-
-
 ## 可终止的预处理
 
 这个阶段尝试着去承担下一个阶段Final Remark阶段足够多的工作。这个阶段持续的时间依赖好多的因素，由于这个阶段是重复的做相同的事情直到发生aboart的条件（比如：重复的次数、多少量的工作、持续的时间等等）之一才会停止。
 **ps:此阶段最大持续时间为5秒，之所以可以持续5秒，另外一个原因也是为了期待这5秒内能够发生一次ygc，清理年轻带的引用，是的下个阶段的重新标记阶段，扫描年轻带指向老年代的引用的时间减少；**
 
-![image-20191218131428965](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218131428965.png)
+
 
 ## 重新标记
 
-这个阶段会导致第二次stop the word，该阶段的任务是完成标记整个年老代的所有的存活对象。
+这个阶段会导致第二次stop the word，**该阶段的任务是完成标记整个年老代的所有的存活对象**。
 这个阶段，重新标记的内存范围是整个堆，包含_young_gen和_old_gen。为什么要扫描新生代呢，因为对于老年代中的对象，如果被新生代中的对象引用，那么就会被视为存活对象，即使新生代的对象已经不可达了，也会使用这些不可达的对象当做cms的“gc root”，来扫描老年代； 因此对于老年代来说，引用了老年代中对象的新生代的对象，也会被老年代视作“GC ROOTS”:当此阶段耗时较长的时候，可以加入参数-XX:+CMSScavengeBeforeRemark，在重新标记之前，先执行一次ygc，回收掉年轻带的对象无用的对象，并将对象放入幸存带或晋升到老年代，这样再进行年轻带扫描时，只需要扫描幸存区的对象即可，一般幸存带非常小，这大大减少了扫描时间
-由于之前的预处理阶段是与用户线程并发执行的，这时候可能年轻带的对象对老年代的引用已经发生了很多改变，这个时候，remark阶段要花很多时间处理这些改变，会导致很长stop the word，所以通常CMS尽量运行Final Remark阶段在年轻代是足够干净的时候。
+由于之前的预处理阶段是与用户线程并发执行的，这时候可能年轻带的对象对老年代的引用已经发生了很多改变，这个时候，remark阶段要花很多时间处理这些改变，会导致很长stop the word，所以通常CMS尽量运行Final Remark阶段在年轻代是足够干净的时候，是为了减少连续 STW 发生的可能性（年轻代存活对象过多的话，也会导致老年代涉及的存活对象会很多）。
 
 **另外，还可以开启并行收集：-XX:+CMSParallelRemarkEnabled**
 
-![image-20191218131457980](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218131457980.png)
 
 
+**至此，老年代所有存活的对象都被标记过了，现在可以通过清除算法去清理老年代不再使用的对象**。
 
-![image-20191218131557106](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218131557106.png)
+
 
 ## 并发清理
 
@@ -1006,7 +1010,7 @@ CMS收集器有３个明显的缺点：
 
 由于CMS并发清理阶段用户线程还在运行着，伴随程序运行自然就还会有新的垃圾不断产生，这一部分垃圾出现在标记过程之后，CMS无法在当次收集中处理掉它们，只好留待下一次GC时再清理掉。这一部分垃圾就称为“浮动垃圾”。
 
-![image-20191218131616356](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218131616356.png)
+![image-20191219091858884](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191219091858884.png)
 
 ### 阶段七：并发重置
 
@@ -1014,11 +1018,11 @@ CMS收集器有３个明显的缺点：
 
 ### CMS 总结
 
-CMS 通过
-
-![image-20191218131700588](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218131700588.png)
-
-![image-20191218131738284](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218131738284.png)
+- CMS 通过将大量工作分散到并发处理阶段来减少 STW 时间；
+- CMS 缺点：
+  - CMS 收集器无法处理浮动垃圾（Floating Garbage），可能出现 Concurrent Mode Failure 失败从而导致另一次的 Full GC 的产生，可能引发串行 Full GC。
+  - 空间碎片导致无法分配大对象，CMS 收集器提供了一个 `-XX+UseCMSCompaceAtFullCollection` 开关参数（默认开启），用于在 CMS 收集器顶不住要进行 Full GC 时候开启内存碎片的合并整理过程，内存整理过程是无法并发的，解决了空间碎片问题但是增加了停顿时间；
+  - 对于堆比较大的应用， GC 的时间难以预估。
 
 
 
@@ -1074,6 +1078,35 @@ Heap
  concurrent mark-sweep generation total 10240K, used 8825K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
  Metaspace       used 3144K, capacity 4496K, committed 4864K, reserved 1056768K
   class space    used 343K, capacity 388K, committed 512K, reserved 1048576K
+
+Process finished with exit code 0
+
+```
+
+另一端代码，将上面代码中的 `byte[] myAlloc4 = new byte[2 * size];` 修改为：`byte[] myAlloc4 = new byte[3 * size];`得到的结果如下：
+
+```java
+----111111111----
+[GC (Allocation Failure) [ParNew: 5765K->637K(9216K), 0.0024098 secs] 5765K->4735K(19456K), 0.0024726 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+----222222222----
+[GC (Allocation Failure) [ParNew: 4974K->240K(9216K), 0.0041475 secs] 9072K->9060K(19456K), 0.0041812 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+----333333333----
+----444444444----
+[GC (CMS Initial Mark) [1 CMS-initial-mark: 8819K(10240K)] 16522K(19456K), 0.0002890 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+[CMS-concurrent-mark-start]
+Heap
+ par new generation   total 9216K, used 7764K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+  eden space 8192K,  91% used[CMS-concurrent-mark: 0.001/0.001 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+[CMS-concurrent-preclean-start]
+[CMS-concurrent-preclean: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+[CMS-concurrent-abortable-preclean-start]
+[CMS-concurrent-abortable-preclean: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+ [0x00000000fec00000, 0x00000000ff358e70, 0x00000000ff400000)
+  from space 1024K,  23% used [0x00000000ff400000, 0x00000000ff43c2d0, 0x00000000ff500000)
+  to   space 1024K,   0% used [0x00000000ff500000, 0x00000000ff500000, 0x00000000ff600000)
+ concurrent mark-sweep generation total 10240K, used 8819K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+ Metaspace       used 3126K, capacity 4496K, committed 4864K, reserved 1056768K
+  class space    used 338K, capacity 388K, committed 512K, reserved 1048576K
 
 Process finished with exit code 0
 
@@ -1136,7 +1169,7 @@ ConcGCThreads =(ParallelGCThreads + 3)/4
 
 
 
-## G1收集器（Garbage First Collector）
+## 十、G1收集器（Garbage First Collector）
 
 ### (一)评价系统的指标
 
@@ -1187,7 +1220,7 @@ ConcGCThreads =(ParallelGCThreads + 3)/4
 
 ![image-20191218163937612](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218163937612.png)
 
-####  （七）G1 堆结构
+###  （七）G1 堆结构
 
  
 
@@ -1289,77 +1322,82 @@ global concurrent marking 的执行过程类似于 CMS，但是不同的是在 G
 
 ### 什么时候发生 Mixed GC?
 
-- 由一些参数控制，另外也控制着哪些老年代 Region 会被选入 CSet  (收集集合)
-    - **G1HeapWastePercent**：在 global concurrent marking 结束之后，我们可以知道 old gen regions 中有多少空间要被回收，在每次 YGC 之后和再次发生 Mixed GC之前，会检查垃圾占比是否达到此参数，只有达到了，下次才会发生 Mixed GC；
-    
+- 由一些参数控制，另外也控制着哪些老年代 Region 会被选入 CSet  (收集集合)，下面是一部分的参数
+    - **G1HeapWastePercent**：在 global concurrent marking 结束之后，我们可以知道 old gen regions 中有多少空间要被回收，在每次 YGC 之后和再次发生 Mixed GC 之前（YGC  和 Mixed GC 之间是交替进行（不是一次一次交替，可能是多次对一次）的），会检查垃圾占比是否达到此参数，只有达到了，下次才会发生 Mixed GC；
     - **G1MixedGCLiveThresholdPercent**： old generation region 中的存活对象的占比，只有在此参数之下，才会被选入CSet
-    
     - **G1MixedGCCountTarget**：一 次 global concurrent marking 之后，最多执行 Mixed GC 的次数
-    
     - **G1OldCSetRegionThresholdPercent**：一次 Mixed GC 中能被选入 CSet 的最多 old generation region 数量
+    - 除了以上的参数，G1 GC 相关的其他主要的参数有：
     
-    - 除了以上的参数，G1 GC相关的其他主要的参数有：
-    
-        | 参数                               | 含义                                                         |
-        | :--------------------------------- | :----------------------------------------------------------- |
-        | -XX:G1HeapRegionSize=n             | 设置Region大小，并非最终值                                   |
-        | -XX:MaxGCPauseMillis               | 设置G1收集过程目标时间，默认值200 ms，不是硬性条件           |
-        | -XX:G1NewSizePercent               | 新生代最小值，默认值5%                                       |
-        | -XX:G1MaxNewSizePercent            | 新生代最大值，默认值60%                                      |
-        | -XX:ParallelGCThreads              | STW期间，并行GC线程数                                        |
-        | -XX:ConcGCThreads=n                | 并发标记阶段，并行执行的线程数                               |
-        | -XX:InitiatingHeapOccupancyPercent | 设置触发标记周期的 Java 堆占用率阈值。默认值是45%。这里的java堆占比指的是non_young_capacity_bytes，包括old+humongous |
-
-
+    | 参数                               | 含义                                                         |
+    | :--------------------------------- | :----------------------------------------------------------- |
+    | -XX:G1HeapRegionSize=n             | 设置 Region 大小，并非最终值                                 |
+    | -XX:MaxGCPauseMillis               | 设置 G1 收集过程目标时间，默认值200 ms，不是硬性条件         |
+    | -XX:G1NewSizePercent               | 新生代最小值，默认值 5%                                      |
+    | -XX:G1MaxNewSizePercent            | 新生代最大值，默认值 60%                                     |
+    | -XX:ParallelGCThreads              | STW 期间，并行 GC 线程数                                     |
+    | -XX:ConcGCThreads=n                | 并发标记阶段，并行执行的线程数                               |
+    | -XX:InitiatingHeapOccupancyPercent | 设置触发标记周期的 Java 堆占用率阈值。默认值是 45%。这里的 Java 堆占比指的是 non_young_capacity_bytes，包括old+humongous |
 
 ### G1 收集概览
 
-- G1算法将堆划分为若干个区域( Region),它仍然属于分代收集器。不过,这些区域的一部分包含新生代,**新生代的垃圾收集依然采用暂停所有应用线程的方式**,将存活对象拷贝到老年代或者Survivor空间。老年代也分成很多区域**,G1收集器通过将对象从一个区域复制到另外一个区域,完成了清理工作**。这就意味着,在正常的处理过程中,G1完成了堆的压缩(至少是部分堆的压缩),这样也就不会有CMS内存碎片问题的存在
-
-
+- G1算法将堆划分为若干个区域( Region),它仍然属于分代收集器。不过,这些区域的一部分包含新生代,**新生代的垃圾收集依然采用暂停所有应用线程的方式**，将存活对象拷贝到老年代或者 Survivor 空间。老年代也分成很多区域，**G1收集器通过将对象从一个区域复制到另外一个区域,完成了清理工作**。这就意味着,在正常的处理过程中，G1完成了堆的压缩(至少是部分堆的压缩，因为复制本质上就包括压缩),这样也就不会有CMS内存碎片问题的存在
 
 #### Humongous区域
 
-在G1中,还有一种特殊的区域,叫 Humongous区域。如果一个对象占用的空间达到或是超过了分区容量50%以上,G1收集器就认为这是一个巨型对象。**这些巨型对象,默认直接会被分配在老年代**,但是如果它是一个短期存在的巨型对象就会对垃圾收集器造成负面影响。为了解决这个问题,G1划分了一个 Humongous区,它用来专门存放巨型对象。如果一个H区装不下一个巨型对象,那么G1会寻找连续的H分区来存储。为了能找到连续的H区,有时候不得不启动Full GC
+在G1中,还有一种特殊的区域,叫 Humongous区域。如果一个对象占用的空间达到或是超过了分区容量50%以上,G1收集器就认为这是一个巨型对象。**这些巨型对象,默认直接会被分配在老年代**,但是如果它是一个短期存在的巨型对象就会对垃圾收集器造成负面影响。为了解决这个问题， G1 划分了一个 Humongous 区,它用来专门存放巨型对象。如果一个H 区装不下一个巨型对象,那么 G1 会寻找连续的H分区来存储。为了能找到连续的H区,有时候不得不启动 Full GC
 
 
 
 ### G1 Yong GC
 
-- Young GG主要是对Eden区进行GC,它在Eden空间耗尽时会被触发。在这种情况下Eden空间的数据移动到 Survivor空间中如果 Survivor空间不够,Eden空间的部分数据会直接晋升到老年代空间。 Survivor区的数据移动到新的 Survivor区中,也有部分数据晋升到老年代空间中。最终Eden空间的数据为空,GC完成工作,应用线程继续执行;
-- 如果仅仅GC新生代对象,我们如何找到所有的根对象呢?老年代的所有对象都是根么?那这样扫描下来会耗费大量的时间。于是,G1引进了RSet的概念。它的全称是Remembered set,作用是跟踪指向某个heap内的对象引用
+- Young GC 主要是对Eden区进行GC，**它在Eden空间耗尽时会被触发**。在这种情况下Eden空间的数据移动到 Survivor空间中如果 Survivor 空间不够,Eden空间的部分数据会直接晋升到老年代空间。 Survivor区的数据移动到新的 Survivor 区中,也有部分数据晋升到老年代空间中。最终Eden空间的数据为空,GC完成工作,应用线程继续执行;
+- 如果仅仅 GC 新生代对象,我们如何找到所有的根对象呢?老年代的所有对象都是根么?那这样扫描下来会耗费大量的时间。于是，G1引进了 RSet 的概念。它的全称是 Remembered set，作用是跟踪指向某个堆内的对象引用
 
 ![image-20191218205128114](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218205128114.png)
 
-- 在CMS中,也有RSet的概念,在老年代中有一块区域用来记录指向新生代的引用这是一种 point-out,在进行 Young Go时扫描根时,仅仅需要扫描这一块区域,而不需要扫描整个老年代
+- 在 CMS 中,也有RSet的概念,**在老年代中有一块区域用来记录指向新生代的引用这是一种 point-out**,在进行 Young Go时扫描根时,仅仅需要扫描这一块区域,而不需要扫描整个老年代
 
-- 但在G1中,并没有使用 point-out,这是由于一个分区太小,分区数量太多,如果是用 point-out的话,会造成大量的扫描浪费,有些根本不需要GC的分区引用也扫描了。
-- 于是G1中使用 point-in来解决。 point-in的意思是哪些分区引用了当前分区中的对象。这样,仅仅将这些对象当做根来扫描就避免了无效的扫描。
-- 由于新生代有多个,那么我们需要在新生代之间记录引用吗?这是不必要的,原因在于每次GC时所有新生代都会被扫描,**所以只需要记录老年代到新生代之间的引用即可**
+- 但在 G1 中,并没有使用 point-out，这是由于一个分区太小,分区数量太多,如果是用 point-out 的话,会造成大量的扫描浪费,有些根本不需要 GC 的分区引用也扫描了。
+- 于是 G1中使用 point-in 来解决。 point-in 的意思是哪些分区引用了当前分区中的对象。这样,仅仅将这些对象当做根来扫描就避免了无效的扫描。
+- 由于新生代有多个，那么我们需要在新生代之间记录引用吗?这是不必要的，原因在于每次 GC 时所有新生代都会被扫描，**所以只需要记录老年代到新生代之间的引用即可**
 
-- 需要注意的是,如果引用的对象很多,赋值器需要对每个引用做处理,赋值器开销会很大,为了解决赋值器开销这个问题,在G1中又引入了另外一个概念,卡表( Card table)。一个 Card table将一个分区在逻辑上划分为固定大小的连续区域,每个区域称之为卡。卡通常较小,介于128到512字节之间。 Card Table通常为字节数组,由Card的索引(即数组下标)来标识每个分区的空间地址
+- 需要注意的是，如果引用的对象很多，赋值器需要对每个引用做处理，赋值器开销会很大，为了解决赋值器开销这个问题，在 G1 中又引入了另外一个概念：卡表( Card table)。一个 Card table 将一个分区在逻辑上划分为固定大小的连续区域，每个区域称之为卡。卡通常较小，介于 128 到 512 字节之间。 Card Table通常为字节数组，由 Card 的索引(即数组下标)来标识每个分区的空间地址；
+
+- 默认情况下，每个卡都未被引用，当一个地址空间被引用时候，这个地址空间对应的数组索引的值被标记为 0，即标记为脏被引用，此外 Rset 也将这个数组下标记录下来。一般情况下，**这个 Rset 其实是一个 HashTable，Key 是别的 Region 的起始地址，Value 是一个集合，里面的元素是 Card Table 的 Index**。
+
+- G1 Young GC 过程
+
+  - 阶段一：根扫描；
+
+    静态和本地对象被扫描
+
+  - 阶段二：更新 RS
+
+    处理 Dirty Card 队列，更新 RS
+
+  - 阶段三：处理 RS
+
+    检测从年轻代指向老年代的对象
+
+  - 阶段四：对象拷贝
+
+    拷贝存活的对象到 Survivor/old 区域
+
+  - 阶段五：处理引用队列
+
+    软引用、弱引用、虚引用处理
 
 
 
+#### 再谈 Mixed GC
 
+- **Mixed GC 不仅进行正常的新生代垃圾收集，同时也回收部分后台扫描线程（即全局并发标记的线程）标记的老年代分区**；
+- Mixed GC 步骤：
+  - 全局并发标记（Global concurrent marking）
+  - 拷贝存活对象（evacuation）
 
-![image-20191218205531191](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218205531191.png)
-
-
-
-
-
-![image-20191218205558870](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218205558870.png)
-
-
-
-![image-20191218205743466](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218205743466.png)
-
-![image-20191218205751755](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218205751755.png)
-
-![image-20191218205819964](JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191218205819964.png)
-
-步骤见上：
+- 在 G1 GC 中， Global concurrent Marking 主要是为 Mixed GC 提供标记服务的，并不是一次 GC 过程中的一个必须环节。
 
 
 
@@ -1419,12 +1457,12 @@ global concurrent marking 的执行过程类似于 CMS，但是不同的是在 G
 - SATB 是维持并发 GC 的一种手段。G1 并发的基础就是 SATB。SATB 可以理解成在 GC 开始之前对堆内存里的对象做次快照，此时活的对象就认为是活的，从而形成了一个对象图。
 - 在 GC 收集的时候，新生代的对象也认为是活的对象，除此之外其他不可达的对象都认为是垃圾对象
 
-### 如何找到在GC过程中分配的对象呢?
+#### 如何找到在GC过程中分配的对象呢?
 
-- 每个region记录着两个 top-at-mark-start ( TAMS 指针，分别为prevTAMS和nextTAMS。在TAMS以上的对象就是新分配的，因而被视为隐式marked（即默认被标记了）。
+- 每个region记录着两个 top-at-mark-start ( TAMS 指针，分别为 prevTAMS 和 nextTAMS。在TAMS以上的对象就是新分配的，因而被视为隐式marked（即默认被标记了）。
 - 通过这种方式我们就找到了在GC过程中新分配的对象，并把这些对象认为是活的对象。
 - 解决了对象在GC过程中分配的问题，那么在GC过程中引用发生变化的问题怎么解决呢?
-    - G1给出的解决办法是通过WriteBarrier。Write Barrier就是对引用字段进行赋值做了额外处理。通过Write Barrier就可以了解到哪些引用对象发生了什么样的变化
+    - G1给出的解决办法是通过 WriteBarrier。Write Barrier 就是对引用字段进行赋值做了额外处理。通过Write Barrier就可以了解到哪些引用对象发生了什么样的变化
 
 ### 基础知识
 
@@ -1472,44 +1510,46 @@ Young GC 和 Mixed GC 是分代 G1 模式下选择 Cset 的两种子模式；
 
 ### G1日志解析:
 
+程序代码为：
+
+VM 参数为：`-verbose:gc -Xms10m -Xmx10m -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:MaxGCPauseMillis=200m`
+
+其中：` * -XX:+UseG1GC` 表示指定垃圾收集器使用G1；`-XX:MaxGCPauseMillis=200m ` 表示设置垃圾收集最大停顿时间
+
 ```java
+package com.gjxaiou.gc.g1;
+
 /**
- * Created BY GJXAIOU ON 2019/11/30
- * G1日志分析
- * 虚拟机相关参数：
- * -verbose:gc
- * -Xms10m
- * -Xmx10m
- * -XX:+UseG1GC 表示垃圾收集器使用G1
- * -XX:+PrintGCDetails
- * -XX:+PrintGCDateStamps
- * -XX:MaxGCPauseMillis=200m 设置垃圾收集最大停顿时间
+ * @Author GJXAIOU
+ * @Date 2019/12/20 20:59
  */
 public class G1LogAnalysis {
-
     public static void main(String[] args) {
         int size = 1024 * 1024;
-        byte[] bytes1 = new byte[size];
-        byte[] bytes2 = new byte[size];
-        byte[] bytes3 = new byte[size];
-        byte[] bytes4 = new byte[size];
+        byte[] myAlloc1 = new byte[size];
+        byte[] myAlloc2 = new byte[size];
+        byte[] myAlloc3 = new byte[size];
+        byte[] myAlloc4 = new byte[size];
         System.out.println("hello world");
     }
 }
-/**
- * GC日志：
- * 2019-11-30T16:13:41.663+0800: [GC pause (G1 Humongous Allocation【说明分配的对象超过了region大小的50%】) (young) (initial-mark), 0.0014516 secs]
- * [Parallel Time: 1.1 ms, GC Workers: 4【GC工作线程数】]
- * [GC Worker Start (ms): Min: 167.0, Avg: 167.1, Max: 167.1, Diff: 0.1]【几个垃圾收集工作的相关信息统计】
- * [Ext Root Scanning (ms): Min: 0.4, Avg: 0.4, Max: 0.4, Diff: 0.1, Sum: 1.6]
- * [Update RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
- * [Processed Buffers: Min: 0, Avg: 0.0, Max: 0, Diff: 0, Sum: 0]
- * [Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
- * [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
- * [Object Copy (ms): Min: 0.6, Avg: 0.6, Max: 0.6, Diff: 0.0, Sum: 2.4]
- * [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
- * [Termination Attempts: Min: 1, Avg: 1.3, Max: 2, Diff: 1, Sum: 5]
- * 【上面的几个步骤为YOUNG GC的固定执行步骤】
+```
+
+日志结果为：
+
+```java
+2019-12-20T21:02:10.163+0800: [GC pause (G1 Humongous Allocation【说明分配的对象超过了region大小的50%】) (young) (initial-mark), 0.0015901 secs]
+   [Parallel Time: 0.8 ms, GC Workers: 10【GC工作线程数】]
+      [GC Worker Start (ms): Min: 90.3, Avg: 90.4, Max: 90.4, Diff: 0.1]【几个垃圾收集工作的相关信息统计】
+      [Ext Root Scanning (ms): Min: 0.1, Avg: 0.2, Max: 0.3, Diff: 0.1, Sum: 2.1]
+      [Update RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+         [Processed Buffers: Min: 0, Avg: 0.0, Max: 0, Diff: 0, Sum: 0]
+      [Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Object Copy (ms): Min: 0.4, Avg: 0.4, Max: 0.5, Diff: 0.1, Sum: 4.4]
+      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+         [Termination Attempts: Min: 1, Avg: 5.4, Max: 8, Diff: 7, Sum: 54]
+【上面的几个步骤为YOUNG GC的固定执行步骤】
  * 阶段1:根扫描
  * 静态和本地对象被描
  * 阶段2:更新RS
@@ -1520,36 +1560,68 @@ public class G1LogAnalysis {
  * 拷贝存活的对象到survivor/old区域
  * 阶段5:处理引用队列
  * 软引用，弱引用，虚引用处理
- * [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.2]
- * [GC Worker Total (ms): Min: 1.0, Avg: 1.1, Max: 1.1, Diff: 0.1, Sum: 4.2]
- * [GC Worker End (ms): Min: 168.1, Avg: 168.1, Max: 168.1, Diff: 0.0]
- * [Code Root Fixup: 0.0 ms]
- * [Code Root Purge: 0.0 ms]
- * [Clear CT: 0.1 ms]【清楚cardTable所花费时间】
- * [Other: 0.3 ms]
- * [Choose CSet: 0.0 ms]
- * [Ref Proc: 0.1 ms]
- * [Ref Enq: 0.0 ms]
- * [Redirty Cards: 0.1 ms]
- * [Humongous Register: 0.0 ms]
- * [Humongous Reclaim: 0.0 ms]
- * [Free CSet: 0.0 ms]
- * [Eden: 2048.0K(4096.0K)->0.0B【新生代清理后】(2048.0K) Survivors: 0.0B->1024.0K Heap: 3800.2K(10.0M)->2752.1K(10.0M)]
- * [Times: user=0.00 sys=0.00, real=0.01 secs]
- * 2019-11-30T16:13:41.671+0800: [GC concurrent-root-region-scan-start]
- * 2019-11-30T16:13:41.671+0800: [GC concurrent-root-region-scan-end, 0.0008592 secs]
- * 2019-11-30T16:13:41.671+0800: [GC concurrent-mark-start]
- * 2019-11-30T16:13:41.672+0800: [GC concurrent-mark-end, 0.0000795 secs]
- * 2019-11-30T16:13:41.672+0800: [GC remark 2019-11-30T16:13:41.672+0800: [Finalize Marking, 0.0001170 secs] 2019-11-30T16:13:41.672+0800: [GC ref-proc, 0.0002159 secs] 2019-11-30T16:13:41.672+0800: [Unloading, 0.0005800 secs], 0.0011024 secs]
- * [Times: user=0.00 sys=0.00, real=0.00 secs]
- * 2019-11-30T16:13:41.673+0800: [GC cleanup 4800K->4800K(10M), 0.0003239 secs]
- * [Times: user=0.00 sys=0.00, real=0.00 secs]
- * hello world
- * Heap
- * garbage-first heap   total 10240K, used 4800K [0x00000000ff600000, 0x00000000ff700050, 0x0000000100000000)
- * region size 1024K【说明region默认大小】, 2 young (2048K), 1 survivors (1024K)
- * Metaspace       used 3224K, capacity 4496K, committed 4864K, reserved 1056768K
- * class space    used 350K, capacity 388K, committed 512K, reserved 1048576K
- */
+      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.3]
+      [GC Worker Total (ms): Min: 0.7, Avg: 0.7, Max: 0.7, Diff: 0.1, Sum: 6.9]
+      [GC Worker End (ms): Min: 91.1, Avg: 91.1, Max: 91.1, Diff: 0.0]
+   [Code Root Fixup: 0.0 ms]
+   [Code Root Purge: 0.0 ms]
+   [Clear CT: 0.1 ms]【 清楚 cardTable所花费时间】
+   [Other: 0.7 ms]
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.1 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.1 ms]
+      [Humongous Register: 0.0 ms]
+      [Humongous Reclaim: 0.0 ms]
+      [Free CSet: 0.0 ms]
+   [Eden: 2048.0K(6144.0K)->0.0B(2048.0K) Survivors: 0.0B->1024.0K Heap: 3725.2K(10.0M)->2836.0K(10.0M)]
+ [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2019-12-20T21:02:10.165+0800: [GC concurrent-root-region-scan-start]
+2019-12-20T21:02:10.165+0800: [GC pause (G1 Humongous Allocation) (young)2019-12-20T21:02:10.165+0800: [GC concurrent-root-region-scan-end, 0.0006999 secs]
+2019-12-20T21:02:10.165+0800: [GC concurrent-mark-start]
+, 0.0013416 secs]
+   [Root Region Scan Waiting: 0.3 ms]
+   [Parallel Time: 0.5 ms, GC Workers: 10]
+      [GC Worker Start (ms): Min: 92.5, Avg: 92.6, Max: 92.6, Diff: 0.1]
+      [Ext Root Scanning (ms): Min: 0.1, Avg: 0.1, Max: 0.2, Diff: 0.1, Sum: 1.0]
+      [Update RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+         [Processed Buffers: Min: 0, Avg: 0.0, Max: 0, Diff: 0, Sum: 0]
+      [Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Object Copy (ms): Min: 0.3, Avg: 0.3, Max: 0.3, Diff: 0.0, Sum: 3.0]
+      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+         [Termination Attempts: Min: 1, Avg: 4.6, Max: 8, Diff: 7, Sum: 46]
+      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]
+      [GC Worker Total (ms): Min: 0.4, Avg: 0.4, Max: 0.5, Diff: 0.1, Sum: 4.1]
+      [GC Worker End (ms): Min: 93.0, Avg: 93.0, Max: 93.0, Diff: 0.0]
+   [Code Root Fixup: 0.0 ms]
+   [Code Root Purge: 0.0 ms]
+   [Clear CT: 0.2 ms]
+   [Other: 0.3 ms]
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.2 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.1 ms]
+      [Humongous Register: 0.0 ms]
+      [Humongous Reclaim: 0.0 ms]
+      [Free CSet: 0.0 ms]
+   [Eden: 1024.0K(2048.0K)->0.0B【新生代清理后】(1024.0K) Survivors: 1024.0K->1024.0K Heap: 3901.0K(10.0M)->4120.5K(10.0M)]
+ [Times: user=0.00 sys=0.00, real=0.00 secs] 
+2019-12-20T21:02:10.166+0800: [GC concurrent-mark-end, 0.0012143 secs]
+2019-12-20T21:02:10.167+0800: [Full GC (Allocation Failure)  4120K->3676K(10M), 0.0020786 secs]
+   [Eden: 0.0B(1024.0K)->0.0B(1024.0K) Survivors: 1024.0K->0.0B Heap: 4120.5K(10.0M)->3676.9K(10.0M)], [Metaspace: 3091K->3091K(1056768K)]
+ [Times: user=0.00 sys=0.00, real=0.00 secs] 
+2019-12-20T21:02:10.169+0800: [GC remark, 0.0000082 secs]
+ [Times: user=0.00 sys=0.00, real=0.00 secs] 
+2019-12-20T21:02:10.169+0800: [GC concurrent-mark-abort]
+hello world
+Heap
+ garbage-first heap   total 10240K, used 4700K [0x00000000ff600000, 0x00000000ff700050, 0x0000000100000000)
+  region size 1024K【说明region默认大小】, 1 young (1024K), 0 survivors (0K)
+ Metaspace       used 3229K, capacity 4496K, committed 4864K, reserved 1056768K
+  class space    used 350K, capacity 388K, committed 512K, reserved 1048576K
+
+Process finished with exit code 0
+
 ```
 
