@@ -2,19 +2,19 @@
 
 ## 一、配置文件
 
-- SpringBoot 使用一个全局的配置文件，配置文件名是固定的，下面两者选一即可；
+- SpringBoot 使用一个全局的配置文件，配置文件名是固定的，位置位于 `src/main/resources/` 下面两者选一即可；
 
   - application.properties（默认创建项目时只有这个）
 
   - application.yml
 
-- 配置文件的作用：修改SpringBoot自动配置的默认值；
+- 配置文件的作用：修改 SpringBoot 自动配置的默认值；
 
-    默认启动是因为SpringBoot在底层都给我们自动配置好；
+    默认启动是因为 SpringBoot 在底层都给我们自动配置好；
 
 - YAML（YAML Ain't Markup Language）
 
-  - YAML  A Markup Language：是一个标记语言
+  - YAML  A Mcomarkup Language：是一个标记语言
 
   - YAML   isn't Markup Language：不是一个标记语言；
 

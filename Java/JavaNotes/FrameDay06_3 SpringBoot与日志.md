@@ -174,7 +174,7 @@ SpringBoot修改日志的默认配置(在 application.properties 配置文件中
 
 ```properties
 # 日志的输出级别可以控制到包/类
-logging.level.com.atguigu=trace
+logging.level.com.gjxaiou=trace
 
 
 #logging.path=
@@ -280,16 +280,16 @@ slf4j+log4j的方式；不推荐
 切换为log4j2：不推荐
 
 ```xml
-   <dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <artifactId>spring-boot-starter-logging</artifactId>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                    <groupId>org.springframework.boot</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        </exclusion>
+    </exclusions>
+</dependency>
 
 <dependency>
   <groupId>org.springframework.boot</groupId>

@@ -1,4 +1,4 @@
-# JavaEEDay47
+# JavaEEDay47 MVC
 
 
 MVC：

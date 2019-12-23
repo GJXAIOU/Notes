@@ -2193,8 +2193,9 @@ public void refresh() throws BeansException, IllegalStateException {
     - **创建的第一步：获取嵌入式的Servlet容器工厂：**
 
     `EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFactory();`getEmbeddedServletContainerFactory() 就是从ioc容器中获取EmbeddedServletContainerFactory 组件；	**TomcatEmbeddedServletContainerFactory**创建对象，后置处理器一看是这个对象，就获取所有的定制器来先定制Servlet容器的相关配置；
-    -  **使用上面的容器工厂获取嵌入式的Servlet容器**：`this.embeddedServletContainer = containerFactory.getEmbeddedServletContainer(getSelfInitializer());`该方法中就创建了 Tomcat 对象同时
-
+    
+-  **使用上面的容器工厂获取嵌入式的Servlet容器**：`this.embeddedServletContainer = containerFactory.getEmbeddedServletContainer(getSelfInitializer());`该方法中就创建了 Tomcat 对象同时
+    
 - 同时（接上）嵌入式的Servlet容器创建对象并启动Servlet容器；
 
 **先启动嵌入式的Servlet容器，再将ioc容器中剩下没有创建出的对象获取出来；**
@@ -2245,45 +2246,39 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 4）、启动服务器就可以使用；
 
-### 原理
+### （二）原理
 
-jar包：执行SpringBoot主类的main方法，启动ioc容器，创建嵌入式的Servlet容器；
+- jar包：执行SpringBoot主类的main方法，启动ioc容器，创建嵌入式的Servlet容器；
 
-war包：启动服务器，**服务器启动SpringBoot应用**【SpringBootServletInitializer】，启动ioc容器；
-
-
-
-servlet3.0（Spring注解版）：
-
-8.2.4 Shared libraries / runtimes pluggability：
-
-规则：
-
-​	1）、服务器启动（web应用启动）会创建当前web应用里面每一个jar包里面ServletContainerInitializer实例：
-
-​	2）、ServletContainerInitializer的实现放在jar包的META-INF/services文件夹下，有一个名为javax.servlet.ServletContainerInitializer的文件，内容就是ServletContainerInitializer的实现类的全类名
-
-​	3）、还可以使用@HandlesTypes，在应用启动的时候加载我们感兴趣的类；
+- war包：首先启动服务器，**服务器启动SpringBoot应用**【SpringBootServletInitializer】，启动ioc容器；
 
 
 
-流程：
+在 servlet3.0 文档的 8.2.4章： Shared libraries / runtimes pluggability中定义了一些规则：
 
-1）、启动Tomcat
+- 服务器启动（web应用启动）会创建当前web应用里面每一个jar包里面ServletContainerInitializer实例：
 
-2）、org\springframework\spring-web\4.3.14.RELEASE\spring-web-4.3.14.RELEASE.jar!\META-INF\services\javax.servlet.ServletContainerInitializer：
+- ServletContainerInitializer的实现放在jar包的META-INF/services文件夹下，该文件夹下必须有一个名为javax.servlet.ServletContainerInitializer的文件，该文件内容就是ServletContainerInitializer的实现类的全类名
 
-Spring的web模块里面有这个文件：**org.springframework.web.SpringServletContainerInitializer**
+- 还可以使用@HandlesTypes，在应用启动的时候加载我们感兴趣的类；
 
-3）、SpringServletContainerInitializer将@HandlesTypes(WebApplicationInitializer.class)标注的所有这个类型的类都传入到onStartup方法的Set<Class<?>>；为这些WebApplicationInitializer类型的类创建实例；
 
-4）、每一个WebApplicationInitializer都调用自己的onStartup；
+
+### （三）流程：
+
+- 启动Tomcat
+
+-  在org\springframework\spring-web\4.3.14.RELEASE\spring-web-4.3.14.RELEASE.jar!\META-INF\services\javax.servlet.ServletContainerInitializer：Spring的web模块里面有这个文件：**org.springframework.web.SpringServletContainerInitializer**
+
+- SpringServletContainerInitializer将@HandlesTypes(WebApplicationInitializer.class)标注的所有这个类型的类都传入到onStartup方法的Set<Class<?>>；为这些WebApplicationInitializer类型的类创建实例；
+
+- 每一个WebApplicationInitializer都调用自己的onStartup；
 
 ![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180302221835.png)
 
-5）、相当于我们的SpringBootServletInitializer的类会被创建对象，并执行onStartup方法
+- 相当于我们的SpringBootServletInitializer的类会被创建对象，并执行onStartup方法
 
-6）、SpringBootServletInitializer实例执行onStartup的时候会createRootApplicationContext；创建容器
+- SpringBootServletInitializer实例执行onStartup的时候会createRootApplicationContext；创建容器
 
 ```java
 protected WebApplicationContext createRootApplicationContext(
@@ -2326,7 +2321,7 @@ protected WebApplicationContext createRootApplicationContext(
 }
 ```
 
-7）、Spring的应用就启动并且创建IOC容器
+- Spring的应用就启动并且创建IOC容器
 
 ```java
 public ConfigurableApplicationContext run(String... args) {

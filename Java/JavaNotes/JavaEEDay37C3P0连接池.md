@@ -1,4 +1,4 @@
-# JavaEEDay37C3P0连接池
+# JavaEEDay37 C3P0连接池
 
 
 ## 四、连接池
@@ -457,8 +457,8 @@ on employee.deptID = dept.id; -- 表示条件
 ### 左右外连接
 - 需求，查看每一个部门的员工
 -- 预期结果
---	JavaEE 张三
--- 	JavaEE 赵六
+	--	JavaEE 张三
+	-- 	JavaEE 赵六
 --  iOS  王五
 --  PHP  李四
 

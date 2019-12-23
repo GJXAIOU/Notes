@@ -8,17 +8,6 @@ Hibernate配置一对多和多对多
 Hibernate查询操作
 
 
-## 今天内容介绍
-
-- web 内容回顾
-  - javaee 三层结构
-  - mvc 思想
-- Hibernate 概述
-- Hibernate 入门案例
-- Hibernate 配置文件
-- Hibernate 的 api 使用
-
-
 ## 一、WEB 内容回顾
 
 ### （一）JavaEE 三层结构
@@ -26,15 +15,11 @@ Hibernate查询操作
 - web层：struts2、SpringMVC 框架
 - service层：spring 框架
 - dao层：Hibernate、MyBatis 框架
-（1）对数据库进行 CUED 操作
+（1）对数据库进行 CRUD 操作
 
 ![JavaEE三层架构]($resource/JavaEE%E4%B8%89%E5%B1%82%E6%9E%B6%E6%9E%84.png)
 
-### （二）MVC 思想
 
-- m：模型
-- v：视图
-- c：控制器
 
 ## 二、Hibernate 概述
 
@@ -46,7 +31,7 @@ Hibernate查询操作
 - hibernate版本：目前一般使用 Hibernate5.x；
 
 ### （二）什么是 ORM 思想（重点）
- 
+
 - hibernate 使用 orm 思想对数据库进行 crud 操作，完成数据持久化；是一个全自动 ORM 框架
 - **ORM：Object Relational Mapping，对象关系映射**，利用描述对象和数据库表之间映射的元数据，自动把 Java 应用程序中对象持久化到关系型数据库的表中；
 ![ORM原理]($resource/ORM%E5%8E%9F%E7%90%86.png)
@@ -93,7 +78,7 @@ slf4j-log4j.jar
 @AllArgsConstructor
 public class User {
     // Hibernate 要求实体类中至少有一个属性的唯一的；
-    private Integer uId;
+    private Integer uid;
     private String username;
     private String password;
     private String address;
@@ -108,7 +93,7 @@ public class User {
     - 映射配置文件名称和位置没有固定要求
     - 建议：在实体类所在包里面创建：`实体类名称.hbm.xml`
 
-  - （2）配置是是 xml 格式，在配置文件中首先引入 xml 约束；
+  - （2）配置是 xml 格式，在配置文件中首先引入 xml 约束；
     - 在 hibernate 里面引入的约束是 dtd 约束；
 dtd 的名称为：`hibernate-mapping-3.0.dtd`
 对应文件的配置内容为：
@@ -159,13 +144,13 @@ dtd 的名称为：`hibernate-mapping-3.0.dtd`
 <hibernate-configuration>
     <session-factory>
         
-        <!--第一部分：配置数据库信息-->
+<!--第一部分：配置数据库信息-->
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/lianxi</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">GJXAIOU</property>
 
-        <!--第二部分：配置 Hibernate 信息-->
+<!--第二部分：配置 Hibernate 信息-->
             <!--在控制台输出底层对应的 SQL 语句-->
         <property name="hibernate.show_sql">true</property>
             <!--按照格式输出 SQL 语句-->
@@ -175,7 +160,7 @@ dtd 的名称为：`hibernate-mapping-3.0.dtd`
             <!--配置数据库方言，即让 Hibernate 根据不同的数据库自动解析为对应的语句-->
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
         
-        <!--第三部分：把映射文件加载到核心配置文件中-->
+<!--第三部分：把映射文件加载到核心配置文件中-->
         <mapping resource="User.hbm.xml"></mapping>
 
     </session-factory>
@@ -260,8 +245,8 @@ Hibernate:
 
 - 映射配置文件名称和位置没有固定要求
 - 映射配置文件中，**标签name属性值写实体类相关内容**
-  - class标签name属性值实体类全路径
-  - id标签和property标签name属性值  实体类属性名称
+  - class标签name属性值为实体类全路径
+  - id标签和property标签name属性值 为实体类属性名称
 - id标签和property标签，column属性可以省略的
   - 不写值和name属性值一样的（建议书写）
 -  property标签type属性，设置生成表字段的类型，一般hibernate会自动对应类型
@@ -294,7 +279,66 @@ Hibernate:
 Configuration configuration = new Configuration();
 configuration.configure();
 ```
-默认是在 src 目录下寻找 hibernate.cfg.xml 配置文件，当然配置文件路径可以自定义，只需要在使用：`configuration.configure("xml 文件位置");` 即可；路径的根目录为 src，也就是说如果放置在 src/config 包中，则路径为：`/config/hibernate.cfg.xml`
+下面是 configure()方法 部分代码 L243：
+
+```java
+	public Configuration configure() throws HibernateException {
+		return configure( StandardServiceRegistryBuilder.DEFAULT_CFG_RESOURCE_NAME );
+	}
+// 其中： 	public static final String DEFAULT_CFG_RESOURCE_NAME = "hibernate.cfg.xml";
+```
+
+因此上面作用就是默认是在 src 目录下寻找 hibernate.cfg.xml 配置文件，当然配置文件路径可以自定义，只需要在使用：`configuration.configure("xml 文件位置");` 即可；路径的根目录为 src，也就是说如果放置在 src/config 包中，则路径为：`/config/hibernate.cfg.xml`
+
+可以只配置文件路径原理如下：
+
+```java
+// 这里取自 Configuration.java 的 L257
+public Configuration configure(String resource) throws HibernateException {
+    standardServiceRegistryBuilder.configure( resource );
+    properties.putAll( standardServiceRegistryBuilder.getSettings() );
+    return this;
+}
+```
+
+比较这里和上面的代码就可以发现，这里的 `configure()`方法进行了重载，如果有参数就会调用含参的方法，该方法本质上调用了`localConfigXmlResource()`方法，该方法代码如下下：
+
+```java
+public StandardServiceRegistryBuilder configure(String resourceName) {
+    return configure( configLoader.loadConfigXmlResource( resourceName ) );
+}
+```
+
+`localConfigXmlResource()`代码如下
+
+```java
+public LoadedConfig loadConfigXmlResource(String cfgXmlResourceName) {
+    // 将 xml 文件变成输入流
+		final InputStream stream = bootstrapServiceRegistry.getService( ClassLoaderService.class ).locateResourceStream( cfgXmlResourceName );
+    // 如果没有内容，报错找不到该文件
+		if ( stream == null ) {
+			throw new ConfigurationException( "Could not locate cfg.xml resource [" + cfgXmlResourceName + "]" );
+		}
+
+		try {
+            // unmarshal() 方法将传入的流和资源类型，该方通过 FraxFactory 创建一个createXMLEventReader 读取 xml 文件
+			final JaxbCfgHibernateConfiguration jaxbCfg = jaxbProcessorHolder.getValue().unmarshal(
+					stream,
+					new Origin( SourceType.RESOURCE, cfgXmlResourceName )
+			);
+
+			return LoadedConfig.consume( jaxbCfg );
+		}
+		finally {
+			try {
+				stream.close();
+			}
+			catch (IOException e) {
+				log.debug( "Unable to close cfg.xml resource stream", e );
+			}
+		}
+	}
+```
 
 - 可以用于加载映射文件
 因为 Hibernate 的核心配置文件可以使用上面的 xml 形式，也可以使用. properties 文件形式，其中使用键值对的形式存放信息，默认文件名：hibernate.properties；使用的时候，如果使用 properties 作为核心配置文件，其他的基本配置可以使用键值对，但是其中加载映射文件部分没法读取，这里就可以使用 configuration 进行手动加载映射文件。、

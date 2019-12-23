@@ -1,4 +1,4 @@
-# JSP
+# JavaEEDay43 JSP
 
 @toc
 
@@ -183,7 +183,7 @@ Destination.jsp
  [contentType="text/html; charset="UTF-8"]
  %>
 ```
- 
+
  注意： 使用errorPage设置当前页面的错误异常处理页面，有错误时候就跳转到错误页面中，在错误处理页面中，如果需要使用exception对象，必须设置 `isErrorPage="true"`，然后才能使用 exception 对象；
 
  一般情况下不会给每一个页面都设置ErrorPage, 会在 web.xml 文件中进行配置，作全局异常处理；
