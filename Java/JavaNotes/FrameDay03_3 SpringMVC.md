@@ -41,6 +41,7 @@ preHandle ->进入控制器（controller）-> postHandler -> JSP -> afterComplet
   - 拦截器只能拦截 Controller；
   - Filter 可以拦截任何请求；
   
+
 **实现自定义拦截器的步骤:**
 【通过下面的拦截器，URL 中输入 demo2 无法访问，demo3 可以访问】
 - 首先新建类并实现 HandlerInterceptor（使用 Ctrl + O 重写未实现方法）
@@ -263,7 +264,7 @@ afterCompletion1
 
 ## 三、SpringMVC 运行原理
 
-如果在  web.xml 中设置  DispatcherServlet 的<url-pattern>为/时，当用户发起请求， 请求一个控制器时， 首先会执行  DispatcherServlet。 由DispatcherServlet 调  用  HandlerMapping 的DefaultAnnotationHandlerMapping 解  析  URL， 解  析  后  调  用HandlerAdatper 组  件  的  AnnotationMethodHandlerAdapter 去  调  用Controller 中的  HandlerMethod。当  HandlerMethod 执行完成后会返回View，返回的view会被  ViewResovler 进行视图解析，解析后调用  jsp 对应的.class 文件并运行，最终把运行.class 文件的结果响应给客户端。
+如果在  web.xml 中设置  DispatcherServlet 的 `<url-pattern>` 为`/`时，当用户发起请求， 请求一个控制器时， 首先会执行  DispatcherServlet。 由DispatcherServlet 调  用  HandlerMapping 的DefaultAnnotationHandlerMapping 解  析  URL， 解  析  后  调  用HandlerAdatper 组  件  的  AnnotationMethodHandlerAdapter 去  调  用Controller 中的  HandlerMethod。当  HandlerMethod 执行完成后会返回View，返回的view会被  ViewResovler 进行视图解析，解析后调用  jsp 对应的.class 文件并运行，最终把运行.class 文件的结果响应给客户端。
 
 
 ## 四、SpringMVC 对 Date 类型转换

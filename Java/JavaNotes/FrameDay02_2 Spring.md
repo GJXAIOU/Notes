@@ -27,7 +27,7 @@ style: summer
 
 主要可以在程序执行的任意一个方法的前面或者后面额外添加或者扩充一些功能；
 
-![面向切面编程]($resource/%E9%9D%A2%E5%90%91%E5%88%87%E9%9D%A2%E7%BC%96%E7%A8%8B.png)
+![面向切面编程](FrameDay02_2%20Spring.resource/%E9%9D%A2%E5%90%91%E5%88%87%E9%9D%A2%E7%BC%96%E7%A8%8B.png)
 
 
 - 常用概念
@@ -316,7 +316,7 @@ http://www.springframework.org/schema/context/spring-context.xsd">
 ```
 
 - @Component
-  - 相当于<bean/>
+  - 相当于 `<bean/>`
   - 如果没有参数,把类名首字母变小写,相当于 `<bean  id=””/>`
   - @Component(“自定义名称”)
 
@@ -413,10 +413,10 @@ public class MyAdvice {
   - **利用反射机制**，效率不高
 
 - 使用 JDK 动态代理时可能出现下面异常
-![异常]($resource/%E5%BC%82%E5%B8%B8.png)
+![异常](FrameDay02_2%20Spring.resource/%E5%BC%82%E5%B8%B8.png)
 出现原因:希望把接口对象转换为具体真实对象
 
- 
+
 #### cglib 动态代理
 
 - cglib 优点:

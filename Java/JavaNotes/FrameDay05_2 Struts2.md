@@ -102,7 +102,7 @@ struts.xml 全局配置文件：
 
 
 ### （二）局部结果页面
- 
+
 为每个 action 单独配置 <result 标签就是局部结果返回页面；
 
 - 配置全局页面，也配置了局部页面，最终**以局部配置为准**
@@ -162,7 +162,7 @@ Action 不能直接访问 Servlet，只能通过下面三种方式；
  获取当前线程的 ActionContext 对象方法：`static ActionContext getContext();`
 - 因为方法不是静态的方法，需要创建ActionContext类的对象
 - 这个ActionContext类对象不是new出来的；
- 
+
 **具体演示：**
 
 - 首先创建表单，提交表单到action里面
@@ -191,10 +191,10 @@ context.getApplication.put("name", "GJXAIOU");
 context.getSession.put("name", "GJXAIOU");
 ```
 ==上面代码有问题==
- 
+
 
 ### （二）使用ServletActionContext类获取（常用）
- 
+
 * `static HttpServletRequest getReques();` //获取web应用的HttpServletRequest对象
 * `static HttpServletResponse getResponse();` //获取web应用的HttpServletResponse对象
 * `static ServletContext getServletContext();` //获取web'应用的ServletContext对象
@@ -238,7 +238,7 @@ public class Form3Action extends ActionSupport implements ServletRequestAware {
     }
 }
 ```
- 
+
 
 ### （四）在 action 操作域对象
 
@@ -269,7 +269,7 @@ public class Form2Action extends ActionSupport {
     }
 }
 ```
- 
+
 
 ## 三、Struts2 封装获取表单数据方式
 ### （一）原始方式获取表单封装到实体类对象
@@ -326,7 +326,7 @@ public class Form4Action extends ActionSupport {
 （1）在action成员变量位置定义变量
 变量名称和表单输入项的name属性值一样
 （2）生成变量的set方法（把set和get方法都写出来）
- 
+
 
 -使用属性封装获取表单数据到属性里面，不能把数据直接封装到实体类对象里面，放入还是得写上面的新建对象，然后使用 setParm....
 
@@ -335,12 +335,12 @@ public class Form4Action extends ActionSupport {
 
 2 实现步骤
 （1）action实现接口 ModelDriven
- 
+
 （2）实现接口里面的方法 getModel方法
 - 把创建对象返回
 
 （3）在action里面创建实体类对象
- 
+
  
 
 3 使用模型驱动和属性封装注意问题：
@@ -354,9 +354,9 @@ public class Form4Action extends ActionSupport {
 
 第一步 在action里面声明实体类（也需要实体类）
 第二步 生成实体类变量的set和get方法
- 
+
 第三步 在表单输入项的name属性值里面写表达式形式
- 
+
 2 把表达式封装归类到属性封装里面
 
 ### （四）比较表达式封装和模型驱动封装
@@ -367,32 +367,32 @@ public class Form4Action extends ActionSupport {
 - 在一个action里面不能使用模型驱动把数据封装到不同的实体类对象里面
 
 （2）使用表达式封装可以把数据封装到不同的实体类对象里面
- 
- 
+
+
 ## 四、获取表单数据封装到集合里面
 ### （一）封装数据到List集合
 ListAction.java 和 list.jsp
 第一步 在action声明List
 第二步 生成list变量的set和get方法
- 
+
 第三步 在表单输入项里面写表达式
- 
+
 
 ### （二）封装数据到Map集合
 mapAction.java 和 map.jsp
 第一步 声明map集合
 第二步 生成get和set方法
- 
+
 第三步 在表单输入项的name属性值里面写表达式
- 
+
 
 案例-添加客户功能
 1 模型驱动获取表单数据
- 
+
 2 在hibernate实现
- 
+
 3 添加之后到列表页面中，让列表的action执行一次
- 
+
 
 完成任务
 1 客户列表功能

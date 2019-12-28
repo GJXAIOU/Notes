@@ -62,20 +62,21 @@
   - uuid：之前 web 阶段写代码生成 uuid 值，hibernate 会帮我们生成 uuid 值；
 
 Hibernate 中提供的主键生成策略
-| 值 | 描述
-|---|---
-|native | 根据底层数据库对自动生成表示符的能力来选择过 identity 、sequence、hilo三种生成器中的一种，适合跨数据库平台开发。适用于代理主键。 
-|uuid | Hibernate 采用 128 位的 UUID 算法来生成标识符。 该算法能够在网络环境中生成唯一的字符串标识符，其 UUID 被编码为一个长度为32 位的十六进制字符串。 这种策略并不流行， 因为字符串类型的主键比整数类型的主键占用更多的数据库空间。 适用于代理主键。 
-|  increment | 用于 long、 short、或 int 类型， 由 Hibernate 自动以递增的方式生成唯一标识符，每次增量为 1。只有当没有其它进程向同一张表中插入数据时才可以使用，不能在集群环境下使用。 适用于代理主键。
-|identity| 采用底层数据库本身提供的主键生成标识符，条件是数据库支持自动增长数据类型。 在 DB2、 MySQL、 MS SQL Server、 Sybase 和 HypersomcSQL 数据库中可以使用该生成器，该生成器要求在数据库中 把主键定义成为自增长类型。 适用于代理主键。
-|sequence | Hibernate 根据底层数据库序列生成标识符。 条件是数据库支持序列。 适用于代理主键。
-| assigned | 由 Java程序负责生成标识符，如果不指定过元素的 generator 属性，则默认使用该主键生成策略。 适用于自然主键。 
+
+| 值 | 描述 |
+|---|---|
+|native | 根据底层数据库对自动生成表示符的能力来选择过 identity 、sequence、hilo三种生成器中的一种，适合跨数据库平台开发。适用于代理主键。|
+|uuid | Hibernate 采用 128 位的 UUID 算法来生成标识符。 该算法能够在网络环境中生成唯一的字符串标识符，其 UUID 被编码为一个长度为32 位的十六进制字符串。 这种策略并不流行， 因为字符串类型的主键比整数类型的主键占用更多的数据库空间。 适用于代理主键。|
+|  increment | 用于 long、 short、或 int 类型， 由 Hibernate 自动以递增的方式生成唯一标识符，每次增量为 1。只有当没有其它进程向同一张表中插入数据时才可以使用，不能在集群环境下使用。 适用于代理主键。|
+|identity| 采用底层数据库本身提供的主键生成标识符，条件是数据库支持自动增长数据类型。 在 DB2、 MySQL、 MS SQL Server、 Sybase 和 HypersomcSQL 数据库中可以使用该生成器，该生成器要求在数据库中 把主键定义成为自增长类型。 适用于代理主键。|
+|sequence | Hibernate 根据底层数据库序列生成标识符。 条件是数据库支持序列。 适用于代理主键。|
+| assigned | 由 Java程序负责生成标识符，如果不指定过元素的 generator 属性，则默认使用该主键生成策略。 适用于自然主键。|
 
 - 演示生成策略值 uuid
  - 使用 uuid 生成策略，实体类 id 属性类型 必须 **字符串类型**：`private String uid;`
  - 配置部分写出uuid值：`<generator class="uuid"></generator>`
- 
- 
+
+
 ## 三、实体类操作
 ## 对实体类crud操作
 **下面使用的是 native 方式**
@@ -147,7 +148,7 @@ Hibernate:
     where
         uid=?
 ```
- 
+
 
 ### （三）删除操作
 先查询再删除
@@ -181,7 +182,7 @@ Hibernate:
     where
         uid=?
 ```
- 
+
 
 ## 四、实体类对象状态（概念）
 
@@ -205,7 +206,7 @@ user.setAddress("jiangsu");
 User user = new User();
 user.setUid(3);
 ```
- 
+
 **测试三种状态：**
 
 ```java
@@ -240,7 +241,7 @@ public void stateTest(){
 
 **Hibernate 持久化对象三种状态之间的转换**
 
-![持久化对象三种状态之间转换]($resource/%E6%8C%81%E4%B9%85%E5%8C%96%E5%AF%B9%E8%B1%A1%E4%B8%89%E7%A7%8D%E7%8A%B6%E6%80%81%E4%B9%8B%E9%97%B4%E8%BD%AC%E6%8D%A2.png)
+![持久化对象三种状态之间转换](FrameDay04_2%20Hibernate.resource/%E6%8C%81%E4%B9%85%E5%8C%96%E5%AF%B9%E8%B1%A1%E4%B8%89%E7%A7%8D%E7%8A%B6%E6%80%81%E4%B9%8B%E9%97%B4%E8%BD%AC%E6%8D%A2.png)
 
 
 - 演示操作实体类对象的方法
@@ -265,7 +266,7 @@ user.setUsername("lilei");
 // 实体类对象状态是持久态，做修改操作
 session.saveOrUpdate(user);
 ```
- 
+
 
 ## 五、Hibernate 的一级缓存
 
@@ -333,8 +334,8 @@ true
 第二个执行get方法之后，没有发送sql语句，查询一级缓存内容
 
 ### （四）Hibernate一级缓存执行过程
- 
-![一级缓存执行过程]($resource/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png)
+
+![一级缓存执行过程](FrameDay04_2%20Hibernate.resource/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png)
 
 ### （五）Hibernate一级缓存特性
 
@@ -346,8 +347,8 @@ user.setUsername("hanmeimei");
 ```
 
 -  执行过程（了解）
- 
-![一级缓存具体执行过程]($resource/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png)
+
+![一级缓存具体执行过程](FrameDay04_2%20Hibernate.resource/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png)
 
 ## 六、Hibernate事务操作
 
@@ -372,13 +373,14 @@ user.setUsername("hanmeimei");
   - 可重复读(Repeatable Read, 4 级）： 一个事务在执行过程中， 可以访问其他事务成功提交的新插入的数据， 但不可以访问成功修改的数据。读取数据的事务将会禁止写事务（但允许读事务）， 写事务则禁止任何其他事务。此隔离级别可有效的防止不可重复读和脏读。
   - 序列化／串行化(Serializable, 8 级）： 提供严格的事务隔离。它要求事务序列化执行， 事务只能一个接着一个地执行， 但不能并发执行。此隔离级别可有效的防止脏读、不可重复读和幻读。
 
-| 隔离级别 | 含义
-|---|---
-|READ UNCOMMITTED |允许你读取还未提交的改变了的数据。可能导致脏、幻、不可重复读
-| READ COMMITTED  | 允许在并发事务已经提交后读取。 可防止脏读，但幻读和不可重复读仍可发生
-| REPEATABLE_READ | 对相同字段的多次读取是一致的，除非数据被事务本身改变。 可防止 脏、不可重复读，但幻读仍可能发生。
-| SERIALIZABLE  |  完全服从ACID的隔离级别，确保不发生脏、 幻、不可重复读。这在所有的隔离级别中是最慢的，它是典型的通过 完全锁定在事务中 涉及的数据表来完成的。 
 
+
+| 隔离级别 | 含义|
+|:--|---|
+|READ UNCOMMITTED |允许你读取还未提交的改变了的数据。可能导致脏、幻、不可重复读|
+|READ COMMITTED |允许在并发事务已经提交后读取。 可防止脏读，但幻读和不可重复读仍可发生|
+|REPEATABLE_READ |对相同字段的多次读取是一致的，除非数据被事务本身改变。 可防止 脏、不可重复读，但幻读仍可能发生。|
+|SERIALIZABLE |完全服从ACID的隔离级别，确保不发生脏、 幻、不可重复读。这在所有的隔离级别中是最慢的，它是典型的通过 完全锁定在事务中 涉及的数据表来完成的。|
 事务的隔离级别，是由数据库提供的，并不是所有数据库都支持四种隔离级别
 • MySQL : `READ_UNCOMMITTED` 、`READ_COMMITTED` 、`REPEATABLE_READ` 、`SERI ALIZABLE` (默认REPEATABLE—READ)
 • Oracle: `READ_UNCOMMITTED`、`READ_COMMITTED`、`SERIALIZABLE`（默认READ_COMMITTED )
@@ -441,9 +443,9 @@ public class TransactionTest {
 **设置事务隔离级别**
 可以在 hibernate.cfg.xml 的 `<session-factory>`标签中设置：`<property name = "hibernate.connection.isolation">4</property>`，中间的值可以自己设定为：1,2,4,8；
 
-
 **事务控制应该在 Service 层实现，不应该在 DAO 层实现**，可以在 Service 中调用多个 DAO 实现一个业务逻辑操作，
-![在Service层添加事务]($resource/%E5%9C%A8Service%E5%B1%82%E6%B7%BB%E5%8A%A0%E4%BA%8B%E5%8A%A1.png)
+
+![在Service层添加事务](FrameDay04_2%20Hibernate.resource/%E5%9C%A8Service%E5%B1%82%E6%B7%BB%E5%8A%A0%E4%BA%8B%E5%8A%A1.png)
 
 **保证 Service 和多个 DAO 使用的 Session 是同一个的方法：**
 - 向下传递：可以在业务层获取 Session，并将 Session 作为参数传递给 DAO；
@@ -473,7 +475,7 @@ public static Session getSessionObject(){
 
    - 然后实现session时候使用上面方法构建即可；
 - 获取与本地线程绑定session时候，如果关闭session会报错，**不需要手动关闭了**
- 
+
 
 ## 七、Hibernate 的 api 使用（下面三个都是查询的）
 

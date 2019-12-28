@@ -8,7 +8,7 @@ tags :
 ## 一、反射总结
 - 反射：
  	**当一个Java文件编译之后，编译成一个.class文件，也就是字节码文件，当这个字节码文件【加载】到内存的方法区/代码区，JVM会根据【加载】的字节码文件内容，创建一个Class的类对象。这个Class类对象里面包含了当前字节码文件里面的所有内容**。
- 	
+
  	只要我们获取到这个Class对象，就可以为所欲为！！！
  	这个Class对象中包含了对应字节码文件的所有成员变量(Field) 所有成员方法(Method)构造方法(Constructor)。
  	
@@ -26,7 +26,7 @@ tags :
     Constructor 是构造方法类
     Method 是成员方法类
     Field 是成员变量类
-        
+    
 - 3.Constructor常用方法：
 
 返回值 | 方法名| 作用
@@ -36,7 +36,7 @@ Constructor[] | getConstructors(); |获取所有public修饰的构造方法
 Constructor |getConstructor(Object... paramterTyeps);|根据所需参数不同，获取指定的构造方法对象
 Constructor| getDeclaredConstructor(Object... paramterTyeps);|根据所需参数不同，获取指定的构造方法对象，包括私有化的方法
  Object | newInstance(Object... initargs); |给予确定的参数，通过反射调用构造方法，这里的参数列表是一个不定参数列表
-                    
+
 - 4.Method常用方法 
 
 返回值 | 方法名| 作用
@@ -46,7 +46,7 @@ Method[] | getDeclaredMethods(); |获取当前类里面的所有方法，包括p
 Method  | getMethod(String methodName, Object... args);|根据方法的名字和对应的参数列表，获取指定方法
 Method | getDeclaredMethod(String methodName, Object... args);|根据方法的名字和对应的参数列表，获取指定方法，可以获取private修饰的方法
  无    | invoke(Object obj, Object... args);  |执行成员方法的函数，第一个参数是执行该方法的类对象，第二个参数是执行该方法需要的参数列表
-    
+
 - 5.Field常用方法
 
 返回值 | 方法名| 作用
@@ -56,7 +56,7 @@ Method | getDeclaredMethod(String methodName, Object... args);|根据方法的�
 Field |getField(String fieldName);|根据成员变量的名字获取对应的成员变量
 Field |getDeclaredField(String fieldName);|根据成员变量的名字获取包括private修饰在内的成员变量
 无   | set(Object obj, Object value);|设置成员变量的数值，第一个参数是调用该成员变量的对象，第二个参数是赋予数值
-    
+
 - 6.暴力反射赋予权限的函数
         setAccessible(boolean )
 

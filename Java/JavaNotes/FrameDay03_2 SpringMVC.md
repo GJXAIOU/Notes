@@ -265,7 +265,7 @@ public class DemoController {
 ```
 
 - 最后编写控制器类
- MultipartFile 对象名必须和<input type=”file”/>的 name 属性值相同
+ MultipartFile 对象名必须和`<input type="file"/>` 的 name 属性值相同
 ```java
 @Controller
 public class DemoController {

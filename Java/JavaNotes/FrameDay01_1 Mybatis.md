@@ -7,7 +7,7 @@ style: summer
 
 - 创建数据库并指定编码
 `Create database 数据库名 default character set utf8`
- 
+
  - 创建表
 ```java
 Createtable 表名(
@@ -38,17 +38,24 @@ Createtable 表名(
 - M: Model 模型；实体类和业务和 dao
 - V: view 视图 ；现在一般使用. JSP
 - C: Controller 控制器，现在使用servlet
+  
   - 作用：视图和逻辑分离
 - MVC 适用场景:大型项目开发.
 - **项目实现步骤**：
   - 先设计数据库
+  
   - 再写实体类：用于封装数据
+  
   - 持久层DAO
-  - 业务逻辑
+  
+- 业务逻辑
+  
   - 控制器
+  
   - 视图
-![MVC开发模式]($resource/MVC%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F.png)
-
+    
+  
+    ![MVC开发模式](FrameDay01_1%20Mybatis.resource/MVC%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F.png)
 
 ## 四、框架概念
 
@@ -95,7 +102,7 @@ log4j-api.jar| 日志包
 log4j-core.jar| 日志包
 slf4j-api.jar| 日志包
 slf4j-log4j.jar| 日志包
-   
+
 - 步骤二：**在 src 下新建全局配置文件**(编写 JDBC 四个变量)
   - 没有名称和地址要求
   - **在全局配置文件中引入 DTD 或 schema**【使用见 Blogs -> DTD】
@@ -131,7 +138,7 @@ slf4j-log4j.jar| 日志包
 </configuration>
 ```
 
-**注：** mybatis.xml 中的 <mappers>中配置的 resource 是整个项目中的所有其他 `实体类Mapper.xml` 文件；
+**注：** mybatis.xml 中的 `<mappers>`中配置的 resource 是整个项目中的所有其他 `实体类Mapper.xml` 文件；
 
 mappers 标签下有许多 mapper 标签，每一个 mapper 标签中配置的都是一个独立的映射配置文件的路径，配置方式有以下几种。
 
@@ -214,10 +221,10 @@ public class Test {
 ### （二）环境搭建详解
 
 **全局配置文件中内容**
-- <transactionManager/> type 属性可取值如下：
+- `<transactionManager/>` type 属性可取值如下：
   - JDBC，事务管理使用 JDBC 原生事务管理方式；
   - MANAGED 把事务管理转交给其他容器，相当于设置原生 JDBC 事务`setAutoMapping(false)`；
-- <dataSouce/>type 属性可取值如下：
+- `<dataSouce/>`type 属性可取值如下：
   - POOLED：使用数据库连接池；
   - UNPOOLED：不使用数据库连接池，和直接使用 JDBC 一样；
   - JNDI：是 java 命名目录接口技术；
@@ -382,7 +389,7 @@ public class Test {
     *  标志: 只要以/开头的都是绝对路径
 - 绝对路径:
   - 如果是请求转发 / 表示项目根目录(WebContent)
-  - 其他重定向，<img/> <script/>，<style/>，location.href 等/都表示服务器根目录(tomcat/webapps 文件夹)
+  - 其他重定向，`<img/> <script/>`，`<style/>`，location.href 等/都表示服务器根目录(tomcat/webapps 文件夹)
 - 如果客户端请求的控制器，控制器转发到JSP 后，jsp 中如果使用相对路径，需要按照控制器的路径去找其他资源；
   - 保险办法:使用绝对路径，可以防止上面的问题；
 
@@ -438,10 +445,11 @@ logger.debug("这是调试信息");
 
 
 
-# 十三、<settings>标签
+# 十三、`<settings>`标签
 
 ==该标签必须配置在最前面==
-- 在 mybatis 全局配置文件中通过<settings>标签控制 mybatis 全局开关
+
+- 在 mybatis 全局配置文件中通过`<settings>`标签控制 mybatis 全局开关
 - 在 mybatis.xml 中开启 log4j 命令如下：
   -  必须保证有 log4j.jar
   -  在 src 下有 log4j.properties
@@ -457,7 +465,7 @@ logger.debug("这是调试信息");
       - 先在总体级别调成 Error，这样可以不输出无用信息
       -  在设置某个指定位置级别为 DEBUG
 
-![根据命名空间设置不同优先级]($resource/%E6%A0%B9%E6%8D%AE%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E8%AE%BE%E7%BD%AE%E4%B8%8D%E5%90%8C%E4%BC%98%E5%85%88%E7%BA%A7.png)
+![根据命名空间设置不同优先级](FrameDay01_1%20Mybatis.resource/%E6%A0%B9%E6%8D%AE%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E8%AE%BE%E7%BD%AE%E4%B8%8D%E5%90%8C%E4%BC%98%E5%85%88%E7%BA%A7.png)
 
   - 类级别
     -  namespace 属性值 ，相当于namespace 类名
@@ -534,8 +542,9 @@ mapper.xml 中代码为：
 
 ## 十五、typeAliases 别名（在mybatis.xml中进行配置，命令如下）
 
-==别名配置必须在 <environments>前面==
+==别名配置必须在 `<environments>`前面==
 一共有三类：分别是系统内置的别名，给某个类的别名，
+
 - 系统内置别名: 就是把类型全小写（见文档 ）
 - 给某个类起别名
     - alias=”自定义”
@@ -586,7 +595,7 @@ mapper.xml 中内容为：
   - 如果出现异常，应该 `session.rollback()` 回滚事务.
 
 - 实现新增的步骤
-  - 在 mapper.xml  中提供<insert>标签，标签没有返回值类型
+  - 在 mapper.xml  中提供 `<insert>` 标签，标签没有返回值类型
   - 通过 `session.insert()` 调用新增方法
 mapper.xml 值为；
 ```xml
@@ -607,7 +616,7 @@ if(index1>0){
 
 ## 十二、MyBatis 实现修改
 
-- 在 mapper.xml 中提供<update>标签
+- 在 mapper.xml 中提供 `<update>` 标签
 ```java
 <update id="upd" parameterType="People">
   update people set name = #{name} where id = #{id}
@@ -630,7 +639,7 @@ session.commit();
 
 ##  十三、mybatis 实现删除
 
-- 在 mapper.xml  提供<delete>标签
+- 在 mapper.xml  提供`<delete>` 标签
 ```xml
 <delete id="del" parameterType="int">
     delete from people where id = #{0}

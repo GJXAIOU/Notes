@@ -12,31 +12,25 @@ custom: GJXAIOU
 
 [TOC]
 
-
-
 ## 一、简介
 
-
-
-- 使用SpringBoot 进行 WEB 开发步骤：
-    - **创建SpringBoot应用，选中我们需要的模块；**
-    - **SpringBoot已经默认将这些场景配置好了，只需要在配置文件中指定少量配置就可以运行起来**
+- 使用 SpringBoot 进行 WEB 开发步骤：
+    - **创建 SpringBoot 应用，选中我们需要的模块；**
+    - **SpringBoot 已经默认将这些场景配置好了，只需要在配置文件中指定少量配置就可以运行起来；**
     - **自己编写业务代码；**
-
-
 
 - **自动配置原理**
 
-    使用自动配置原理还应该考虑一下这个场景SpringBoot帮我们配置了什么？能不能修改？能修改哪些配置？能不能扩展？
+    使用自动配置原理还应该考虑一下这个场景 SpringBoot 帮我们配置了什么？能不能修改？能修改哪些配置？能不能扩展？
 
     - xxxxAutoConfiguration：帮我们给容器中自动配置组件；
-    - xxxxProperties:配置类来封装配置文件的内容；
+    - xxxxProperties：配置类来封装配置文件的内容；
 
 
 
 ## 二、Spring Boot 对静态资源的映射规则
 
-在springboot 中关于 springMVC 的所有配置都在 WebMvcAutoConfiguration.java （使用 Ctrl + n 全局搜索该文件名即可）中，下面仅仅是静态资源配置的相关代码
+在 SpringBoot 中关于 SpringMVC 的所有配置都在 `WebMvcAutoConfiguration.java` （使用 Ctrl + n 全局搜索该文件名即可）中，下面仅仅是静态资源配置的相关代码
 
 ```java
 public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -101,7 +95,7 @@ public static class FaviconConfiguration {
 }
 ```
 
-上面代码中的设置配置在 resourceProperties.java 中，例如下面的部分文件设置（点击resourcesProperties 文件即可） ，可以设置其所有的属性值，例如： 可以设置和静态资源有关的参数，缓存时间等
+上面代码中的设置配置在 `resourceProperties.java` 中，例如下面的部分文件设置（点击resourcesProperties 文件即可） ，可以设置其所有的属性值，例如： 可以设置和静态资源有关的参数，缓存时间等
 
 ```java
 @ConfigurationProperties(prefix = "spring.resources", ignoreUnknownFields = false)
@@ -136,12 +130,12 @@ public class ResourceProperties implements ResourceLoaderAware {
 
 从第一段代码中得出：==所有 `/webjars/**`的请求 ，都去 `classpath:/META-INF/resources/webjars/` 找资源；==
 
-- webjars：以jar包的方式引入静态资源；以前是放在 webapp 目录下面即可；
+- webjars：**以 jar 包的方式引入静态资源**，以前是放在 webapp 目录下面即可；
 
 - 需要使用什么，从[官方网站](http://www.webjars.org/)中引入响应的 jar 包即可，这里以 jQuery 为例，需要引入下面的jar包，下图为该jar 包中具体的内容；
 
 ```xml
-<!--引入jquery-webjar-->在访问的时候只需要写webjars下面资源的名称即可
+<!--引入jquery-webjar-->在访问的时候只需要写 webjars 下面资源的名称即可
 <dependency>
     <groupId>org.webjars</groupId>
     <artifactId>jquery</artifactId>
@@ -149,19 +143,15 @@ public class ResourceProperties implements ResourceLoaderAware {
 </dependency>
 ```
 
-
-
-![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180203181751.png)
+<img src="FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180203181751.png" style="zoom:80%;" />
 
 测试：如果访问：localhost:8080/webjars/jquery/3.3.1/jquery.js 就能访问这里面的 js 了
 
 ### （二）映射规则二：（项目任意路径）
 
-代码块一种第13行中：mvcProperties 文件中的 staticPathPattern 值为：`/**`，这就是第二种映射规则；
+- 上述代码块第一个第13行中：mvcProperties 文件中的 staticPathPattern 值为：`/**`（源代码为  WebMvcProperties.java 中对应的代码：`private String staticPathPattern = "/**";`），这就是第二种映射规则；
 
-`private String staticPathPattern = "/**";` 这里是 WebMvcProperties.java 中对应的代码；
-
-=="/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射== 即如果该路径没有人进行处理就去下面文件夹中找（"/"：表示当前项目的根路径）
+- =="/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射== 即如果该路径没有人进行处理就去下面文件夹中找（"/"：表示当前项目的根路径）
 
 ```
 "classpath:/META-INF/resources/", 
@@ -170,19 +160,19 @@ public class ResourceProperties implements ResourceLoaderAware {
 "classpath:/public/" 
 ```
 
-![image-20191122111352927](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191122111352927.png)
+<img src="FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191122111352927.png" alt="image-20191122111352927" style="zoom: 80%;" />
 
 例如访问：localhost:8080/static/asserts/css/signin.css  就是可以访问到资源的；
 
 ### （三）映射规则三：欢迎页
 
-==3）、欢迎页； 静态资源文件夹下的所有index.html页面；被"/**"映射；==
+==欢迎页； 静态资源文件夹下的所有index.html页面；被"/**"映射；==
 
 ​	localhost:8080/   找index页面
 
 ### （四）映射规则四：网页标签的小图标
 
-==4）、所有的 **/favicon.ico  都是在静态资源文件下找；==
+==所有的 **/favicon.ico  都是在静态资源文件下找；==
 
 ### （五）自定义映射规则
 
@@ -196,7 +186,7 @@ public class ResourceProperties implements ResourceLoaderAware {
 
 现有的模板引擎包括：JSP、Velocity、Freemarker、Thymeleaf
 
-![](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/template-engine.png)
+<img src="FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/template-engine.png" style="zoom:80%;" />
 
 
 
@@ -211,22 +201,19 @@ public class ResourceProperties implements ResourceLoaderAware {
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
 </dependency>
-<!--切换thymeleaf版本-->
+<!--切换 thymeleaf 版本-->
 <properties>
     <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
-  
-     <thymeleaf-extras-java8time.version>3.0.4.RELEASE</thymeleaf-extras-java8time.version>
+    <thymeleaf-extras-java8time.version>3.0.4.RELEASE</thymeleaf-extras-java8time.version>
     <thymeleaf-extras-springsecurity.version>3.0.4.RELEASE</thymeleaf-extras-springsecurity.version>
-      <!-- 下面是布局功能的支持程序，针对thymeleaf3主程序需要layout2以上版本 -->
+      <!-- 下面是布局功能的支持程序，针对 thymeleaf3 主程序需要 layout2 以上版本 -->
     <thymeleaf-layout-dialect.version>2.4.1</thymeleaf-layout-dialect.version>
 </properties>
 ```
 
-
-
 ### （二）Thymeleaf 使用
 
-自动配置规则在`spring-boot-autoconfigure-2.2.1.RELEASE.jar!\org\springframework\boot\autoconfigure\thymeleaf\ThymeleafAutoConfiguration.java `中，下面是其对应的 ThymeleafProperties.java 中封装着其默认规则，下面是部分代码
+自动配置规则在 `spring-boot-autoconfigure-2.2.1.RELEASE.jar!\org\springframework\boot\autoconfigure\thymeleaf\ThymeleafAutoConfiguration.java `中，下面是其对应的 ThymeleafProperties.java 中封装着其默认规则，下面是部分代码
 
 ```java
 @ConfigurationProperties(prefix = "spring.thymeleaf")
@@ -444,19 +431,17 @@ public class HelloController {
 
 
 
-
-
 ## 四、SpringMVC 自动配置
 
-[关于springMVC 的说明](  https://docs.spring.io/spring-boot/docs/2.2.1.RELEASE/reference/htmlsingle/#boot-features-spring-mvc  )
+[关于springMVC 的说明](https://docs.spring.io/spring-boot/docs/2.2.1.RELEASE/reference/htmlsingle/#boot-features-spring-mvc  )  
+
+![image-20191224164615565](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191224164615565.png)
 
 ### （一）Spring MVC 的 auto-configuration
 
-Spring Boot 自动配置好了 SpringMVC
+Spring Boot 自动配置好了 SpringMVC以下是SpringBoot 对 SpringMVC的默认配置（见 Reference 文档 P107/519）:**下面的所有自动配置都在（WebMvcAutoConfiguration）文件中**
 
-以下是SpringBoot 对 SpringMVC的默认配置（见 Reference 文档 P107/519）:**==下面的所有都在（WebMvcAutoConfiguration）文件中==**
-
-- Inclusion of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
+- Inclusion（包含） of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
 
   - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
 
@@ -466,47 +451,47 @@ Spring Boot 自动配置好了 SpringMVC
 
     验证：在主类中自定义视图解析器，然后使用 @Bean 就将其加入容器中；
 
-    ```java
-    package com.gjxaiou.springboot;
-    
-    @SpringBootApplication
-    public class SpringBoot04WebRestfulcrudApplication {
-    
-    	public static void main(String[] args) {
-    		SpringApplication.run(SpringBoot04WebRestfulcrudApplication.class, args);
-    	}
-    
-    	// 添加到容器中
-    	@Bean
-    	public ViewResolver myViewReolver(){
-    		return new MyViewResolver();
-    	}
-    
-    	public static class MyViewResolver implements ViewResolver{
-    		@Override
-    		public View resolveViewName(String viewName, Locale locale) throws Exception {
-    			return null;
-    		}
-    	}
-    }
-    
-    ```
-    
-    然后全局搜索：`DispatcherServlet`，来到 1000行（ctrl + G ） 的 doDispatch() 方法上打断点然后调试，访问任意路径看自定义的视图解析器是否在里面；
-    
-    查看 Valiables 中的 viewResolvers 中就应该有自己定义的视图解析器
-    
-    ![image-20191123214440623](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191123214440623.png)
+  ```java
+  package com.gjxaiou.springboot;
+  
+  @SpringBootApplication
+  public class SpringBoot04WebRestfulcrudApplication {
+  
+  	public static void main(String[] args) {
+  		SpringApplication.run(SpringBoot04WebRestfulcrudApplication.class, args);
+  	}
+  
+  	// 添加到容器中
+  	@Bean
+  	public ViewResolver myViewReolver(){
+  		return new MyViewResolver();
+  	}
+  
+  	public static class MyViewResolver implements ViewResolver{
+  		@Override
+  		public View resolveViewName(String viewName, Locale locale) throws Exception {
+  			return null;
+  		}
+  	}
+  }
+  
+  ```
+  
+  然后全局搜索：`DispatcherServlet`，来到 1000行（ctrl + G ） 的 doDispatch() 方法上打断点然后调试，访问任意路径看自定义的视图解析器是否在里面；
+  
+  查看 Valiables 中的 viewResolvers 中就应该有自己定义的视图解析器
+  
+  ![image-20191123214440623](FrameDay06_4%20SpringBoot%E4%B8%8EWeb%E5%BC%80%E5%8F%91.resource/image-20191123214440623.png)
   
 - Support for serving static resources, including support for WebJars (see below).静态资源文件夹路径,webjars
 
 - Static `index.html` support. 静态首页访问
 
-- Custom `Favicon` support (see below).  支持 favicon.ico自定义
+- Custom `Favicon` support (see below).  支持 favicon.ico 自定义
 
 - Automatic use of `Converter`, `GenericConverter`, `Formatter` beans；就是页面带来的数据格式要转换成其他格式，例如页面带来一个 18（文本类型）要转换为 integer 类型等等；
 
-  - `Converter`：转换器；  public String hello(User user)：类型转换使用Converter
+  - `Converter`：转换器；  public String hello(User user)：类型转换使用 Converter
   - `Formatter`  格式化器；  2017.12.17===Date；
 
 ```java
@@ -519,15 +504,13 @@ public Formatter<Date> dateFormatter() {
 
 ​	==自己添加的格式化器转换器，我们只需要放在容器中即可==，因为它也是遍历 Converter 类型；
 
-- Support for `HttpMessageConverters` (see below).
+- Support for `HttpMessageConverters` (see below)。
 
   - HttpMessageConverter：是SpringMVC用来转换Http请求和响应的；如方法返回User对象，想以Json数据形式写出去；
 
   - `HttpMessageConverters` 是从容器中确定；获取所有的HttpMessageConverter；
 
     ==自己给容器中添加HttpMessageConverter，只需要将自己的组件注册容器中（@Bean,@Component）==
-
-    
 
 - Automatic registration of `MessageCodesResolver` (see below).定义错误代码生成规则
 
@@ -542,21 +525,21 @@ public Formatter<Date> dateFormatter() {
 Spring MVC 中拓展方式： 
 
 ```xml
-    <mvc:view-controller path="/hello" view-name="success"/>
-    <mvc:interceptors>
-        <mvc:interceptor>
-            <mvc:mapping path="/hello"/>
-            <bean></bean>
-        </mvc:interceptor>
-    </mvc:interceptors>
+<mvc:view-controller path="/hello" view-name="success"/>
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/hello"/>
+        <bean></bean>
+    </mvc:interceptor>
+</mvc:interceptors>
 ```
 
-Spring Boot 中方式：**==编写一个配置类（@Configuration），该类是WebMvcConfigurerAdapter类型；但是不能标注@EnableWebMvc==**;
+Spring Boot 中方式：**==编写一个配置类（@Configuration），该类是 WebMvcConfigurerAdapter 类型；但是不能标注 @EnableWebMvc==**;
 
 既保留了所有的自动配置，也能用我们扩展的配置；
 
 ```java
-//使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
+// 使用 WebMvcConfigurerAdapter 可以来扩展 SpringMVC 的功能
 @Configuration
 public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
@@ -602,7 +585,7 @@ public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfigurat
 
 ​	效果：SpringMVC 的自动配置和我们的扩展配置都会起作用；
 
-### 全面接管SpringMVC（不推荐）
+### （三）全面接管SpringMVC（不推荐）
 
 SpringBoot 对 SpringMVC 的自动配置都不需要，所有都是我们自己配置；例如基本的静态资源不能使用了，所有路径都需要自己进行配置；
 
@@ -665,13 +648,13 @@ public class WebMvcAutoConfiguration {
 
 
 
-## 五、如何修改SpringBoot的默认配置
+## 五、如何修改 SpringBoot 的默认配置
 
 - 方式一：SpringBoot 在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来；
 
-- 方式二：在SpringBoot中会有非常多的 xxxConfigurer 帮助我们进行扩展配置；
+- 方式二：在 SpringBoot 中会有非常多的 xxxConfigurer 帮助我们进行扩展配置；
 
-- 方式三：在SpringBoot中会有很多的 xxxCustomizer 帮助我们进行定制配置；
+- 方式三：在 SpringBoot 中会有很多的 xxxCustomizer 帮助我们进行定制配置；
 
 
 
@@ -2195,7 +2178,7 @@ public void refresh() throws BeansException, IllegalStateException {
     `EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFactory();`getEmbeddedServletContainerFactory() 就是从ioc容器中获取EmbeddedServletContainerFactory 组件；	**TomcatEmbeddedServletContainerFactory**创建对象，后置处理器一看是这个对象，就获取所有的定制器来先定制Servlet容器的相关配置；
     
 -  **使用上面的容器工厂获取嵌入式的Servlet容器**：`this.embeddedServletContainer = containerFactory.getEmbeddedServletContainer(getSelfInitializer());`该方法中就创建了 Tomcat 对象同时
-    
+   
 - 同时（接上）嵌入式的Servlet容器创建对象并启动Servlet容器；
 
 **先启动嵌入式的Servlet容器，再将ioc容器中剩下没有创建出的对象获取出来；**

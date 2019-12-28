@@ -13,11 +13,11 @@
 
 - **实现步骤**:
   - 创建一个接口 ：例如：`LogMapper`
-    - **接口 Mapper 名和接口名与 mapper.xml  中<mapper>namespace 相同**
-目录示例：`com.gjxaiou.mapper`包下面包含一个接口：`LogMapper`和`LogMapper.xml`，然后 `LogMapper.xml` 中的<mapper>namespace 标签格式为：
+    - **接口 Mapper 名和接口名与 mapper.xml  中`<mapper>`namespace 相同**
+目录示例：`com.gjxaiou.mapper`包下面包含一个接口：`LogMapper`和`LogMapper.xml`，然后 `LogMapper.xml` 中的`<mapper>`namespace 标签格式为：
 `<mapper namespace = "com.gjxaiou.mapper.LogMapper>   </mapper>`
     - **接口中方法名和 mapper.xml  标签的 id 属性相同；**
-  - 在 mybatis.xml 中使用<package>进行扫描接口和 mapper.xml；
+  - 在 mybatis.xml 中使用`<package>`进行扫描接口和 mapper.xml；
 
 - **代码实现步骤**:
   - 首先在 mybatis.xml 中全局配置文件中的`<mappers>`下使用`<package>`
@@ -34,7 +34,7 @@ public  interface  LogMapper  {
 }
 ```
   - 然后在 `com.gjxaiou.mapper` 中新建一个 `LogMapper.xml`
-  其中 namespace 的值必须和接口全限定路径(包名+类名)一致，且使用的 id 值必须和接口中方法名相同。同时如果接口中方法为多个参数,可以省略 parameterType
+    其中 namespace 的值必须和接口全限定路径(包名+类名)一致，且使用的 id 值必须和接口中方法名相同。同时如果接口中方法为多个参数,可以省略 parameterType
 ```xml
 <mapper  namespace="com.gjxaiou.mapper.LogMapper">
   <select  id="selAll"  resultType="log"> 
@@ -133,9 +133,9 @@ public class Test {
 
 ### （二）where 使用
 - 当编写 where 标签时,如果内容中第一个是 and 就会去掉第一个 and；
-- 如果 <where> 中有内容会生成 where 关键字,如果没有内容不生成 where 关键字；
+- 如果 `<where>` 中有内容会生成 where 关键字,如果没有内容不生成 where 关键字；
 
-- 使用示例 ：效果：比直接使用 <if> 少写了  where 1 = 1;
+- 使用示例 ：效果：比直接使用 `<if>` 少写了  where 1 = 1;
 ```xml
 <select  id="selByAccinAccout"  resultType="log"> 
     select  *  from  log
@@ -178,10 +178,10 @@ public class Test {
 ###  （四）set 使用
 
 - 作用:去掉最后一个逗号
-<set>用在修改 SQL 中 set 从句，如果<set>里面有内容则生成 set 关键字,没有就不生成
+`<set>`用在修改 SQL 中 set 从句，如果`<set>`里面有内容则生成 set 关键字,没有就不生成
 
 - 示例
-其中：`id=#{id}` 目的防止<set>中没有内容,mybatis 不生成 set 关键字,如果修改中没有 set 从句 SQL 语法错误.
+其中：`id=#{id}` 目的防止`<set>`中没有内容,mybatis 不生成 set 关键字,如果修改中没有 set 从句 SQL 语法错误.
 ```xml
 <update  id="upd"  parameterType="log"  > 
     update  log
@@ -259,17 +259,16 @@ public class Test {
 </select>
 ```
 
+### （七）`<sql>` 和 `<include>` 搭配使用
 
-### （七）<sql> 和 <include> 搭配使用
-
-- **某些 SQL 片段如果希望复用,可以使用<sql>定义这个片段**；
+- **某些 SQL 片段如果希望复用,可以使用 `<sql>` 定义这个片段**；
 ```xml
 <sql  id="mysql"> 
     id,accin,accout,money
 </sql>
 ```
 
-- 可以在<select>或<delete>或<update>或<insert>中使用<include> 引用
+- 可以在 `<select>` 或 `<delete>` 或 `<update>` 或 `<insert>` 中使用 `<include>` 引用
 ```xml
 <select  id="">
     select  <include  refid="mysql"></include>
@@ -277,8 +276,8 @@ public class Test {
 </select>
 ```
 
-
 ## 三、ThreadLocal
+
 主要优化 service中的方法
 
 - 线程容器：给线程绑定一个 Object 内容后只要线程不变,可以随时取出。但是一旦改变线程,无法取出内容。
@@ -302,9 +301,9 @@ final ThreadLocal<String> threadLocal = ThreadLocal<>();
 2. 缓存存在的意义：让应用程序减少对数据库的访问，提升程序运行效率；
 
 - **MyBatis 中默认 SqlSession 缓存开启**
-  - 同一个 SqlSession 对象调用同一个<select>时,只有第一次访问数据库,第一次之后把查询结果缓存到 SqlSession 缓存区(内存)中
-  - 缓存的是 statement  对象.(简单记忆必须是用一个<select>)
-    -  在 myabtis  时一个<select>对应一个 statement  对象
+  - 同一个 SqlSession 对象调用同一个 `<select>` 时,只有第一次访问数据库,第一次之后把查询结果缓存到 SqlSession 缓存区(内存)中
+  - 缓存的是 statement  对象.(简单记忆必须是用一个`<select>`)
+    -  在 myabtis  时一个 `<select>` 对应一个 statement  对象
   -  有效范围必须是同一个 SqlSession 对象
 
 - 缓存流程
@@ -314,7 +313,7 @@ final ThreadLocal<String> threadLocal = ThreadLocal<>();
   - 步骤四：数据库返回查询结果
   - 步骤五：把查询结果放到对应的缓存区中
 
-![缓存]($resource/%E7%BC%93%E5%AD%98.png)
+![缓存](FrameDay01_2%20Mybatis.resource/%E7%BC%93%E5%AD%98.png)
 
 - SqlSessionFactory 缓存（二级缓存）
   - 有效范围:同一个 factory 内，哪个 SqlSession 都可以获取

@@ -318,7 +318,7 @@ public @interface SpringBootApplication {
         - 因此@**AutoConfigurationPackage**真正的是含义是：==将主配置类（用@SpringBootApplication标注的类）的所在包及下面所有子包里面的所有组件扫描到 Spring 容器；==
 
     - @**Import**(EnableAutoConfigurationImportSelector.class)；
-  
+    
         -  **EnableAutoConfigurationImportSelector**：导入哪些组件的选择器；
 
 ​		上面方法的父类本质上是将所有需要导入的组件以全类名的方式返回；这些组件就会被添加到容器中；

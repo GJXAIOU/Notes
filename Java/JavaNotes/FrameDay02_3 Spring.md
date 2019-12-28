@@ -10,14 +10,13 @@
 - 常用注解
 - Ajax 复习
 
-
 ##  一、自动注入
 
  - 前提：在 Spring 配置文件中对象名和 ref=”id” 即 id 名相同，可以使用自动注入，就是可以不配置`<property/>`
 
 **两种配置办法**
-- 在`<bean>`中通过 `autowire=””` 配置，只对这个 <bean> 生效；
-- 在`<beans>`中通过 `default-autowire=””`配置，表示当前文件中所有 <bean> 都生效，是全局配置内容；
+- 在`<bean>`中通过 `autowire=””` 配置，只对这个 `<bean>`生效；
+- 在`<beans>`中通过 `default-autowire=””`配置，表示当前文件中所有 `<bean>` 都生效，是全局配置内容；
 
 **参数配置**
 - autowire=”” 可取值如下：
@@ -25,10 +24,10 @@
   - no: 不自动注入；
   - byName: 通过名称自动注入，**在 Spring 容器中找类的 Id**；因为在容器中找，因此就是Teacher不在配置文件中配置，使用component注解也是可以的；
   - byType: 根据类型注入；
-    - spring 容器中不可以出现两个相同类型的<bean>，否则不能根据类型注入；
+    - spring 容器中不可以出现两个相同类型的 `<bean>`，否则不能根据类型注入；
   - constructor: 根据构造方法注入；必须在People类中提供 Teacher类的构造方法；
     - 提供对应参数的构造方法(构造方法参数中包含注入对象)；
-    - 底层使用 byName， 构造方法参数名和其他<bean>的 id相同；
+    - 底层使用 byName， 构造方法参数名和其他 `<bean>` 的 id相同；
 
 代码示例：
 ```Teacher_java
@@ -148,9 +147,9 @@ my.demo = 123
 
 ## 三、scope 属性
 
-scope 是<bean>的属性，**作用:控制对象有效范围(例如单例，多例等)**
+scope 是 `<bean>` 的属性，**作用:控制对象有效范围(例如单例，多例等)**
 
-- <bean/> 标签对应的对象**默认是单例的**；即bean声明一次之后，在类中即使使用getBean多次，但是最终对象是同一个。
+- `<bean/>` 标签对应的对象**默认是单例的**；即bean声明一次之后，在类中即使使用getBean多次，但是最终对象是同一个。
 无论获取多少次，都是同一个对象（**单例就是多次获取某一个对象的时候，不是每次都实例化**）
 
 - scope 可取值（字符串）如下：【scope 是在 bean标签中配置】
@@ -439,7 +438,7 @@ public class UsersServiceImpl implements UsersService{
   *  由 jquery 对 js 中 ajax 代码进行的封装，达到使用方便的效果.
 
 ###   jquery 中 ajax 分类
- 
+
 *  第一层 $.ajax({ 属性名:值，属性名:值})
   * 是 jquery 中功能最全的.代码写起来相对最麻烦的.
 

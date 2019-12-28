@@ -39,7 +39,7 @@
 
 Servlet是具体的业务功能，不能封装
 
-![Spring Framework Runtime]($resource/Spring%20Framework%20Runtime.png)
+![Spring Framework Runtime](FrameDay02_1%20Spring.resource/Spring%20Framework%20Runtime.png)
 
    - Spring 框架中重要概念
       - 容器(Container): 将 Spring 当作一个大容器.
@@ -103,7 +103,7 @@ commons-logging.jar
 
 </beans>
 ```
- 
+
 - 然后编写测试方法:Test.java，在这里可以创建对象
   - `getBean(“<bean>标签 id 值”,返回值类型);`如果没有第二个参数, 默认是 Object；
   -  `getBeanDefinitionNames()`，是Spring 容器中目前管理的所有对象；

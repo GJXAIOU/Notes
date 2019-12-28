@@ -2,7 +2,7 @@
 
 **主要内容**
 * Auto Mapping 单表实现(别名方式)
-* <resultMap> 实现单表配置
+* `<resultMap>` 实现单表配置
 * 单个对象关联查询 (N+1,外连接) 集合对象关联查询
 * 注解开发
 * MyBatis 运行原理
@@ -367,7 +367,9 @@ List<Student> selByTid(int tid);
 
 ###  （二）流程图
 
-![MyBatis执行流程图]($resource/MyBatis%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
+![MyBatis执行流程图](FrameDay01_3%20Mybatis.resource/MyBatis%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
+
+
 
 ### （三）文字解释
 

@@ -20,23 +20,24 @@
 
 ### （二）SpringMVC 运行原理图
 
-![SpringMVC 运行原理图]($resource/SpringMVC%20%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86%E5%9B%BE.png)
+![SpringMVC 运行原理图](FrameDay03_1%20SpringMVC.resource/SpringMVC%20%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86%E5%9B%BE.png)
 
 ### （三）Spring 容器和 SpringMVC 容器的关系
 
 - 代码
-![Spring与SpringMVC]($resource/Spring%E4%B8%8ESpringMVC.jpg)
+![Spring与SpringMVC](FrameDay03_1%20SpringMVC.resource/Spring%E4%B8%8ESpringMVC.jpg)
 
 - Spring 容器和 SpringMVC 容器是父子容器。
   - **SpringMVC 容器中能够调用 Spring 容器的所有内容。**
   -  图示
-![关系]($resource/%E5%85%B3%E7%B3%BB.png)
+![关系](FrameDay03_1%20SpringMVC.resource/%E5%85%B3%E7%B3%BB.png)
 
 
 ## 二、SpringMVC 环境搭建【使用注解方式】
 
 ### （一）导入 jar
-![SpringMVC jar]($resource/SpringMVC%20jar.jpg)
+
+![SpringMVC jar](FrameDay03_1%20SpringMVC.resource/SpringMVC%20jar.jpg)
 
 ### （二）配置 web.xml
 
@@ -391,7 +392,7 @@ public class DemoController {
 
 3. 如果希望不执行自定义视图解析器, 在方法返回值前面添加forward:或 redirect:
 
-![自定义视图解析器]($resource/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%86%E5%9B%BE%E8%A7%A3%E6%9E%90%E5%99%A8.jpg)
+![自定义视图解析器](FrameDay03_1%20SpringMVC.resource/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%86%E5%9B%BE%E8%A7%A3%E6%9E%90%E5%99%A8.jpg)
 
 ## 六、@ResponseBody
 

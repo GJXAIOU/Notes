@@ -2,19 +2,27 @@
 
 ## 一、日志框架
 
-**市面上的日志框架；**
+### （一）常见日志框架
 
 JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j....
 
-| 日志门面  （日志的抽象层）                                   | 日志实现                                             |
-| ------------------------------------------------------------ | ---------------------------------------------------- |
-| ~~JCL（Jakarta  Commons Logging）~~    SLF4j（Simple  Logging Facade for Java）    **~~jboss-logging~~** | Log4j  JUL（java.util.logging）  Log4j2  **Logback** |
 
-一般左边选一个门面（抽象层）、右边来选一个实现；
 
-SpringBoot：底层是Spring框架，Spring 框架默认是用 JCL；
+### （二）日志分类
 
-​	**==SpringBoot选用 SLF4j和logback；==**
+- 日志门面（日志的抽象层）
+  - ~~JCL(Jakarta  Commons Logging)~~
+  -  SLF4j（Simple  Logging Facade for Java）
+  -  ~~jboss-logging~~
+- 日志的实现
+  - Log4j 
+  - JUL（java.util.logging）  
+  - Log4j2  
+  - **Logback**
+
+一般选一个门面（抽象层）同时选一个实现；
+
+SpringBoot：底层是 Spring 框架，**Spring 框架默认是用 JCL**；**==SpringBoot 选用 SLF4j 和 logback；==**
 
 
 
@@ -22,9 +30,9 @@ SpringBoot：底层是Spring框架，Spring 框架默认是用 JCL；
 
 ### （一）如何在系统中使用SLF4j 
 
-以后开发的时候，日志记录方法的调用，不应该来直接调用日志的实现类（logback），而是**调用日志抽象层**(slf4j)里面的方法；
+开发的时候，日志记录方法的调用，不应该来直接调用日志的实现类（logback），而是**调用日志抽象层**(slf4j)里面的方法；
 
-- **首先给系统里面导入slf4j的jar和  logback的实现jar**
+- **首先给系统里面导入 slf4j 的 jar 和  logback 的实现 jar**
 - 然后具体需要日志的类中实现即可；
 
 ```java
@@ -45,15 +53,13 @@ public class HelloWorld {
 
 ![images/concrete-bindings.png](FrameDay06_3%20SpringBoot%E4%B8%8E%E6%97%A5%E5%BF%97.resource/concrete-bindings.png)
 
-每一个日志的实现框架（如以前应用的 log4j）都有自己的配置文件。使用slf4j以后，**配置文件还是做成日志实现框架自己本身的配置文件；**相当于用谁实现就写谁的配置文件，slf4j 只是提供一个接口层；
+每一个日志的实现框架（如以前应用的 log4j）都有自己的配置文件。使用 slf4j 以后，**配置文件还是做成日志实现框架自己本身的配置文件；**相当于用谁实现就写谁的配置文件，slf4j 只是提供一个接口层；
 
 ### （二）统一日志记录
 
-如果系统实现（slf4j+logback）: 但是同时该系统依赖 Spring（commons-logging）、Hibernate（jboss-logging）、MyBatis、xxxx等框架，但是框架本身底层就有日志记录还各不相同；
+如果系统实现（slf4j + logback）: 但是同时该系统依赖 Spring（commons-logging）、Hibernate（jboss-logging）、MyBatis、xxxx等框架，但是框架本身底层就有日志记录还各不相同；
 
-目标：统一日志记录，即别的框架和我一起统一使用slf4j进行输出
-
-![](FrameDay06_3%20SpringBoot%E4%B8%8E%E6%97%A5%E5%BF%97.resource/legacy.png)
+目标：统一日志记录，即别的框架和我一起统一使用 slf4j 进行输出；
 
 **如何让系统中所有的日志都统一到slf4j；**
 
@@ -61,22 +67,22 @@ public class HelloWorld {
 
 - 用中间包来替换原有的日志框架；
 
-- 导入slf4j其他的具体实现；
+- 导入slf4j 其他的具体实现；
 
-
+<img src="FrameDay06_3%20SpringBoot%E4%B8%8E%E6%97%A5%E5%BF%97.resource/legacy.png" alt="legacy"  />
 
 ## （三）SpringBoot日志关系
 
+**首先导入 Maven 依赖**：
+
 ```xml
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+</dependency>
 ```
 
-
-
-SpringBoot使用它来做日志功能；下面这个依赖中封装了所有的日志启动场景
+SpringBoot 使用它来做日志功能；下面这个依赖中封装了所有的日志启动场景
 
 ```xml
 <dependency>
@@ -87,17 +93,15 @@ SpringBoot使用它来做日志功能；下面这个依赖中封装了所有的�
 
 spring boot 底层依赖关系（在项目（这里是 web 项目）的 pom.xml 配置文件上生成）
 
-![](FrameDay06_3%20SpringBoot%E4%B8%8E%E6%97%A5%E5%BF%97.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180131220946.png)
+![](FrameDay06_3%20SpringBoot%E4%B8%8E%E6%97%A5%E5%BF%97.resource/%25E6%2590%259C%25E7%258B%2597%25E6%2588%25AA%25E5%259B%25BE20180131220946.png)
 
 - 总结：
-    - SpringBoot 底层也是使用 slf4j+logback 的方式进行日志记录
-    - SpringBoot也把其他的日志都替换成了slf4j（因此导入了 jul-to-slf4j 等 Jar包）；
-
-
+  - SpringBoot 底层也是使用 slf4j + logback 的方式进行日志记录
+  - SpringBoot 也把其他的日志都替换成了slf4j（因此导入了 jul-to-slf4j 等 Jar包）；
 
 - 以中间替换包 jcl-over-slf4j.jar 为例：
 
-    首先点击 jar 包发现里面的包名仍然还是：org.apache.commons.logging，同时里面的类也是 LogFactory，下面就是该类的部分截图，可以看出该类里面的实现是调用了 SLF4JLogFactory()
+  首先点击 jar 包发现里面的包名仍然还是：org.apache.commons.logging，同时里面的类也是 LogFactory，下面就是该类的部分截图，可以看出该类里面的实现是调用了 SLF4JLogFactory()
 
 ```java
 @SuppressWarnings("rawtypes")
@@ -108,13 +112,13 @@ public abstract class LogFactory {
     static LogFactory logFactory = new SLF4JLogFactory();
 ```
 
-![](FrameDay06_3%20SpringBoot%E4%B8%8E%E6%97%A5%E5%BF%97.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180131221411.png)
+![](FrameDay06_3%20SpringBoot%E4%B8%8E%E6%97%A5%E5%BF%97.resource/%25E6%2590%259C%25E7%258B%2597%25E6%2588%25AA%25E5%259B%25BE20180131221411.png)
 
 
 
 - 因此如果我们要引入其他框架，一定要把这个框架的默认日志依赖移除掉
 
-​			例如Spring框架用的是commons-logging；可以在上面的图中点击:spring-boot-starter-logging，就可以跳到 pom.xml 文件中，可以看到下面的配置，确实排除了 commons-logging
+例如Spring框架用的是commons-logging；可以在上面的图中点击:spring-boot-starter-logging，就可以跳到 pom.xml 文件中，可以看到下面的配置，确实排除了 commons-logging
 
 ```xml
 		<dependency>
@@ -135,7 +139,7 @@ public abstract class LogFactory {
 
 ### （一）默认配置
 
-SpringBoot默认帮我们配置好了日志，因此空项目直接运行下面窗口中会有一系列的日志输出；
+SpringBoot 默认帮我们配置好了日志，因此空项目直接运行下面窗口中会有一系列的日志输出；
 
 同时如果自己想配置日志输入示例如下：这里是在 测试类中配置
 
@@ -176,7 +180,6 @@ SpringBoot修改日志的默认配置(在 application.properties 配置文件中
 # 日志的输出级别可以控制到包/类
 logging.level.com.gjxaiou=trace
 
-
 #logging.path=
 # 当 logging.path 没有值的时候，即不指定路径只是配置 logging.file=日志文件名，就会在当前项目下生成该日志文件名的日志；当然可以指定完整的日志文件输出路径，就会在指定路径下面输出日志文件；
 #logging.file=G:/springboot.log
@@ -216,6 +219,7 @@ logback.xml：直接就被日志框架识别了，相当于绕过了 springboot�
   	可以指定某段配置只在某个环境下生效
 </springProfile>
 
+
 ```
 
 如在开发环境输入》》》不在开发环境输出》》》：直接运行就行，这里肯定不是开发环境（在 application.properties 中使用 spring.profiles.active=dev 可以进行指定）
@@ -240,6 +244,7 @@ logback.xml：直接就被日志框架识别了，相当于绕过了 springboot�
             </springProfile>
         </layout>
     </appender>
+
 ```
 
 
@@ -275,6 +280,7 @@ slf4j+log4j的方式；不推荐
   <artifactId>slf4j-log4j12</artifactId>
 </dependency>
 
+
 ```
 
 切换为log4j2：不推荐
@@ -295,5 +301,6 @@ slf4j+log4j的方式；不推荐
   <groupId>org.springframework.boot</groupId>
   <artifactId>spring-boot-starter-log4j2</artifactId>
 </dependency>
+
 ```
 

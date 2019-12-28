@@ -30,8 +30,8 @@
 - struts2框架应用javaee三层结构中web层框架
 - struts2框架在struts1和webwork基础之上发展全新的框架
 - struts2解决问题：
- 
-![01-struts2概述]($resource/01-struts2%E6%A6%82%E8%BF%B0.png)
+
+![01-struts2概述](FrameDay05_1%20Struts2.resource/01-struts2%E6%A6%82%E8%BF%B0.png)
 
 - web层常见框架
   - struts2
@@ -65,8 +65,8 @@ xmlpull-1.1.3.1.jar
 xpp3_min-1.1.4c.jar
 xstream-1.4.11.1.jar
 ```
- 
- 
+
+
 - 第二步：创建 action
 ```java
 package com.gjxaiou.action;
@@ -136,9 +136,9 @@ public class HelloAction {
   </filter-mapping>
 </web-app>
 ```
- 
+
 上面 filter 里面的 StrutsPrepareAndExecutefilter 方法实现为：`public class StrutsPrepareAndExecuteFilter implements StrutsStatics, Filter {`，因为实现了 Filter，因此具有过滤器功能；
- 
+
 
 ## 三、 Struts2 执行过程
 从客户端发送请求过来之后，先进过前端控制器（核心过滤器为：StrutsPrepareAndExecuteFilter），过滤器中执行了一组拦截器（一组拦截器 就会完成部分功能代码），在 Struts2 中定义的默认栈中的拦截器会得到执行，执行完拦截器之后了就会执行目标 Action，在 Action 中返回一个结果视图，根据 Result 的配置进行页面跳转。
@@ -172,10 +172,9 @@ public class HelloAction {
             </interceptor-stack>
 ```
 
-
 **Struts2 执行过程为：**
-![02-struts2执行过程]($resource/02-struts2%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png)
- 
+![02-struts2执行过程](FrameDay05_1%20Struts2.resource/02-struts2%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png)
+
 **Struts2 配置文件的加载顺序**
 每次从客户端发送请求到服务器都要先经过 Struts2 的核心过滤器StrutsPrepareAndExecuteFilter ,这个过滤器有两个功能： 预处理和执行。 **在预处理中主要就是来加载配置文件的。 对应的是过滤器中的 init 方法**，而执行是用来执行 一 组拦截器完成部分功能的，对应的是过滤器的 doFilter 方法。所以我们如果要去了解 Struts2 的配置文件的加载顺序， 那么我们需要查询过滤器的 init 方法。
 
@@ -239,7 +238,7 @@ namespace 属性值和 action 标签里面的 name 属性值构成访问路径�
 
 - abstract 属性
  指定该包是否是一个抽象包，抽象包中不能包含 Action 定义；值为：true 或者 false；
- 
+
 
 ### （二）标签 action
 Action 映射就是将一个请求的 URL 映射到一个 Action 类；
@@ -268,7 +267,7 @@ action 标签用于配置 action 的访问路径；
 
 - name属性
 和所使用的 action 方法返回值一样；
- 
+
 - type属性
   - 用于配置如何到路径中（转发或者重定向）
   - type 属性默认值是：做转发操作
@@ -314,7 +313,7 @@ struts2框架，帮我们实现一部分功能，struts2里面有常量，在常
 - 介绍最常用常量
 `struts.i18n.encoding = UTF-8`
 （i18 是国际化的简写，18的含义是 i 和 n 直接还有 18个单词）
- 
+
 （1）表单提交数据到 action 里面，在 action 可以获取表单提交的数据，
 （2）表单提交数据有中文，有乱码问题，解决：
     post提交直接设置编码
@@ -389,9 +388,9 @@ public class PersonAction extends ActionSupport {
 }
 ```
 进入 ActionSupport 可以看出，该类也是继承 Action：`public class ActionSupport implements Action, Validateable, ValidationAware, TextProvider, LocaleProvider, Serializable {`
+
  
- 
- 
+
 
 ## 七、访问 action 的方法（重点）
 Action 作为框架的核心类，实现对用户请求的处理，Action 类称为业务逻辑控制器；一个 Action 类代表一次请求或者调用，每个请求的动作都对应于一个相应的 Action 类，一个 Action 类就是一个独立的工作单元； 有三种方式实现访问 action
@@ -402,7 +401,7 @@ Action 作为框架的核心类，实现对用户请求的处理，Action 类称
 
 **演示错误**
 如果 action 方法有返回值，在配置文件中没有配置（就是 result 的 name 属性没有对应的返回值），就会出现错误 404；
- 
+
 - 在 action 里面的方法有返回值，如果有返回值时候类型必须是String
 - action 里面的方法可以没有返回值，没有返回值时候，在result标签不需要配置
   - 方法一：把 action 方法写成void
@@ -431,7 +430,7 @@ public class BookAction extends ActionSupport {
     }
 }
 ```
- 
+
 - 使用method配置
 ```xml
 <struts>
@@ -515,7 +514,7 @@ public class HelloWorldAction extends ActionSupport {
 </struts>
 ```
 
-![执行机制]($resource/%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6.png)
+![执行机制](FrameDay05_1%20Struts2.resource/%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6.png)
 
 访问地址http://localhost:8888/HelloWorld/HelloWorld_update.action
 name中的通配符*即代表update的值，也是{1}的值

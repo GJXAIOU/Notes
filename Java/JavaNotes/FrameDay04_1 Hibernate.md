@@ -17,9 +17,7 @@ Hibernate查询操作
 - dao层：Hibernate、MyBatis 框架
 （1）对数据库进行 CRUD 操作
 
-![JavaEE三层架构]($resource/JavaEE%E4%B8%89%E5%B1%82%E6%9E%B6%E6%9E%84.png)
-
-
+![JavaEE三层架构](FrameDay04_1%20Hibernate.resource/JavaEE%E4%B8%89%E5%B1%82%E6%9E%B6%E6%9E%84.png)
 
 ## 二、Hibernate 概述
 
@@ -34,7 +32,7 @@ Hibernate查询操作
 
 - hibernate 使用 orm 思想对数据库进行 crud 操作，完成数据持久化；是一个全自动 ORM 框架
 - **ORM：Object Relational Mapping，对象关系映射**，利用描述对象和数据库表之间映射的元数据，自动把 Java 应用程序中对象持久化到关系型数据库的表中；
-![ORM原理]($resource/ORM%E5%8E%9F%E7%90%86.png)
+![ORM原理](FrameDay04_1%20Hibernate.resource/ORM%E5%8E%9F%E7%90%86.png)
 
 文字描述：
   - 让实体类和数据库表进行一一对应关系

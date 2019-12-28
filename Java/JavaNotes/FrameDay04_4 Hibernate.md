@@ -85,7 +85,7 @@ System.out.println(linkman.size());
 指利用 Session 的 get() 和 load() 方法加载某条记录对应的对象；
 根据 id 查询符合的记录，就是调用 session 里面的 get 方法实现；
 `Customer customer = session.get(Customer.class, 2);`
- 
+
 
 ### （三）HQL 查询【推荐、用的最多】
 
@@ -153,7 +153,7 @@ List<Customer> list = query.list();
 #### 4. 分页查询
 - mysql 实现分页
 使用关键字 limit 实现：`select * from t_customer limit 0,3;`
- 
+
 - 在 hql 中实现分页
 在 hql 操作中，在语句里面不能写 limit，Hibernate 的 Query 对象封装两个方法实现分页操作
 
@@ -165,7 +165,7 @@ query.setMaxResults(3);
 List<Customer> list = query.list();
 ```
 
- 
+
 #### 5.  投影查询
 投影查询：查询不是所有字段值，而是部分字段的值
 
@@ -324,12 +324,12 @@ Query query = session.createQuery("from Customer c inner join c.setLinkMan");
 List list = query.list();
 ```
 返回值为 list，list 里面每部分是数组形式，类型为 Object；
- 
+
 - 演示迫切内连接
   - 迫切内连接和内连接底层实现一样的
   - 区别：使用内连接返回list中每部分是数组，迫切内连接返回list每部分是对象
   - hql语句写法： `from  Customer  c  inner  join  fetch  c.setLinkMan`，其他与上面相同；
- 
+
 
 #### 2. HQL左外连接
 
@@ -386,11 +386,11 @@ System.out.println(linkman.size());
     - extra：极其延迟
    `<fetch="select" lazy = "true">`
    `<fetch="select" lazy = "false">`
- 
+
  - 当 lazy 值为 true 之后， 调用get之后，发送两条sql语句
- 
-![lazy 值为 true]($resource/lazy%20%E5%80%BC%E4%B8%BA%20true.png)
- 
+
+![lazy 值为 true](FrameDay04_4%20Hibernate.resource/lazy%20%E5%80%BC%E4%B8%BA%20true.png)
+
 - 当值为 extra 时候， 极其懒惰，要什么值给什么值，最终执行的 SQL 语句为：
 ```sql
 select count(lkm_id) from t_linkman where clid = ?
