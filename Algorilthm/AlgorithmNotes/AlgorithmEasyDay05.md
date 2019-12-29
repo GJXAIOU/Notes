@@ -4,11 +4,11 @@
 ## 一、哈希函数和哈希表
 哈希函数的概念是：将任意大小的数据转换成特定大小的数据的函数，转换后的数据称为哈希值或哈希编码。下面是一幅示意图：
 
-![](https://images2015.cnblogs.com/blog/1030776/201701/1030776-20170106142012816-1867044021.png)
+![](AlgorithmEasyDay05.resource/1030776-20170106142012816-1867044021.png)
 
 可以明显的看到，原始数据经过哈希函数的映射后称为了一个个的哈希编码，数据得到压缩。哈希函数是实现哈希表和布隆过滤器的基础。
 ### （一）哈希函数
-![输入图片描述](AlgorithmEasyDay05_md_files/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0_20191227095740.png?v=1&type=image&token=V1:uwkxbbjwqvE2w2E7-NbrpGnPqFfe_T1gg3yPdunSQU0)
+![输入图片描述](AlgorithmEasyDay05.resource/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0_20191227095740.png?v=1&type=image&token=V1:uwkxbbjwqvE2w2E7-NbrpGnPqFfe_T1gg3yPdunSQU0)
 - 哈希函数的特征
 	- 输入域是无穷大的，输出域是有穷的；
 	- 确定的输入值对应确定的输出值，即相同的输入值多次经过同一个哈希函数结果相同；
@@ -21,11 +21,10 @@
 **特征推广**
  如果输出值在 S 域上是均匀分布的，则 S 域上所有值 %m 在 0 ~ m-1上为均匀分布；
 
-
 **哈希码**
 输入值经过哈希函数之后得到哈希码，哈希码上每一位都是（`0~9，a~f`）之间的某个值，并且该值在这个范围内均匀分布，同时哈希码的每一位之间都是相互独立的。
 
-![输入图片描述](AlgorithmEasyDay05_md_files/%E5%93%88%E5%B8%8C%E5%80%BC_20191227100917.png?v=1&type=image&token=V1:Kd_h-5I4y42A0XH4nRS5GWjRvuDw1Rk6EpkCW-SnQOY)
+![输入图片描述](AlgorithmEasyDay05.resource/%E5%93%88%E5%B8%8C%E5%80%BC_20191227100917.png?v=1&type=image&token=V1:Kd_h-5I4y42A0XH4nRS5GWjRvuDw1Rk6EpkCW-SnQOY)
 
 ### （二）问：实现一千个相互独立的哈希函数
 - 方案一：使用一个哈希函数分开作为两个种子
@@ -43,7 +42,7 @@
 ## 二、哈希表
 ### （一）经典的哈希表结构
 经典的哈希表是使用**数组 + 链表** 结构实现的，常用的方法有：`put(key,value)`， `get(key)`， `remove(key)`如图所示：
-![输入图片描述](AlgorithmEasyDay05_md_files/%E7%BB%8F%E5%85%B8%E5%93%88%E5%B8%8C%E8%A1%A8%E7%BB%93%E6%9E%84_20191227102458.png?v=1&type=image&token=V1:BIuaD34iWguwf2iPCn014lMmHbOCIrp38zf6mjDwDUI)
+![输入图片描述](AlgorithmEasyDay05.resource/%E7%BB%8F%E5%85%B8%E5%93%88%E5%B8%8C%E8%A1%A8%E7%BB%93%E6%9E%84_20191227102458.png?v=1&type=image&token=V1:BIuaD34iWguwf2iPCn014lMmHbOCIrp38zf6mjDwDUI)
 首先会分配一个数组空间（这里示例长度为 17），然后使用 `put(key1,value1)`时候，首先计算 key1 的哈希值得到 Code1，然后将 Code1 % 17（得到 0 ~ 16 之间一个值），然后将这对 key-vlaue 值挂在计算得到的值对应的位置后面（例如计算得到 5，就把该键值对挂载到下标为 5 的数组后面），其他所有的键值对都使用类似的方法。因为不同或者相同的 key 计算可能得到相同的哈希值，从而 % 17 的时候得到相同的数组下标，所以挂载之前看看该位置上是否已挂载其它键值对，如果有，则比较挂载的 key 值有无和当前的 key 值是否相同，如果相同则将原来键值对的 value 值该为当前键值对的 value 值，如果两个 key 值不相同则直接将该键值对挂载在原来链表后面即可。
 
 - 根据哈希函数的性质，**每个位置后面挂载的链表数目应该是大致相同的**，即大致各位置后链表数目增长速度相同。
@@ -216,7 +215,7 @@ G,1
 **思路**：因为如果使用一个哈希表则绝对不能保证 getRandom 方法中的严格等概率，因为输入值经过哈希函数之后的输出值仅仅是大致等概率均匀分布（均匀性只是在大样本情况下的近似均匀），因此需要使用两个哈希表；
 两个哈希表结构为：
 
-![输入图片描述](AlgorithmEasyDay05_md_files/RandomPool%20%E7%BB%93%E6%9E%84_20191227114346.png?v=1&type=image&token=V1:DbdqtAkHRk-HqcPZvb9GjaIqMAr5yHgSY34K2TeQutg)
+![输入图片描述](AlgorithmEasyDay05.resource/RandomPool%20%E7%BB%93%E6%9E%84_20191227114346.png?v=1&type=image&token=V1:DbdqtAkHRk-HqcPZvb9GjaIqMAr5yHgSY34K2TeQutg)
 
 针对 put 方法，针对第一个键值对（str0,0），数据放入哈希表之后（具体的存放位置不一定是图示的位置（因为经过哈希计算之后是离散的），正因为离散型，所以实际上放置的位置无关紧要，这里仅仅表示该哈希表有这个键值对即可，同时在另一个哈希表中存入对应的键值对（0，str0），每存入一个值 size 值 + 1。
 **如果不考虑 remove 方法**，则使用下面代码即可保证 getRandom 方法等概率返回结构中任意一个 key。
@@ -343,7 +342,7 @@ lisi
 - 方案二：使用上述提到的哈希分流。
 - 方案三：使用布隆过滤器
 布隆过滤器是一个数组，每个元素为一个 bit。
-![输入图片描述](AlgorithmEasyDay05_md_files/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8_20191227144111.png?v=1&type=image&token=V1:sZ8sq-ISj71jUBQD1bvqtwEa83QZrcgr5ZcE143XCuQ)
+![输入图片描述](AlgorithmEasyDay05.resource/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8_20191227144111.png?v=1&type=image&token=V1:sZ8sq-ISj71jUBQD1bvqtwEa83QZrcgr5ZcE143XCuQ)
 
 **实现布隆过滤器代码**：
 ```java
@@ -383,10 +382,9 @@ public class BloomFilter {
 -   如果k个位置有一个为0，则肯定不在集合中
 -   如果k个位置全部为1，则可能在集合中
 
-
 **示例**：
 布隆过滤器是一个 bit 向量或者说 bit 数组，长这样：
-![输入图片描述](AlgorithmEasyDay05_md_files/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E7%BB%93%E6%9E%84_20191227160326.jpg?v=1&type=image&token=V1:cdVwBm4uHcL-lGBCevd4cgE6rYdxwkrkKsvGMCf8oJ8)
+![输入图片描述](AlgorithmEasyDay05.resource/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E7%BB%93%E6%9E%84_20191227160326.jpg?v=1&type=image&token=V1:cdVwBm4uHcL-lGBCevd4cgE6rYdxwkrkKsvGMCf8oJ8)
 
 
 如果我们要映射一个值到布隆过滤器中，我们需要使用**多个不同的哈希函数**生成**多个哈希值，**并对每个生成的哈希值指向的 bit 位置 1，例如针对值 “baidu” 和三个不同的哈希函数分别生成了哈希值 1、4、7，则上图转变为：
@@ -413,25 +411,25 @@ Ok，我们现在再存一个值 “tencent”，如果哈希函数返回 3、4�
 
 另外，哈希函数的个数也需要权衡，个数越多则布隆过滤器 bit 位置位 1 的速度越快，且布隆过滤器的效率越低；但是如果太少的话，那我们的误报率会变高。
 
-![](https://pic4.zhimg.com/80/v2-05d4a17ec47911d9ff0e72dc788d5573_hd.jpg)
+![](AlgorithmEasyDay05.resource/v2-05d4a17ec47911d9ff0e72dc788d5573_hd.jpg)
 
 k 为哈希函数个数，m 为布隆过滤器长度，n 为插入的元素个数，p 为误报率
 
 如何选择适合业务的 k 和 m 值呢，这里直接贴一个公式：
 
-![](https://pic1.zhimg.com/80/v2-1ed5b79aa7ac2e9cd66c83690fdbfcf0_hd.jpg)
+![](AlgorithmEasyDay05.resource/v2-1ed5b79aa7ac2e9cd66c83690fdbfcf0_hd.jpg)
 
 如何推导这个公式这里只是提一句，因为对于使用来说并没有太大的意义，你让一个高中生来推会推得很快。k 次哈希函数某一 bit 位未被置为 1 的概率为：
 
-![[公式]](https://www.zhihu.com/equation?tex=%281-%5Cfrac%7B1%7D%7Bm%7D%29%5E%7Bk%7D)
+![[公式]](AlgorithmEasyDay05.resource/equation-1577590954824.svg)
 
 插入n个元素后依旧为 0 的概率和为 1 的概率分别是：
 
-![[公式]](https://www.zhihu.com/equation?tex=%5Cleft%28+1-%5Cfrac%7B1%7D%7Bm%7D+%5Cright%29%5E%7Bnk%7D)  ![[公式]](https://www.zhihu.com/equation?tex=1-+%5Cleft%28+1-%5Cfrac%7B1%7D%7Bm%7D+%5Cright%29%5E%7Bnk+%7D)
+![[公式]](https://www.zhihu.com/equation?tex=%5Cleft%28+1-%5Cfrac%7B1%7D%7Bm%7D+%5Cright%29%5E%7Bnk%7D)  ![[公式]](AlgorithmEasyDay05.resource/equation.svg)
 
 标明某个元素是否在集合中所需的 k 个位置都按照如上的方法设置为 1，但是该方法可能会使算法错误的认为某一原本不在集合中的元素却被检测为在该集合中（False Positives），该概率由以下公式确定
 
-![[公式]](https://www.zhihu.com/equation?tex=%5Cleft%5B+1-+%5Cleft%28+1-%5Cfrac%7B1%7D%7Bm%7D+%5Cright%29%5E%7Bnk%7D+%5Cright%5D%5E%7Bk%7D%5Capprox%5Cleft%28+1-e%5E%7B-kn%2Fm%7D+%5Cright%29%5E%7Bk%7D)
+![[公式]](AlgorithmEasyDay05.resource/equation-1577590957471.svg)
 
 ## **最佳实践**
 
@@ -449,19 +447,291 @@ Redis 因其支持 setbit 和 getbit 操作，且纯内存性能高等特点，�
 - 所需数组的长度和 URL 的数目有关，和需求的失误率有关，和每条 URL 的长度（所含字节数）无关；
 - 数组长度计算公式：$$m = - \frac{n * (ln^p)}{(ln^2)^2}$$，其中 n表示样本量， p 为预期失误率；
 此题中： n = 100亿，p = 0.0001，则 m = 131571428572 bit ≈ 16G。
+- 需要哈希函数的个数：$$ K = In^{2} * \frac{m}{n} = 0.7 * \frac{m}{n}$$ ，这里约等于 13，如果计算的值为小数，需要进行向上取整；
+- 真实失误率：$$ (1 - e^{-\frac{n * k}{m}})^k $$ ，这里计算的值约为：十万分之六，低于要求的失误率。
+
+
+
+### 一致性哈希
+
+哈希可以近似的实现负载均衡，但是一旦发生设备的增删则需要将所有的数据进行迁移，可以使用一致性哈希来降低迁移代价并且实现负载均衡。
+
+
+
+#### （一）经典服务器抗压结构
+
+![经典服务器抗压结构](AlgorithmEasyDay05.resource/%E7%BB%8F%E5%85%B8%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8A%97%E5%8E%8B%E7%BB%93%E6%9E%84.png)
+
+比如后端共有三台存储服务器，需要将一系列键值对进行存储，首先将 key 经过哈希函数得到哈希值，然后将哈希值 % 存储器数目（图示为 3），这里得到 0 ~ 2 中间一个值，然后将对应的键值对存储到该存储器中即可。取值的时候同样上面步骤找到对应的存储器，然后在对应的存储器找那个查找数据。
+
+**缺点**：当加机器或者减机器的时候就需要将所有存储的数据重新计算哈希值并且重新放置位置，即所有的数据都需要进行迁移。
+
+
+
+#### （二）一致性哈希
+
+假设哈希函数的范围为：0 ~ $$2^{64}$$ ，同样是三台存储设备，这里取三台机器的 IP 作为各自的识别码（只要可以唯一区别各自即可），将每台机器的 IP 经过哈希函数得到的哈希值对应于环上。
+
+![一致性哈希](AlgorithmEasyDay05.resource/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C.png)
+
+当放置键值对数据时候，首先将 key 经过哈希函数之后的哈希值（对应于环上一个位置），然后顺时针找到最近的机器，将该条记录放置到该机器上面。查找的时候同样。
+
+
+
+**结构实现**
+
+首先分别计算 m1, m2, m3 的哈希值，得到他们之间从小到大的一个数组排列，例如 [m1, m3, m2]，然后放置数据时候，将需存入的数据的 key 值经过哈希函数得到哈希值，然后将该哈希值在上面的数组排列中使用二分查找的方法得到第一个刚刚大于等于该哈希值的位置。即将记录存入该机器。
+
+**增加/删除时候的数据迁移**
+
+示例：增加机器 m4,通过计算其哈希值得到其位于 m2 到 m3 之间，则只需要将 m2 到 m4 之间的数据进行数据迁移，重新计算其哈希值然后将其从 m3 迁移到 m4 即可。
+
+**问题**
+
+当如图所示中机器较少的情况下，环很难得到等分，以及添加机器之后同样会发送环不等分造成无法实现负载均衡。
+
+使用虚拟节点技术：为每个真实机器分配很多虚拟结点，然后让虚拟结点去占环上的位置；
+
+示例： 真实机器 m -1：对应的虚拟结点 m-1-1, m-1-2……..m-1-1000;
+
+真实机器 m -2：对应的虚拟结点 m-2-1, m-2-2……..m-2-1000;
+
+真实机器 m -3：对应的虚拟结点 m-3-1, m-3-2……..m-3-1000;
+
+真实机器和虚拟节点之间通过路由表来实现映射，实现真实机器知道自己有哪些虚拟节点，同样每个虚拟结点都可以通过路由表找到归属的物理机，通过上述范围方法得到的由虚拟节点负责的数据交给对应的物理机来处理。
 
 
 
 
 
+### 并查集结构
+
+#### （一）功能作用
+
+- 查询两个元素是否属于同一个集合：isSameSet(A,B)，本质上是判断元素 A 和元素 B所属的集合是否为同一个集合。
+- 两个元素各自所在的**所有集合**进行合并：union(A,B)；
+
+#### （二）前提
+
+所有集合中的数据必须是一次性提前给定的，不能以流的方式动态的加入数据到集合中。
+
+#### （三）实现步骤
+
+- 首先给定数据集合，这里以 int 类型为例 {1,2,3,4,5}
+
+- 然后每个元素自己形成一个集合，如图所示：
+
+    ![并查集输入结构](AlgorithmEasyDay05.resource/%E5%B9%B6%E6%9F%A5%E9%9B%86%E8%BE%93%E5%85%A5%E7%BB%93%E6%9E%84.png)
+
+- 元素所属集合：
+
+    集合（一般为多叉树结构）中元素一直向上查找，一直找到一个结点的上一个结点指向自己，则该结点称为代表节点，同时**该节点代表整个集合**。
+
+- 集合合并：3，5 集合合并，**节点少的集合加在结点多的集合上面**
+
+    ![集合合并](AlgorithmEasyDay05.resource/%E9%9B%86%E5%90%88%E5%90%88%E5%B9%B6.png)
+
+- 查找优化：查询到代表结点之后，将查询过程中经历的所有结点进行打平。
+
+    例如下面结构中查询节点 3 的代表节点，过程就是依次向上查询，一直遍历查询到 1，然后返回 1 并将沿途经过的结点2 打平（直接挂在代表结点下面）。
+
+    ![节点优化](AlgorithmEasyDay05.resource/%E8%8A%82%E7%82%B9%E4%BC%98%E5%8C%96.png)
 
 
 
+代码：
+
+```java
+package nowcoder.easy.class_05;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
+
+public class Code_04_UnionFind {
+
+	public static class Node {
+		// whatever you like，可以是 String，Int，等等类型
+	}
+
+	public static class UnionFindSet {
+		// key:child,value:father节点
+		public HashMap<Node, Node> fatherMap;
+		// 某结点（使用代表结点即可）所在集合中有多少个结点
+		public HashMap<Node, Integer> sizeMap;
+
+		// 初始化的时候创建两个表，用户必须给定数据
+		public UnionFindSet(List<Node> nodes) {
+			makeSets(nodes);
+		}
+
+		private void makeSets(List<Node> nodes) {
+			fatherMap = new HashMap<Node, Node>();
+			sizeMap = new HashMap<Node, Integer>();
+			for (Node node : nodes) {
+				// 每个结点构成一个集合
+				fatherMap.put(node, node);
+				// 每个集合中都加上 size 为 1；
+				sizeMap.put(node, 1);
+			}
+		}
+
+		// 找头，并将其扁平化
+		private Node findHead(Node node) {
+			Node father = fatherMap.get(node);
+			if (father != node) {
+				father = findHead(father);
+			}
+			// 然后将 father 为头结点，将其挂在所有结点上。
+			fatherMap.put(node, father);
+			return father;
+		}
+		// 上面方法的非递归版本
+//		private Node findHead(Node node) {
+//			Stack<Node> stack = new Stack<Node>();
+//			Node cur = node;
+//			Node parent = fatherMap.get(cur);
+//			// 一直向上找，找到头结点，其余结点放在栈中
+//			while (cur != parent){
+//				stack.push(cur);
+//				cur = parent;
+//				parent = fatherMap.get(cur);
+//			}
+//			// 将栈中所有元素挨个弹出，并将它们的父结点设置为头结点。
+//			while (! stack.isEmpty()){
+//				fatherMap.put(stack.pop(), parent);
+//			}
+//			return  parent;
+//		}
+
+		public boolean isSameSet(Node a, Node b) {
+			return findHead(a) == findHead(b);
+		}
+
+		public void union(Node a, Node b) {
+			if (a == null || b == null) {
+				return;
+			}
+			Node aHead = findHead(a);
+			Node bHead = findHead(b);
+			if (aHead != bHead) {
+				int aSetSize= sizeMap.get(aHead);
+				int bSetSize = sizeMap.get(bHead);
+				if (aSetSize <= bSetSize) {
+					fatherMap.put(aHead, bHead);
+					sizeMap.put(bHead, aSetSize + bSetSize);
+				} else {
+					fatherMap.put(bHead, aHead);
+					sizeMap.put(aHead, aSetSize + bSetSize);
+				}
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+
+	}
+}
+
+```
 
 
 
+#### 问题示例
+
+**问题**：岛问题：
+
+一个矩阵中只有 0 和 1 两种值，每个位置都可以和自己的上、下、左、右四个位置相连接，如果有一片 1 连接在一起，则这个部分称为一个岛，求一个矩阵中有多少个岛。
+
+**示例**：下面矩阵中有三个岛。
+
+![示例岛结构](AlgorithmEasyDay05.resource/%E7%A4%BA%E4%BE%8B%E5%B2%9B%E7%BB%93%E6%9E%84.png)
+
+**解答**
+
+如果只是单 CPU 的情况直接使用递归即可，代码如下：
+
+```java
+package nowcoder.easy.class_05;
+
+public class Code_03_Islands {
+
+	public static int countIslands(int[][] m) {
+		if (m == null || m[0] == null) {
+			return 0;
+		}
+		// N 为行数，M 为列数
+		int N = m.length;
+		int M = m[0].length;
+		int res = 0;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				if (m[i][j] == 1) {
+					// 岛的数目 + 1
+					res++;
+					// 进入感染函数，将其练成一片的 1 全部改为 2
+					infect(m, i, j, N, M);
+				}
+			}
+		}
+		return res;
+	}
+
+	public static void infect(int[][] m, int i, int j, int N, int M) {
+		if (i < 0 || i >= N || j < 0 || j >= M || m[i][j] != 1) {
+			return;
+		}
+		m[i][j] = 2;
+		infect(m, i + 1, j, N, M);
+		infect(m, i - 1, j, N, M);
+		infect(m, i, j + 1, N, M);
+		infect(m, i, j - 1, N, M);
+	}
+
+	public static void main(String[] args) {
+		int[][] m1 = {  { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
+				        { 0, 1, 1, 1, 0, 1, 1, 1, 0 }, 
+				        { 0, 1, 1, 1, 0, 0, 0, 1, 0 },
+				        { 0, 1, 1, 0, 0, 0, 0, 0, 0 }, 
+				        { 0, 0, 0, 0, 0, 1, 1, 0, 0 }, 
+				        { 0, 0, 0, 0, 1, 1, 1, 0, 0 },
+				        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, };
+		System.out.println(countIslands(m1));
+
+		int[][] m2 = {  { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
+						{ 0, 1, 1, 1, 1, 1, 1, 1, 0 }, 
+						{ 0, 1, 1, 1, 0, 0, 0, 1, 0 },
+						{ 0, 1, 1, 0, 0, 0, 1, 1, 0 }, 
+						{ 0, 0, 0, 0, 0, 1, 1, 0, 0 }, 
+						{ 0, 0, 0, 0, 1, 1, 1, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0, 0 }, };
+		System.out.println(countIslands(m2));
+	}
+}
+
+```
 
 
 
+如果矩阵非常大，并且可以使用多个 CPU 进行多任务并行计算，可以使用分治思想来切分开矩阵分别计算每个小矩阵中岛的数量，然后进行合并。（**合并是难点**）
 
+示例和步骤：
+
+![优化示例矩阵](AlgorithmEasyDay05.resource/%E4%BC%98%E5%8C%96%E7%A4%BA%E4%BE%8B%E7%9F%A9%E9%98%B5.png)
+
+上面矩阵分割成两部分，每个部分岛的数量进行单独计算然后进行合并，在单独计算时候，以左边为例，首先是从左上角第一个元素开始判断，第一个位置为 1 ，其他位置的 1 均由该位置感染，因此该位置称为感染中心，记为 A，由该位置感染的所有其它位置元素的感染中心均为 A，其它岛的感染中心类似。
+
+在合并阶段：分开求得岛的数量为 4 个，合并只是针对边界上的部分进行去重。
+
+以第一行边界两个元素为例，他们所对应的感染中心分别为 A，B，并且 A， B 不在一个集合中（默认四个感染中心属于各自集合），则首先将岛的数量减一，然后将 A，B 放入一个集合中。
+
+第二行：对应的感染中心为 A，B，但是 A ，B 在一个集合中，所有总的岛的数量不减一；
+
+第三行没有边界不是两个一，无需考虑；
+
+第四行：感染中心分别为 C，B，不在一个集合中，则岛的数量减一，然后将两个放入集合中，现在集合中有 A， B，C 。
+
+第五行同样不需要判断。
+
+最终结果：4 - 1 -1 = 2
 
