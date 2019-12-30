@@ -540,6 +540,8 @@ public class Code_04_MadianQuick {
 
 **分析**
 
+**此题的比较策略即为贪心策略**，但是不一定其它也是两者一样的。
+
 贪心方案一（错误）：按照每个字符串字典序排序然后进行合并，例 “b” “ba” 排完之后是 “b”,”ba”，合并是：”bba”，但是实际上最小的是 “bab”;
 
 贪心方案二：若 “str1 str2“ 拼接结果 <= “str2 str1” 拼接结果，则 str1 放在前面。
@@ -548,9 +550,177 @@ public class Code_04_MadianQuick {
 
 自定义比较器正确的前提是：具有传递性并且结果值唯一，同时可以比较出所有值的大小，
 
-例如：甲乙比较：甲 < 乙；乙丙比较：乙 < 丙；甲丙比较：丙 < 甲，结果就是比较不出来结果；
+例如：甲乙比较：甲 < 乙；乙丙比较：乙 < 丙；甲丙比较：丙 < 甲，结果具有随机性，就是比较不出来结果；
+
+应该具有传递性，例如：甲 < 乙，乙 < 丙，然后甲 < 丙；
+
+**字典序比较**
+
+- 如果两个比较对象长度相等，这直接比较；
+- 如果两个对象长度不等，短的后面补 ASCII 最小值，然后比较；
+
+**证明比较器的传递性**
+
+- 前言
+
+    12,23 两个数字拼接为 1223，即 $$12 * 10^2 + 23$$，即 12 向左位移两位然后加上 23；
+
+    a,b 两个字符串拼接为 ab，将字符串理解为 K 进制数，即 a 向左位移 b 的长度那么多位数然后加上 b  的值；
+
+    所以：ab = $$a * k^{b 长度} + b$$，其中设 $$m(b) = k^{b 长度}$$，同理 $$m(c) = k^{c 长度}$$
+
+证明过程：因为 ab <= ba，bc <= cb，证明：ac <= ca
+
+因为 ab <= ba，所以 `a * m(b) + b <= b * m(a) + a`，等式两边同时减去 b 然后乘 c 得到：`a * m(b) *c <=(b * m(a) +a -b) * c`
+
+因为 bc <= cb，所以 `b * m(c) + c <= c * m(b) + b`，等式两边同时减去 b 然后乘 a 得到：`(b * m(c) +(-b)) *a <= c * m(b) * a`
+
+从上面两个等式推出：`(b * m(c) + (-b)) * a <= (b * m(a) + a - b) * c`，然后两边化简并且除以 b ，并且两边同时加上 a  和 c 之后得到 `a * m(c) + c <= c * m(a) + a)`，即 ac <= ca，证毕。
 
 
+
+**证明任意两个交换都比现在的字典序大**
+
+原来的：………k1 m1 m2 ………….mk k2…….
+
+交换后：………k2 m1 m2 ………… mk k1…….
+
+证明：因为 k1 m1 <= m1 k1 所以：
+
+………k1 m1 m2 ………….mk k2……. 小于等于
+
+………m1 k1 m2 ………….mk k2……. 小于等于
+
+………m1 m2 k1 ………….mk k2……. 小于等于
+
+。。。。。。。。。。。
+
+………m1 m2 ………….mk k2 k1……. 小于等于
+
+………m1 m2 ………….k2 mk k1……. 小于等于
+
+。。。。。。。。。。。
+
+………k2 m1 m2 ………….mk k1……. 
+
+证毕，并可以证明多个数交换也符合（可以化简到两个元素交换）。
 
 **判断贪心方案的正确性**
+
+做题的时候不要妄图验证贪心方案的正确性，直接使用小数据样本输入该贪心方案和对数器的结果比较，如果小样本验证是正确的则默认该方案就是正确的。
+
+
+
+代码：
+
+```java
+package nowcoder.easy.class_07;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Code_05_LowestLexicography {
+
+	public static class MyComparator implements Comparator<String> {
+		// 自定义比较器
+		@Override
+		public int compare(String a, String b) {
+			return (a + b).compareTo(b + a);
+		}
+	}
+
+	public static String lowestString(String[] strs) {
+		if (strs == null || strs.length == 0) {
+			return "";
+		}
+		// 使用自己的比较器
+		Arrays.sort(strs, new MyComparator());
+		String res = "";
+		for (int i = 0; i < strs.length; i++) {
+			res += strs[i];
+		}
+		return res;
+	}
+
+	public static void main(String[] args) {
+		String[] strs1 = { "jibw", "ji", "jp", "bw", "jibw" };
+		System.out.println(lowestString(strs1));
+
+		String[] strs2 = { "ba", "b" };
+		System.out.println(lowestString(strs2));
+	}
+}
+
+```
+
+结果为：
+
+```java
+bwjibwjibwjijp
+bab
+```
+
+
+
+### 问题
+
+一些项目要占用一个会议室宣讲，会议室不能同时容纳两个项目 的宣讲。 给你每一个项目开始的时间和结束的时间(给你一个数 组，里面 是一个个具体的项目)，你来安排宣讲的日程，要求会 议室进行 的宣讲的场次最多。返回这个最多的宣讲场次。
+
+**解答**
+
+下面是不同的贪心策略：
+
+方式一（错误）：最早开始的最先安排；
+
+方式二（错误）：哪个会议持续时间长；
+
+方式三（正确）：哪个项目最早结束，然后淘汰因为安排这个项目而耽误的其他的项目；
+
+代码：
+
+```java
+package nowcoder.easy.class_07;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Code_06_BestArrange {
+
+	public static class Program {
+		public int start;
+		public int end;
+
+		public Program(int start, int end) {
+			this.start = start;
+			this.end = end;
+		}
+	}
+
+	public static class ProgramComparator implements Comparator<Program> {
+		@Override
+		public int compare(Program o1, Program o2) {
+			return o1.end - o2.end;
+		}
+	}
+
+	public static int bestArrange(Program[] programs, int currentTime) {
+		Arrays.sort(programs, new ProgramComparator());
+		int result = 0;
+		for (int i = 0; i < programs.length; i++) {
+			// 如果当前时间小于项目的开始时间，则项目可以安排
+			if (currentTime <= programs[i].start) {
+				// 项目可以做，即项目数 + 1;
+				result++;
+				// 当前时间来到项目的结束时间，表示项目做完了
+				currentTime = programs[i].end;
+			}
+		}
+		return result;
+	}
+
+	public static void main(String[] args) {
+
+	}
+}
+```
 
