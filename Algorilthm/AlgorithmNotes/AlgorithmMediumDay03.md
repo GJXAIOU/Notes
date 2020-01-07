@@ -4,9 +4,11 @@
 
 
 
-## part 1
 
-介绍一种时间复杂度O(N)，额外空间复杂度O(1)的二叉树的遍历方式，N为二叉树的节点个数（不要求是完全二叉树）
+
+## 一、介绍一种时间复杂度O(N)，额外空间复杂度O(1)的二叉树的遍历方式，N为二叉树的节点个数（不要求是完全二叉树）
+
+利用 Morris 遍历实现二叉树的先序、中序、后序遍历，时间复杂度为 O（N），额外空间复杂度为 O（1）。
 
 ### Morris遍历
 
@@ -664,9 +666,19 @@ public class AbstractBinarySearchTree {
 
 
 
+#### 以 AVL 树为例
 
+- 怎么发现不平衡的
 
+![image-20200104113644523](AlgorithmMediumDay03.resource/image-20200104113644523.png)
 
+- 发现之后的修改方式
+
+    结点发现左右子树高度不平衡，修改，然后向父走，一级一级判断修改
+
+- LL，RR，LR，RL型
+
+    ![image-20200104114442568](AlgorithmMediumDay03.resource/image-20200104114442568.png)
 
 ### 旋转——Rebalance
 
@@ -753,180 +765,7 @@ public static void main(String[] args) {
 
 `TreeMap`的优势是`key`在其中是有序组织的，因此增加、删除、查找`key`的时间复杂度均为`log(2,N)`。
 
-### 案例
-
-#### The Skyline Problem
-
-水平面上有 *N* 座大楼，每座大楼都是矩阵的形状，可以用一个三元组表示 `(start, end, height)`，分别代表其在x轴上的起点，终点和高度。大楼之间从远处看可能会重叠，求出 *N* 座大楼的外轮廓线。
-
-外轮廓线的表示方法为若干三元组，每个三元组包含三个数字 (start, end, height)，代表这段轮廓的起始位置，终止位置和高度。
-
-给出三座大楼：
-
-```
-[
-  [1, 3, 3],
-  [2, 4, 4],
-  [5, 6, 1]
-]
-复制代码
-```
 
 
 
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9521a4936?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
-
-外轮廓线为：
-
-```java
-[
-  [1, 2, 3],
-  [2, 4, 4],
-  [5, 6, 1]
-]
-复制代码
-```
-
-**解析**：
-
-1. 将一座楼的表示`[start,end,height]`拆分成左右两个边界（边界包含：所处下标、边界高度、是楼的左边界还是右边界），比如`[1,3,3]`就可以拆分成`[1,3,true]`和`[3,3,false]`的形式（`true`代表左边界、`false`代表右边界）。
-
-2. 将每座楼都拆分成两个边界，然后对边界按照边界所处的下标进行排序。比如`[[1,3,3],[2,4,4],[5,6,1]`拆分之后为`[[1,3,true],[3,3,false],[2,4,true],[,4,4,false],[5,1,true],[6,1,false]]`，排序后为`[[1,3,true],[2,4,true],[3,3,false],[4,4,false],[5,1,true],[6,1,false]]`
-
-3. 将边界排序后，遍历每个边界的高度并依次加入到一棵`TreeMap`红黑树中（记为`countOfH`），以该高度出现的次数作为键值（第一次添加的高度键值为1），如果遍历过程中有重复的边界高度添加，要判断它是左边界还是右边界，前者直接将该高度在红黑树中的键值加1，后者则减1。以步骤2中排序后的边界数组为例，首先判断`countOfH`是否添加过边界`[1,3,true]`的高度`3`，发现没有，于是`put(3,1)`；接着对`[2,4,true]`，`put[4,1]`；然后尝试添加`[3,3,false]`的`3`，发现`countOfH`中添加过`3`，而`[3,3,false]`是右边界，因此将`countOfH.get(3)`的次数减1，当`countOfH`中的记录的键值为0时直接移除，于是移除高度为3的这一条记录；……
-
-    对于遍历过程经过的每一个边界，我们还需要一棵`TreeMap`红黑树（记为`maxHOfPos`）来记录对我们后续求外轮廓线有用的信息，也就是每个边界所处下标的最大建筑高度：
-
-    
-
-    ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9675967fd?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-    
-
-    这里有个细节要注意一下，那就是如果添加某个边界之后，`countOfH`树为空了，那么该边界所处下标的建筑高度要记为0，表示一片相邻建筑的结束，比如上图中下标为4和6的边界。这也是为了后续求外轮廓线提供判断的依据。
-
-4. 遍历`maxHOfPos`中的记录，构造整个外轮廓线数组：
-
-    
-
-    ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e96acb3258?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-    
-
-    起初没有遍历边界时，记`start=0,height=0`，接着遍历边界，如果边界高度`curHeight!=height`如上图中的`1->2：height=0,curHeight=3`，那么记`start=1,height=3`表示第一条组外轮廓线的`start`和`height`，接下来就是确定它的`end`了。确定了一条轮廓线的`start`和`height`之后会有两种情况：下一组轮廓线和这一组是挨着的（如上图`2->3`）、下一组轮廓线和这一组是相隔的（如上图中`3->4`）。因此在遍历到边界`[index:2,H:4]`时，发现`curHeight=4 != height=3`，于是可以确定轮廓线`start:1,heigth:3`的`end:2`。确定一条轮廓线后就要更新一下`start=2,heigth=4`表示下一组轮廓线的起始下标和高度，接着遍历到边界`[index:3,H:4]`，发现`curHeight=4=height`于是跳过；接着遍历到边界`[index:4,H:0]`，发现`curHeight=0`，根据步骤3中的逻辑可知一片相邻的建筑到此结束了，因此轮廓线`start:2,height:4`的`end=4`。
-
-示例代码：
-
-```java
-package top.zhenganwen.lintcode;
-
-import java.util.*;
-
-public class T131_The_SkylineProblem {
-
-    public class Border implements Comparable<Border> {
-        public int index;
-        public int height;
-        public boolean isLeft;
-
-        public Border(int index, int height, boolean isLeft) {
-            this.index = index;
-            this.height = height;
-            this.isLeft = isLeft;
-        }
-
-        @Override
-        public int compareTo(Border border) {
-            if (this.index != border.index) {
-                return this.index - border.index;
-            }
-            if (this.isLeft != border.isLeft) {
-                return this.isLeft ? -1 : 1;
-            }
-            return 0;
-        }
-    }
-
-    /**
-     * @param buildings: A list of lists of integers
-     * @return: Find the outline of those buildings
-     */
-    public List<List<Integer>> buildingOutline(int[][] buildings) {
-        //1、split one building to two borders and sort by border's index
-        Border[] borders = new Border[buildings.length * 2];
-        for (int i = 0; i < buildings.length; i++) {
-            int[] oneBuilding = buildings[i];
-            borders[i * 2] = new Border(oneBuilding[0], oneBuilding[2], true);
-            borders[i * 2 + 1] = new Border(oneBuilding[1], oneBuilding[2], false);
-        }
-        Arrays.sort(borders);
-
-        //2、traversal borders and record the max height of each index
-
-        //key->height   value->the count of the height
-        TreeMap<Integer, Integer> countOfH = new TreeMap<>();
-        //key->index    value->the max height of the index
-        TreeMap<Integer, Integer> maxHOfPos = new TreeMap<>();
-        for (int i = 0; i < borders.length; i++) {
-            int height = borders[i].height;
-            if (!countOfH.containsKey(height)) {
-                countOfH.put(height, 1);
-            }else {
-                int count = countOfH.get(height);
-                if (borders[i].isLeft) {
-                    countOfH.put(height, count + 1);
-                } else {
-                    countOfH.put(height, count - 1);
-                    if (countOfH.get(height) == 0) {
-                        countOfH.remove(height);
-                    }
-                }
-            }
-
-            if (countOfH.isEmpty()) {
-                maxHOfPos.put(borders[i].index, 0);
-            } else {
-                //lastKey() return the maxHeight in countOfH RedBlackTree->log(2,N)
-                maxHOfPos.put(borders[i].index, countOfH.lastKey());
-            }
-        }
-
-        //3、draw the buildings outline according to the maxHOfPos
-        int start = 0;
-        int height = 0;
-        List<List<Integer>> res = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> entry : maxHOfPos.entrySet()) {
-            int curPosition = entry.getKey();
-            int curMaxHeight = entry.getValue();
-            if (height != curMaxHeight) {
-                //if the height don't be reset to 0，the curPosition is the end
-                if (height != 0) {
-                    List<Integer> record = new ArrayList<>();
-                    record.add(start);
-                    record.add(curPosition);//end
-                    record.add(height);
-
-                    res.add(record);
-                }
-                //reset the height and start
-                height = curMaxHeight;
-                start = curPosition;
-            }
-        }
-        return res;
-    }
-
-    public static void main(String[] args) {
-        int[][] buildings = {
-                {1, 3, 3},
-                {2, 4, 4},
-                {5, 6, 1}
-        };
-        System.out.println(new T131_The_SkylineProblem().buildingOutline(buildings));
-
-    }
-}
-```
 
