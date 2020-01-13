@@ -94,7 +94,7 @@
 
 #### 讨论计算复杂度：
 
-![img](https://img-blog.csdn.net/20180617225822654?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+![img](AlgorithmMediumDay01.resource/20180617225822654.png)
 
 
 
@@ -194,6 +194,141 @@ public class KMP {
 
 
 ## 二、Manacher算法：
+
+### 原始问题
+
+Manacher算法是由题目“求字符串中最长回文子串的长度”而来。比如`abcdcb`的最长回文子串为`bcdcb`，其长度为5。
+
+我们可以遍历字符串中的每个字符，当遍历到某个字符时就比较一下其左边相邻的字符和其右边相邻的字符是否相同，如果相同则继续比较其右边的右边和其左边的左边是否相同，如果相同则继续比较……，我们暂且称这个过程为向外“扩”。当“扩”不动时，经过的所有字符组成的子串就是以当前遍历字符为中心的最长回文子串。
+
+我们每次遍历都能得到一个最长回文子串的长度，使用一个全局变量保存最大的那个，遍历完后就能得到此题的解。但分析这种方法的时间复杂度：当来到第一个字符时，只能扩其本身即1个；来到第二个字符时，最多扩两个；……；来到字符串中间那个字符时，最多扩`(n-1)/2+1`个；因此时间复杂度为`1+2+……+(n-1)/2+1`即`O(N^2)`。但Manacher算法却能做到`O(N)`。
+
+Manacher算法中定义了如下几个概念：
+
+- 回文半径：串中某个字符最多能向外扩的字符个数称为该字符的回文半径。比如`abcdcb`中字符`d`，能扩一个`c`，还能再扩一个`b`，再扩就到字符串右边界了，再算上字符本身，字符`d`的回文半径是3。
+- 回文半径数组`pArr`：长度和字符串长度一样，保存串中每个字符的回文半径。比如`charArr="abcdcb"`，其中`charArr[0]='a'`一个都扩不了，但算上其本身有`pArr[0]=1`；而`charArr[3]='d'`最多扩2个，算上其本身有`pArr[3]=3`。
+- 最右回文右边界`R`：遍历过程中，“扩”这一操作扩到的最右的字符的下标。比如`charArr=“abcdcb”`，当遍历到`a`时，只能扩`a`本身，向外扩不动，所以`R=0`；当遍历到`b`时，也只能扩`b`本身，所以更新`R=1`；但当遍历到`d`时，能向外扩两个字符到`charArr[5]=b`，所以`R`更新为5。
+- 最右回文右边界对应的回文中心`C`：`C`与`R`是对应的、同时更新的。比如`abcdcb`遍历到`d`时，`R=5`，`C`就是`charArr[3]='d'`的下标`3`。
+
+处理回文子串长度为偶数的问题：上面拿`abcdcb`来举例，其中`bcdcb`属于一个回文子串，但如果回文子串长度为偶数呢？像`cabbac`，按照上面定义的“扩”的逻辑岂不是每个字符的回文半径都是0，但事实上`cabbac`的最长回文子串的长度是6。因为我们上面“扩”的逻辑默认是将回文子串当做奇数长度的串来看的，因此我们在使用Manacher算法之前还需要将字符串处理一下，这里有一个小技巧，那就是将字符串的首尾和每个字符之间加上一个特殊符号，这样就能将输入的串统一转为奇数长度的串了。比如`abba`处理过后为`#a#b#b#a`，这样的话就有`charArr[4]='#'`的回文半径为4，也即原串的最大回文子串长度为4。相应代码如下：
+
+```
+public static char[] manacherString(String str){
+  char[] source = str.toCharArray();
+  char chs[] = new char[str.length() * 2 + 1];
+  for (int i = 0; i < chs.length; i++) {
+    chs[i] = i % 2 == 0 ? '#' : source[i / 2];
+  }
+  return chs;
+}
+复制代码
+```
+
+接下来分析，BFPRT算法是如何利用遍历过程中计算的`pArr`、`R`、`C`来为后续字符的回文半径的求解加速的。
+
+首先，情况1是，遍历到的字符下标`cur`在`R`的右边（起初另`R=-1`），这种情况下该字符的最大回文半径`pArr[cur]`的求解无法加速，只能一步步向外扩来求解。
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8308cb40c?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+情况2是，遍历到的字符下标`cur`在`R`的左边，这时`pArr[cur]`的求解过程可以利用之前遍历的字符回文半径信息来加速。分别做`cur`、`R`关于`C`的对称点`cur'`和`L`：
+
+- 如果从`cur'`向外扩的最大范围的左边界没有超过`L`，那么`pArr[cur]=pArr[cur']`。
+
+    
+
+    ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e83279de43?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+    
+
+    证明如下：
+
+    
+
+    ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e83231d1ba?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+    
+
+    由于之前遍历过`cur'`位置上的字符，所以该位置上能扩的步数我们是有记录的（`pArr[cur']`），也就是说`cur'+pArr[cur']`处的字符`y'`是不等于`cur'-pArr[cur']`处的字符`x'`的。根据`R`和`C`的定义，整个`L`到`R`范围的字符是关于`C`对称的，也就是说`cur`能扩出的最大回文子串和`cur'`能扩出的最大回文子串相同，因此可以直接得出`pArr[cur]=pArr[cur']`。
+
+- 如果从`cur'`向外扩的最大范围的左边界超过了`L`，那么`pArr[cur]=R-cur+1`。
+
+    
+
+    ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e83297b708?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+    
+
+    证明如下：
+
+    
+
+    ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8328b74da?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+    
+
+    `R`右边一个字符`x`，`x`关于`cur`对称的字符`y`，`x,y`关于`C`对称的字符`x',y'`。根据`C,R`的定义有`x!=x'`；由于`x',y'`在以`cur'`为中心的回文子串内且关于`cur'`对称，所以有`x'=y'`，可推出`x!=y'`；又`y,y'`关于`C`对称，且在`L,R`内，所以有`y=y'`。综上所述，有`x!=y`，因此`cur`的回文半径为`R-cur+1`。
+
+- 以`cur'`为中心向外扩的最大范围的左边界正好是`L`，那么`pArr[cur] >= （R-cur+1）`
+
+    
+
+    ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8329df8aa?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+    
+
+    这种情况下，`cur'`能扩的范围是`cur'-L`，因此对应有`cur`能扩的范围是`R-cur`。但`cur`能否扩的更大则取决于`x`和`y`是否相等。而我们所能得到的前提条件只有`x!=x'`、`y=y'`、`x'!=y'`，无法推导出`x,y`的关系，只知道`cur`的回文半径最小为`R-cur+1`（算上其本身），需要继续尝试向外扩以求解`pArr[cur]`。
+
+综上所述，`pArr[cur]`的计算有四种情况：暴力扩、等于`pArr[cur']`、等于`R-cur+1`、从`R-cur+1`继续向外扩。使用此算法求解原始问题的过程就是遍历串中的每个字符，每个字符都尝试向外扩到最大并更新`R`（只增不减），每次`R`增加的量就是此次能扩的字符个数，而`R`到达串尾时问题的解就能确定了，因此时间复杂度就是每次扩操作检查的次数总和，也就是`R`的变化范围（`-1~2N`，因为处理串时向串中添加了`N+1`个`#`字符），即`O(1+2N)=O(N)`。
+
+整体代码如下：
+
+```
+public static int maxPalindromeLength(String str) {
+  char charArr[] = manacherString(str);
+  int pArr[] = new int[charArr.length];
+  int R = -1, C = -1;
+  int max = Integer.MIN_VALUE;
+  for (int i = 0; i < charArr.length; i++) {
+    pArr[i] = i > R ? 1 : Math.min(pArr[C * 2 - i], R - i);
+    while (i + pArr[i] < charArr.length && i - pArr[i] > -1) {
+      if (charArr[i + pArr[i]] == charArr[i - pArr[i]]) {
+        pArr[i]++;
+      } else {
+        break;
+      }
+    }
+    if (R < i + pArr[i]) {
+      R = i + pArr[i]-1;
+      C = i;
+    }
+    max = Math.max(max, pArr[i]);
+  }
+  return max-1;
+}
+
+public static void main(String[] args) {
+  System.out.println(maxPalindromeLength("zxabcdcbayq"));
+}
+复制代码
+```
+
+上述代码将四种情况的分支处理浓缩到了`7~14`行。其中第`7`行是确定加速信息：如果当前遍历字符在`R`右边，先算上其本身有`pArr[i]=1`，后面检查如果能扩再直接`pArr[i]++`即可；否则，当前字符的`pArr[i]`要么是`pArr[i']`（`i`关于`C`对称的下标`i'`的推导公式为`2*C-i`），要么是`R-i+1`，要么是`>=R-i+1`，可以先将`pArr[i]`的值置为这三种情况中最小的那一个，后面再检查如果能扩再直接`pArr[i]++`即可。
+
+最后得到的`max`是处理之后的串（`length=2N+1`）的最长回文子串的半径，`max-1`刚好为原串中最长回文子串的长度。
+
+### 进阶问题
+
+给你一个字符串，要求添加尽可能少的字符使其成为一个回文字符串。
+
+> 思路：当`R`第一次到达串尾时，做`R`关于`C`的对称点`L`，将`L`之前的字符串逆序就是结果。
+
+--------------------------------
+
+-----------------------------------------------------------------------------------------
 
 ### （一）Manacher 算法应用
 
@@ -396,6 +531,401 @@ public class LastAddString {
 
 
 ## 三、BFPRT算法：
+
+题目：给你一个整型数组，返回其中第K小的数。
+
+这道题可以利用荷兰国旗改进的`partition`和随机快排的思想：随机选出一个数，将数组以该数作比较划分为`<,=,>`三个部分，则`=`部分的数是数组中第几小的数不难得知，接着对`<`（如果第K小的数在`<`部分）或`>`（如果第K小的数在`>`部分）部分的数递归该过程，直到`=`部分的数正好是整个数组中第K小的数。这种做法不难求得时间复杂度的数学期望为`O(NlogN)`（以2为底）。但这毕竟是数学期望，在实际工程中的表现可能会有偏差，而BFPRT算法能够做到时间复杂度就是`O(NlogN)`。
+
+BFPRT算法首先将数组按5个元素一组划分成`N/5`个小部分（最后不足5个元素自成一个部分），再这些小部分的内部进行排序，然后将每个小部分的中位数取出来再排序得到中位数：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e84ccac4b5?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+BFPRT求解此题的步骤和开头所说的步骤大体类似，但是“随机选出一个的作为比较的那个数”这一步替换为上图所示最终选出来的那个数。
+
+`O(NlogN)`的证明，为什么每一轮`partition`中的随机选数改为BFPRT定义的选数逻辑之后，此题的时间复杂度就彻底变为`O(NlogN)`了呢？下面分析一下这个算法的步骤：
+
+BFPRT算法，接收一个数组和一个K值，返回数组中的一个数
+
+1. 数组被划分为了`N/5`个小部分，每个部分的5个数排序需要`O(1)`，所有部分排完需要`O(N/5)=O(N)`
+2. 取出每个小部分的中位数，一共有`N/5`个，递归调用BFPRT算法得到这些数中第`(N/5)/2`小的数（即这些数的中位数），记为`pivot`
+3. 以`pivot`作为比较，将整个数组划分为`pivot`三个区域
+4. 判断第K小的数在哪个区域，如果在`=`区域则直接返回`pivot`，如果在`<`或`>`区域，则将这个区域的数递归调用BFPRT算法
+5. `base case`：在某次递归调用BFPRT算法时发现这个区域只有一个数，那么这个数就是我们要找的数。
+
+代码示例：
+
+```
+public static int getMinKthNum(int[] arr, int K) {
+  if (arr == null || K > arr.length) {
+    return Integer.MIN_VALUE;
+  }
+  int[] copyArr = Arrays.copyOf(arr, arr.length);
+  return bfprt(copyArr, 0, arr.length - 1, K - 1);
+}
+
+public static int bfprt(int[] arr, int begin, int end, int i) {
+  if (begin == end) {
+    return arr[begin];
+  }
+  int pivot = medianOfMedians(arr, begin, end);
+  int[] pivotRange = partition(arr, begin, end, pivot);
+  if (i >= pivotRange[0] && i <= pivotRange[1]) {
+    return arr[i];
+  } else if (i < pivotRange[0]) {
+    return bfprt(arr, begin, pivotRange[0] - 1, i);
+  } else {
+    return bfprt(arr, pivotRange[1] + 1, end, i);
+  }
+}
+
+public static int medianOfMedians(int[] arr, int begin, int end) {
+  int num = end - begin + 1;
+  int offset = num % 5 == 0 ? 0 : 1;
+  int[] medians = new int[num / 5 + offset];
+  for (int i = 0; i < medians.length; i++) {
+    int beginI = begin + i * 5;
+    int endI = beginI + 4;
+    medians[i] = getMedian(arr, beginI, Math.min(endI, end));
+  }
+  return bfprt(medians, 0, medians.length - 1, medians.length / 2);
+}
+
+public static int getMedian(int[] arr, int begin, int end) {
+  insertionSort(arr, begin, end);
+  int sum = end + begin;
+  int mid = (sum / 2) + (sum % 2);
+  return arr[mid];
+}
+
+public static void insertionSort(int[] arr, int begin, int end) {
+  if (begin >= end) {
+    return;
+  }
+  for (int i = begin + 1; i <= end; i++) {
+    for (int j = i; j > begin; j--) {
+      if (arr[j] < arr[j - 1]) {
+        swap(arr, j, j - 1);
+      } else {
+        break;
+      }
+    }
+  }
+}
+
+public static int[] partition(int[] arr, int begin, int end, int pivot) {
+  int L = begin - 1;
+  int R = end + 1;
+  int cur = begin;
+  while (cur != R) {
+    if (arr[cur] > pivot) {
+      swap(arr, cur, --R);
+    } else if (arr[cur] < pivot) {
+      swap(arr, cur++, ++L);
+    } else {
+      cur++;
+    }
+  }
+  return new int[]{L + 1, R - 1};
+}
+
+public static void swap(int[] arr, int i, int j) {
+  int tmp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = tmp;
+}
+
+public static void main(String[] args) {
+  int[] arr = {6, 9, 1, 3, 1, 2, 2, 5, 6, 1, 3, 5, 9, 7, 2, 5, 6, 1, 9};
+  System.out.println(getMinKthNum(arr,13));
+}
+复制代码
+```
+
+时间复杂度为`O(NlogN)`（底数为2）的证明，分析`bfprt`的执行步骤（假设`bfprt`的时间复杂度为`T(N)`）：
+
+1. 首先数组5个5个一小组并内部排序，对5个数排序为`O(1)`，所有小组排好序为`O(N/5)=O(N)`
+2. 由步骤1的每个小组抽出中位数组成一个中位数小组，共有`N/5`个数，递归调用`bfprt`求出这`N/5`个数中第`(N/5)/2`小的数（即中位数）为`T(N/5)`，记为`pivot`
+3. 对步骤2求出的`pivot`作为比较将数组分为小于、等于、大于三个区域，由于`pivot`是中位数小组中的中位数，所以中位数小组中有`N/5/2=N/10`个数比`pivot`小，这`N/10`个数分别又是步骤1中某小组的中位数，可推导出至少有`3N/10`个数比`pivot`小，也即最多有`7N/10`个数比`pivot`大。也就是说，大于区域（或小于）最大包含`7N/10`个数、最少包含`3N/10`个数，那么如果第`i`大的数不在等于区域时，无论是递归`bfprt`处理小于区域还是大于区域，最坏情况下子过程的规模最大为`7N/10`，即`T(7N/10)`
+
+综上所述，`bfprt`的`T(N)`存在推导公式：`T(N/5)+T(7N/10)+O(N)`。根据 **基础篇** 中所介绍的Master公式可以求得`bfprt`的时间复杂度就是`O(NlogN)`（以2为底）。
+
+## morris遍历二叉树
+
+> 关于二叉树先序、中序、后序遍历的递归和非递归版本在【直通BAT算法（基础篇）】中有讲到，但这6种遍历算法的时间复杂度都需要`O(H)`（其中`H`为树高）的额外空间复杂度，因为二叉树遍历过程中只能向下查找孩子节点而无法回溯父结点，因此这些算法借助栈来保存要回溯的父节点（递归的实质是系统帮我们压栈），并且栈要保证至少能容纳下`H`个元素（比如遍历到叶子结点时回溯父节点，要保证其所有父节点在栈中）。而morris遍历则能做到时间复杂度仍为`O(N)`的情况下额外空间复杂度只需`O(1)`。
+
+### 遍历规则
+
+首先在介绍morris遍历之前，我们先把先序、中序、后序定义的规则抛之脑后，比如先序遍历在拿到一棵树之后先遍历头结点然后是左子树最后是右子树，并且在遍历过程中对于子树的遍历仍是这样。
+
+忘掉这些遍历规则之后，我们来看一下morris遍历定义的标准：
+
+1. 定义一个遍历指针`cur`，该指针首先指向头结点
+
+2. 判断
+
+    ```
+    cur
+    ```
+
+    的左子树是否存在
+
+    - 如果`cur`的左孩子为空，说明`cur`的左子树不存在，那么`cur`右移来到`cur.right`
+
+    - 如果
+
+        ```
+        cur
+        ```
+
+        的左孩子不为空，说明
+
+        ```
+        cur
+        ```
+
+        的左子树存在，找出该左子树的最右结点，记为
+
+        ```
+        mostRight
+        ```
+
+        - 如果，`mostRight`的右孩子为空，那就让其指向`cur`（`mostRight.right=cur`），并左移`cur`（`cur=cur.left`）
+        - 如果`mostRight`的右孩子不空，那么让`cur`右移（`cur=cur.right`），并将`mostRight`的右孩子置空
+
+3. 经过步骤2之后，如果`cur`不为空，那么继续对`cur`进行步骤2，否则遍历结束。
+
+下图所示举例演示morris遍历的整个过程：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e86eb7cac7?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+### 先序、中序序列
+
+遍历完成后对`cur`进过的节点序列稍作处理就很容易得到该二叉树的先序、中序序列：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8a7c5bf81?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+示例代码：
+
+```
+public static class Node {
+    int data;
+    Node left;
+    Node right;
+    public Node(int data) {
+        this.data = data;
+    }
+}
+
+public static void preOrderByMorris(Node root) {
+    if (root == null) {
+        return;
+    }
+    Node cur = root;
+    while (cur != null) {
+        if (cur.left == null) {
+            System.out.print(cur.data+" ");
+            cur = cur.right;
+        } else {
+            Node mostRight = cur.left;
+            while (mostRight.right != null && mostRight.right != cur) {
+                mostRight = mostRight.right;
+            }
+            if (mostRight.right == null) {
+                System.out.print(cur.data+" ");
+                mostRight.right = cur;
+                cur = cur.left;
+            } else {
+                cur = cur.right;
+                mostRight.right = null;
+            }
+        }
+    }
+    System.out.println();
+}
+
+public static void mediumOrderByMorris(Node root) {
+    if (root == null) {
+        return;
+    }
+    Node cur = root;
+    while (cur != null) {
+        if (cur.left == null) {
+            System.out.print(cur.data+" ");
+            cur = cur.right;
+        } else {
+            Node mostRight = cur.left;
+            while (mostRight.right != null && mostRight.right != cur) {
+                mostRight = mostRight.right;
+            }
+            if (mostRight.right == null) {
+                mostRight.right = cur;
+                cur = cur.left;
+            } else {
+                System.out.print(cur.data+" ");
+                cur = cur.right;
+                mostRight.right = null;
+            }
+        }
+    }
+    System.out.println();
+}
+
+public static void main(String[] args) {
+    Node root = new Node(1);
+    root.left = new Node(2);
+    root.right = new Node(3);
+    root.left.left = new Node(4);
+    root.left.right = new Node(5);
+    root.right.left = new Node(6);
+    root.right.right = new Node(7);
+    preOrderByMorris(root);
+    mediumOrderByMorris(root);
+
+}
+复制代码
+```
+
+这里值得注意的是：**morris遍历会来到一个左孩子不为空的结点两次**，而其它结点只会经过一次。因此使用morris遍历打印先序序列时，如果来到的结点无左孩子，那么直接打印即可（这种结点只会经过一次），否则如果来到的结点的左子树的最右结点的右孩子为空才打印（这是第一次来到该结点的时机），这样也就忽略了`cur`经过的结点序列中第二次出现的结点；而使用morris遍历打印中序序列时，如果来到的结点无左孩子，那么直接打印（这种结点只会经过一次，左中右，没了左，直接打印中），否则如果来到的结点的左子树的最右结点不为空时才打印（这是第二次来到该结点的时机），这样也就忽略了`cur`经过的结点序列中第一次出现的重复结点。
+
+### 后序序列
+
+使用morris遍历得到二叉树的后序序列就没那么容易了，因为对于树种的非叶结点，morris遍历最多会经过它两次，而我们后序遍历实在第三次来到该结点时打印该结点的。因此要想得到后序序列，仅仅改变在morris遍历时打印结点的时机是无法做到的。
+
+但其实，在morris遍历过程中，如果在每次遇到第二次经过的结点时，将该结点的左子树的右边界上的结点从下到上打印，最后再将整个树的右边界从下到上打印，最终就是这个数的后序序列：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8ace72a83?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8ad102b9d?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8ae36d836?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8c2a5f049?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+其中无非就是在morris遍历中在第二次经过的结点的时机执行一下打印操作。而从下到上打印一棵树的右边界，可以将该右边界上的结点看做以`right`指针为后继指针的链表，将其反转`reverse`然后打印，最后恢复成原始结构即可。示例代码如下（其中容易犯错的地方是`18`行和`19`行的代码不能调换）：
+
+```
+public static void posOrderByMorris(Node root) {
+    if (root == null) {
+        return;
+    }
+    Node cur = root;
+    while (cur != null) {
+        if (cur.left == null) {
+            cur = cur.right;
+        } else {
+            Node mostRight = cur.left;
+            while (mostRight.right != null && mostRight.right != cur) {
+                mostRight = mostRight.right;
+            }
+            if (mostRight.right == null) {
+                mostRight.right = cur;
+                cur = cur.left;
+            } else {
+                mostRight.right = null;
+                printRightEdge(cur.left);
+                cur = cur.right;
+            }
+        }
+    }
+    printRightEdge(root);
+}
+
+private static void printRightEdge(Node root) {
+    if (root == null) {
+        return;
+    }
+    //reverse the right edge
+    Node cur = root;
+    Node pre = null;
+    while (cur != null) {
+        Node next = cur.right;
+        cur.right = pre;
+        pre = cur;
+        cur = next;
+    }
+    //print 
+    cur = pre;
+    while (cur != null) {
+        System.out.print(cur.data + " ");
+        cur = cur.right;
+    }
+    //recover
+    cur = pre;
+    pre = null;
+    while (cur != null) {
+        Node next = cur.right;
+        cur.right = pre;
+        pre = cur;
+        cur = next;
+    }
+}
+
+public static void main(String[] args) {
+    Node root = new Node(1);
+    root.left = new Node(2);
+    root.right = new Node(3);
+    root.left.left = new Node(4);
+    root.left.right = new Node(5);
+    root.right.left = new Node(6);
+    root.right.right = new Node(7);
+    posOrderByMorris(root);
+}
+复制代码
+```
+
+### 时间复杂度分析
+
+因为morris遍历中，只有左孩子非空的结点才会经过两次而其它结点只会经过一次，也就是说遍历的次数小于`2N`，因此使用morris遍历得到先序、中序序列的时间复杂度自然也是`O(1)`；但产生后序序列的时间复杂度还要算上`printRightEdge`的时间复杂度，但是你会发现整个遍历的过程中，所有的`printRightEdge`加起来也只是遍历并打印了`N`个结点：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8c715ba38?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+因此时间复杂度仍然为`O(N)`。
+
+> morris遍历结点的顺序不是先序、中序、后序，而是按照自己的一套标准来决定接下来要遍历哪个结点。
+>
+> morris遍历的独特之处就是充分利用了叶子结点的无效引用（引用指向的是空，但该引用变量仍然占内存），从而实现了`O(1)`的时间复杂度。
+
+
+作者：Anwen
+链接：https://juejin.im/post/5c6b9d4c6fb9a04a05403cbe
+来源：掘金
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+-------------
+
+------------------
 
 ### （一）BFPRT 算法详解与应用：
 
@@ -668,7 +1198,205 @@ public class BFPRT {
 
 ## 窗口： 
 
-**介绍窗口以及窗口内最大值或者最小值的更新结构（单调双向队列）**
+## 窗口最大值更新结构
+
+### 最大值更新结构
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8fb6ccd04?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+当向此结构放数据时会检查一下结构中的已有数据，从时间戳最大的开始检查，如果检查过程中发现该数据小于即将放入的数据则将其弹出并检查下一个，直到即将放入的数据小于正在检查的数据或者结构中的数据都被弹出了为止，再将要放入的数据放入结构中并盖上时间戳。如此每次从该结构取数据时，都会返回结构中时间戳最小的数据，也是目前为止进入过此结构的所有数据中最大的那一个。
+
+此结构可以使用一个双端队列来实现，一端只用来放数据（放数据之前的检查过程可能会弹出其他数据），另一端用来获取目前为止出现过的最大值。
+
+示例如下：
+
+```
+package top.zhenganwen.structure;
+
+import java.util.LinkedList;
+
+public class MaxValueWindow {
+
+  private LinkedList<Integer> queue;
+  public MaxValueWindow() {
+    this.queue = new LinkedList();
+  }
+
+  //更新窗口最大值
+  public void add(int i){
+    while (!queue.isEmpty() && queue.getLast() <= i) {
+      queue.pollLast();
+    }
+    queue.add(i);
+  }
+
+  //获取窗口最大值
+  public int getMax() {
+    if (!queue.isEmpty()) {
+      return queue.peek();
+    }
+    return Integer.MIN_VALUE;
+  }
+
+  //使窗口最大值过期
+  public void expireMaxValue() {
+    if (!queue.isEmpty()) {
+      queue.poll();
+    }
+  }
+
+  public static void main(String[] args) {
+    MaxValueWindow window = new MaxValueWindow();
+    window.add(6);
+    window.add(4);
+    window.add(9);
+    window.add(8);
+    System.out.println(window.getMax());//9
+    window.expireMaxValue();
+    System.out.println(window.getMax());//8
+  }
+}
+复制代码
+```
+
+### 例题
+
+#### 窗口移动
+
+给你一个长度为`N`的整型数组和大小为`W`的窗口，用一个长度为`N-W+1`的数组记录窗口从数组由左向右移动过程中窗口内最大值。
+
+对于数组`[1,2,3,4,5,6,7]`和窗口大小为`3`，窗口由左向右移动时有：
+
+- `[1,2,3],4,5,6,7`，窗口起始下标为0时，框住的数是`1,2,3`，最大值是3
+- `1,[2,3,4],5,6,7`，最大值是4
+- `1,2,[3,4,5],6,7`，最大值是5
+- ……
+
+因此所求数组是`[3,4,5,6,7]`。
+
+> 思路：前面介绍的窗口最大值更新结构的特性是，先前放入的数如果还存在于结构中，那么该数一定比后放入的数都大。此题窗口移动的过程就是从窗口中减一个数和增一个数的过程。拿`[1,2,3],4`到`1,[2,3,4]`这一过程分析：首先`[1,2,3],4`状态下的窗口应该只有一个值`3`（因为先加了1，加2之前弹出了1，加3之前弹出了2）；转变为`1,[2,3,4]`的过程就是向窗口先减一个数`1`再加一个数`4`的过程，因为窗口中不含`1`所以直接加一个数`4`（弹出窗口中的`3`，加一个数`4`）。
+
+代码示例：
+
+```
+public static void add(int arr[], int index, LinkedList<Integer> queue) {
+  if (queue == null) {
+    return;
+  }
+  while (!queue.isEmpty() && arr[queue.getLast()] < arr[index]) {
+    queue.pollLast();
+  }
+  queue.add(index);
+}
+
+public static void expireIndex(int index, LinkedList<Integer> queue) {
+  if (queue == null) {
+    return;
+  }
+  if (!queue.isEmpty() && queue.peek() == index) {
+    queue.pollFirst();
+  }
+}
+
+public static int[] maxValues(int[] arr, int w) {
+  int[] res = new int[arr.length - w + 1];
+  LinkedList<Integer> queue = new LinkedList();
+  for (int i = 0; i < w; i++) {
+    add(arr, i, queue);
+  }
+  for (int i = 0; i < res.length; i++) {
+    res[i] = queue.peek();
+    if (i + w <= arr.length - 1) {
+      expireIndex(i, queue);
+      add(arr, i + w, queue);
+    }
+  }
+  for (int i = 0; i < res.length; i++) {
+    res[i] = arr[res[i]];
+  }
+  return res;
+}
+
+public static void main(String[] args) {
+  int[] arr = {3, 2, 1, 5, 6, 2, 7, 8, 10, 6};
+  System.out.println(Arrays.toString(maxValues(arr,3)));//[3, 5, 6, 6, 7, 8, 10, 10]
+}
+复制代码
+```
+
+这里需要的注意的是，针对这道题将窗口最大值更新结构的`add`和`expire`方法做了改进（结构中存的是值对应的下标）。例如`[2,1,2],-1->2,[1,2,-1]`，应当翻译为`[2,1,2],-1`状态下的窗口最大值为2下标上的数`2`，变为`2,[1,2,-1]`时应当翻译为下标为0的数从窗口过期了，而不应该是数据`2`从窗口过期了（这样会误删窗口中下标为2的最大值2）。
+
+#### 求达标的子数组个数
+
+给你一个整型数组，判断其所有子数组中最大值和最小值的差值不超过`num`（如果满足则称该数组达标）的个数。（子数组指原数组中任意个连续下标上的元素组成的数组）
+
+暴力解：遍历每个元素，再遍历以当前元素为首的所有子数组，再遍历子数组找到其中的最大值和最小值以判断其是否达标。很显然这种方法的时间复杂度为`o(N^3)`，但如果使用最大值更新结构，则能实现`O(N)`级别的解。
+
+如果使用`L`和`R`两个指针指向数组的两个下标，且`L`在`R`的左边。当`L~R`这一子数组达标时，可以推导出以`L`开头的长度不超过`R-L+1`的所有子数组都达标；当`L~R`这一子数组不达标时，无论`L`向左扩多少个位置或者`R`向右扩多少个位置，`L~R`还是不达标。
+
+`O(N)`的解对应的算法是：`L`和`R`都从0开始，`R`先向右移动，`R`每右移一个位置就使用最大值更新结构和最小值更新结构记录一下`L~R`之间的最大值和最小值的下标，当`R`移动到如果再右移一个位置`L~R`就不达标了时停止，这时以当前`L`开头的长度不超过`R-L+1`的子数组都达标；然后`L`右移一个位置，同时更新一下最大值、最小值更新结构（`L-1`下标过期了），再右移`R`至`R`如果右移一个位置`L~R`就不达标了停止（每右移`R`一次也更新最大、小值更新结构）……；直到`L`到达数组尾元素为止。将每次`R`停止时，`R-L+1`的数量累加起来就是`O(N)`的解，因为`L`和`R`都只向右移动，并且每次`R`停止时，以`L`开头的达标子串的数量直接通过`R-L+1`计算，所以时间复杂度就是将数组遍历了一遍即`O(N)`。
+
+示例代码：
+
+```
+public static int getComplianceChildArr(int arr[], int num) {
+  //最大值、最小值更新结构
+  LinkedList<Integer> maxq = new LinkedList();
+  LinkedList<Integer> minq = new LinkedList<>();
+  int L = 0;
+  int R = 0;
+  maxq.add(0);
+  minq.add(0);
+  int res = 0;
+  while (L < arr.length) {
+    while (R < arr.length - 1) {
+      while (!maxq.isEmpty() && arr[maxq.getLast()] <= arr[R + 1]) {
+        maxq.pollLast();
+      }
+      maxq.add(R + 1);
+      while (!minq.isEmpty() && arr[minq.getLast()] >= arr[R + 1]) {
+        minq.pollLast();
+      }
+      minq.add(R + 1);
+      if (arr[maxq.peekFirst()] - arr[minq.peekFirst()] > num) {
+        break;
+      }
+      R++;
+    }
+    res += (R - L + 1);
+    if (maxq.peekFirst() == L) {
+      maxq.pollFirst();
+    }
+    if (minq.peekFirst() == L) {
+      minq.pollFirst();
+    }
+    L++;
+  }
+  return res;
+}
+
+public static void main(String[] args) {
+  int[] arr = {1, 2, 3, 5};
+  System.out.println(getComplianceChildArr(arr, 3));//9
+}
+```
+
+作者：Anwen
+链接：https://juejin.im/post/5c6b9d4c6fb9a04a05403cbe
+来源：掘金
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+---
+
+-----
+
+
+
+介绍窗口以及窗口内最大值或者最小值的更新结构（单调双向队列）**
 
 **什么是窗口：**
 
@@ -1296,7 +2024,6 @@ public class MaximalRectangle {
         System.out.println("maxArea = " + maxArea);
     }
 }
-
 ```
 
 

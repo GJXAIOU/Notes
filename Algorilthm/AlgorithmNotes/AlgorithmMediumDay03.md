@@ -767,5 +767,536 @@ public static void main(String[] args) {
 
 
 
+## 跳表
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e96cbc2217?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+跳表有着和红黑树、SBT树相同的功能，都能实现在`O(log(2,N))`内实现对数据的增删改查操作。但跳表不是以二叉树为原型的，其设计细节如下：
+
+记该结构为`SkipList`，该结构中可以包含有很多结点（`SkipListNode`），每个结点代表一个被添加到该结构的数据项。当实例化`SkipList`时，该对象就会自带一个`SkipListNode`（不代表任何数据项的头结点）。
+
+### 添加数据
+
+当你向其中添加数据之前，首先会抛硬币，将第一次出现正面朝上时硬币被抛出的次数作为该数据的层数（`level`，**最小为1**），接着将数据和其层数封装成一个`SkipListNode`添加到`SkipList`中。结构初始化时，其头结点的层数为0，但每次添加数据后都会更新头结点的层数为所添数据中层数最大的。比如实例化一个`SkipList`后向其中添加一条层数为`3`的数据`7`：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e97278c2b4?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+这时如果再添加一条层数为`2`的数据`5`呢？首先游标`curNode`会从`head`的最高层出发往右走，走到数据项为7的结点，发现`7>5`，于是又退回来走向下一层：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9816ae3c1?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+接着再尝试往右走，还是发现`7>5`，于是还是准备走向下一层，但此时发现`curNode`所在层数`2`是数据项`5`的最高层，于是先建出数据项`5`的第二层，`curNode`再走向下一层：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e98dbd9a4d?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+同样的，`curNode`尝试往右走，但发现`7>5`，`curNode`所在层为1，但数据`5`的第一层还没建，于是建出，`curNode`再往下走。当`curNode`走到`null`时，建出数据`5`根部的`null`：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e992ace6b1?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+至此层数为2的数据项`5`的添加操作完毕。
+
+那如果添加一个层数较高的数据项该如何处理呢？以添加层数为4的数据`10`为例：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9982e49b4?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+添加操作对应的代码示例：
+
+```java
+import java.util.ArrayList;
+
+/**
+ * A stored structure.Its add,delete,update,find operation are log(2,N)
+ *
+ * @author zhenganwen
+ */
+public class SkipList {
+    private SkipListNode head;
+    private int maxLevel;
+    private int size;
+    public static final double PROBABILITY = 0.5;
+
+    public SkipList() {
+        this.head = new SkipListNode(Integer.MIN_VALUE);
+        /**
+         * the 0th level of each SkipListNode is null
+         */
+        this.head.nextNodes.add(null);
+        this.maxLevel = 0;
+        this.size = 0;
+    }
+
+    private class SkipListNode {
+        int value;
+        /**
+         * nextNodes represent the all levels of a SkipListNode the element on
+         * one index represent the successor SkipListNode on the indexth level
+         */
+        ArrayList<SkipListNode> nextNodes;
+
+        public SkipListNode(int newValue) {
+            this.value = newValue;
+            this.nextNodes = new ArrayList<SkipListNode>();
+        }
+    }
+
+    /**
+     * put a new data into the structure->log(2,N)
+     *
+     * @param newValue
+     */
+    public void add(int newValue) {
+        if (!contains(newValue)) {
+
+            // generate the level
+            int level = 1;
+            while (Math.random() < PROBABILITY) {
+                level++;
+            }
+            // update max level
+            if (level > maxLevel) {
+                int increment = level - maxLevel;
+                while (increment-- > 0) {
+                    this.head.nextNodes.add(null);
+                }
+                maxLevel = level;
+            }
+            // encapsulate value
+            SkipListNode newNode = new SkipListNode(newValue);
+            // build all the levels of new node
+            SkipListNode cur = findInsertionOfTopLevel(newValue, level);
+            while (level > 0) {
+                if (cur.nextNodes.get(level) != null) {
+                    newNode.nextNodes.add(0, cur.nextNodes.get(level));
+                } else {
+                    newNode.nextNodes.add(0, null);
+                }
+                cur.nextNodes.set(level, newNode);
+                level--;
+                cur = findNextInsertion(cur, newValue, level);
+            }
+            newNode.nextNodes.add(0, null);
+            size++;
+        }
+    }
+
+    /**
+     * find the insertion point of the newNode's top level from head's maxLevel
+     * by going right or down
+     *
+     * @param newValue newNode's value
+     * @param level    newNode's top level
+     * @return
+     */
+    private SkipListNode findInsertionOfTopLevel(int newValue, int level) {
+        int curLevel = this.maxLevel;
+        SkipListNode cur = head;
+        while (curLevel >= level) {
+            if (cur.nextNodes.get(curLevel) != null
+                    && cur.nextNodes.get(curLevel).value < newValue) {
+                // go right
+                cur = cur.nextNodes.get(curLevel);
+            } else {
+                // go down
+                curLevel--;
+            }
+        }
+        return cur;
+    }
+
+    /**
+     * find the next insertion from cur node by going right on the level
+     *
+     * @param cur
+     * @param newValue
+     * @param level
+     * @return
+     */
+    private SkipListNode findNextInsertion(SkipListNode cur, int newValue,
+                                           int level) {
+        while (cur.nextNodes.get(level) != null
+                && cur.nextNodes.get(level).value < newValue) {
+            cur = cur.nextNodes.get(level);
+        }
+        return cur;
+    }
+
+    /**
+     * check whether a value exists->log(2,N)
+     *
+     * @param value
+     * @return
+     */
+    public boolean contains(int value) {
+        if (this.size == 0) {
+            return false;
+        }
+        SkipListNode cur = head;
+        int curLevel = maxLevel;
+        while (curLevel > 0) {
+            if (cur.nextNodes.get(curLevel) != null) {
+                if (cur.nextNodes.get(curLevel).value == value) {
+                    return true;
+                } else if (cur.nextNodes.get(curLevel).value < value) {
+                    cur = cur.nextNodes.get(curLevel);
+                } else {
+                    curLevel--;
+                }
+            } else {
+                curLevel--;
+            }
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+        SkipList skipList = new SkipList();
+        skipList.add(1);
+        skipList.add(2);
+        skipList.add(3);
+        skipList.add(4);
+        skipList.add(5);
+        //mark a break point here to check the memory structure of skipList
+        System.out.println(skipList);
+    }
+
+}
+
+```
+
+### 查找数据
+
+查找数据项的操作和添加数据项的步骤类似，也是游标`curNode`从`head`的最高层出发，每次先尝试向右走来到`nextNode`，如果`nextNode`封装的数据大于查找的目标`target`或`nextNode`为空，那么`curNode`回退并向下走；如果`nextNode`封装的数据小于`target`，那么`curNode`继续向右走，直到`curNode`走到的结点数据与`target`相同表示找到了，否则`curNode`走到了某一结点的根部`null`，那么说明结构中不存在该数据。`->contains()`
+
+### 删除数据
+
+了解添加数据的过程之后，删除数据其实就是将逻辑倒过来：解除该数据结点的前后引用关系。下图是我在写好上述`add()`方法后，向其中放入`1、2、3、4、5`后形成的结构：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9a1bc219d?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+如果此时删除数据`3`：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9a1e24f68?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+首先应该从`head`的最高层出发，通过向右或向下找到数据3的最高层（如图`2->3->5->6->7`），将该层移除整体结构并处理好该层上，其前后结点的关系。同样的逻辑，将数据`3`剩下的层移除。
+
+示例代码：
+
+```java
+/**
+     * delete skipListNode by the value
+     *
+     * @param value
+     */
+public void delete(int value) {
+    //if exists
+    if (contains(value)) {
+        //find the node and its level
+        SkipListNode deletedNode = head;
+        int deletedLevels = maxLevel;
+        //because exists,so must can find
+        while (deletedLevels > 0) {
+            if (deletedNode.nextNodes.get(deletedLevels) != null) {
+                if (deletedNode.nextNodes.get(deletedLevels).value == value) {
+                    deletedNode = deletedNode.nextNodes.get(deletedLevels);
+                    break;
+                } else if (deletedNode.nextNodes.get(deletedLevels).value < value) {
+                    deletedNode = deletedNode.nextNodes.get(deletedLevels);
+                } else {
+                    deletedLevels--;
+                }
+            } else {
+                deletedLevels--;
+            }
+        }
+        //release the node and adjust the reference
+        while (deletedLevels > 0) {
+            SkipListNode pre = findInsertionOfTopLevel(value, deletedLevels);
+            if (deletedNode.nextNodes.get(deletedLevels) != null) {
+                pre.nextNodes.set(deletedLevels, deletedNode.nextNodes.get(deletedLevels));
+            } else {
+                pre.nextNodes.set(deletedLevels, null);
+            }
+            deletedLevels--;
+        }
+
+        size--;
+    }
+}
+
+public static void main(String[] args) {
+    SkipList skipList = new SkipList();
+    skipList.add(1);
+    skipList.add(2);
+    skipList.add(3);
+    skipList.add(4);
+    skipList.add(5);
+    //mark a break point here to check the memory structure of skipList
+    skipList.delete(3);
+    System.out.println(skipList);
+}
+
+```
+
+### 遍历数据
+
+需要遍历跳表中的数据时，我们可以根据每个数据的层数至少为1的特点（每个结点的第一层引用的是比该结点数据大的结点中数据最小的结点）。
+
+示例代码：
+
+```java
+class SkipListIterator implements Iterator<Integer> {
+    private SkipListNode cur;
+    public SkipListIterator(SkipList skipList) {
+        this.cur = skipList.head;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return cur.nextNodes.get(1) != null;
+    }
+
+    @Override
+    public Integer next() {
+        int value = cur.nextNodes.get(1).value;
+        cur = cur.nextNodes.get(1);
+        return value;
+    }
+}
+
+@Override
+public String toString() {
+    SkipListIterator iterator = new SkipListIterator(this);
+    String res = "[ ";
+    while (iterator.hasNext()) {
+        res += iterator.next()+" ";
+    }
+    res += "]";
+    System.out.println();
+    return res;
+}
+
+public static void main(String[] args) {
+    SkipList skipList = new SkipList();
+    skipList.add(1);
+    skipList.add(2);
+    skipList.add(3);
+    skipList.add(4);
+    skipList.add(5);
+    System.out.println(skipList);
+    skipList.delete(3);
+    System.out.println(skipList);
+}
+```
+
+
+
+完整的代码程序
+
+```java
+package nowcoder.advanced.day03;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
+/**
+ * 跳表
+ */
+public class Code_02_SkipList {
+
+    public static class SkipListNode {
+        public Integer value;
+        // 该调表 ArrayList 的长度表示有多少层，nextNodes[0] 表示第一层上 SkipListNode 节点的下一层是什么
+        public ArrayList<SkipListNode> nextNodes;
+
+        public SkipListNode(Integer value) {
+            this.value = value;
+            nextNodes = new ArrayList<SkipListNode>();
+        }
+    }
+
+    public static class SkipListIterator implements Iterator<Integer> {
+        SkipList list;
+        SkipListNode current;
+
+        public SkipListIterator(SkipList list) {
+            this.list = list;
+            this.current = list.getHead();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return current.nextNodes.get(0) != null;
+        }
+
+        @Override
+        public Integer next() {
+            current = current.nextNodes.get(0);
+            return current.value;
+        }
+    }
+
+    public static class SkipList {
+        // head 就是巨小，根据最大的层数决定
+        private SkipListNode head;
+        private int maxLevel;
+        private int size;
+        // 以什么概率出 0，则 1- 概率出 1
+        private static final double PROBABILITY = 0.5;
+
+        public SkipList() {
+            size = 0;
+            maxLevel = 0;
+            head = new SkipListNode(null);
+            head.nextNodes.add(null);
+        }
+
+        public SkipListNode getHead() {
+            return head;
+        }
+
+        public void add(Integer newValue) {
+            if (!contains(newValue)) {
+                size++;
+                int level = 0;
+                while (Math.random() < PROBABILITY) {
+                    level++;
+                }
+                // 如果当前 level 大于之前最大的 maxLevel，则头部一定要增加
+                while (level > maxLevel) {
+                    head.nextNodes.add(null);
+                    maxLevel++;
+                }
+                // 当新加入元素总是从头部 head 的最高层往下移动的
+                SkipListNode newNode = new SkipListNode(newValue);
+                SkipListNode current = head;
+                // 同一层，如果下一个位置数比当前位置数小，则往右移动；如果大了就往下移动
+                // 每次都是从最高层开始往下找
+                int levelAll = maxLevel;
+                do {
+                    current = findNext(newValue, current, levelAll);
+                    if (level >= levelAll) {
+                        newNode.nextNodes.add(0, current.nextNodes.get(level));
+                        current.nextNodes.set(level, newNode);
+                        level--;
+                    }
+                } while (levelAll-- > 0);
+            }
+        }
+
+        public void delete(Integer deleteValue) {
+            if (contains(deleteValue)) {
+                SkipListNode deleteNode = find(deleteValue);
+                size--;
+                int level = maxLevel;
+                SkipListNode current = head;
+                do {
+                    current = findNext(deleteNode.value, current, level);
+                    if (deleteNode.nextNodes.size() > level) {
+                        current.nextNodes.set(level, deleteNode.nextNodes.get(level));
+                    }
+                } while (level-- > 0);
+            }
+        }
+
+        // Returns the skiplist node with greatest value <= e
+        private SkipListNode find(Integer e) {
+            return find(e, head, maxLevel);
+        }
+
+        // Returns the skiplist node with greatest value <= e
+        // Starts at node start and level
+        private SkipListNode find(Integer e, SkipListNode current, int level) {
+            do {
+                current = findNext(e, current, level);
+            } while (level-- > 0);
+            return current;
+        }
+
+        // Returns the node at a given level with highest value less than e
+        private SkipListNode findNext(Integer e, SkipListNode current, int level) {
+            SkipListNode next = current.nextNodes.get(level);
+            while (next != null) {
+                // 拿出 next 值
+                Integer value = next.value;
+                // 如果当前值小于拿出来的值，找到了
+                if (lessThan(e, value)) {
+                    break;
+                }
+                // 如果不小于，则往右走，所以 current 就是在该 level 层中最后一个小于当前数的
+                current = next;
+                next = current.nextNodes.get(level);
+            }
+            return current;
+        }
+
+        public int size() {
+            return size;
+        }
+
+        public boolean contains(Integer value) {
+            SkipListNode node = find(value);
+            return node != null && node.value != null && equalTo(node.value, value);
+        }
+
+        public Iterator<Integer> iterator() {
+            return new SkipListIterator(this);
+        }
+
+        /******************************************************************************
+         * Utility Functions *
+         ******************************************************************************/
+
+        private boolean lessThan(Integer a, Integer b) {
+            return a.compareTo(b) < 0;
+        }
+
+        private boolean equalTo(Integer a, Integer b) {
+            return a.compareTo(b) == 0;
+        }
+
+    }
+
+    public static void main(String[] args) {
+
+    }
+}
+
+```
+
+
+
 
 
