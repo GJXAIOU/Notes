@@ -1,7 +1,3 @@
----
-pin: true
-tag:[Java基础，WEB，MySQL]
----
 # README
 
 ##  标签说明
@@ -12,5 +8,16 @@ tag:[Java基础，WEB，MySQL]
 * purple：question
 
 ## 内容说明
-- 个人 Java 学习笔记，视频链接为：链接: https://pan.baidu.com/s/1XXTrq-r2m-Ux6G9JIhgWPA 提取码: 2uaq。
-- 笔记内容较为简单，后期会进行丰富和删减。
+该部分为个人 Java 技术栈，主要包括：
+
+- JavaSE
+- WEB 前端
+- MySQL
+- Spring
+- SpringMVC
+- Mybatis
+- Struts2
+- Hibernate
+- Redis
+- Shiro
+- Netty
