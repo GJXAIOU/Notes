@@ -4,10 +4,14 @@
 
 ## :bulb:使用说明
 
-#### 🎨图片加载失败方法
+### 🎨Git 和 GitHub 基本使用
+
+对 Git 和 GitHub 使用过程中有疑问的可以先看看[这里](https://github.com/GJXAIOU/Notes/blob/master/Tools/GitWithGithub/Git%26Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)。
+
+### 🎨图片加载失败方法
 
 - 【推荐】**方法一**：使用 Typora 时候，需要设置：文件 -> 偏好设置 -> 图像 -> 选择“复制到指定路径” -> 路径格式为：`./${filename}.resource`，正逐步将文件中图片链接更改为此种方式；
-    
+  
     ![image-20200113215647773](README.resource/image-20200113215647773.png)
     
     - 软件下载地址： https://www.typora.io/ 
@@ -18,11 +22,11 @@
 
 -  **方法三**：当然也可以直接打开仓库中每个文件对应的 `.resources` 文件查看文件中包含的图片；
 
-#### 🎨完整笔记获取
+### 🎨完整笔记获取
 
 - 如果需要完整笔记，或者需要 PDF 版本，可以提交 issue 或者发送邮件到上面邮箱，说明需要具体的笔记名即可，一般晚上会查看 Github 和查阅邮箱。
 
-#### 🎨Fork 之后保证笔记更新
+### 🎨Fork 之后保证笔记更新
 
 - 因为笔记一直**处于更新和修改过程中**，所以大家可以采用以下方式保证 Fork 到自己仓库的笔记能够保持最新。
 
@@ -38,10 +42,10 @@
 
     ![合并步骤三](README.resource/%E5%90%88%E5%B9%B6%E6%AD%A5%E9%AA%A4%E4%B8%89.png)
 
-#### 🎨排版规范
+### 🎨排版规范
 
 - **Java 代码规范参照** ：[AlibabaJavaCodeGuide](https://github.com/GJXAIOU/Notes/blob/master/Java/CodeGuide/AlibabaJavaCodeGuide1.3.0.md)
-- 中文排版参照：[ChineseCopywritingGuidelines](https://github.com/GJXAIOU/Notes/blob/master/Java/CodeGuide/ChineseCopywritingGuidelines.md)
+- **中文排版参照**：[ChineseCopywritingGuidelines](https://github.com/GJXAIOU/Notes/blob/master/Java/CodeGuide/ChineseCopywritingGuidelines.md)
 
 
 
