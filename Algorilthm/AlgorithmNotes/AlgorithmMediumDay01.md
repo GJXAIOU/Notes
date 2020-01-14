@@ -101,9 +101,13 @@
 代码
 
 ```java
-package nowcoder.advanced.class01;
+package nowcoder.advanced.day01;
 
+/**
+ * @author GJXAIOU
+ */
 public class KMP {
+
     public static int getIndexOf(String s, String m) {
         if (s == null || m == null || m.length() < 1 || s.length() < m.length()) {
             return -1;
@@ -127,20 +131,19 @@ public class KMP {
         return mi == ms.length ? si - mi : -1;
     }
 
-
     // 求解 next 数组方法
-    public static int[] getNextArray(char[] str2) {
-        if (str2.length == 1) {
+    public static int[] getNextArray(char[] ms) {
+        if (ms.length == 1) {
             return new int[]{-1};
         }
-        int[] next = new int[str2.length];
+        int[] next = new int[ms.length];
         next[0] = -1;
         next[1] = 0;
         // 需要求值的位置
         int pos = 2;
         int cn = 0;
         while (pos < next.length) {
-            if (str2[pos - 1] == str2[cn]) {
+            if (ms[pos - 1] == ms[cn]) {
                 next[pos++] = ++cn;
             } else if (cn > 0) {
                 cn = next[cn];
@@ -152,15 +155,16 @@ public class KMP {
     }
 
     public static void main(String[] args) {
-        int indexOf = getIndexOf("abcabdad", "bd");
-        System.out.println(indexOf);
+        String str = "abcabcababaccc";
+        String match = "ababa";
+        System.out.println(getIndexOf(str, match));
+
     }
+
 }
 
-
-
 ```
-
+程序运行结果为：`6`
 
 
 ### （五）相关题目
@@ -175,6 +179,78 @@ public class KMP {
 
 总结： 在 KMP 中 nextArr 数组基础上多求一位终止位，将不是的补上即可
 
+```java
+package nowcoder.advanced.day01;
+
+/**
+ * @author GJXAIOU
+ */
+public class ShortestHaveTwice {
+
+    public static String answer(String str) {
+        if (str == null || str.length() == 0) {
+            return "";
+        }
+        char[] chas = str.toCharArray();
+        if (chas.length == 1) {
+            return str + str;
+        }
+        if (chas.length == 2) {
+            return chas[0] == chas[1] ? (str + String.valueOf(chas[0])) : (str + str);
+        }
+        int endNext = endNextLength(chas);
+        return str + str.substring(endNext);
+    }
+
+    public static int endNextLength(char[] chas) {
+        int[] next = new int[chas.length + 1];
+        next[0] = -1;
+        next[1] = 0;
+        int pos = 2;
+        int cn = 0;
+        while (pos < next.length) {
+            if (chas[pos - 1] == chas[cn]) {
+                next[pos++] = ++cn;
+            } else if (cn > 0) {
+                cn = next[cn];
+            } else {
+                next[pos++] = 0;
+            }
+        }
+        return next[next.length - 1];
+    }
+
+    public static void main(String[] args) {
+        String test1 = "a";
+        System.out.println(answer(test1));
+
+        String test2 = "aa";
+        System.out.println(answer(test2));
+
+        String test3 = "ab";
+        System.out.println(answer(test3));
+
+        String test4 = "abcdabcd";
+        System.out.println(answer(test4));
+
+        String test5 = "abracadabra";
+        System.out.println(answer(test5));
+
+    }
+
+}
+
+```
+程序运行结果为
+```java
+aa
+aaa
+abab
+abcdabcdabcd
+abracadabracadabra
+```
+
+
 - 给定两个树（值可以相同或者不同） 判断数 1 的某棵子树是否包含树 2（结构和值完全相同），  是则返回true
 
 子树就是从某个头结点开始下面所有子节点都要，下图第一个图就是可以 true，另一个图就是 false。
@@ -184,7 +260,108 @@ public class KMP {
 
 
 **思路**： 把一棵树序列化（可以先序、中序、后续）为字符串（字符数组）  。如果 str2 是 str1的子串 则T2也是T1的子树。
+```java
+package nowcoder.advanced.day01;
 
+/**
+ * 判断树 1 的某棵子树是否包含树 2
+ *
+ * @author GJXAIOU
+ */
+public class T1SubtreeEqualsT2 {
+
+    public static class Node {
+        public int value;
+        public Node left;
+        public Node right;
+
+        public Node(int data) {
+            this.value = data;
+        }
+    }
+
+    public static boolean isSubtree(Node t1, Node t2) {
+        String t1Str = serialByPre(t1);
+        String t2Str = serialByPre(t2);
+        return getIndexOf(t1Str, t2Str) != -1;
+    }
+
+    public static String serialByPre(Node head) {
+        if (head == null) {
+            return "#!";
+        }
+        String res = head.value + "!";
+        res += serialByPre(head.left);
+        res += serialByPre(head.right);
+        return res;
+    }
+
+    // KMP
+    public static int getIndexOf(String s, String m) {
+        if (s == null || m == null || m.length() < 1 || s.length() < m.length()) {
+            return -1;
+        }
+        char[] ss = s.toCharArray();
+        char[] ms = m.toCharArray();
+        int[] nextArr = getNextArray(ms);
+        int index = 0;
+        int mi = 0;
+        while (index < ss.length && mi < ms.length) {
+            if (ss[index] == ms[mi]) {
+                index++;
+                mi++;
+            } else if (nextArr[mi] == -1) {
+                index++;
+            } else {
+                mi = nextArr[mi];
+            }
+        }
+        return mi == ms.length ? index - mi : -1;
+    }
+
+    public static int[] getNextArray(char[] ms) {
+        if (ms.length == 1) {
+            return new int[]{-1};
+        }
+        int[] nextArr = new int[ms.length];
+        nextArr[0] = -1;
+        nextArr[1] = 0;
+        int pos = 2;
+        int cn = 0;
+        while (pos < nextArr.length) {
+            if (ms[pos - 1] == ms[cn]) {
+                nextArr[pos++] = ++cn;
+            } else if (cn > 0) {
+                cn = nextArr[cn];
+            } else {
+                nextArr[pos++] = 0;
+            }
+        }
+        return nextArr;
+    }
+
+    public static void main(String[] args) {
+        Node t1 = new Node(1);
+        t1.left = new Node(2);
+        t1.right = new Node(3);
+        t1.left.left = new Node(4);
+        t1.left.right = new Node(5);
+        t1.right.left = new Node(6);
+        t1.right.right = new Node(7);
+        t1.left.left.right = new Node(8);
+        t1.left.right.left = new Node(9);
+
+        Node t2 = new Node(2);
+        t2.left = new Node(4);
+        t2.left.right = new Node(8);
+        t2.right = new Node(5);
+        t2.right.left = new Node(9);
+
+        System.out.println(isSubtree(t1, t2));
+    }
+}
+
+```
 
 
 - 判断一个大字符串是否由一个小字符串重复得到，就是某个字符串是否为某个小字符串 * n 得到；
@@ -212,16 +389,16 @@ Manacher算法中定义了如下几个概念：
 
 处理回文子串长度为偶数的问题：上面拿`abcdcb`来举例，其中`bcdcb`属于一个回文子串，但如果回文子串长度为偶数呢？像`cabbac`，按照上面定义的“扩”的逻辑岂不是每个字符的回文半径都是0，但事实上`cabbac`的最长回文子串的长度是6。因为我们上面“扩”的逻辑默认是将回文子串当做奇数长度的串来看的，因此我们在使用Manacher算法之前还需要将字符串处理一下，这里有一个小技巧，那就是将字符串的首尾和每个字符之间加上一个特殊符号，这样就能将输入的串统一转为奇数长度的串了。比如`abba`处理过后为`#a#b#b#a`，这样的话就有`charArr[4]='#'`的回文半径为4，也即原串的最大回文子串长度为4。相应代码如下：
 
-```
-public static char[] manacherString(String str){
-  char[] source = str.toCharArray();
-  char chs[] = new char[str.length() * 2 + 1];
-  for (int i = 0; i < chs.length; i++) {
-    chs[i] = i % 2 == 0 ? '#' : source[i / 2];
-  }
-  return chs;
+```java
+public static char[] manacherString(String str) {  
+    char[] charArr = str.toCharArray();  
+    char[] res = new char[str.length() * 2 + 1];  
+    int index = 0;  
+    for (int i = 0; i != res.length; i++) {  
+        res[i] = (i & 1) == 0 ? '#' : charArr[index++];  
+    }  
+    return res;  
 }
-复制代码
 ```
 
 接下来分析，BFPRT算法是如何利用遍历过程中计算的`pArr`、`R`、`C`来为后续字符的回文半径的求解加速的。
@@ -286,34 +463,61 @@ public static char[] manacherString(String str){
 
 整体代码如下：
 
-```
-public static int maxPalindromeLength(String str) {
-  char charArr[] = manacherString(str);
-  int pArr[] = new int[charArr.length];
-  int R = -1, C = -1;
-  int max = Integer.MIN_VALUE;
-  for (int i = 0; i < charArr.length; i++) {
-    pArr[i] = i > R ? 1 : Math.min(pArr[C * 2 - i], R - i);
-    while (i + pArr[i] < charArr.length && i - pArr[i] > -1) {
-      if (charArr[i + pArr[i]] == charArr[i - pArr[i]]) {
-        pArr[i]++;
-      } else {
-        break;
-      }
+```java
+package nowcoder.advanced.day01;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2020/1/1 14:22
+ */
+public class Manacher {
+    public static char[] manacherString(String str) {
+        char[] charArr = str.toCharArray();
+        char[] res = new char[str.length() * 2 + 1];
+        int index = 0;
+        for (int i = 0; i != res.length; i++) {
+            res[i] = (i & 1) == 0 ? '#' : charArr[index++];
+        }
+        return res;
     }
-    if (R < i + pArr[i]) {
-      R = i + pArr[i]-1;
-      C = i;
+
+    public static int maxLcpsLength(String str) {
+        if (str == null || str.length() == 0) {
+            return 0;
+        }
+        char[] charArr = manacherString(str);
+        // 回文半径数组
+        int[] pArr = new int[charArr.length];
+        // index  为对称中心 C
+        int index = -1;
+        int pR = -1;
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i != charArr.length; i++) {
+            // 2 * index - 1 就是对应 i' 位置，R> i,表示 i 在回文右边界里面，则最起码有一个不用验的区域，
+            pArr[i] = pR > i ? Math.min(pArr[2 * index - i], pR - i) : 1;
+            // 四种情况都让扩一下，其中 1 和 4 会成功，但是 2 ，3 会失败则回文右边界不改变；可以自己写成 if-else 问题。
+            while (i + pArr[i] < charArr.length && i - pArr[i] > -1) {
+                if (charArr[i + pArr[i]] == charArr[i - pArr[i]]) {
+                    pArr[i]++;
+                } else {
+                    break;
+                }
+            }
+            if (i + pArr[i] > pR) {
+                pR = i + pArr[i];
+                index = i;
+            }
+            max = Math.max(max, pArr[i]);
+        }
+        return max - 1;
     }
-    max = Math.max(max, pArr[i]);
-  }
-  return max-1;
+
+    public static void main(String[] args) {
+        int length = maxLcpsLength("123abccbadbccba4w2");
+        System.out.println(length);
+    }
 }
 
-public static void main(String[] args) {
-  System.out.println(maxPalindromeLength("zxabcdcbayq"));
-}
-复制代码
 ```
 
 上述代码将四种情况的分支处理浓缩到了`7~14`行。其中第`7`行是确定加速信息：如果当前遍历字符在`R`右边，先算上其本身有`pArr[i]=1`，后面检查如果能扩再直接`pArr[i]++`即可；否则，当前字符的`pArr[i]`要么是`pArr[i']`（`i`关于`C`对称的下标`i'`的推导公式为`2*C-i`），要么是`R-i+1`，要么是`>=R-i+1`，可以先将`pArr[i]`的值置为这三种情况中最小的那一个，后面再检查如果能扩再直接`pArr[i]++`即可。
@@ -326,9 +530,67 @@ public static void main(String[] args) {
 
 > 思路：当`R`第一次到达串尾时，做`R`关于`C`的对称点`L`，将`L`之前的字符串逆序就是结果。
 
---------------------------------
+```java
+package nowcoder.advanced.day01;
 
------------------------------------------------------------------------------------------
+/**
+ * 添加尽可能少的字符使其成为一个回文字符串
+ *
+ * @author GJXAIOU
+ */
+public class ShortestEnd {
+
+    public static char[] manacherString(String str) {
+        char[] charArr = str.toCharArray();
+        char[] res = new char[str.length() * 2 + 1];
+        int index = 0;
+        for (int i = 0; i != res.length; i++) {
+            res[i] = (i & 1) == 0 ? '#' : charArr[index++];
+        }
+        return res;
+    }
+
+    public static String shortestEnd(String str) {
+        if (str == null || str.length() == 0) {
+            return null;
+        }
+        char[] charArr = manacherString(str);
+        int[] pArr = new int[charArr.length];
+        int index = -1;
+        int pR = -1;
+        int maxContainsEnd = -1;
+        for (int i = 0; i != charArr.length; i++) {
+            pArr[i] = pR > i ? Math.min(pArr[2 * index - i], pR - i) : 1;
+            while (i + pArr[i] < charArr.length && i - pArr[i] > -1) {
+                if (charArr[i + pArr[i]] == charArr[i - pArr[i]])
+                    pArr[i]++;
+                else {
+                    break;
+                }
+            }
+            if (i + pArr[i] > pR) {
+                pR = i + pArr[i];
+                index = i;
+            }
+            if (pR == charArr.length) {
+                maxContainsEnd = pArr[i];
+                break;
+            }
+        }
+        char[] res = new char[str.length() - maxContainsEnd + 1];
+        for (int i = 0; i < res.length; i++) {
+            res[res.length - 1 - i] = charArr[i * 2 + 1];
+        }
+        return String.valueOf(res);
+    }
+
+    public static void main(String[] args) {
+        String str2 = "abcd1233212";
+        System.out.println(shortestEnd(str2));
+    }
+}
+
+```
 
 ### （一）Manacher 算法应用
 
@@ -399,7 +661,7 @@ public static void main(String[] args) {
 代码：
 
 ```java
-package nowcoder.advanced.class01;
+package nowcoder.advanced.day01;
 
 /**
  * @Author GJXAIOU
@@ -408,11 +670,9 @@ package nowcoder.advanced.class01;
 public class Manacher {
     public static char[] manacherString(String str) {
         char[] charArr = str.toCharArray();
-        // 存放加入特殊字符的数组
         char[] res = new char[str.length() * 2 + 1];
         int index = 0;
         for (int i = 0; i != res.length; i++) {
-            // (i & 1) == 0 用于判断 i 的奇偶性，因为如果 i 为奇数，则其二进制最后一位比为 1，则相当于 XXX1 & 0001，结果肯定为 1。
             res[i] = (i & 1) == 0 ? '#' : charArr[index++];
         }
         return res;
@@ -470,13 +730,17 @@ public class Manacher {
 用manacher求得回文边界，发现边界与字符串最后位置，停止，求得回文中心C与有边界R，找到回文字符串，用原字符串减去该部分，在逆序就是结果。
 
 ```java
-package nowcoder.advanced.class01;
+package nowcoder.advanced.day01;
 
 /**
- * @Author GJXAIOU
+ * 添加尽可能少的字符使其成为一个回文字符串
+ *
+ * @author GJXAIOU
  * @Date 2020/1/1 14:11
  */
-public class LastAddString {
+
+public class ShortestEnd {
+
     public static char[] manacherString(String str) {
         char[] charArr = str.toCharArray();
         char[] res = new char[str.length() * 2 + 1];
@@ -499,9 +763,9 @@ public class LastAddString {
         for (int i = 0; i != charArr.length; i++) {
             pArr[i] = pR > i ? Math.min(pArr[2 * index - i], pR - i) : 1;
             while (i + pArr[i] < charArr.length && i - pArr[i] > -1) {
-                if (charArr[i + pArr[i]] == charArr[i - pArr[i]]) {
+                if (charArr[i + pArr[i]] == charArr[i - pArr[i]])
                     pArr[i]++;
-                } else {
+                else {
                     break;
                 }
             }
@@ -522,10 +786,11 @@ public class LastAddString {
     }
 
     public static void main(String[] args) {
-        String yuanlai = LastAddString.shortestEnd("abcd123321");
-        System.out.println(yuanlai);
+        String str2 = "abcd1233212";
+        System.out.println(shortestEnd(str2));
     }
 }
+
 ```
 
 
@@ -918,12 +1183,6 @@ public static void main(String[] args) {
 > morris遍历的独特之处就是充分利用了叶子结点的无效引用（引用指向的是空，但该引用变量仍然占内存），从而实现了`O(1)`的时间复杂度。
 
 
-作者：Anwen
-链接：https://juejin.im/post/5c6b9d4c6fb9a04a05403cbe
-来源：掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-
--------------
 
 ------------------
 

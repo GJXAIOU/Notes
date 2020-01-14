@@ -1,12 +1,12 @@
 # AlgorithmEasyDay05
 
 
-## 一、哈希函数和哈希表
+## 一、哈希函数
 哈希函数的概念是：将任意大小的数据转换成特定大小的数据的函数，转换后的数据称为哈希值或哈希编码。下面是一幅示意图：
 
 ![](AlgorithmEasyDay05.resource/1030776-20170106142012816-1867044021.png)
 
-可以明显的看到，原始数据经过哈希函数的映射后称为了一个个的哈希编码，数据得到压缩。哈希函数是实现哈希表和布隆过滤器的基础。
+可以明显的看到，原始数据经过哈希函数的映射后成为了一个个的哈希编码，数据得到压缩。哈希函数是实现哈希表和布隆过滤器的基础。
 ### （一）哈希函数
 ![输入图片描述](AlgorithmEasyDay05.resource/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0_20191227095740.png?v=1&type=image&token=V1:uwkxbbjwqvE2w2E7-NbrpGnPqFfe_T1gg3yPdunSQU0)
 - 哈希函数的特征
@@ -19,20 +19,20 @@
 如输入：a1,a2,a3...但是对应的输出值可能差距很大；
 
 **特征推广**
- 如果输出值在 S 域上是均匀分布的，则 S 域上所有值 %m 在 0 ~ m-1上为均匀分布；
+ 如果输出值在 S 域上是均匀分布的，则 S 域上所有值 `%m` 在 `0  ~  m-1`上为均匀分布；
 
 **哈希码**
-输入值经过哈希函数之后得到哈希码，哈希码上每一位都是（`0~9，a~f`）之间的某个值，并且该值在这个范围内均匀分布，同时哈希码的每一位之间都是相互独立的。
+输入值经过哈希函数之后得到哈希码，哈希码上每一位都是（`0~9，a~f`）之间的某个值，并且该值在这个范围内均匀分布，同时**哈希码的每一位之间都是相互独立的**。
 
 ![输入图片描述](AlgorithmEasyDay05.resource/%E5%93%88%E5%B8%8C%E5%80%BC_20191227100917.png?v=1&type=image&token=V1:Kd_h-5I4y42A0XH4nRS5GWjRvuDw1Rk6EpkCW-SnQOY)
 
-### （二）问：实现一千个相互独立的哈希函数
+### （二）实现一千个相互独立的哈希函数
 - 方案一：使用一个哈希函数分开作为两个种子
 因为哈希值为 N 个 16 位数的一串值，可以将 16 位数分为前 8 和后 8 位，分别作为 h1 和 h2 种子，即得到两个不相关的哈希函数（前后两部分相互独立），然后得到其他剩余的哈希函数： h3  = h1 + 1 * h2， h4 = h1 + 2 * h2，。。。。
 - 方案二：使用两个哈希函数作为两个种子
 即使用两个哈希函数作为种子，然后不断使用上面的公式得到其他的哈希函数。
 
-### （三）问：对于一个 10 T 大小的文件，每行为无序的字符串，打印里面所有重复的字符串
+### （三）对于一个 10 T 大小的文件，每行均为无序的字符串，打印里面所有重复的字符串
 **解释**：首先文件中每行数据之间是无序的，然后重复的规则可能是多种。
 **条件**：允许 1000 台机器（编号为 0 ~ 999），文件存放在分布式系统上；
 **过程**：将每行读出来，然后计算每行字符串的哈希值，然后将该值 % 1000（结果值为 0 ~ 999 之一），对应的将这条字符串放入计算出来的编号位置上。所以如果字符串相同，则其哈希值相同，最终会落在同一个机器上。
@@ -43,7 +43,7 @@
 ### （一）经典的哈希表结构
 经典的哈希表是使用**数组 + 链表** 结构实现的，常用的方法有：`put(key,value)`， `get(key)`， `remove(key)`如图所示：
 ![输入图片描述](AlgorithmEasyDay05.resource/%E7%BB%8F%E5%85%B8%E5%93%88%E5%B8%8C%E8%A1%A8%E7%BB%93%E6%9E%84_20191227102458.png?v=1&type=image&token=V1:BIuaD34iWguwf2iPCn014lMmHbOCIrp38zf6mjDwDUI)
-首先会分配一个数组空间（这里示例长度为 17），然后使用 `put(key1,value1)`时候，首先计算 key1 的哈希值得到 Code1，然后将 Code1 % 17（得到 0 ~ 16 之间一个值），然后将这对 key-vlaue 值挂在计算得到的值对应的位置后面（例如计算得到 5，就把该键值对挂载到下标为 5 的数组后面），其他所有的键值对都使用类似的方法。因为不同或者相同的 key 计算可能得到相同的哈希值，从而 % 17 的时候得到相同的数组下标，所以挂载之前看看该位置上是否已挂载其它键值对，如果有，则比较挂载的 key 值有无和当前的 key 值是否相同，如果相同则将原来键值对的 value 值该为当前键值对的 value 值，如果两个 key 值不相同则直接将该键值对挂载在原来链表后面即可。
+首先会分配一个数组空间（这里示例长度为 17），然后使用 `put(key1,value1)`时候，首先计算 key1 的哈希值得到 Code1，然后将 Code1 % 17（得到 0 ~ 16 之间一个值），然后将这对 key-vlaue 值挂在计算得到的值对应的位置后面（例如计算得到 5，就把该键值对挂载到下标为 5 的数组后面），其他所有的键值对都使用类似的方法。因为不同或者相同的 key 计算可能得到相同的哈希值，从而 % 17 的时候得到相同的数组下标，所以挂载之前看看该位置上是否已挂载其它键值对，如果有，则比较挂载的 key 值有无和当前的 key 值相同的，如果相同则将原来键值对的 value 值修改为当前键值对的 value 值，如果两个 key 值不相同则直接将该键值对挂载在原来链表后面即可。
 
 - 根据哈希函数的性质，**每个位置后面挂载的链表数目应该是大致相同的**，即大致各位置后链表数目增长速度相同。
 
@@ -52,14 +52,10 @@
 
 - 扩容方式
 	- 在线扩容：用户线程需要暂停
+    即原来数组长度为 17，数据量过大的时候后面挂载的链表数目就会很多，会影响操作效率，这里假设当后面链表节点数超过 5 即需要扩容至 104。扩容时候需要将原有哈希值重新经历哈希函数然后放置到新的数组对应位置上。
 	- 离线扩容：扩容和用户操作同步进行
+	当后面节点数到 5 的时候启动离线扩容（当前结构仍然可以使用，仅仅是效率有点下降），这时候在后台同时创建一个长度为 104 的数组，当用户使用 get 方法获取值时从原来结构中获取，当使用 put 方法放入值得时候，该键值对同时放入原来结构和扩容后的结构，扩容完成之后只需要将用户的指向该为扩容之后的结构即可。
 
-**在线扩容**
-即原来数组长度为 17，数据量过大的时候后面挂载的链表数目就会很多，会影响操作效率，这里假设当后面链表节点数超过 5 即需要扩容至 104,。
-扩容时候需要将原有哈希值重新经历哈希函数然后放置到新的数组对应位置上。
-
-**离线扩容**
-当后面节点数到 5 的时候启动离线扩容（当前结构仍然可以使用，仅仅是效率有点下降），这时候在后台同时创建一个长度为 104 的数组，当用户使用 get 方法获取值时从原来结构中获取，当使用 put 方法放入值得时候，该键值对同时放入原来结构和扩容后的结构，扩容完成之后只需要将用户的指向该为扩容之后的结构即可。
 
 ```java
 package nowcoder.easy.day05;  
@@ -69,93 +65,88 @@ import java.util.HashMap;
 import java.util.List;  
 import java.util.Map.Entry;  
   
-public class Code_01_HashMap {  
+/**  
+ * @author GJXAIOU  
+ * HashMap 基本使用操作 
+ */
+ public class HashMapOperation {  
   
-   public static void main(String[] args) {  
-      HashMap<String, String> map = new HashMap<>();  
-      map.put("zhangsan", "20");  
+    public static void main(String[] args) {  
+        HashMap<String, String> map = new HashMap<>();  
+        map.put("zhangsan", "11");  
   
-      System.out.println(map.containsKey("zhangsan"));  
-      System.out.println(map.containsKey("lisi"));  
-      System.out.println("=========================");  
+        System.out.println(map.containsKey("zhangsan"));  
+        System.out.println(map.containsKey("lisi"));  
+        System.out.println("=========================");  
   
-      System.out.println(map.get("zhangsan"));  
-      System.out.println(map.get("lisi"));  
-      System.out.println("=========================");  
+        System.out.println(map.get("zhangsan"));  
+        System.out.println(map.get("lisi"));  
+        System.out.println("=========================");  
   
-      System.out.println(map.isEmpty());  
-      System.out.println(map.size());  
-      System.out.println("=========================");  
+        System.out.println(map.isEmpty());  
+        System.out.println(map.size());  
+        System.out.println("=========================");  
+        // remove 方法返回删除 key 对应的 value 值  
+  System.out.println(map.remove("zhangsan"));  
+        System.out.println(map.containsKey("zhangsan"));  
+        System.out.println(map.get("zhangsan"));  
+        System.out.println(map.isEmpty());  
+        System.out.println(map.size());  
+        System.out.println("=========================");  
   
-      System.out.println(map.remove("zhangsan"));  
-      System.out.println(map.containsKey("zhangsan"));  
-      System.out.println(map.get("zhangsan"));  
-      System.out.println(map.isEmpty());  
-      System.out.println(map.size());  
-      System.out.println("=========================");  
+        map.put("zhangsan", "11");  
+        System.out.println(map.get("zhangsan"));  
+        map.put("zhangsan", "22");  
+        System.out.println(map.get("zhangsan"));  
+        System.out.println("=========================");  
   
-      map.put("zhangsan", "31");  
-      System.out.println(map.get("zhangsan"));  
-      map.put("zhangsan", "32");  
-      System.out.println(map.get("zhangsan"));  
-      System.out.println("=========================");  
+        map.put("zhangsan", "11");  
+        map.put("lisi", "22");  
+        map.put("wangwu", "33");  
   
-      map.put("zhangsan", "31");  
-      map.put("lisi", "32");  
-      map.put("wangwu", "33");  
+        for (String key : map.keySet()) {  
+            System.out.println(key);  
+        }  
+        System.out.println("=========以上为 key 列表================");  
   
-      for (String key : map.keySet()) {  
-         System.out.println(key);  
-      }  
-      System.out.println("=========================");  
+        for (String values : map.values()) {  
+            System.out.println(values);  
+        }  
+        System.out.println("===========以上为 value 列表==============");  
   
-      for (String values : map.values()) {  
-         System.out.println(values);  
-      }  
-      System.out.println("=========================");  
+        map.clear();  
+        map.put("A", "1");  
+        map.put("B", "2");  
+        map.put("C", "3");  
+        map.put("D", "1");  
+        map.put("E", "2");  
+        map.put("F", "3");  
+        map.put("G", "1");  
+        map.put("H", "2");  
+        map.put("I", "3");  
+        for (Entry<String, String> entry : map.entrySet()) {  
+            String key = entry.getKey();  
+            String value = entry.getValue();  
+            System.out.println(key + "," + value);  
+        }  
+        System.out.println("=========================");  
   
-      map.clear();  
-      map.put("A", "1");  
-      map.put("B", "2");  
-      map.put("C", "3");  
-      map.put("D", "1");  
-      map.put("E", "2");  
-      map.put("F", "3");  
-      map.put("G", "1");  
-      map.put("H", "2");  
-      map.put("I", "3");  
-      for (Entry<String, String> entry : map.entrySet()) {  
-         String key = entry.getKey();  
-         String value = entry.getValue();  
-         System.out.println(key + "," + value);  
-      }  
-      System.out.println("=========================");  
-  
-      // you can not remove item in map when you use the iterator of map  
-//     for(Entry<String,String> entry : map.entrySet()){  
-//        if(!entry.getValue().equals("1")){  
-//           map.remove(entry.getKey());  
-//        }  
-//     }  
-  
- // if you want to remove items, collect them first, then remove them by // this way.  List<String> removeKeys = new ArrayList<String>();  
-      for (Entry<String, String> entry : map.entrySet()) {  
-         if (!entry.getValue().equals("1")) {  
-            removeKeys.add(entry.getKey());  
-         }  
-      }  
-      for (String removeKey : removeKeys) {  
-         map.remove(removeKey);  
-      }  
-      for (Entry<String, String> entry : map.entrySet()) {  
-         String key = entry.getKey();  
-         String value = entry.getValue();  
-         System.out.println(key + "," + value);  
-      }  
-      System.out.println("=========================");  
-  
-   }  
-  
+        List<String> removeKeys = new ArrayList<String>();  
+        for (Entry<String, String> entry : map.entrySet()) {  
+            if (!entry.getValue().equals("1")) {  
+                removeKeys.add(entry.getKey());  
+            }  
+        }  
+        for (String removeKey : removeKeys) {  
+            map.remove(removeKey);  
+        }  
+        for (Entry<String, String> entry : map.entrySet()) {  
+            String key = entry.getKey();  
+            String value = entry.getValue();  
+            System.out.println(key + "," + value);  
+        }  
+        System.out.println("=========================");  
+    }  
 }
 ```
 输出结果为：
@@ -163,29 +154,29 @@ public class Code_01_HashMap {
 true
 false
 =========================
-20
+11
 null
 =========================
 false
 1
 =========================
-20
+11
 false
 null
 true
 0
 =========================
-31
-32
+11
+22
 =========================
 lisi
 zhangsan
 wangwu
-=========================
-32
-31
+=========以上为 key 列表================
+22
+11
 33
-=========================
+===========以上为 value 列表==============
 A,1
 B,2
 C,3
@@ -203,26 +194,31 @@ G,1
 ```
 
 
-### （三）问：设计 RandomPool 结构
+### （三）设计 RandomPool 结构
 
 【题目】 设计一种结构，在该结构中有如下三个功能：
-- insert(key)：将某个key加入到该结构，做到不重复加入。
-- delete(key)：将原本在结构中的某个key移除。 
-- getRandom()：等概率随机返回结构中的任何一个key。
+- insert(key)：将某个 key 加入到该结构，做到不重复加入。
+- delete(key)：将原本在结构中的某个 key 移除。 
+- getRandom()：等概率随机返回结构中的任何一个 key。
 
-【要求】 Insert、delete和getRandom方法的时间复杂度都是O(1)
+【要求】 Insert、delete 和 getRandom 方法的时间复杂度都是 O(1)
 
 **思路**：因为如果使用一个哈希表则绝对不能保证 getRandom 方法中的严格等概率，因为输入值经过哈希函数之后的输出值仅仅是大致等概率均匀分布（均匀性只是在大样本情况下的近似均匀），因此需要使用两个哈希表；
 两个哈希表结构为：
 
 ![输入图片描述](AlgorithmEasyDay05.resource/RandomPool%20%E7%BB%93%E6%9E%84_20191227114346.png?v=1&type=image&token=V1:DbdqtAkHRk-HqcPZvb9GjaIqMAr5yHgSY34K2TeQutg)
 
-针对 put 方法，针对第一个键值对（str0,0），数据放入哈希表之后（具体的存放位置不一定是图示的位置（因为经过哈希计算之后是离散的），正因为离散型，所以实际上放置的位置无关紧要，这里仅仅表示该哈希表有这个键值对即可，同时在另一个哈希表中存入对应的键值对（0，str0），每存入一个值 size 值 + 1。
+针对 put 方法，针对第一个键值对（str0, 0），数据放入哈希表之后（具体的存放位置不一定是图示的位置（因为经过哈希计算之后是离散的），正因为离散型，所以实际上放置的位置无关紧要，这里仅仅表示该哈希表有这个键值对即可，同时在另一个哈希表中存入对应的键值对（0，str0），每存入一个值 size 值 + 1。
 **如果不考虑 remove 方法**，则使用下面代码即可保证 getRandom 方法等概率返回结构中任意一个 key。
 
 ```java
 package nowcoder.easy.day05;  
   
+/**  
+ * 不考虑 Remove 方法的 RandomPool 程序 
+ * @author GJXIAOU  
+ * @create 2020/1/14 0014 上午 11:13  
+ */  
 import java.util.HashMap;  
   
 public class RandomPoolWithoutRemove {  
@@ -237,11 +233,10 @@ public class RandomPoolWithoutRemove {
     }  
   
     public void add(String str) {  
-        // 这里只是巧合：value 值正好为 size 大小；  
-  map1.put(str, size);  
-        map2.put(size, str);  
-        size++;  
-    }  
+	    map1.put(str, size);  
+	    map2.put(size, str);  
+	    size++;  
+    }
   
     public String getRandom() {  
         if (size == 0) {  
@@ -252,9 +247,9 @@ public class RandomPoolWithoutRemove {
     }  
 }
 ```
-**考虑到 remove 方法**：因为使用 remove 方法，会在整个数组中形成空位置，所以如果使用 getRandom 方法可能会获取到空位置，当空位置很多时候就得不断的进行重新计算使得时间复杂度不是 O(1)。
-默认删除方式：例如这里删除 key 为 str17 的记录，则首先在哈希表1 中找到 key 为 str17，删除该键值对，同时根据其对应的 value 值作为 key  值查询哈希表 2 中对应的键值对，然后删除该记录。 
-**为了保证 getRandom 查询严格等概率并且时间复杂度为 O（1）**： **最后一个元素填洞**。
+**考虑到 remove 方法**：因为使用 remove 方法，会在整个数组中形成空位置，所以如果使用 getRandom 方法可能会获取到空位置，当空位置很多时候就得不断的进行重新计算新的非空位置使得时间复杂度不是 O(1)。
+默认删除方式：例如这里删除 key 为 str17 的记录，则首先在哈希表 1 中找到 key 为 str17，删除该键值对，同时根据其对应的 value 值作为 key  值查询哈希表 2 中对应的键值对，然后删除该记录。 
+**为了保证 getRandom 查询严格等概率并且时间复杂度为 O（1）**： **每次 Remove 之后使用哈希表中最后一个元素填充产生的洞**。
 在删除哈希表中 str17 之前，将表中最后一个位置的 str999 放到 str17 位置，然后同样将哈希表 1 中该 key 对应的 value 对应的哈希表 2 中的 key = 17 的 value 值也设置为最后一个值 str999，然后删除两张表中的最后一条记录，同时将哈希表的长度 size 改为 999。
 最后使用 Math.Random() * size 获取 0 ~ 998 之间的随机值，最后返回哈希表 2 中对应值的 value 值即可。
 ```java
@@ -262,7 +257,9 @@ package nowcoder.easy.day05;
   
 import java.util.HashMap;  
   
-public class Code_02_RandomPool {  
+/**  
+ * 完整的 RandomPool 结构 * * @author GJXAIOU  
+ */public class RandomPool {  
   
     public static class Pool<K> {  
         private HashMap<K, Integer> keyIndexMap;  
@@ -276,21 +273,23 @@ public class Code_02_RandomPool {
         }  
   
         public void insert(K key) {  
-            if (!this.keyIndexMap.containsKey(key)) {  
-                this.keyIndexMap.put(key, this.size);  
-                this.indexKeyMap.put(this.size++, key);  
+            if (!keyIndexMap.containsKey(key)) {  
+                keyIndexMap.put(key, size);  
+                indexKeyMap.put(size++, key);  
             }  
         }  
   
         public void delete(K key) {  
-            if (this.keyIndexMap.containsKey(key)) {  
-                int deleteIndex = this.keyIndexMap.get(key);  
-                int lastIndex = --this.size;  
-                K lastKey = this.indexKeyMap.get(lastIndex);  
-                this.keyIndexMap.put(lastKey, deleteIndex);  
-                this.indexKeyMap.put(deleteIndex, lastKey);  
-                this.keyIndexMap.remove(key);  
-                this.indexKeyMap.remove(lastIndex);  
+            if (keyIndexMap.containsKey(key)) {  
+                int deleteIndex = keyIndexMap.get(key);  
+                // 因为 index 从 0 开始，所以 lastIndex = --size  
+  int lastIndex = --size;  
+                // 将最后一个值放置到刚才删除的 deleteIndex 上面，然后删除 lastIndex。  
+  K lastKey = indexKeyMap.get(lastIndex);  
+                keyIndexMap.put(lastKey, deleteIndex);  
+                indexKeyMap.put(deleteIndex, lastKey);  
+                keyIndexMap.remove(key);  
+                indexKeyMap.remove(lastIndex);  
             }  
         }  
   
@@ -299,7 +298,7 @@ public class Code_02_RandomPool {
                 return null;  
             }  
             int randomIndex = (int) (Math.random() * this.size); // 0 ~ size -1  
-  return this.indexKeyMap.get(randomIndex);  
+  return indexKeyMap.get(randomIndex);  
         }  
     }  
   
@@ -329,7 +328,7 @@ lisi
 
 ## 三、布隆过滤器
 ### （一）作用
-- 一般用于判断某个值是否在集合中，如果在则一定返回 true，但是不在也可能返回 true，**有失误率**；判断==某样东西一定不存在或者可能存在==。
+- 一般用于判断某个值是否在集合中，如果在则一定返回 true，但是不在也可能返回 true，**有失误率**。即判断==某样东西一定不存在或者可能存在==。
 - 相比于传统的 List、Set、Map 等数据结构，它更高效、占用空间更少，但是缺点是其返回的结果是概率性的，而不是确切的；
 - 判断某个元素是否存在可以使用 HashMap，时间复杂度为 O（1），但是存储容量占比高（占用内存高），同时对于本地输入，数据在远程服务器，同时数据集大到无法一次性读进内存构建 HashMap 时候也存在问题。
 - 比较针对黑名单问题和爬虫去重问题；
@@ -350,7 +349,10 @@ package nowcoder.easy.day05;
 
 /**
  * 使用基本数据结构实现布隆过滤器，如果想减少数组空间，可以使用 Long 类型或者使用矩阵
+ * @author GJXIAOU
+ * @create 2020/1/14 0014 下午 1:43
  */
+
 public class BloomFilter {
     public static void main(String[] args) {
         // 使用 int 类型，因为一个 int 占 4 位即 32 bit，因此 1000 个 int 数据可以表示 32000bit；
@@ -367,20 +369,20 @@ public class BloomFilter {
 }
 ```
 **实现过程**
-取其中一个 URL 分别经过 K 个相互独立的哈希函数（hash1，hash2，hash3，。。。hashk），分别得到哈希值 code1，code2，code3，。。。codeK，然后对所有的哈希值 %m，得到 0 ~ m-1 之间的某个值，将这个值的位置描黑（如果该位置已经描黑，则继续描黑）。将所有的 URL 都按照此步骤走一遍，如果某个 URL 对应的 K 个数组中位置都是描黑的，则该 URL 在黑名单中，如果有一个不为黑则不在 URL 中。
+取其中一个 URL 分别经过 K 个相互独立的哈希函数（hash1，hash2，hash3，。。。hashk），分别得到哈希值 code1，code2，code3，。。。codeK，然后对所有的哈希值 %m，得到 0 ~ m - 1 之间的某个值，将这个值的位置描黑（如果该位置已经描黑，则继续描黑）。将所有的 URL 都按照此步骤走一遍，如果某个 URL 对应的 K 个数组中位置都是描黑的，则该 URL 在黑名单中，如果有一个不为黑则不在 URL 中。
 
-### 布隆过滤器添加元素
+### （三）布隆过滤器添加元素
 
--   将要添加的元素给k个哈希函数
--   得到对应于位数组上的k个位置
--   将这k个位置设为1
+-   将要添加的元素给 k 个哈希函数
+-   得到对应于位数组上的 k 个位置
+-   将这 k 个位置设为 1
 
-### 布隆过滤器查询元素
+### （四）布隆过滤器查询元素
 
--   将要查询的元素给k个哈希函数
--   得到对应于位数组上的k个位置
--   如果k个位置有一个为0，则肯定不在集合中
--   如果k个位置全部为1，则可能在集合中
+-   将要查询的元素给 k 个哈希函数
+-   得到对应于位数组上的 k 个位置
+-   如果 k 个位置有一个为 0，则肯定不在集合中
+-   如果 k 个位置全部为 1，则可能在集合中
 
 **示例**：
 布隆过滤器是一个 bit 向量或者说 bit 数组，长这样：
@@ -399,13 +401,13 @@ Ok，我们现在再存一个值 “tencent”，如果哈希函数返回 3、4�
 
 这是为什么呢？答案跟简单，因为随着增加的值越来越多，被置为 1 的 bit 位也会越来越多，这样某个值 “taobao” 即使没有被存储过，但是万一哈希函数返回的三个 bit 位都被其他值置位了 1 ，那么程序还是会判断 “taobao” 这个值存在。
 
-### **支持删除么**
+### （五）不支持删除
 
-目前我们知道布隆过滤器可以支持 add 和 isExist 操作，那么 delete 操作可以么，答案是不可以，例如上图中的 bit 位 4 被两个值共同覆盖的话，一旦你删除其中一个值例如 “tencent” 而将其置位 0，那么下次判断另一个值例如 “baidu” 是否存在的话，会直接返回 false，而实际上你并没有删除它。
+不支持 delete 操作，只支持 add 和 isExit 操作，例如上图中的 bit 位 4 被两个值共同覆盖的话，一旦你删除其中一个值例如 “tencent” 而将其置位 0，那么下次判断另一个值例如 “baidu” 是否存在的话，会直接返回 false，而实际上你并没有删除它。
 
 如何解决这个问题，答案是计数删除。但是计数删除需要存储一个数值，而不是原先的 bit 位，会增大占用的内存大小。这样的话，增加一个值就是将对应索引槽上存储的值加一，删除则是减一，判断是否存在则是看值是否大于0。
 
-### **如何选择哈希函数个数和布隆过滤器长度**
+### （六）如何选择哈希函数个数和布隆过滤器长度
 
 很显然，过小的布隆过滤器很快所有的 bit 位均为 1，那么查询任何值都会返回“可能存在”，起不到过滤的目的了。布隆过滤器的长度会直接影响误报率，布隆过滤器越长其误报率越小。
 
@@ -431,7 +433,7 @@ k 为哈希函数个数，m 为布隆过滤器长度，n 为插入的元素个�
 
 ![[公式]](AlgorithmEasyDay05.resource/equation-1577590957471.svg)
 
-## **最佳实践**
+## 四、最佳实践
 
 常见的适用常见有，利用布隆过滤器减少磁盘 IO 或者网络请求，因为一旦一个值必定不存在的话，我们可以不用进行后续昂贵的查询请求。
 
@@ -452,13 +454,13 @@ Redis 因其支持 setbit 和 getbit 操作，且纯内存性能高等特点，�
 
 
 
-### 一致性哈希
+### （一）一致性哈希
 
 哈希可以近似的实现负载均衡，但是一旦发生设备的增删则需要将所有的数据进行迁移，可以使用一致性哈希来降低迁移代价并且实现负载均衡。
 
 
 
-#### （一）经典服务器抗压结构
+#### 1.经典服务器抗压结构
 
 ![经典服务器抗压结构](AlgorithmEasyDay05.resource/%E7%BB%8F%E5%85%B8%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8A%97%E5%8E%8B%E7%BB%93%E6%9E%84.png)
 
@@ -504,35 +506,39 @@ Redis 因其支持 setbit 和 getbit 操作，且纯内存性能高等特点，�
 
 
 
-### 并查集结构
+## 五、并查集结构
+**并查集**是一种树型的数据结构，用于处理一些不交集（Disjoint Sets）的合并及查询问题。有一个**联合-查找算法**（**union-find algorithm**）定义了两个用于此数据结构的操作：
 
-#### （一）功能作用
+-   Find：确定元素属于哪一个子集。它可以被用来确定两个元素是否属于同一子集。
+-   Union：将两个子集合并成同一个集合。
 
-- 查询两个元素是否属于同一个集合：isSameSet(A,B)，本质上是判断元素 A 和元素 B所属的集合是否为同一个集合。
+首先并查集本身是一个结构，我们在构造它的时候需要将所有要操作的数据扔进去，初始时每个数据自成一个结点，且每个结点都有一个父指针（初始时指向自己）。
+
+**前提**就是所有集合中的数据必须是一次性提前给定的，不能以流的方式动态的加入数据到集合中。
+
+### （一）功能作用
+
+- 查询两个元素是否属于同一个集合：isSameSet(A,B)，本质上是判断元素 A 和元素 B 所属的集合是否为同一个集合。
 - 两个元素各自所在的**所有集合**进行合并：union(A,B)；
 
-#### （二）前提
+### （二）前提
 
 所有集合中的数据必须是一次性提前给定的，不能以流的方式动态的加入数据到集合中。
 
-#### （三）实现步骤
+### （三）实现步骤
 
 - 首先给定数据集合，这里以 int 类型为例 {1,2,3,4,5}
-
-- 然后每个元素自己形成一个集合，如图所示：
-
-    ![并查集输入结构](AlgorithmEasyDay05.resource/%E5%B9%B6%E6%9F%A5%E9%9B%86%E8%BE%93%E5%85%A5%E7%BB%93%E6%9E%84.png)
+- 初始时并查集中的每个结点都算是一个子集，我们可以对任意两个元素进行合并操作。值得注意的是，`union(nodeA,nodeB)`并不是将结点`nodeA`和`nodeB`合并成一个集合，而是将`nodeA`所在的集合和`nodeB`所在的集合合并成一个新的子集：![并查集输入结构](AlgorithmEasyDay05.resource/%E5%B9%B6%E6%9F%A5%E9%9B%86%E8%BE%93%E5%85%A5%E7%BB%93%E6%9E%84.png)
+![](AlgorithmEasyDay05.resource/169045ae3f1f0d9e)
 
 - 元素所属集合：
+    集合（一般为多叉树结构）中元素一直向上查找，一直找到一个结点的上一个结点指向自己，则该结点称为代表节点（并查集初始化时，每个结点都是各自集合的代表结点），同时**该节点代表整个集合**。`find`操作：查找两个结点是否所属同一个集合。我们只需判断两个结点所在集合的代表结点是否是同一个就可以了：
 
-    集合（一般为多叉树结构）中元素一直向上查找，一直找到一个结点的上一个结点指向自己，则该结点称为代表节点，同时**该节点代表整个集合**。
+- 集合合并：合并两个集合就是将结点个数较少的那个集合的代表结点的父指针指向另一个集合的代表结点。3，5 集合合并
 
-- 集合合并：3，5 集合合并，**节点少的集合加在结点多的集合上面**
+    ![集合合并](AlgorithmEasyDay05.resource/%E9%9B%86%E5%90%88%E5%90%88%E5%B9%B6.png)    
 
-    ![集合合并](AlgorithmEasyDay05.resource/%E9%9B%86%E5%90%88%E5%90%88%E5%B9%B6.png)
-
-- 查找优化：查询到代表结点之后，将查询过程中经历的所有结点进行打平。
-
+- 查找优化：**查询到代表结点之后，将查询过程中经历的所有结点进行打平**。
     例如下面结构中查询节点 3 的代表节点，过程就是依次向上查询，一直遍历查询到 1，然后返回 1 并将沿途经过的结点2 打平（直接挂在代表结点下面）。
 
     ![节点优化](AlgorithmEasyDay05.resource/%E8%8A%82%E7%82%B9%E4%BC%98%E5%8C%96.png)
@@ -542,18 +548,22 @@ Redis 因其支持 setbit 和 getbit 操作，且纯内存性能高等特点，�
 代码：
 
 ```java
-package nowcoder.easy.class_05;
+package nowcoder.easy.day05;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
-public class Code_04_UnionFind {
+/**
+ * 查找两个节点是否在同一个集合中
+ * @author GJXAIOU
+ */
+public class UnionFind {
 
 	public static class Node {
-		// whatever you like，可以是 String，Int，等等类型
+		// 可以是 String，Int，等等类型
 	}
 
+	// 初始化并查集中数据
 	public static class UnionFindSet {
 		// key:child,value:father节点
 		public HashMap<Node, Node> fatherMap;
@@ -632,81 +642,80 @@ public class Code_04_UnionFind {
 
 	}
 }
-
 ```
 
+### （四）岛问题：
 
+【问题】一个矩阵中只有 0 和 1 两种值，每个位置都可以和自己的上、下、左、右四个位置相连接，如果有一片 1 连接在一起，则这个部分称为一个岛，求一个矩阵中有多少个岛。
 
-#### 问题示例
-
-**问题**：岛问题：
-
-一个矩阵中只有 0 和 1 两种值，每个位置都可以和自己的上、下、左、右四个位置相连接，如果有一片 1 连接在一起，则这个部分称为一个岛，求一个矩阵中有多少个岛。
-
-**示例**：下面矩阵中有三个岛。
+【示例】下面矩阵中有三个岛。
 
 ![示例岛结构](AlgorithmEasyDay05.resource/%E7%A4%BA%E4%BE%8B%E5%B2%9B%E7%BB%93%E6%9E%84.png)
 
-**解答**
-
-如果只是单 CPU 的情况直接使用递归即可，代码如下：
+【解答】如果只是单 CPU 的情况直接使用递归即可，代码如下：
 
 ```java
-package nowcoder.easy.class_05;
+package nowcoder.easy.day05;
 
-public class Code_03_Islands {
+/**
+ * 岛问题
+ *
+ * @author GJXAIOU
+ */
+public class Islands {
 
-	public static int countIslands(int[][] m) {
-		if (m == null || m[0] == null) {
-			return 0;
-		}
-		// N 为行数，M 为列数
-		int N = m.length;
-		int M = m[0].length;
-		int res = 0;
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				if (m[i][j] == 1) {
-					// 岛的数目 + 1
-					res++;
-					// 进入感染函数，将其练成一片的 1 全部改为 2
-					infect(m, i, j, N, M);
-				}
-			}
-		}
-		return res;
-	}
+    public static int countIslands(int[][] inputArray) {
+        if (inputArray == null || inputArray[0] == null) {
+            return 0;
+        }
+        // row 为行数，column 为列数
+        int row = inputArray.length;
+        int column = inputArray[0].length;
+        int res = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if (inputArray[i][j] == 1) {
+                    // 岛的数目 + 1
+                    res++;
+                    // 进入感染函数，将其连成一片的 1 全部改为 2
+                    infect(inputArray, i, j, row, column);
+                }
+            }
+        }
+        return res;
+    }
 
-	public static void infect(int[][] m, int i, int j, int N, int M) {
-		if (i < 0 || i >= N || j < 0 || j >= M || m[i][j] != 1) {
-			return;
-		}
-		m[i][j] = 2;
-		infect(m, i + 1, j, N, M);
-		infect(m, i - 1, j, N, M);
-		infect(m, i, j + 1, N, M);
-		infect(m, i, j - 1, N, M);
-	}
+    public static void infect(int[][] inputArray, int i, int j, int row, int column) {
+        // 判断边界以及当前遍历到的结点值是否为 1；
+        if (i < 0 || i >= row || j < 0 || j >= column || inputArray[i][j] != 1) {
+            return;
+        }
+        inputArray[i][j] = 2;
+        infect(inputArray, i + 1, j, row, column);
+        infect(inputArray, i - 1, j, row, column);
+        infect(inputArray, i, j + 1, row, column);
+        infect(inputArray, i, j - 1, row, column);
+    }
 
-	public static void main(String[] args) {
-		int[][] m1 = {  { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
-				        { 0, 1, 1, 1, 0, 1, 1, 1, 0 }, 
-				        { 0, 1, 1, 1, 0, 0, 0, 1, 0 },
-				        { 0, 1, 1, 0, 0, 0, 0, 0, 0 }, 
-				        { 0, 0, 0, 0, 0, 1, 1, 0, 0 }, 
-				        { 0, 0, 0, 0, 1, 1, 1, 0, 0 },
-				        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, };
-		System.out.println(countIslands(m1));
+    public static void main(String[] args) {
+        int[][] m1 = {{0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 1, 1, 1, 0, 1, 1, 1, 0},
+                {0, 1, 1, 1, 0, 0, 0, 1, 0},
+                {0, 1, 1, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 1, 1, 0, 0},
+                {0, 0, 0, 0, 1, 1, 1, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},};
+        System.out.println(countIslands(m1));
 
-		int[][] m2 = {  { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
-						{ 0, 1, 1, 1, 1, 1, 1, 1, 0 }, 
-						{ 0, 1, 1, 1, 0, 0, 0, 1, 0 },
-						{ 0, 1, 1, 0, 0, 0, 1, 1, 0 }, 
-						{ 0, 0, 0, 0, 0, 1, 1, 0, 0 }, 
-						{ 0, 0, 0, 0, 1, 1, 1, 0, 0 },
-						{ 0, 0, 0, 0, 0, 0, 0, 0, 0 }, };
-		System.out.println(countIslands(m2));
-	}
+        int[][] m2 = {{0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 1, 1, 1, 1, 1, 1, 1, 0},
+                {0, 1, 1, 1, 0, 0, 0, 1, 0},
+                {0, 1, 1, 0, 0, 0, 1, 1, 0},
+                {0, 0, 0, 0, 0, 1, 1, 0, 0},
+                {0, 0, 0, 0, 1, 1, 1, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},};
+        System.out.println(countIslands(m2));
+    }
 }
 
 ```
