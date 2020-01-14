@@ -11,8 +11,6 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
 
 # Git & GitHub 使用说明
 
-@toc
-
 ==原则：不要在远程仓库（GitHub）中直接修改文件，应该在本地修改之后 push 到远程仓库。==
 
 ## 一、Git
@@ -26,7 +24,7 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
   - Git GUI      ：这是有界面的模式
   
 - Git 整体结构：
-  ![Git结构 2](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/Git%E7%BB%93%E6%9E%84%202.png)
+  <img src="Git&amp;Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/Git%E7%BB%93%E6%9E%84%202.png" alt="Git结构 2" style="zoom:50%;" />
 
 - 查看 Git 基本配置：`git config --list`  基本不使用；
 
@@ -79,7 +77,7 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
 **步骤：**
 
 - 进入GitHub 中所要同步的库页面，选择：`clone or download`，然后将URL复制下来，示例为：`https://github.com/GJXAIOU/Notes.git`
-![URL](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/URL.jpg)
+![image-20200114215859346](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/image-20200114215859346.png)
 
 - 在 Git Bash 中首先将目录切换到想要保存该库的目录下，然后输入命令
 `git clone https://github.com/GJXAIOU/Notes.git` (后面的网址就是刚才复制的)，这样就把 Github 在线仓库 clone 到了本地；
@@ -89,12 +87,19 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
 **作用**：实现 GitHub 账号和本地关联，使得下面你有权限在本地修改 GitHub 上面的仓库内容，所以只有更换机器的时候需要关联。
 
 - 步骤一：注册 GitHub 账号，换个头像，折腾折腾。。。
+
 - 步骤二：在本地生成 SSH Key :  
-在 Git Bash 中（如果不声明位置，默认任何位置右击选择 `git bash here` 打开命令行窗口即可）输入命令：`ssh-keygen -t rsa -C "GitHub 邮箱"`，接下来**全部回车**确认，这样在**电脑 C 盘本人用户名目录下**就会出现一个文件：`.ssh`
+
+  在 Git Bash 中（如果不声明位置，默认任何位置右击选择 `git bash here` 打开命令行窗口即可）输入命令：`ssh-keygen -t rsa -C "GitHub 邮箱"`，接下来**全部回车**确认，这样在**电脑 C 盘本人用户名目录下**就会出现一个文件：`.ssh`
+
 - 步骤三：将上面 `.ssh` 文件中的 `id_rsa` 使用记事本打开，然后全选复制内容；
-- 步骤四：将上面复制的秘钥内容，黏贴到 GitHub 中
-![搜狗截图20190226204854](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226204854.png)
-![搜狗截图20190226205651](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226205651.png)
+
+- 步骤四：将上面复制的秘钥内容，黏贴到 GitHub 中（右上角头像旁边的下拉按钮点击 setting 就会到该页面）
+
+  ![image-20200114220244937](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/image-20200114220244937.png)
+
+  ![搜狗截图20190226204854](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226204854.png
+  ![搜狗截图20190226205651](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226205651.png)
 
 - 步骤六：将本地的 master 分支与 GitHub 仓库分支进行关联,仓库别名为 notes（可以自己制定，这个名字就是以后修改 GitHub 仓库时候，如果你有多个仓库，需要制定修改的是哪个仓库，相当于为 GitHub 仓库取个别名）
 `git remote add notes https://github.com/GJXAIOU/Notes.git` # 后面为仓库的 SSH 地址，相当于以后使用 `notes` 指定自己操作的是名叫 `Notes` 的仓库 
@@ -130,6 +135,11 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
 - `git add .` 或者 `git add 文件名或文件夹`
 - `git commit -m "提交的备注"`
 - `git push 仓库别名 master`
+
+
+
+--------下面可以忽略不看，有需求时候可以在学习---------
+
 
 
 ### （四）工作区和版本库区别
