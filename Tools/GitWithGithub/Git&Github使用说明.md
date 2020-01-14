@@ -9,60 +9,59 @@ custom: GJXAIOU
 note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭代，2019-8-6号形成终稿
 ---
 
-# Git&GitHub使用说明
+# Git & GitHub 使用说明
 
 @toc
 
-==原则：不要在远程库修改文件，一定要在本地修改然后 push==
+==原则：不要在远程仓库（GitHub）中直接修改文件，应该在本地修改之后 push 到远程仓库。==
 
 ## 一、Git
 
 ### （一）Git 安装
-[软件下载地址](https://git-scm.com/downloads)，按照这里的教程安装即可：[附录一：Git安装教程](#附录一：git-安装)
+[软件下载地址](https://git-scm.com/downloads)，选择对应系统版本正常安装即可，按照过程可参考[该博客](https://blog.csdn.net/qq_32786873/article/details/80570783)。
 
 ### （二）Git 简介
 - Git 使用模式：
   - Git Bash   ：这是命令行模式（类似Linux）【推荐】
   - Git GUI      ：这是有界面的模式
+  
 - Git 整体结构：
-![Git结构 2]($resource/Git%E7%BB%93%E6%9E%84%202.png)
+  ![Git结构 2](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/Git%E7%BB%93%E6%9E%84%202.png)
+
 - 查看 Git 基本配置：`git config --list`  基本不使用；
 
 
 ### （三）Git 配置
 
-- 下面是使用Git的最小配置
-1.打开Git Bash :切换到下面文件目录下；（或者在文件资源器中进入该目录，然后右键：Git Bash Here）
-配置`user.name`和`user.email` 其中global表示对登录用户的所有仓库有效，是用于区分不同的开发人员身份；
-注：以上信息都保存在.git 文件夹中，存放的是本地库相关的子目录和文件，可以使用：`ll .git/`查看，同时，可以使用`cat .git/config`进行查看配置文件，这里看到所有的用户
-2.输入：`git config --global user.name '随便用户名'`
-3.输入：`git config --global user.email '随便邮箱'`
+下面是使用 Git 的最小配置
+- 步骤一：首先在任意文件夹（路径尽量不要有中文）的空白处右击，选择 `git bash here`，即可打开 Git 命令行窗口并处于该文件夹路径下。
+- 步骤二：输入命令 `git config --global user.name '任意用户名'`
+- 步骤三：输入命令 `git config --global user.email '随便邮箱'`
+
+【注】
+- 上面两步骤是配置`user.name`和`user.email` 其中 global 表示对登录用户的所有仓库有效，是用于区分不同的开发人员身份；
+- 以上信息都保存在 .git 文件夹中，存放的是本地库相关的子目录和文件，可以使用：`ll .git/`查看，同时，可以使用`cat .git/config`进行查看配置文件，这里看到所有的用户
+
 ```git
- git config --local         local只对仓库有效。此也为缺省条件下的配置
- git config --global        global对登录用户的所有仓库都有效
- git config --system        system对系统的所有用户都有效
+ git config --local         local 只对仓库有效。此也为缺省条件下的配置
+ git config --global        global 对登录用户的所有仓库都有效
+ git config --system        system 对系统的所有用户都有效
 ```
 上面三个作用域是由一定的优先级的：local > global > system
 
 
 
 ### （三）在本地建立一个仓库
-- 示例：在`E`盘下建立一个名为`practice`的仓库
-```git
-  cd e:
-  mkdir practice
-  cd practice
-  ls -la     # 看现在里面有多少文件
-  git init   # 完成初始化，建立了一个空仓库
-```
 
 - 建立本地 Git 仓库的两种方式：
-  *   用Git之前已经有项目代码，则使用以下两条命令建立Git仓库
+  *   如果用 Git 之前已经有项目代码，则使用以下两条命令建立本地 Git 仓库
 ```git
   cd 项目代码所在的文件夹
   git init
 ```
-  *   用Git之前还没有项目代码，使用下面三条命令创建git仓库
+或者向上面那样，进入到项目路径所处的文件夹，然后右击：`git bash here`，在命令行窗口输入：`git init` 也可以。
+
+  *   用Git之前还没有项目代码，使用下面三条命令创建本地 Git 仓库
 ```
   cd 路径
   git init your_project #会在当前路径下创建和项目名称同名的文件夹
@@ -70,14 +69,77 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
 ```
 然后就是在自己的仓库中开始写代码或者更改代码了。
 
+
+## 二、GitHub
+
+### （一）将 GitHub 上的仓库克隆到本地
+
+**演示说明：** 默认本地 文件地址为：`E:\Program\GitHub\`，GitHub上的库为：`Notes`
+
+**步骤：**
+
+- 进入GitHub 中所要同步的库页面，选择：`clone or download`，然后将URL复制下来，示例为：`https://github.com/GJXAIOU/Notes.git`
+![URL](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/URL.jpg)
+
+- 在 Git Bash 中首先将目录切换到想要保存该库的目录下，然后输入命令
+`git clone https://github.com/GJXAIOU/Notes.git` (后面的网址就是刚才复制的)，这样就把 Github 在线仓库 clone 到了本地；
+**至此就实现了将 GitHub 上仓库复制到本地的操作**，GitHub 下载较慢，耐心等待一会。
+
+### （二）连接本地仓库与 GitHub
+**作用**：实现 GitHub 账号和本地关联，使得下面你有权限在本地修改 GitHub 上面的仓库内容，所以只有更换机器的时候需要关联。
+
+- 步骤一：注册 GitHub 账号，换个头像，折腾折腾。。。
+- 步骤二：在本地生成 SSH Key :  
+在 Git Bash 中（如果不声明位置，默认任何位置右击选择 `git bash here` 打开命令行窗口即可）输入命令：`ssh-keygen -t rsa -C "GitHub 邮箱"`，接下来**全部回车**确认，这样在**电脑 C 盘本人用户名目录下**就会出现一个文件：`.ssh`
+- 步骤三：将上面 `.ssh` 文件中的 `id_rsa` 使用记事本打开，然后全选复制内容；
+- 步骤四：将上面复制的秘钥内容，黏贴到 GitHub 中
+![搜狗截图20190226204854](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226204854.png)
+![搜狗截图20190226205651](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226205651.png)
+
+- 步骤六：将本地的 master 分支与 GitHub 仓库分支进行关联,仓库别名为 notes（可以自己制定，这个名字就是以后修改 GitHub 仓库时候，如果你有多个仓库，需要制定修改的是哪个仓库，相当于为 GitHub 仓库取个别名）
+`git remote add notes https://github.com/GJXAIOU/Notes.git` # 后面为仓库的 SSH 地址，相当于以后使用 `notes` 指定自己操作的是名叫 `Notes` 的仓库 
+
+- 步骤：这步**不需要**，这是移除关联，如果取错了或者想换个名字可以使用 `git remote remove 名字` 取消关联，然后使用步骤六重新关联。
+
+【注】查看当前远程仓库地址别名命令：`git remote -v`
+
+
+### （三）上传同步本地文件
+**作用**主要用于自己上传文件到 GitHub。
+
+**重要**：在 GitHub 上新创建仓库时候，一般都会自动创建 README.md 文件（可能没有，取决于自己选择），所以
+
+- 步骤一：在想存放 GitHub 仓库的本地目录下，使用 Git Bash  命令`git init` 初始化本地 git 仓库；
+- 步骤二：使用命令 `git pull GitHub仓库的SSH地址`，例如 `git pull https://github.com/GJXAIOU/Notes.git`，将仓库中已经有的文件先拉到本地。
+- 步骤三：进入仓库目录下，输入：`git status` 可以查看多少文件未提交到仓库中（显示为红色的为未提交的），该命令用于查看工作区和暂存区的状态；
+- 步骤四：将所在位置下的**所有文件**从工作区提交到缓存区：`git add . ` ， 将特定文件提交大缓冲区：`git add 具体的文件名（包括后缀）`
+- 步骤五：再使用命令 `git status` 查看是不是想要提交的文件都提交到了缓冲区（显示为绿色的是的）
+- 步骤六：为本次修改增加备注，使用命令： `git commit -m "本次提交备注描述"`
+- 步骤七：推送到 GitHub，使用命令： `git push 仓库名 分支名`，仓库名就是上面起的别名，这里为：`notes`，分支名默认为 `master`。
+
+==重要：== 
+- 不要在 GitHub 上对仓库内文件做任何的修改，如果有修改在本地修改之后然后推送到 GitHub 上，否则如果本地和 GitHub 上都进行修改会造成文件冲突。
+- 如果在 GitHub 上进行了修改，请使用上面的`git pull GitHub仓库的SSH地址`，例如 `git pull https://github.com/GJXAIOU/Notes.git`，将仓库中的文件先拉到本地。然后本地进行文件其它修改之后再使用上面命令传入 GitHub，否则会出现 rejected 错误。
+- 如果想仅仅删除 GitHub 上文件，不删除本地该文件，使用以下命令：
+ **删除缓冲区和 github 文件**，本地不删除
+`git rm -r --cached 文件名或者文件夹名`
+`git commit -m "本次修改备注内容"`
+`git push 仓库名字 master`
+
+### （四）平时使用时候上次文件步骤
+- `git add .` 或者 `git add 文件名或文件夹`
+- `git commit -m "提交的备注"`
+- `git push 仓库别名 master`
+
+
 ### （四）工作区和版本库区别
 
-![工作区与版本库的区别]($resource/%E5%B7%A5%E4%BD%9C%E5%8C%BA%E4%B8%8E%E7%89%88%E6%9C%AC%E5%BA%93%E7%9A%84%E5%8C%BA%E5%88%AB.png)
+![工作区与版本库的区别](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E5%B7%A5%E4%BD%9C%E5%8C%BA%E4%B8%8E%E7%89%88%E6%9C%AC%E5%BA%93%E7%9A%84%E5%8C%BA%E5%88%AB.png)
 
 注：示例文件名`test.txt`
 - 当使用`git add  test.txt`将文件提交到暂存区之后，仍然在本地继续修改，如果产生了新的修改；
-  - 使用：`git commit -m 'shuoming' `提交只是提交第一个修改的，后面修改的不提交；
-  - 使用：`git commit -m 'shuoming' test.txt`提交的将是后面修改的版本；
+  - 使用：`git commit -m '说明信息' `提交只是提交第一个修改的，后面修改的不提交；
+  - 使用：`git commit -m '说明信息' test.txt`提交的将是后面修改的版本；
   - 使用：`git diff head -- test.txt`可以显示工作区和分支的区别；
 
 
@@ -93,13 +155,14 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
 `git commit -m "delete test.txt"`
 `git push 名字`
 
+==仅仅删除 Github 端文件==
 - **删除缓冲区和 github 文件**，本地不删除
 `git rm -r --cached 文件名或者文件夹名`  --cached 不会将本地文件删除
 `git commit -m "XXXXX"`
-`git push 名字`
+`git push 名字 master`
 
 
- 
+
 
 ### （七）Git文件重命名的命令
 
@@ -114,7 +177,7 @@ git add readme.cpp
 最后可以使用git status查看修改后的仓库的状态
 上述是三条命令，还可以使用下面的一条命令达到上述三条命令的效果
  `git mv readme readme.cpp`
- 
+
 - 如果想要撤销刚刚的修改，使用下面的命令：
 `git reset --hard`
 
@@ -156,11 +219,11 @@ git log --oneline temp 只查看temp的分支的信息且oneline形式
 其中：Head 含义：HEAD@{移动到当前版本需要多少步}
 2.输入：`git reset --hard 第二次提交版本号` （这里版本号填写 `git reflog`显示的即可，不必填写完整的版本号）即可回退到第二个版本；
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20181028233812515.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NjbnVhY21oZHU=,size_27,color_FFFFFF,t_70)
+![在这里插入图片描述](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/20181028233812515.png)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20181028234106489.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NjbnVhY21oZHU=,size_27,color_FFFFFF,t_70)
+![在这里插入图片描述](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/20181028234106489.png)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20181028234356533.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NjbnVhY21oZHU=,size_27,color_FFFFFF,t_70)
+![在这里插入图片描述](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/20181028234356533.png)
 
 - 方式二：只能后退
 `git reset --head HEAD^`其中一个^表示后退一步，n 个表示后退 n 步；
@@ -168,8 +231,6 @@ git log --oneline temp 只查看temp的分支的信息且oneline形式
 `git reset --head HEAD~n`,表示后退 n 步
 
  **补充：reset 参数**
-![搜狗截图20190731203134]($resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190731203134.png)
-
 - 参数一:`--soft`  ：仅仅在本地库移动 HEAD 指针；
 - 参数二:`--mixed` ：在本地库移动 HEAD 指针，同时重置暂存区；
 - 参数三:`--hard` ：在本地库移动 HEAD 指针，同时重置暂存区和工作区；
@@ -199,7 +260,7 @@ git log --oneline temp 只查看temp的分支的信息且oneline形式
 **步骤：**
 1.将GitHub上已有的仓库下载到本地（这样可以在本地编辑）
 - 进入GitHub中所要同步的库页面，选择：`clone or download`，然后将URL复制下来：本人为：`https://github.com/GJXAIOU/Notes.git`
-![URL]($resource/URL.jpg)
+![URL](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/URL.jpg)
 
 - 在Git Bash 中首先将目录切换到想要保存该库的目录下：然后输入
 `git clone https://github.com/GJXAIOU/Notes.git` (后面的网址就是刚才复制的)，这样就把 Github 在线仓库 clone 到了本地；
@@ -210,8 +271,8 @@ git log --oneline temp 只查看temp的分支的信息且oneline形式
 1.在本地生成SSH Key :  在Git Bash中输入：`ssh-keygen -t rsa -C "GitHub邮箱"`，接下来**全部回车**确认，这样在电脑C盘本人用户名目录下就会出现一个文件：`.ssh`
 2.将上面文件中的`id_rsa`使用记事本打开，然后全选复制；
 3.将上面复制的秘钥，黏贴到GitHub中
-![搜狗截图20190226204854]($resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226204854.png)
-![搜狗截图20190226205651]($resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226205651.png)
+![搜狗截图20190226204854](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226204854.png)
+![搜狗截图20190226205651](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20190226205651.png)
 
 
 
@@ -328,7 +389,7 @@ build/
 
 **本地版本库（Local Repository）**
 工作区有一个隐藏目录 `.git`，这个不算工作区，而是 `Git`的版本库。 
-![版本库]($resource/%E7%89%88%E6%9C%AC%E5%BA%93.png)
+![版本库](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E7%89%88%E6%9C%AC%E5%BA%93.png)
 
  **暂存区（stage）**
 本地版本库里存了很多东西，其中最重要的就是称为 `stage`（或者叫index）的暂存区，还有 `Git` 为我们自动创建的第一个分支 `master`，以及指向 `master` 的一个指针叫 `HEAD`。
@@ -339,15 +400,15 @@ build/
 
 **以上概念之间的关系**
 `工作区`、`暂存区`、`本地版本库`、`远程版本库`之间几个常用的 `Git`操作流程如下图所示： 
-![Git各区之间关系]($resource/Git%E5%90%84%E5%8C%BA%E4%B9%8B%E9%97%B4%E5%85%B3%E7%B3%BB.png)
+![Git各区之间关系](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/Git%E5%90%84%E5%8C%BA%E4%B9%8B%E9%97%B4%E5%85%B3%E7%B3%BB.png)
 
 **分支（Branch）**
 分支是为了将修改记录的整个流程分开存储，让分开的分支不受其它分支的影响，所以在同一个数据库里可以同时进行多个不同的修改 
-![分支]($resource/%E5%88%86%E6%94%AF.png)
+![分支](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E5%88%86%E6%94%AF.png)
 
 **主分支（Master）**
 前面提到过 `master` 是 `Git` 为我们自动创建的第一个分支，也叫主分支，其它分支开发完成后都要合并到 `master`
-![分支和标签]($resource/%E5%88%86%E6%94%AF%E5%92%8C%E6%A0%87%E7%AD%BE.png)
+![分支和标签](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E5%88%86%E6%94%AF%E5%92%8C%E6%A0%87%E7%AD%BE.png)
 
 **标签（Tag）**
 标签是用于标记特定的点或提交的历史，通常会用来标记发布版本的名称或版本号（如：`publish/0.0.1`），虽然标签看起来有点像分支，但打上标签的提交是固定的，不能随意的改动，参见上图中的`1.0` / `2.0` / `3.0`
@@ -356,7 +417,7 @@ build/
 
 `HEAD`指向的就是当前分支的最新提交 
 
-![](https://mmbiz.qpic.cn/mmbiz_png/JfTPiahTHJhpibRAib4ypnbXhb1w94Ria1fDltHy65E6ErjC94IGzefLfMB3pk3e36SibJficoYWbZqsemnD4Qwu5fFA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/640.webp)
 
 
 
@@ -468,12 +529,12 @@ build/
 `git merge --squash`
 将待合并分支上的 `commit` 合并成一个新的 `commit`放入当前分支，适用于待合并分支的提交记录不需要保留的情况 
 
-![合并分支]($resource/%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF.gif)
+![合并分支](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF.gif)
 
 - `git merge --no-ff `
 默认情况下，`Git` 执行"`快进式合并`"（fast-farward merge），会直接将 `Master` 分支指向 `Develop` 分支，使用 `--no-ff` 参数后，会执行正常合并，在 `Master`分支上生成一个新节点，保证版本演进更清晰。 
 
-![分支合并]($resource/%E5%88%86%E6%94%AF%E5%90%88%E5%B9%B6.png)
+![分支合并](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E5%88%86%E6%94%AF%E5%90%88%E5%B9%B6.png)
 
 - `git merge --no-edit`
 在没有冲突的情况下合并，不想手动编辑提交原因，而是用 `Git` 自动生成的类似 `Merge branch 'test'`的文字直接提交
@@ -522,25 +583,25 @@ build/
 
 * `git stash create`
  为当前修改或删除的文件创建一个自定义的栈并返回一个ID，此时并未真正存储到栈里
- 
+
 * `git stash store xxxxxx`
 将 `create` 方法里返回的ID放到 `store` 后面，此时在栈里真正创建了一个记录，但当前修改或删除的文件并未从工作区移除
 
  
- 
+
 ### 操作历史
 
 #### git log 显示提交历史记录
 
 * `git log -p`
 显示带提交差异对比的历史记录
- 
+
 * `git log demo.html`
 显示 `demo.html` 文件的历史记录
- 
+
 * `git log --since="2 weeks ago"`
 显示2周前开始到现在的历史记录，其它时间可以类推
- 
+
 * `git log --before="2 weeks ago"`
 显示截止到2周前的历史记录，其它时间可以类推
 
@@ -600,7 +661,7 @@ build/
 `git rebase branch_name`
 合并分支，这跟 `merge`很像，但还是有本质区别，看下图： 
 
-![合并分支过程]($resource/%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF%E8%BF%87%E7%A8%8B.png)
+![合并分支过程](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF%E8%BF%87%E7%A8%8B.png)
 
 合并过程中可能需要先解决冲突，然后执行 `git rebase --continue`
 
@@ -640,7 +701,7 @@ pick 0d4a808 添加pull的说明
 #### git diff
 
 查看工作区、暂存区、本地版本库之间的文件差异，用一张图来解释
-![git各个区域文件差异]($resource/git%E5%90%84%E4%B8%AA%E5%8C%BA%E5%9F%9F%E6%96%87%E4%BB%B6%E5%B7%AE%E5%BC%82.png)
+![git各个区域文件差异](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/git%E5%90%84%E4%B8%AA%E5%8C%BA%E5%9F%9F%E6%96%87%E4%BB%B6%E5%B7%AE%E5%BC%82.png)
 
 `git diff --stat`
 通过 `--stat` 参数可以查看变更统计数据
@@ -654,7 +715,7 @@ pick 0d4a808 添加pull的说明
 
 `reflog` 可以查看所有分支的所有操作记录（包括commit和reset的操作、已经被删除的commit记录，跟 `git log`的区别在于它不能查看已经删除了的commit记录 
 
-![640]($resource/640.png)
+![640](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/640.png)
 
 ### 远程版本库连接
 
@@ -667,7 +728,7 @@ pick 0d4a808 添加pull的说明
  `git remote -v`
 不带参数，列出已经存在的远程分支，加上 `-v` 列出详细信息，在每一个名字后面列出其远程url
 
- 
+
 `git remote add origin https://github.com/gafish/gafish.github.com.git`
 添加一个新的远程仓库，指定一个名字，以便引用后面带的URL
 
@@ -705,7 +766,7 @@ pick 0d4a808 添加pull的说明
 
 `git submodule add https://github.com/gafish/demo.git demo`
 将 `demo` 仓库添加为子模块
- 
+
 `git submodule update demo`
 更新子模块 `demo`
 
@@ -717,24 +778,6 @@ pick 0d4a808 添加pull的说明
 
 `git archive -v --format=zip v0.1 > v0.1.zip`
 `--format` 表示打包的格式，如 `zip`，`-v` 表示对应的tag名，后面跟的是tag名，如 `v0.1`。
-
-## **总结**
-
-本文只是对 `Git` 的所有功能中的部分实用功能做了一次探秘，Git非常强大，还有很多功能有待我们去发现，限于本文篇幅，咱就此打住吧，预知更多好用功能，请善用谷歌。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -764,9 +807,6 @@ pick 0d4a808 添加pull的说明
 
 # 附录：
 
-## 附录一：Git 安装
-TODO：Git 和 GitHub
 
-
-![github开源协议区分]($resource/github%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E5%8C%BA%E5%88%86.png)
+![github开源协议区分](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/github%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E5%8C%BA%E5%88%86.png)
 
