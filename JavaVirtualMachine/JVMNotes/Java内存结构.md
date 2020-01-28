@@ -232,17 +232,39 @@ java.lang.StackOverflowError
 
 **测试多线程情况**
 
-首先操作系统对于分配给每个进程的内存是有限制的，为 总内存 - 最大堆容量 - 最大方法区容量（程序计数器忽略），剩余的内存由
+首先操作系统对于分配给每个进程的内存是有限制的，为 总内存 - 最大堆容量 - 最大方法区容量（程序计数器忽略），剩余的内存由虚拟机和本地方法栈进行瓜分，如果每个线程分配的栈容量越大则可以建立的线程数量越少。
 
+测试：创建线程导致内存溢出异常 【因为 Windows 的虚拟机中，Java 线程是映射到操作系统的内核线程上的，所以以下代码运行很危险，慎用】
 
+```java
+package chapter2;
 
+public class Code2_1 {
+    public void dontShop() {
+        while (true) {
 
+        }
+    }
 
+    public void stackLeakByThread() {
+        while (true) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    dontShop();
+                }
+            });
+            thread.start();
+        }
+    }
 
+    public static void main(String[] args) {
+        Code2_1 oom = new Code2_1();
+        oom.stackLeakByThread();
+    }
+}
 
-
-
-
+```
 
 ### （一）JConsole 使用
 
@@ -308,9 +330,13 @@ class B{
 
 ## 三、方法区元空间溢出测试
 
+因为方法区用于存放 Class 的相关信息，如类名、访问修饰符、常量池、字段描述、方法描述等，因此只有不断产生类来填满方法区来制造溢出异常。
+
 因为从 1.8 开始废除永久代，使用元空间，因为元空间采用的是操作系统本地的内存，初始内存大小为 21 M，并且如果不断占用达到空间最大内存大小则元空间虚拟机会进行垃圾回收，如果回收还是不够就会进行内存扩展，最大可以扩展到物理内存最大值；
 
 首先需要显式的设定初始元空间大小，同时因为元空间中存放一个类的 Class 的元信息（并不存放最占空间的对象实例）， 因此需要不断将 Class 信息不断的增加到元空间中，例如在 Spring （jsp 会动态转为 Servlet，CGlib 等等同理）中会在运行期动态的生成类（就是该类在编译时候是不存在的，在运行期动态创建），这些动态创建类的元信息就要放在元空间中，因此需要不断的动态创建类。
+
+因为一个类如果要被垃圾收集器回收的判定条件是比较苛刻的，因此需要注意大量产生 Class 的应用中，例如： CGLib 字节码增强和动态语言之外、大量 JSP 或者动态产生 JSP 的应用（因为 JSP 第一次运行的时候需要编译Wie Java 类）、基于 OSGi 的应用（即使是同一个类文件，被不同的类加载器加载也视为不同的类）。
 
 ```java
 package com.gjxaiou.memory;
@@ -504,4 +530,34 @@ public void method() {
 }
 ```
 
+### 本机直接内存溢出
 
+直接内存（DirectMemory）的容量如果不通过 `-XX:MaxDirectMemorySize` 指定，默认等于 Java 堆最大值（可通过 -Xmx 指定）。
+
+下面代码越过了 DirectByteBuffer 类，直接通过反射获取 Unsafe 实例进行内存分配（Unsafe 类的 getUnsafe() 方法限制了只有引导类加载器才会返回实例，也就是设计者希望只有 rt.jar 中的类才能使用 Unsafe 的功能）。因为，虽然使用 DirectByteBuffer 分配内存也会抛出内存溢出异常，但它抛出异常时并没有真正向操作系统申请分配内存，而是通过计算得知内存无法分配，于是手动抛出异常，真正申请分配内存的方法是unsafe.allocateMemory()。
+
+```java
+import java.lang.reflect.Field;
+import sun.misc.Unsafe;
+
+
+public class DirectMemoryOOM {
+  	private static final int _1MB = 1024 * 1024;
+
+  	public static void main(String[] args) throws IllegalArgumentException,
+     IllegalAccessException {
+   	 	Field unsafeField = Unsafe.class.getDeclaredFields()[0];
+  		unsafeField.setAccessible(true);
+    	Unsafe unsafe = (Unsafe) unsafeField.get(null);
+    	while (true) {
+     		unsafe.allocateMemory(_1MB);
+    	}
+  	}
+}
+```
+
+运行结果：
+Exception in thread "main" java.lang.OutOfMemoryError
+ at sun.misc.Unsafe.allocateMemory(Native Method)
+ at org.fenixsoft.oom.DMOOM.main(DMOOM.java:20）
+ 由DirectMemory异致的内存溢出，一个明显的特征是在Heap Dump文件中不会看见明显的异常，如果读者发现OOM之后Dump文件很小，而程序中又直接或间接使用了NIO，那就可以考虑一下是不是这方面的原因。
