@@ -1,4 +1,4 @@
-AlgorithmEasyDay03
+# AlgorithmEasyDay03
 
 [TOC]
 
@@ -130,7 +130,7 @@ public class ArrayToStackAndQueue {
 **要求**：pop、push、getMin 的操作的时间复杂度都是 O（1），同时设计的栈类型可以使用现成的栈结构；
 
 **解答思路**： 因为时间复杂度要求：O(1)，因此不能使用遍历，因为遍历的结果就是 O（N），这里使用两个栈；一个栈为 Data 栈，用于存放数据，另一个栈为 min 栈，用于存放最小值，两个栈一起增长；                     
-**步骤**：放入第一个数据，放入 Data 栈中，同时因为 Min 栈中当前为空，因此放入第一个元素之后最小值也是第一个元素，因此将第一个元素也放入 min 栈中；在 Data 栈中放入第二个数据时候，将当前元素与 min 栈顶比较，如果当前数大于等于 min 栈顶，方法一是不动，方法二是将原来 Min 栈的栈顶元素再次压入一遍；反之如果当前数小于 min 栈顶，就将原来 min 栈顶的元素再次在 min 栈中压入一遍。
+**步骤**：放入第一个数据，放入 Data 栈中，同时因为 Min 栈中当前为空，因此放入第一个元素之后最小值也是第一个元素，因此将第一个元素也放入 min 栈中；在 Data 栈中放入第二个数据时候，将当前元素与 min 栈顶比较，如果当前数大于等于 min 栈顶，方法一是不动，方法二是将原来 Min 栈的栈顶元素再次压入一遍；反之如果当前数小于 min 栈顶，就将原来 min 栈顶的元素再次在 min 栈中压入一遍。**push 和 pop 方法都有修改**
 
 ```java
 package nowcoder.easy.day03;
@@ -605,7 +605,7 @@ cat
 例如： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 
 打印结果为：1，2，3，4，8，12，16，15，14，13，9，5，6，7，11， 10
 示例图片：
-![无标题]($resource/%E6%97%A0%E6%A0%87%E9%A2%98.png)
+![无标题](AlgorithmEasyDay03.resource/%E6%97%A0%E6%A0%87%E9%A2%98.png)
 【要求】 额外空间复杂度为O(1)。
 
 **进行宏观调度分析**
@@ -945,7 +945,7 @@ Double Linked List: 4 3 2 1 | 1 2 3 4
 **A、B 之间完全解耦**
 示例图片：
 
-![之字形打印]($resource/%E4%B9%8B%E5%AD%97%E5%BD%A2%E6%89%93%E5%8D%B0.png)
+![之字形打印](AlgorithmEasyDay03.resource/%E4%B9%8B%E5%AD%97%E5%BD%A2%E6%89%93%E5%8D%B0.png)
 
 ```java
 package nowcoder.easy.day03;
@@ -1012,7 +1012,7 @@ public class ZigZagPrintMatrix {
 4 4 8 5 7 7 9 如果K为7，返回true；如果K为6，返回false。
 【要求】 时间复杂度为O(N+M)，额外空间复杂度为O(1)
 
-![有序矩阵中找数]($resource/%E6%9C%89%E5%BA%8F%E7%9F%A9%E9%98%B5%E4%B8%AD%E6%89%BE%E6%95%B0.png)
+![有序矩阵中找数](AlgorithmEasyDay03.resource/%E6%9C%89%E5%BA%8F%E7%9F%A9%E9%98%B5%E4%B8%AD%E6%89%BE%E6%95%B0.png)
 
 **解答：**
 可以从左下角或者右上角开始，这里以右上角为例，在上面数组中找元素 4；
@@ -1150,6 +1150,7 @@ Common Part: 2 5
 【题目】 给定一个链表的头节点head，请判断该链表是否为回文结构。 例： 1->2->1，返回true。 1->2->2->1，返回true。15->6->15，返回true。 1->2->3，返回 false。
 
 **方法一：** 额外空间复杂度为 O（N），需要栈的长度等于链表的长度；
+
 - 将链表遍历一遍之后挨个放入栈中，相当于顺序反了过来；
 - 然后再遍历链表，并且同时从栈中取出元素，两个进行逐个比较，如果有不相等的就不是；
 
@@ -1596,15 +1597,30 @@ Linked List: 1 2 5 5 7 9 8
 
 ### （三）复制含有随机指针节点的链表
 【题目】 一种特殊的链表节点类描述如下：
-public class Node { public int value; public Node next; public
-Node rand;
-public Node(int data) { this.value = data; }
+
+```java
+public class Node { 
+    public int value; 
+    public Node next; 
+    public Node rand;
+	public Node(int data) { 
+        this.value = data; 
+    }
 }
+```
+
+
 Node类中的value是节点值，next指针和正常单链表中next指针的意义一 样，都指向下一个节点，rand指针是Node类中新增的指针，这个指针可 能指向链表中的任意一个节点，也可能指向null。 给定一个由Node节点类型组成的无环单链表的头节点head，请实现一个 函数完成这个链表中所有结构的复制，并返回复制的新链表的头节点。 
 
 示例图片：
 ![复制随机指针节点的链表]($resource/%E5%A4%8D%E5%88%B6%E9%9A%8F%E6%9C%BA%E6%8C%87%E9%92%88%E8%8A%82%E7%82%B9%E7%9A%84%E9%93%BE%E8%A1%A8.png)
+
+![复制随机指针节点的链表](AlgorithmEasyDay03.resource/%E5%A4%8D%E5%88%B6%E9%9A%8F%E6%9C%BA%E6%8C%87%E9%92%88%E8%8A%82%E7%82%B9%E7%9A%84%E9%93%BE%E8%A1%A8.png)
+
+
+
 **解法：**空间复杂度为：O(N)
+
 - 首先准备一个 map<Node, Node>；
 - 拷贝节点 1，得到节点 1’，然后将节点 1，1’ 以 key 和 value 的形式存放在 Map 中；
 - 通过 1 的 next() 找到节点 2，然后拷贝节点 2 得到节点 2’，同样将节点 2 和 2’ 存放在 Map 中；同样以此类推，将所有节点及其拷贝节点存放在 map 中；
@@ -1614,8 +1630,13 @@ Node类中的value是节点值，next指针和正常单链表中next指针的意
 
 **进阶**：不使用额外的数据结构，只用有限几个变量，且在时间复杂度为 O(N)内完成原问题要实现的函数。
 **解法：** 
+
 - 遍历链表将各个节点的复制节点链接到源节点的后面，示例得到的结果为：1 -> 1’ -> 2 -> 2’ -> 3 -> 3’ ->null；
+
+    <img src="AlgorithmEasyDay03.resource/image-20200131140945725.png" alt="image-20200131140945725" style="zoom:67%;" />
+
 - 然后将新的链表中的结点两个两个一起拿出，因为节点 1 的 rand 指向节点 3，则节点 1’ 的 rand 应该指向 节点 3 的 next（即节点 3’）；其他节点的 rand 原理同上；最后原链表的 next 和 rand 指向的还是原链表的值，复制后的链表的 next 和 rand 指向新链表的值；
+
 - 最后将两个链表分开；
 
 ```java
@@ -1644,9 +1665,11 @@ public class CopyListWithRandom {
 			map.put(cur, new Node(cur.value));
 			cur = cur.next;
 		}
+         // 遍历 map 中所有 value 节点，为其赋值：next 和 rand
 		cur = head;
 		while (cur != null) {
 			// 拷贝节点的 next 应该指向原来 cur 节点的 next节点对应的 value值；
+            // 相当于 复制节点.next = 原来对应结点的.next
 			map.get(cur).next = map.get(cur.next);
 			map.get(cur).rand = map.get(cur.rand);
 			cur = cur.next;
@@ -1777,7 +1800,7 @@ public class CopyListWithRandom {
 
 **两个都有环的单链表是否相交**
 两个有环的单链表位置情况如下：
-![有环链表的相交问题]($resource/%E6%9C%89%E7%8E%AF%E9%93%BE%E8%A1%A8%E7%9A%84%E7%9B%B8%E4%BA%A4%E9%97%AE%E9%A2%98.png)
+![有环链表的相交问题](AlgorithmEasyDay03.resource/%E6%9C%89%E7%8E%AF%E9%93%BE%E8%A1%A8%E7%9A%84%E7%9B%B8%E4%BA%A4%E9%97%AE%E9%A2%98.png)
 
 - 首先判断属于哪一种结构，这里需要两个单链表的头结点 head，进入环的第一个节点 loop，即首先得到 head1,dead2,loop1,loop2;
 - 如果 loop1 = loop2，则为第二种结构，只需要将尾结点设置为 loop 1 或者 loop2，其判断过程和前面的无环相交判断是一样的；

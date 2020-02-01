@@ -203,9 +203,9 @@ public class InsertionSort {
 流程：首先将数组对半分为两个部分，然后分别对左右两边进行排序；最后对整体进行外排；
 重点关注：最后整体的外排
 
-![](https://images2015.cnblogs.com/blog/1024555/201612/1024555-20161218163120151-452283750.png)
+![](AlgorithmEasyDay01.resource/1024555-20161218163120151-452283750.png)
 
-![](https://images2015.cnblogs.com/blog/1024555/201612/1024555-20161218194508761-468169540.png)
+![](AlgorithmEasyDay01.resource/1024555-20161218194508761-468169540.png)
 
 ```java
 package nowcoder.easy.day01;

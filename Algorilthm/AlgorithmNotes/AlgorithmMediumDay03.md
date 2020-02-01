@@ -1,8 +1,6 @@
 # AlgorithmMediumDay03
 
-笔记可以和 PDF 一样了
-
-
+[TOC]
 
 
 

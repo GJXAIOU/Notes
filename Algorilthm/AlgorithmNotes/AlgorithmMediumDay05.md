@@ -1,3 +1,9 @@
+# AlgorithmMediumDay05
+
+[TOC]
+
+
+
 ## 判断一棵树是否为完全二叉树
 
 ```java

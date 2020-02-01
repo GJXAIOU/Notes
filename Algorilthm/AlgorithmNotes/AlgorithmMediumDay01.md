@@ -1,5 +1,7 @@
 # AlgorithmMediumDay01
 
+[TOC]
+
 
 
 ## 一、KMP

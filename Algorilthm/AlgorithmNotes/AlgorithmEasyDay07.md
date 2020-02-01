@@ -1,5 +1,9 @@
 # AlgorithmEasyDay07
 
+[TOC]
+
+
+
 ## 一、前缀树
 
 ### （一）前缀树作用
