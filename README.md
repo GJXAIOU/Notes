@@ -12,7 +12,7 @@
 
 - 【推荐】**方法一**：使用 Typora 时候，需要设置：文件 -> 偏好设置 -> 图像 -> 选择“复制到指定路径” -> 路径格式为：`./${filename}.resource`，正逐步将文件中图片链接更改为此种方式；
   
-    ![image-20200113215647773](README.resource/image-20200113215647773.png)
+    <img src="README.resource/image-20200113215647773.png" alt="image-20200113215647773" style="zoom: 50%;" />
     
     - 软件下载地址： https://www.typora.io/ 
     
@@ -32,15 +32,15 @@
 
     - 合并步骤一
 
-    ![合并步骤一](README.resource/%E5%90%88%E5%B9%B6%E6%AD%A5%E9%AA%A4%E4%B8%80.png)
+    <img src="README.resource/%E5%90%88%E5%B9%B6%E6%AD%A5%E9%AA%A4%E4%B8%80.png" alt="合并步骤一" style="zoom: 50%;" />
 
     - 合并步骤二、三、四
 
-    ![合并步骤二](README.resource/%E5%90%88%E5%B9%B6%E6%AD%A5%E9%AA%A4%E4%BA%8C.png)
+    <img src="README.resource/%E5%90%88%E5%B9%B6%E6%AD%A5%E9%AA%A4%E4%BA%8C.png" alt="合并步骤二" style="zoom: 50%;" />
 
     - 合并步骤五、六
 
-    ![合并步骤三](README.resource/%E5%90%88%E5%B9%B6%E6%AD%A5%E9%AA%A4%E4%B8%89.png)
+    <img src="README.resource/%E5%90%88%E5%B9%B6%E6%AD%A5%E9%AA%A4%E4%B8%89.png" alt="合并步骤三" style="zoom:50%;" />
 
 ### 🎨排版规范
 
@@ -68,6 +68,7 @@
     - HTML、CSS、JSP、JQuery
     - Spring、SpringMVC、Mybatis、Hibernate、Struts2、SpringBoot
     - Redis、Shiro
+- JavaConcurrency:open_file_folder:
 - JavaVirtualMachine【已基本完成】:open_file_folder:
     - JVM 内存结构
     - 类加载机制
