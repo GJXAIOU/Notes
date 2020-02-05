@@ -1288,7 +1288,7 @@ public static void main(String[] args) {
 
 2. 遍历数组，将以首元素开头，以当前遍历元素结尾的子数组的异或和的32位二进制数放入前缀树结构中（每一位作为一个字符，且字符非0即1）。遍历结束后，所有`0~i`的异或和就存放在前缀树中了。比如：遍历`{1, 2, 3, 4, 1, 2, 0}`形成的前缀树如下：
 
-    ![img](AlgorithmMediumDay04.resource/169045e8cf9fa63d)
+    ![img](AlgorithmMediumDay04.resource/169045e8cf9fa63d.jpg)
 
     
 
@@ -1298,7 +1298,7 @@ public static void main(String[] args) {
 
     
 
-    ![img](AlgorithmMediumDay04.resource/169045e8d42d2e95)
+    ![img](AlgorithmMediumDay04.resource/169045e8d42d2e95.jpg)
 
     
 
@@ -1469,7 +1469,7 @@ public static void main(String[] args) {
     
     ```
 
-# 经典结构
+# 经典结构(增加的）
 
 ## 窗口最大值更新结构
 

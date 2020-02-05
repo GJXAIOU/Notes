@@ -1,5 +1,7 @@
 ## AlgorithmEasyDay08
 
+[TOC]
+
 ## 一、暴力递归
 
 - 把问题转化为规模缩小了的同类问题的子问题；
@@ -9,7 +11,7 @@
 
 
 
-### （一）问题一
+### （一）问题一：求 n!
 
 求 $$n!$$ 的结果
 
@@ -61,6 +63,16 @@ public class Code_01_Factorial {
 
 
 ### （二）汉诺塔问题
+
+给定一个数n，表示n层汉诺塔问题，请打印最优步数的所有过程
+进阶：给定一个汉诺塔的状况用数组arr表示（arr中只有1，2，3三种数字），请返回这是汉诺塔最优步数的第几步？
+举例：
+arr = {3,2,1}
+arr长度为3，表示这是一个3层汉诺塔问题；
+arr[0] == 3表示上面的汉诺塔在右边；
+arr[1] == 2表示中间的汉诺塔在中间；
+arr[2] == 1表示底下的汉诺塔在左间；
+这种状况是3层汉诺塔最优步数的第2步，所以返回2。
 
 **该问题的递归不能改为动态规划**，因为其每一步都需要打印结果。
 
@@ -188,7 +200,7 @@ move 1 from 左 to 右
 
 
 
-### 问题：输出全部子序列
+### （三）输出全部子序列
 
 **问题**：打印一个字符串的全部子序列，包括空字符串，**注意**：不是子串。
 
@@ -301,11 +313,11 @@ abc
 
 
 
-### 同类问题：全排列
+### （四）全排列
 
 **问题**：打印一个字符串的全部排列
 
-### 补充问题
+**补充问题**
 
 **问题**：打印一个字符串的全部排列，要求不要出现重复的排列
 
@@ -408,7 +420,7 @@ cca
 
 
 
-### 问题
+### （五）母牛数量
 
 母牛每年生一只母牛，新出生的母牛成长三年后也能每年生一只 母牛，假设不会死。求N年后，母牛的数量。
 
@@ -419,6 +431,49 @@ cca
 
 代码：== 待补充== ，该代码的时间复杂度为： O(n)，将在进阶班优化为  $$O(log^{n})$$。
 ```java
+package nowcoder.easy.day08;
+
+public class Code_05_Cow {
+
+	public static int cowNumber1(int n) {
+		if (n < 1) {
+			return 0;
+		}
+		if (n == 1 || n == 2 || n == 3) {
+			return n;
+		}
+		return cowNumber1(n - 1) + cowNumber1(n - 3);
+	}
+
+	public static int cowNumber2(int n) {
+		if (n < 1) {
+			return 0;
+		}
+		if (n == 1 || n == 2 || n == 3) {
+			return n;
+		}
+		int res = 3;
+		int pre = 2;
+		int prepre = 1;
+		int tmp1 = 0;
+		int tmp2 = 0;
+		for (int i = 4; i <= n; i++) {
+			tmp1 = res;
+			tmp2 = pre;
+			res = res + prepre;
+			pre = tmp1;
+			prepre = tmp2;
+		}
+		return res;
+	}
+
+	public static void main(String[] args) {
+		int n = 20;
+		System.out.println(cowNumber1(n));
+		System.out.println(cowNumber2(n));
+	}
+
+}
 
 ```
 
@@ -426,8 +481,6 @@ cca
 
 **进阶问题**
 如果每只母牛只能活10年，求N年后，母牛的数量。
-
-
 
 
 
@@ -452,7 +505,6 @@ cca
 
 代码：
 ```java
-
 
 ```
 

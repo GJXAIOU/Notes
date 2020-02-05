@@ -2,6 +2,157 @@
 
 [TOC]
 
+## 一、不用比较符返回较大数
+
+给定两个数a和b，如何不用比较运算符，返回较大的数。
+
+```java
+package nowcoder.advanced.day01;
+
+public class Code_01_GetMax {
+
+	public static int flip(int n) {
+		return n ^ 1;
+	}
+
+	public static int sign(int n) {
+		return flip((n >> 31) & 1);
+	}
+
+	public static int getMax1(int a, int b) {
+		int c = a - b;
+		int scA = sign(c);
+		int scB = flip(scA);
+		return a * scA + b * scB;
+	}
+
+	public static int getMax2(int a, int b) {
+		int c = a - b;
+		int sa = sign(a);
+		int sb = sign(b);
+		int sc = sign(c);
+		int difSab = sa ^ sb;
+		int sameSab = flip(difSab);
+		int returnA = difSab * sa + sameSab * sc;
+		int returnB = flip(returnA);
+		return a * returnA + b * returnB;
+	}
+
+	public static void main(String[] args) {
+		int a = -16;
+		int b = 1;
+		System.out.println(getMax1(a, b));
+		System.out.println(getMax2(a, b));
+		a = 2147483647;
+		b = -2147480000;
+		System.out.println(getMax1(a, b)); // wrong answer because of overflow
+		System.out.println(getMax2(a, b));
+
+	}
+
+}
+
+```
+
+
+
+## 二、二叉树和为 Sum 的最长路径长度
+
+给定一棵二叉树的头节点head，和一个整数sum，二叉树每个节点上都有数字，我们规定路径必须是从上往下的，求二叉树上累加和为sum的最长路径长度。
+
+```java
+package nowcoder.advanced.day01;
+
+import java.util.HashMap;
+
+public class Code_03_LongestPathSum {
+
+	public static class Node {
+		public int value;
+		public Node left;
+		public Node right;
+
+		public Node(int data) {
+			this.value = data;
+		}
+	}
+
+	public static int getMaxLength(Node head, int sum) {
+		HashMap<Integer, Integer> sumMap = new HashMap<Integer, Integer>();
+		sumMap.put(0, 0); // important
+		return preOrder(head, sum, 0, 1, 0, sumMap);
+	}
+
+	public static int preOrder(Node head, int sum, int preSum, int level,
+			int maxLen, HashMap<Integer, Integer> sumMap) {
+		if (head == null) {
+			return maxLen;
+		}
+		int curSum = preSum + head.value;
+		if (!sumMap.containsKey(curSum)) {
+			sumMap.put(curSum, level);
+		}
+		if (sumMap.containsKey(curSum - sum)) {
+			maxLen = Math.max(level - sumMap.get(curSum - sum), maxLen);
+		}
+		maxLen = preOrder(head.left, sum, curSum, level + 1, maxLen, sumMap);
+		maxLen = preOrder(head.right, sum, curSum, level + 1, maxLen, sumMap);
+		if (level == sumMap.get(curSum)) {
+			sumMap.remove(curSum);
+		}
+		return maxLen;
+	}
+
+	// for test -- print tree
+	public static void printTree(Node head) {
+		System.out.println("Binary Tree:");
+		printInOrder(head, 0, "H", 17);
+		System.out.println();
+	}
+
+	public static void printInOrder(Node head, int height, String to, int len) {
+		if (head == null) {
+			return;
+		}
+		printInOrder(head.right, height + 1, "v", len);
+		String val = to + head.value + to;
+		int lenM = val.length();
+		int lenL = (len - lenM) / 2;
+		int lenR = len - lenM - lenL;
+		val = getSpace(lenL) + val + getSpace(lenR);
+		System.out.println(getSpace(height * len) + val);
+		printInOrder(head.left, height + 1, "^", len);
+	}
+
+	public static String getSpace(int num) {
+		String space = " ";
+		StringBuffer buf = new StringBuffer("");
+		for (int i = 0; i < num; i++) {
+			buf.append(space);
+		}
+		return buf.toString();
+	}
+
+	public static void main(String[] args) {
+		Node head = new Node(-3);
+		head.left = new Node(3);
+		head.right = new Node(-9);
+		head.left.left = new Node(1);
+		head.left.right = new Node(0);
+		head.left.right.left = new Node(1);
+		head.left.right.right = new Node(6);
+		head.right.left = new Node(2);
+		head.right.right = new Node(1);
+		printTree(head);
+		System.out.println(getMaxLength(head, 6));
+		System.out.println(getMaxLength(head, -9));
+
+	}
+
+}
+
+```
+
 
 
 ## 一、KMP
@@ -86,19 +237,25 @@
 
 ![img](https://img-blog.csdn.net/20180617214652560?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
-
-
-![img](https://img-blog.csdn.net/20180617215337314?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
+4.如果向前跳到最左位置（即 match[0] 的位置），此时 nextArr[0] == -1，说明字符 A 之前的字符串不存在前缀和后缀匹配的情况，则令 nextArr[i] = 0。用这种不断向前跳的方式可以算出正确的 nextArr[i] 值的原因还是因为每跳到一个位置 cn，nextArr[cn] 的意义就表示它之前字符串的最大匹配长度。求解 nextArr 数组的具体过程请参照如下代码中的 getNextArray 方法。
 
 
 
+**讨论计算复杂度：**
 
-#### 讨论计算复杂度：
+getNextArray 方法中的 while 循环就是求解 nextArr 数组的过程，现在证明这个循环发生的次数不会超过 2M 这个数量。先来看 pos 量，一个为（pos-cn）的量，对 pos 量来说，从 2 开始又必然不会大于 match 的长度，即 pos < M，对（pos-cn）量来说，pos 最大为 M - 1， cn 最小为 0，所以 （pos - cn）<= M。
 
-![img](AlgorithmMediumDay01.resource/20180617225822654.png)
+循环的第一个逻辑分支会让 pos 的值增加，（pos - cn）的值不变。循环的第二个逻辑分支为 cn 向左跳的过程，所以会让 cn 减小， pos 值在这个分支中不变，所以 (pos - cn)的值会增加，循环的第三个逻辑分支会让 pos 的值增加，（pos- cn) 的值也会增加，如下表所示：
 
+|                      | Pos  | pos-cn |
+| -------------------- | ---- | ------ |
+| 循环的第一个逻辑分支 | 增加 | 不变   |
+| 循环的第二个逻辑分支 | 不变 | 增加 |
+| 循环的第三个逻辑分支 | 增加 | 增加 |
 
+因为 pos+ （pos - cn）< 2M，和上表的关系，所以循环发生的总体次数小于 pos 量 和 （pos - cn）量的增加次数，也必然小于 2M，证明完毕。
+
+所以整个 KMP 算法的复杂度为 O(M)(求解 nextArr 数组的过程) + O(N)(匹配的过程)，因为有 N>= M，所以时间复杂度为 O（N）。
 
 代码
 
@@ -1453,967 +1610,9 @@ public class BFPRT {
 
 ​      且以此基准值划分 比它小的在左边 比它大的在右边 和它相等的在中间并将相等的左右边界存放在一个数组中
 
-====第二课==
 
 
 
-## 窗口： 
-
-## 窗口最大值更新结构
-
-### 最大值更新结构
-
-
-
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8fb6ccd04?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
-
-当向此结构放数据时会检查一下结构中的已有数据，从时间戳最大的开始检查，如果检查过程中发现该数据小于即将放入的数据则将其弹出并检查下一个，直到即将放入的数据小于正在检查的数据或者结构中的数据都被弹出了为止，再将要放入的数据放入结构中并盖上时间戳。如此每次从该结构取数据时，都会返回结构中时间戳最小的数据，也是目前为止进入过此结构的所有数据中最大的那一个。
-
-此结构可以使用一个双端队列来实现，一端只用来放数据（放数据之前的检查过程可能会弹出其他数据），另一端用来获取目前为止出现过的最大值。
-
-示例如下：
-
-```
-package top.zhenganwen.structure;
-
-import java.util.LinkedList;
-
-public class MaxValueWindow {
-
-  private LinkedList<Integer> queue;
-  public MaxValueWindow() {
-    this.queue = new LinkedList();
-  }
-
-  //更新窗口最大值
-  public void add(int i){
-    while (!queue.isEmpty() && queue.getLast() <= i) {
-      queue.pollLast();
-    }
-    queue.add(i);
-  }
-
-  //获取窗口最大值
-  public int getMax() {
-    if (!queue.isEmpty()) {
-      return queue.peek();
-    }
-    return Integer.MIN_VALUE;
-  }
-
-  //使窗口最大值过期
-  public void expireMaxValue() {
-    if (!queue.isEmpty()) {
-      queue.poll();
-    }
-  }
-
-  public static void main(String[] args) {
-    MaxValueWindow window = new MaxValueWindow();
-    window.add(6);
-    window.add(4);
-    window.add(9);
-    window.add(8);
-    System.out.println(window.getMax());//9
-    window.expireMaxValue();
-    System.out.println(window.getMax());//8
-  }
-}
-复制代码
-```
-
-### 例题
-
-#### 窗口移动
-
-给你一个长度为`N`的整型数组和大小为`W`的窗口，用一个长度为`N-W+1`的数组记录窗口从数组由左向右移动过程中窗口内最大值。
-
-对于数组`[1,2,3,4,5,6,7]`和窗口大小为`3`，窗口由左向右移动时有：
-
-- `[1,2,3],4,5,6,7`，窗口起始下标为0时，框住的数是`1,2,3`，最大值是3
-- `1,[2,3,4],5,6,7`，最大值是4
-- `1,2,[3,4,5],6,7`，最大值是5
-- ……
-
-因此所求数组是`[3,4,5,6,7]`。
-
-> 思路：前面介绍的窗口最大值更新结构的特性是，先前放入的数如果还存在于结构中，那么该数一定比后放入的数都大。此题窗口移动的过程就是从窗口中减一个数和增一个数的过程。拿`[1,2,3],4`到`1,[2,3,4]`这一过程分析：首先`[1,2,3],4`状态下的窗口应该只有一个值`3`（因为先加了1，加2之前弹出了1，加3之前弹出了2）；转变为`1,[2,3,4]`的过程就是向窗口先减一个数`1`再加一个数`4`的过程，因为窗口中不含`1`所以直接加一个数`4`（弹出窗口中的`3`，加一个数`4`）。
-
-代码示例：
-
-```
-public static void add(int arr[], int index, LinkedList<Integer> queue) {
-  if (queue == null) {
-    return;
-  }
-  while (!queue.isEmpty() && arr[queue.getLast()] < arr[index]) {
-    queue.pollLast();
-  }
-  queue.add(index);
-}
-
-public static void expireIndex(int index, LinkedList<Integer> queue) {
-  if (queue == null) {
-    return;
-  }
-  if (!queue.isEmpty() && queue.peek() == index) {
-    queue.pollFirst();
-  }
-}
-
-public static int[] maxValues(int[] arr, int w) {
-  int[] res = new int[arr.length - w + 1];
-  LinkedList<Integer> queue = new LinkedList();
-  for (int i = 0; i < w; i++) {
-    add(arr, i, queue);
-  }
-  for (int i = 0; i < res.length; i++) {
-    res[i] = queue.peek();
-    if (i + w <= arr.length - 1) {
-      expireIndex(i, queue);
-      add(arr, i + w, queue);
-    }
-  }
-  for (int i = 0; i < res.length; i++) {
-    res[i] = arr[res[i]];
-  }
-  return res;
-}
-
-public static void main(String[] args) {
-  int[] arr = {3, 2, 1, 5, 6, 2, 7, 8, 10, 6};
-  System.out.println(Arrays.toString(maxValues(arr,3)));//[3, 5, 6, 6, 7, 8, 10, 10]
-}
-复制代码
-```
-
-这里需要的注意的是，针对这道题将窗口最大值更新结构的`add`和`expire`方法做了改进（结构中存的是值对应的下标）。例如`[2,1,2],-1->2,[1,2,-1]`，应当翻译为`[2,1,2],-1`状态下的窗口最大值为2下标上的数`2`，变为`2,[1,2,-1]`时应当翻译为下标为0的数从窗口过期了，而不应该是数据`2`从窗口过期了（这样会误删窗口中下标为2的最大值2）。
-
-#### 求达标的子数组个数
-
-给你一个整型数组，判断其所有子数组中最大值和最小值的差值不超过`num`（如果满足则称该数组达标）的个数。（子数组指原数组中任意个连续下标上的元素组成的数组）
-
-暴力解：遍历每个元素，再遍历以当前元素为首的所有子数组，再遍历子数组找到其中的最大值和最小值以判断其是否达标。很显然这种方法的时间复杂度为`o(N^3)`，但如果使用最大值更新结构，则能实现`O(N)`级别的解。
-
-如果使用`L`和`R`两个指针指向数组的两个下标，且`L`在`R`的左边。当`L~R`这一子数组达标时，可以推导出以`L`开头的长度不超过`R-L+1`的所有子数组都达标；当`L~R`这一子数组不达标时，无论`L`向左扩多少个位置或者`R`向右扩多少个位置，`L~R`还是不达标。
-
-`O(N)`的解对应的算法是：`L`和`R`都从0开始，`R`先向右移动，`R`每右移一个位置就使用最大值更新结构和最小值更新结构记录一下`L~R`之间的最大值和最小值的下标，当`R`移动到如果再右移一个位置`L~R`就不达标了时停止，这时以当前`L`开头的长度不超过`R-L+1`的子数组都达标；然后`L`右移一个位置，同时更新一下最大值、最小值更新结构（`L-1`下标过期了），再右移`R`至`R`如果右移一个位置`L~R`就不达标了停止（每右移`R`一次也更新最大、小值更新结构）……；直到`L`到达数组尾元素为止。将每次`R`停止时，`R-L+1`的数量累加起来就是`O(N)`的解，因为`L`和`R`都只向右移动，并且每次`R`停止时，以`L`开头的达标子串的数量直接通过`R-L+1`计算，所以时间复杂度就是将数组遍历了一遍即`O(N)`。
-
-示例代码：
-
-```
-public static int getComplianceChildArr(int arr[], int num) {
-  //最大值、最小值更新结构
-  LinkedList<Integer> maxq = new LinkedList();
-  LinkedList<Integer> minq = new LinkedList<>();
-  int L = 0;
-  int R = 0;
-  maxq.add(0);
-  minq.add(0);
-  int res = 0;
-  while (L < arr.length) {
-    while (R < arr.length - 1) {
-      while (!maxq.isEmpty() && arr[maxq.getLast()] <= arr[R + 1]) {
-        maxq.pollLast();
-      }
-      maxq.add(R + 1);
-      while (!minq.isEmpty() && arr[minq.getLast()] >= arr[R + 1]) {
-        minq.pollLast();
-      }
-      minq.add(R + 1);
-      if (arr[maxq.peekFirst()] - arr[minq.peekFirst()] > num) {
-        break;
-      }
-      R++;
-    }
-    res += (R - L + 1);
-    if (maxq.peekFirst() == L) {
-      maxq.pollFirst();
-    }
-    if (minq.peekFirst() == L) {
-      minq.pollFirst();
-    }
-    L++;
-  }
-  return res;
-}
-
-public static void main(String[] args) {
-  int[] arr = {1, 2, 3, 5};
-  System.out.println(getComplianceChildArr(arr, 3));//9
-}
-```
-
-作者：Anwen
-链接：https://juejin.im/post/5c6b9d4c6fb9a04a05403cbe
-来源：掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-
----
-
------
-
-
-
-介绍窗口以及窗口内最大值或者最小值的更新结构（单调双向队列）**
-
-**什么是窗口：**
-
-就是一个数组------有L和R指针，默认两个指针均位于数组的最左边即下标为 -1 的位置， 当有数字进入时R向右移动  当有数字删除时则L向右移动 且L 和R 不会回退且 L 不能到 R 右边~
-
-
-
-思路： **双端队列（链表）**：双端队列中既需要放置数据又需要放置位置下标，本质上存放下标就行，对应值从数组中就能获取。
-
-**可以从头 尾入 可以从尾 头出**
-
-**规则： L< R  且 L,R 永远不回退~**
-
-![增加元素过程](AlgorithmMediumDay01.resource/%E5%A2%9E%E5%8A%A0%E5%85%83%E7%B4%A0%E8%BF%87%E7%A8%8B.jpg)
-
-
-
-**分析逻辑为：** 如果想实现窗口内最大值的更新结构： 使得双端队列保证从大到小的顺序 
-
-当放入元素时候 ：
-
-​           （R增加） 头部始终存放的是当前最大的元素--- 如果即将进入双端队列的元素（因为 R 增加而从数组中取出放入双端队列中的元素）比上一个进入双端队列的元素小，则从尾部进入，新进入的元素直接连接在后面，否则 原来双端队列的尾部一直弹出（包含相等情况，因为晚过期） 直到为即将要放入的元素找到合适的位置，或者整个队列为空，然后放入新加入的元素。（见上面示例）
-
-当窗口减数时候：
-
-​            （L增加） ---L向右移---（index下标一定得保留）则需要检查当前头部元素index是否过期 若过期则需要从头部进行弹出
-
-![img](AlgorithmMediumDay01.resource/20180621232650862.png)
-
-**时间复杂度**：因为从到到位滑过，每个数只会进队列一次，出队列一次，在队列中删除的数是不找回的，因此时间复杂度为：$$O(N)$$
-
-
-
-#### **具体应用：**
-
-#### **生成窗口最大值数组：** 
-
-**题目**
-
-有一个整型数组 arr 和一个大小为 w 的窗口从数组的最左边滑到最右边，窗口每次向右滑一个位置。
-
-例如，数组为 [4,3,5,4,3,3,6,7]，窗口大小为 3 时候：
-
-[4 3 5] 4 3 3 6 7   窗口中最大值为：5
-
-4 [3 5 4] 3 3 6 7   窗口中最大值为：5
-
-4 3 [5 4 3] 3 6 7   窗口中最大值为：5
-
-4 3 5 [4 3 3] 6 7   窗口中最大值为：4
-
-4 3 5 4 [3 3 6] 7   窗口中最大值为：6
-
-4 3 5 4 3 [3 6 7]   窗口中最大值为：7
-
-如果数组长度为 n，窗口大小为 w，则一共产生 n - w + 1 个窗口的最大值。
-
-请实现一个函数：
-
-输入：整型数组 arr，窗口大小为 w。
-
-输出：一个长度为 n - w + 1 的数组 res，res[i]表示每一种窗口状态下的最大值。
-
-上面的结果应该返回{5,5,5,4,6,7}
-
-**代码：**
-
-```java
-package nowcoder.advanced.class02;
-
-import java.util.LinkedList;
-
-/**
- * @Author GJXAIOU
- * @Date 2020/1/1 20:29
- */
-public class SlidingWindowMaxArray {
-    public static int[] getMaxWindow(int[] arr, int w) {
-        if (arr == null || w < 1 || arr.length < w) {
-            return null;
-        }
-        // LinkedList 就是一个标准的双向链表
-        LinkedList<Integer> qmax = new LinkedList<Integer>();
-        // 生成的结果数组
-        int[] res = new int[arr.length - w + 1];
-        int index = 0;
-        for (int i = 0; i < arr.length; i++) {
-            //更新双端队列，如果双端队列不为空，并且尾结点(存的是下标)对应数组中的值是否小于等于当前值
-            while (!qmax.isEmpty() && arr[qmax.peekLast()] <= arr[i]) {
-                qmax.pollLast();
-            }
-            // 上面一直弹出，直到不符合然后加上当前值。
-            qmax.addLast(i);
-            // 上面加法是通用的，但是减法是针对该题定制的
-            // 当过期的时候（当窗口形成之后再扩充才算过期），窗口形成过程中不会过期
-            if (qmax.peekFirst() == i - w) {
-                qmax.pollFirst();
-            }
-            //判断下标过期
-            if (i >= w - 1) {
-                res[index++] = arr[qmax.peekFirst()];
-            }
-        }
-        return res;
-    }
-
-    public static void printArray(int[] array) {
-        for (int i = 0; i < array.length; i++) {
-            System.out.print(array[i] + " ");
-        }
-        System.out.println();
-    }
-
-    public static void main(String[] args) {
-        int[] arr = {4, 3, 5, 4, 3, 3, 6, 7};
-        printArray(getMaxWindow(arr, 3));
-    }
-}
-```
-
-
-
-## 最大值-最小值<=num的子数组数量:
-
-**题目**：给定数组 arr 和整数 num，共返回有多少个子数组满足如下情况：`max(arr[i...j]) - min(arr[i...j]) <= num`，其中 `max(arr[i...j])` 表示子数组 `arr[i...j]` 中最大值，`min(arr[i...j])` 表示子数组 `arr[i...j]` 中的最小值。
-
-**要求**：如果数组长度为 N，请实现时间复杂度为 O（N）的解法。
-
-
-
-- 子数组（必须连续）一共有：$$N^2$$ 个（0~1,0~2，。。。0~n；1~1，。。。）
-
-
-
-#### 最简单思路： 暴力求解 两个for 依次遍历 
-
-```java
-package nowcoder.advanced.class02;
-
-/**
- * @Author GJXAIOU
- * @Date 2020/1/1 20:59
- */
-public class AllLessNumSubArray {
-    // 暴力解法:O(N^3)
-    public static int getNum1(int[] arr, int num) {
-        int res = 0;
-        // 双层 for 循环穷尽所有的子数组可能性。
-        for (int start = 0; start < arr.length; start++) {
-            for (int end = start; end < arr.length; end++) {
-                if (isValid(arr, start, end, num)) {
-                    res++;
-                }
-            }
-        }
-        return res;
-    }
-
-    public static boolean isValid(int[] arr, int start, int end, int num) {
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
-        for (int i = start; i <= end; i++) {
-            max = Math.max(max, arr[i]);
-            min = Math.min(min, arr[i]);
-        }
-        return max - min <= num;
-    }
-}
-
-```
-
-
-
-分析时间复杂度： o(N3) n的3次方
-
-
-
-#### 最优解思路：
-
-- 如果有一个子数组 L~R 已经符合要求（并且其最大值为 max，最小值为 min），则其中内部的子数组一定也符合要求，因为内部空间（即范围小于 L ~ R）中的最大值只会 <= max，并且最小值只会 >=min，所有相减的结果肯定小于等于 num。
-
-- 同理如果已经不达标 则往两边扩也肯定不达标（因为扩大返回只会导致 max 值变大，min 值变小）。
-
-- 总计规律： 就是L一直往右走 不回退 R也跟着往右扩大范围
-
-首先数组左边固定在 0 位置，然后右边界一直扩充，但是同时维护一个窗口内最大值更新结构和窗口内最小值更新结构，使得每次扩充值之后都可以比较当前数组是否满足最大值 - 最小值 <= max 的情况，比如当到 X 下标的时候是满足的，但是 X + 1 下标就不满足的时候，则表示以 0 开头的满足的子数组数目为 X +1 个（0 ~ 0,0 ~1，。。0 ~X）。
-
-然后 L 缩一个位置，到 1 的位置，然后更新现有的最大和最小窗口更新结构（因为更新结构中 0 下标的值需要弹出），然后 R 继续向右走进行判断，直到不可以了就可以得到所有以 1 开头的子数组个数。
-
-其他类型，以此类推。
-
-
-
-代码：
-
-```java
-package nowcoder.advanced.class02;
-
-import java.util.LinkedList;
-
-/**
- * @Author GJXAIOU
- * @Date 2020/1/1 20:59
- */
-public class AllLessNumSubArray {
-    // 暴力解法:O(N^3)
-    public static int getNum1(int[] arr, int num) {
-        int res = 0;
-        // 双层 for 循环穷尽所有的子数组可能性。
-        for (int start = 0; start < arr.length; start++) {
-            for (int end = start; end < arr.length; end++) {
-                if (isValid(arr, start, end, num)) {
-                    res++;
-                }
-            }
-        }
-        return res;
-    }
-
-    public static boolean isValid(int[] arr, int start, int end, int num) {
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
-        for (int i = start; i <= end; i++) {
-            max = Math.max(max, arr[i]);
-            min = Math.min(min, arr[i]);
-        }
-        return max - min <= num;
-    }
-
-    /**
-     * 使用双向最大最小值更新结构，时间复杂度为 O（N）
-     */
-    public static int getNum(int[] arr, int num) {
-        if (arr == null || arr.length == 0) {
-            return 0;
-        }
-        // 分别准备最大值和最小值更新结构
-        LinkedList<Integer> qmax = new LinkedList<Integer>();
-        LinkedList<Integer> qmin = new LinkedList<Integer>();
-        int L = 0;
-        int R = 0;
-        int res = 0;
-        while (L < arr.length) {
-            while (R < arr.length) {
-                while (!qmin.isEmpty() && arr[qmin.peekLast()] >= arr[R]) {
-                    qmin.pollLast();
-                }
-                qmin.addLast(R);
-                while (!qmax.isEmpty() && arr[qmax.peekLast()] <= arr[R]) {
-                    qmax.pollLast();
-                }
-                qmax.addLast(R);
-                // 不达标
-                if (arr[qmax.getFirst()] - arr[qmin.getFirst()] > num) {
-                    break;
-                }
-                R++;
-            }
-            if (qmin.peekFirst() == L) {
-                qmin.pollFirst();
-            }
-            if (qmax.peekFirst() == L) {
-                qmax.pollFirst();
-            }
-            res += R - L;
-            // 换一个开头
-            L++;
-        }
-        return res;
-    }
-}
-
-```
-
-
-
-
-
-# 单调栈：
-
-问题描述：给定一个数组 请确定每个元素左右距离最近的比它大的数字
-
-![img](AlgorithmMediumDay01.resource/20180624215316588.png)
-
-**常规想法：** 到某一个元素时，通过两个for 分别获取其左边比它大的和右边比他大的数字 时间复杂度为 $$O(n^2)$$
-
-
-
-**最优解思路（单调栈）**，栈中实际放置下标即可。O(N)
-
-- 首先一个按照从大到小顺序排序的栈结构 ，若在压栈过程中发现要压栈的元素和栈顶的元素相比要大，则弹出当前栈顶元素，并从开始弹出处记录，要压栈的元素就是其右边离栈顶元素最近比它大的数，之后继续弹出的下一个即为栈顶元素左边距离最近的一个元素。
-
-![img](AlgorithmMediumDay01.resource/20180624215839593.png)
-
-注意： 到数组末尾时 但是栈中依然有元素 则此时元素弹出 右为null 而左边为栈中的下一元素
-
-记得 观察 这个元素弹出的驱动是啥？  之前的是因为右边要压栈的比栈顶元素要大 所以可以弹出并记录信息
-
-![img](AlgorithmMediumDay01.resource/20180625215803883.png)
-
-
-
-**特殊情况：**若出现相等元素情况，则将下标放在一起，等到出现比它们大的数字时再都依次弹出即可。
-
-![image-20200101220719195](AlgorithmMediumDay01.resource/image-20200101220719195.png)
-
-
-
-## 具体应用：
-
-## **1  构造数组的maxtree:**
-
-定义二叉树的节点如下：
-
-```
-public class Node{
-    public int value;
-    public Node left;
-    public Node right;
-    public Node(int data){
-        this.value=data;
-    }
-}
-```
-
-
-
-一个数组的MaxTree定义：
-
-- 数组必须没有重复元素
-- MaxTree是一棵二叉树，数组的每一个值对应一个二叉树节点
-- 包括MaxTree树在内且在其中的每一棵子树上，值最大的节点都是树的头
-
-给定一个没有重复元素的数组arr，写出生成这个数组的MaxTree的函数，要求如果数组长度为N，则时间负责度为O(N)、额外空间负责度为O(N)。
-
-## 实现思路
-
-对每一个元素，从左边和右边各选择第一个比这个元素大的值，选择值较小的元素作为父节点。
-  在【生成窗口最大数组】里面，已经掌握了，在O(N)时间复杂度里面，找到每个元素位置最近的比元素大的元素，同个这个套路，就可以构造一棵MaxTree了。
-
-## 证明
-
-1 构造的不是森林
-2 是一棵二叉树
-
-证明：1  
-  对于每一个树节点，都能往上找到一个节点，直到找到最大节点为止，这样所有树节点都有共同的父节点，这样构造出来的就是一棵树。
-
-证明：2
-  使用反证法解决，如果是一棵二叉树，那么对于每个作为父节点的元素，能够在元素的一边找到两个或两个以上的元素。存在如：[p, b1, x, b2]这样的结构，p是父节点、b1、b2为子节点, x为其他节点。
-
-- 按照题目，可以设定：
-      p > b1, p > b2
-- 当b1 > b2：
-      b2不会选择p作为父节点，可能选择b1作为父节点.
-- 当b1 < b2：
-      当x < b2时，b1不会选择p作为父节点，选择b2作为父节点.
-      当x > b2时，b2不会选择p作为父节点，选择x作为父节点.
-
-![img](https://img-blog.csdn.net/20180625221545761?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-​         ![img](https://img-blog.csdn.net/201806252217091?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-
-
-**注意**：树不要求一定要平衡
-
-思路1 ： 按照大根堆思路建立 O(N)
-
-思路2： 单调栈：O（N）
-
-按照单调栈的思路找到每个元素左右最近比它大的元素---分以下几种情况进行讨论：
-
- 1 若一个元素左右均是null 则它是全局最大的 直接作为根节点
-
- 2 若一个元素左或者右 只存在一个 则只具有唯一的父节点
-
- 3  若一个元素左右两个元素均存在 则选择其中最小的那个作为父节点
-
-![img](https://img-blog.csdn.net/20180625222059635?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-注意： 一定只能构成一棵树，不会成为多叉树或者森林：
-
-因为数组中没有重复值，所有最大值肯定作为整棵树的头结点，而任何一个节点都会找到一个比它大的，然后放置在其下面，所以每个节点都有归属并且均以最大值为头结点 -》最终形成一棵树。
-
-证明不是多叉树：即是证明每个结点下面最多只有两个子节点，即是证明每个结点的单侧只有一个数会挂在该结点的底下。
-
-![image-20200103145926092](AlgorithmMediumDay01.resource/image-20200103145926092.png)
-
-
-
-代码 ==核对一下==
-
-```java
-package nowcoder.advanced.class01;
-
-import java.util.HashMap;
-import java.util.Stack;
-
-/**
- * @Author GJXAIOU
- * @Date 2020/1/3 15:05
- */
-public class MaxTree {
-    public static class Node {
-        public int value;
-        public Node left;
-        public Node right;
-
-        public Node(int data) {
-            this.value = data;
-        }
-    }
-
-    public static Node getMaxTree(int[] arr) {
-        Node[] nArr = new Node[arr.length];
-        for (int i = 0; i < arr.length; i++) {
-            nArr[i] = new Node(arr[i]);
-        }
-        HashMap<Node, Node> lBigMap = new HashMap<Node, Node>();
-        HashMap<Node, Node> rBigMap = new HashMap<Node, Node>();
-        Stack<Node> stack = new Stack<Node>();
-        for (int i = arr.length - 1; i >= 0; i--) {
-            Node curNode = nArr[i];
-            while ((!stack.isEmpty()) && stack.peek().value < curNode.value) {
-                popStackSetMap(stack, lBigMap);
-            }
-            stack.push(curNode);
-        }
-        while (!stack.isEmpty()) {
-            popStackSetMap(stack, lBigMap);
-        }
-
-        for (int i = nArr.length - 1; i != -1; i--) {
-            Node curNode = nArr[i];
-            while ((!stack.isEmpty()) && stack.peek().value < curNode.value) {
-                popStackSetMap(stack, rBigMap);
-            }
-            stack.push(curNode);
-        }
-        while (!stack.isEmpty()) {
-            popStackSetMap(stack, rBigMap);
-        }
-
-        Node head = null;
-        for (int i = 0; i != nArr.length; i++) {
-            Node curNode = nArr[i];
-            Node left = lBigMap.get(curNode);
-            Node right = rBigMap.get(curNode);
-            if (left == null && right == null) {
-                head = curNode;
-            } else if (left == null) {
-                if (right.left == null) {
-                    right.left = curNode;
-                } else {
-                    right.right = curNode;
-                }
-            } else if (right == null) {
-                if (left.left == null) {
-                    left.left = curNode;
-                } else {
-                    left.right = curNode;
-                }
-            } else {
-                Node parent = left.value < left.value ? left : right;
-                if (parent.left == null) {
-                    parent.left = curNode;
-                } else {
-                    parent.right = curNode;
-                }
-            }
-        }
-        return head;
-    }
-
-    public static void popStackSetMap(Stack<Node> stack, HashMap<Node, Node> map) {
-        Node popNode = stack.pop();
-        if (stack.isEmpty()) {
-            map.put(popNode, null);
-        } else {
-            map.put(popNode, stack.peek());
-        }
-    }
-
-    public static void printPreOrder(Node head) {
-        if (head == null) {
-            return;
-        }
-        System.out.print(head.value + " ");
-        printPreOrder(head.left);
-        printPreOrder(head.right);
-    }
-
-    public static void main(String[] args) {
-        int[] uniqueArr ={3, 4, 5, 1, 2};
-        Node head = getMaxTree(uniqueArr);
-        printPreOrder(head);
-        System.out.println();
-        printPreOrder(head);
-    }
-}
-
-
-```
-
-
-
-代码：
-
-![img](https://img-blog.csdn.net/20180628215634109?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-   ![img](https://img-blog.csdn.net/20180628215700907?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-![img](https://img-blog.csdn.net/20180628215813854?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-![img](https://img-blog.csdn.net/20180628215841863?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-
-
-## 2  求最大子矩阵的大小： 
-
-![img](https://img-blog.csdn.net/20180625223145661?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-
-
-
-
-**类似的，下图的直方图** （值可以相等），以每个矩阵的中心高度为杠---然后分别向左右去扩展，到比它小的时候就停止 ---并记录能够达成的最大格子数目
-
-![img](https://img-blog.csdn.net/20180625223536951?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-**解法:**   此题用单调栈，但是是找到左边和右边离他最近的比它小的数---从小到大的顺序  
-
-若压栈元素<当前栈顶元素 则弹出栈顶元素 ，并且结算值，例如放入  1 -> 3 时候会弹出 0 -》4 则表示 0 位置数的距离其最近的比它小的数在 1 位置，同时 0-》 4 下面没有元素，表示最左边可以扩充到 -1 位置，因为 -1 和 1 位置都不可达，所以其真正能扩充的只有它自己。 
-
-如果栈下面没有元素 则一定能够到达左边界 右边界就是那个压栈元素所在值  
-
-若到最后栈里有元素 但是没有主动让元素弹出的右端元素 则可以最右到达右边界 左边就是下面的元素（两边不可达）
-
-![img](AlgorithmMediumDay01.resource/20180625224236941.png)
-
-**转换到原始问题中** ：
-
-数组为 10 11 带入上面代码求出，以第 0 行为底的所有长方形中，含有1 最大的长方形；
-
-则 对于1 行  2 1 2 2（表示以该行开始往上看有多少个连续的 1）带入上面代码求出以 第 1 行为底的。。。。
-
-对于行 3 2 2 0 （注意此时为0 因为最上面是0 并没构成连续的1）
-
-目的就是找到 每一行打底的最大的1的长方形
-
-![img](AlgorithmMediumDay01.resource/201806252302410.png)
-
-
-
-分析时间复杂度：因为每行运算都是 O（m），然后一共 N 行，所以是 O（n*m ) 就是遍历一遍矩阵
-
-![img](AlgorithmMediumDay01.resource/2018062523051320.png)
-
-
-
-代码
-
-```java
-package nowcoder.advanced.class01;
-
-import java.util.Stack;
-
-/**
- * @Author GJXAIOU
- * @Date 2020/1/3 15:59
- */
-public class MaximalRectangle {
-    // 原问题（就是 0 1 矩阵）
-    public static int maxRecSize(int[][] map) {
-        if (map == null || map.length == 0 || map[0].length == 0) {
-            return 0;
-        }
-        int maxArea = 0;
-        int[] height = new int[map[0].length];
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[0].length; j++) {
-                // 形成辅助数组：就是 [10 11][2 1 2 2]等等
-                height[j] = map[i][j] == 0 ? 0 : height[j] + 1;
-            }
-            maxArea = Math.max(maxRecFromBottom(height), maxArea);
-        }
-        return maxArea;
-    }
-
-    // 最基本方法，即一个数组代表直方图的话在其中找到最大矩形
-    public static int maxRecFromBottom(int[] height) {
-        if (height == null || height.length == 0) {
-            return 0;
-        }
-        int maxArea = 0;
-        // 准备一个单调栈，栈中放置下标
-        Stack<Integer> stack = new Stack<Integer>();
-        for (int i = 0; i < height.length; i++) {
-            // 当栈不为空，且当前数小于等于栈顶
-            while (!stack.isEmpty() && height[i] <= height[stack.peek()]) {
-                // 弹出栈顶
-                int j = stack.pop();
-                // k 为左边界 （即弹出的数的下面是什么）
-                int k = stack.isEmpty() ? -1 : stack.peek();
-                // i 为当前数，就是右边界，自己在 k 位置上
-                int curArea = (i - k - 1) * height[j];
-                maxArea = Math.max(maxArea, curArea);
-            }
-            stack.push(i);
-        }
-        // 遍历完成之后，栈中剩余元素进行结算
-        while (!stack.isEmpty()) {
-            int j = stack.pop();
-            int k = stack.isEmpty() ? -1 : stack.peek();
-            int curArea = (height.length - k - 1) * height[j];
-            maxArea = Math.max(maxArea, curArea);
-        }
-        return maxArea;
-    }
-
-    public static void main(String[] args) {
-        int[][] map = {{1, 0, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 0}};
-        int maxArea = maxRecSize(map);
-        System.out.println("maxArea = " + maxArea);
-    }
-}
-```
-
-
-
-### 回形山
-
-使用一个数组表示环形山，然后每座山上放烽火，相邻山之间的烽火可以看见；因为任意两座山之间可以通过顺时针或者逆时针的方式互相到达，如果两种方式中一条经过的数字都不大于两座山值的较小的一个，则两座山相互可见（如 3,4 之间可以看见），返回能返回相互看见的山峰有多少对。
-
-![image-20200103164426898](AlgorithmMediumDay01.resource/image-20200103164426898.png)
-
-如果数组中所有值都不相等：
-
-1 座山峰规定为 0 对，2 座山峰规定为 1 对，如果大于 2 座，则 i 座山峰共 （ 2 * i - 3 ）对。
-
-找发规定为：小的找大的，
-
-![image-20200103171117637](AlgorithmMediumDay01.resource/image-20200103171117637.png)
-
-
-
-但是实际问题中是可能含有最大值的，因此首先找到数组中的最大值，如果有多个取第一个，从该值开始进行环形遍历（例如：3  3 5  4  5，遍历顺序为：5 4  5 3  3）
-
-![image-20200103173145387](AlgorithmMediumDay01.resource/image-20200103173145387.png)
-
-针对遍历结束之后单调栈中剩余的元素，倒数第 3 及其以上的仍然适用于原来的公式，其余倒数第 2 和倒数第 1 单独计算。
-
-![image-20200103174347520](AlgorithmMediumDay01.resource/image-20200103174347520.png)
-
-```java
-package nowcoder.advanced.class01;
-
-import java.awt.*;
-import java.util.Scanner;
-import java.util.Stack;
-
-/**
- * @Author GJXAIOU
- * @Date 2020/1/3 17:44
- */
-public class MountainsAndFlame {
-    public static void main(String[] args) {
-        // 输入两部分值：数组长度和数组具体的内容
-        Scanner in = new Scanner(System.in);
-        while (in.hasNextInt()) {
-            int size = in.nextInt();
-            int[] arr = new int[size];
-            for (int i = 0; i < size; i++) {
-                arr[i] = in.nextInt();
-            }
-            System.out.println(communications(arr));
-        }
-        in.close();
-    }
-
-    // 在环形数组中 i 位置的下一位，没到底则 +1，到底就为 0
-    public static int nextIndex(int size, int i) {
-        return i < (size - 1) ? (i + 1) : 0;
-    }
-
-    public static long getInternalSum(int n) {
-        return n == 1L ? 0L : (long) n * (long) (n - 1) / 2L;
-    }
-
-    public static class Pair {
-        public int value;
-        public int times;
-
-        public Pair(int value) {
-            this.value = value;
-            this.times = 1;
-        }
-    }
-
-    // arr 为环形数组
-    public static long communications(int[] arr) {
-        if (arr == null || arr.length < 2) {
-            return 0;
-        }
-        int size = arr.length;
-        // 找到最大值位置（第一个）
-        int maxIndex = 0;
-        for (int i = 0; i < size; i++) {
-            maxIndex = arr[maxIndex] < arr[i] ? i : maxIndex;
-        }
-        // value 为最大值
-        int value = arr[maxIndex];
-        int index = nextIndex(size, maxIndex);
-        long res = 0L;
-        // 首先将最大值扔入栈中
-        Stack<Pair> stack = new Stack<Pair>();
-        stack.push(new Pair(value));
-        // 因为是从 maxIndex 的下一个位置开始遍历的，所有如果值再次相等说明遍历结束
-        while (index != maxIndex) {
-            // 数组中的当前值
-            value = arr[index];
-            while (!stack.isEmpty() && stack.peek().value < value) {
-                int times = stack.pop().times;
-                // res += getInernalSum(times) +times;
-                // res += stack.isEmpty() ? 0 : times;
-                // 下面结果为上面两句合并
-                res += getInternalSum(times) + 2 * times;
-            }
-            // 如果当前值使得栈顶弹出，然后栈顶和弹出之后露出的栈顶值相同，则原来栈顶数目 +1
-            if (!stack.isEmpty() && stack.peek().value == value) {
-                stack.peek().times++;
-                // 如果和弹出之后露出的栈顶值不相等，则将当前值放入栈中
-            } else {
-                stack.push(new Pair(value));
-            }
-            index = nextIndex(size, index);
-        }
-        // 遍历结束之后剩余栈中元素进行结算
-        while (!stack.isEmpty()) {
-            int times = stack.pop().times;
-            res += getInternalSum(times);
-            if (!stack.isEmpty()) {
-                res += times;
-                if (stack.size() > 1) {
-                    res += times;
-                } else {
-                    res += stack.peek().times > 1 ? times : 0;
-                }
-            }
-        }
-        return res;
-    }
-}
-
-```
 
 
 

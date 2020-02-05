@@ -4,11 +4,13 @@
 
 
 
-## 一、介绍一种时间复杂度O(N)，额外空间复杂度O(1)的二叉树的遍历方式，N为二叉树的节点个数（不要求是完全二叉树）
+## 一、Morris遍历
+
+介绍一种时间复杂度O(N)，额外空间复杂度O(1)的二叉树的遍历方式，N为二叉树的节点个数（不要求是完全二叉树）
 
 利用 Morris 遍历实现二叉树的先序、中序、后序遍历，时间复杂度为 O（N），额外空间复杂度为 O（1）。
 
-### Morris遍历
+
 
 经典二叉树，由于没有指向父节点的指针，故遍历时都需要一个栈（递归：系统递归函数帮助压栈，非递归：自己压）来保存有关父节点的信息，都会造成O(H)的额外空间复杂度，H为二叉树高度。
 
@@ -213,15 +215,19 @@ public class MorrisTraversal {
 
 
 
-## 二、二叉树
 
-## 搜索二叉树
+
+## 二、搜索二叉树
 
 搜索二叉树的定义：对于一棵二叉树中的任意子树，其左子树上的所有数值小于头结点的数值，其右子树上所有的数值大于头结点的数值，并且树中不存在数值相同的结点。也称二叉查找树。
 
-### 平衡二叉树/AVL树
 
-#### 平衡性
+
+
+
+## 三、平衡二叉树/AVL树
+
+### （一）平衡性
 
 经典的平衡搜索二叉树结构：在满足搜索二叉树的前提条件下，对于一棵二叉树中的任意子树，其左子树和其右子树的高度相差不超过1。
 
@@ -229,13 +235,13 @@ public class MorrisTraversal {
 
 因为默认情况下形成的搜索二叉树结构和数值的输入顺序有关，如果想要尽量保持平衡性则需要对树的结构进行调整。
 
-### 典型搜索二叉树—AVL树、红黑树、SBT树的原理，增删改查都是 O（N）
+### （二）典型搜索二叉树—AVL树、红黑树、SBT树的原理，增删改查都是 O（N）
 
-#### AVL树
+#### 1.AVL树
 
 AVL树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平衡性呢？那就是**所有子树的左子树和右子树的高度相差不超过1**。弊端是，每次发现因为插入、删除操作破坏了这种严苛的平衡性之后，都需要作出相应的调整以使其恢复平衡，调整较为频繁。
 
-#### 红黑树
+#### 2.红黑树
 
 红黑树是每个节点都带有颜色属性的搜索二叉树，颜色或红色或黑色。在搜索二叉树强制一般要求以外，对于任何有效的红黑树我们增加了如下的额外要求:
 
@@ -249,7 +255,380 @@ AVL树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平�
 
 要知道为什么这些特性确保了这个结果，注意到**性质4导致了路径不能有两个毗连的红色节点**就足够了。**最短的可能路径都是黑色节点，最长的可能路径有交替的红色和黑色节点**。因为根据性质5所有最长的路径都有相同数目的黑色节点，这就表明了没有路径能多于任何其他路径的两倍长。
 
-#### SBT树
+**红黑树结构**
+
+```java
+package nowcoder.advanced.day03;
+
+/**
+ * Not implemented by zuochengyun
+ * 
+ * Red-Black tree implementation. From Introduction to Algorithms 3rd edition.
+ * 
+ * @author Ignas Lelys
+ * @created May 6, 2011
+ * 
+ */
+public class RedBlackTree extends AbstractSelfBalancingBinarySearchTree {
+
+    protected enum ColorEnum {
+        RED,
+        BLACK
+    };
+
+    protected static final RedBlackNode nilNode = new RedBlackNode(null, null, null, null, ColorEnum.BLACK);
+
+    /**
+     * @see trees.AbstractBinarySearchTree#insert(int)
+     */
+    @Override
+    public Node insert(int element) {
+        Node newNode = super.insert(element);
+        newNode.left = nilNode;
+        newNode.right = nilNode;
+        root.parent = nilNode;
+        insertRBFixup((RedBlackNode) newNode);
+        return newNode;
+    }
+    
+    /**
+     * Slightly modified delete routine for red-black tree.
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node delete(Node deleteNode) {
+        Node replaceNode = null; // track node that replaces removedOrMovedNode
+        if (deleteNode != null && deleteNode != nilNode) {
+            Node removedOrMovedNode = deleteNode; // same as deleteNode if it has only one child, and otherwise it replaces deleteNode
+            ColorEnum removedOrMovedNodeColor = ((RedBlackNode)removedOrMovedNode).color;
+        
+            if (deleteNode.left == nilNode) {
+                replaceNode = deleteNode.right;
+                rbTreeTransplant(deleteNode, deleteNode.right);
+            } else if (deleteNode.right == nilNode) {
+                replaceNode = deleteNode.left;
+                rbTreeTransplant(deleteNode, deleteNode.left);
+            } else {
+                removedOrMovedNode = getMinimum(deleteNode.right);
+                removedOrMovedNodeColor = ((RedBlackNode)removedOrMovedNode).color;
+                replaceNode = removedOrMovedNode.right;
+                if (removedOrMovedNode.parent == deleteNode) {
+                    replaceNode.parent = removedOrMovedNode;
+                } else {
+                    rbTreeTransplant(removedOrMovedNode, removedOrMovedNode.right);
+                    removedOrMovedNode.right = deleteNode.right;
+                    removedOrMovedNode.right.parent = removedOrMovedNode;
+                }
+                rbTreeTransplant(deleteNode, removedOrMovedNode);
+                removedOrMovedNode.left = deleteNode.left;
+                removedOrMovedNode.left.parent = removedOrMovedNode;
+                ((RedBlackNode)removedOrMovedNode).color = ((RedBlackNode)deleteNode).color;
+            }
+            
+            size--;
+            if (removedOrMovedNodeColor == ColorEnum.BLACK) {
+                deleteRBFixup((RedBlackNode)replaceNode);
+            }
+        }
+        
+        return replaceNode;
+    }
+    
+    /**
+     * @see trees.AbstractBinarySearchTree#createNode(int, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node)
+     */
+    @Override
+    protected Node createNode(int value, Node parent, Node left, Node right) {
+        return new RedBlackNode(value, parent, left, right, ColorEnum.RED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node getMinimum(Node node) {
+        while (node.left != nilNode) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node getMaximum(Node node) {
+        while (node.right != nilNode) {
+            node = node.right;
+        }
+        return node;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node rotateLeft(Node node) {
+        Node temp = node.right;
+        temp.parent = node.parent;
+        
+        node.right = temp.left;
+        if (node.right != nilNode) {
+            node.right.parent = node;
+        }
+
+        temp.left = node;
+        node.parent = temp;
+
+        // temp took over node's place so now its parent should point to temp
+        if (temp.parent != nilNode) {
+            if (node == temp.parent.left) {
+                temp.parent.left = temp;
+            } else {
+                temp.parent.right = temp;
+            }
+        } else {
+            root = temp;
+        }
+        
+        return temp;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node rotateRight(Node node) {
+        Node temp = node.left;
+        temp.parent = node.parent;
+
+        node.left = temp.right;
+        if (node.left != nilNode) {
+            node.left.parent = node;
+        }
+
+        temp.right = node;
+        node.parent = temp;
+
+        // temp took over node's place so now its parent should point to temp
+        if (temp.parent != nilNode) {
+            if (node == temp.parent.left) {
+                temp.parent.left = temp;
+            } else {
+                temp.parent.right = temp;
+            }
+        } else {
+            root = temp;
+        }
+        
+        return temp;
+    }
+
+    
+    /**
+     * Similar to original transplant() method in BST but uses nilNode instead of null.
+     */
+    private Node rbTreeTransplant(Node nodeToReplace, Node newNode) {
+        if (nodeToReplace.parent == nilNode) {
+            this.root = newNode;
+        } else if (nodeToReplace == nodeToReplace.parent.left) {
+            nodeToReplace.parent.left = newNode;
+        } else {
+            nodeToReplace.parent.right = newNode;
+        }
+        newNode.parent = nodeToReplace.parent;
+        return newNode;
+    }
+    
+    /**
+     * Restores Red-Black tree properties after delete if needed.
+     */
+    private void deleteRBFixup(RedBlackNode x) {
+        while (x != root && isBlack(x)) {
+            
+            if (x == x.parent.left) {
+                RedBlackNode w = (RedBlackNode)x.parent.right;
+                if (isRed(w)) { // case 1 - sibling is red
+                    w.color = ColorEnum.BLACK;
+                    ((RedBlackNode)x.parent).color = ColorEnum.RED;
+                    rotateLeft(x.parent);
+                    w = (RedBlackNode)x.parent.right; // converted to case 2, 3 or 4
+                }
+                // case 2 sibling is black and both of its children are black
+                if (isBlack(w.left) && isBlack(w.right)) {
+                    w.color = ColorEnum.RED;
+                    x = (RedBlackNode)x.parent;
+                } else if (w != nilNode) {
+                    if (isBlack(w.right)) { // case 3 sibling is black and its left child is red and right child is black
+                        ((RedBlackNode)w.left).color = ColorEnum.BLACK;
+                        w.color = ColorEnum.RED;
+                        rotateRight(w);
+                        w = (RedBlackNode)x.parent.right;
+                    }
+                    w.color = ((RedBlackNode)x.parent).color; // case 4 sibling is black and right child is red
+                    ((RedBlackNode)x.parent).color = ColorEnum.BLACK;
+                    ((RedBlackNode)w.right).color = ColorEnum.BLACK;
+                    rotateLeft(x.parent);
+                    x = (RedBlackNode)root;
+                } else {
+                    x.color = ColorEnum.BLACK;
+                    x = (RedBlackNode)x.parent;
+                }
+            } else {
+                RedBlackNode w = (RedBlackNode)x.parent.left;
+                if (isRed(w)) { // case 1 - sibling is red
+                    w.color = ColorEnum.BLACK;
+                    ((RedBlackNode)x.parent).color = ColorEnum.RED;
+                    rotateRight(x.parent);
+                    w = (RedBlackNode)x.parent.left; // converted to case 2, 3 or 4
+                }
+                // case 2 sibling is black and both of its children are black
+                if (isBlack(w.left) && isBlack(w.right)) {
+                    w.color = ColorEnum.RED;
+                    x = (RedBlackNode)x.parent;
+                } else if (w != nilNode) {
+                    if (isBlack(w.left)) { // case 3 sibling is black and its right child is red and left child is black
+                        ((RedBlackNode)w.right).color = ColorEnum.BLACK;
+                        w.color = ColorEnum.RED;
+                        rotateLeft(w);
+                        w = (RedBlackNode)x.parent.left;
+                    }
+                    w.color = ((RedBlackNode)x.parent).color; // case 4 sibling is black and left child is red
+                    ((RedBlackNode)x.parent).color = ColorEnum.BLACK;
+                    ((RedBlackNode)w.left).color = ColorEnum.BLACK;
+                    rotateRight(x.parent);
+                    x = (RedBlackNode)root;
+                } else {
+                    x.color = ColorEnum.BLACK;
+                    x = (RedBlackNode)x.parent;
+                }
+            }
+            
+        }
+    }
+    
+    private boolean isBlack(Node node) {
+        return node != null ? ((RedBlackNode)node).color == ColorEnum.BLACK : false;
+    }
+    
+    private boolean isRed(Node node) {
+        return node != null ? ((RedBlackNode)node).color == ColorEnum.RED : false;
+    }
+
+    /**
+     * Restores Red-Black tree properties after insert if needed. Insert can
+     * break only 2 properties: root is red or if node is red then children must
+     * be black.
+     */
+    private void insertRBFixup(RedBlackNode currentNode) {
+        // current node is always RED, so if its parent is red it breaks
+        // Red-Black property, otherwise no fixup needed and loop can terminate
+        while (currentNode.parent != root && ((RedBlackNode) currentNode.parent).color == ColorEnum.RED) {
+            RedBlackNode parent = (RedBlackNode) currentNode.parent;
+            RedBlackNode grandParent = (RedBlackNode) parent.parent;
+            if (parent == grandParent.left) {
+                RedBlackNode uncle = (RedBlackNode) grandParent.right;
+                // case1 - uncle and parent are both red
+                // re color both of them to black
+                if (((RedBlackNode) uncle).color == ColorEnum.RED) {
+                    parent.color = ColorEnum.BLACK;
+                    uncle.color = ColorEnum.BLACK;
+                    grandParent.color = ColorEnum.RED;
+                    // grandparent was recolored to red, so in next iteration we
+                    // check if it does not break Red-Black property
+                    currentNode = grandParent;
+                } 
+                // case 2/3 uncle is black - then we perform rotations
+                else {
+                    if (currentNode == parent.right) { // case 2, first rotate left
+                        currentNode = parent;
+                        rotateLeft(currentNode);
+                    }
+                    // do not use parent
+                    parent.color = ColorEnum.BLACK; // case 3
+                    grandParent.color = ColorEnum.RED;
+                    rotateRight(grandParent);
+                }
+            } else if (parent == grandParent.right) {
+                RedBlackNode uncle = (RedBlackNode) grandParent.left;
+                // case1 - uncle and parent are both red
+                // re color both of them to black
+                if (((RedBlackNode) uncle).color == ColorEnum.RED) {
+                    parent.color = ColorEnum.BLACK;
+                    uncle.color = ColorEnum.BLACK;
+                    grandParent.color = ColorEnum.RED;
+                    // grandparent was recolored to red, so in next iteration we
+                    // check if it does not break Red-Black property
+                    currentNode = grandParent;
+                }
+                // case 2/3 uncle is black - then we perform rotations
+                else {
+                    if (currentNode == parent.left) { // case 2, first rotate right
+                        currentNode = parent;
+                        rotateRight(currentNode);
+                    }
+                    // do not use parent
+                    parent.color = ColorEnum.BLACK; // case 3
+                    grandParent.color = ColorEnum.RED;
+                    rotateLeft(grandParent);
+                }
+            }
+
+        }
+        // ensure root is black in case it was colored red in fixup
+        ((RedBlackNode) root).color = ColorEnum.BLACK;
+    }
+
+    protected static class RedBlackNode extends Node {
+        public ColorEnum color;
+
+        public RedBlackNode(Integer value, Node parent, Node left, Node right, ColorEnum color) {
+            super(value, parent, left, right);
+            this.color = color;
+        }
+    }
+
+}
+
+```
+
+**Java中红黑树的使用**
+
+Java中红黑树的实现有`TreeSet`和`TreeMap`，前者结点存储的是单一数据，而后者存储的是``的形式。
+
+```java
+public static void main(String[] args) {
+    TreeMap<Integer,String> treeMap = new TreeMap();
+    treeMap.put(5, "tom");
+    treeMap.put(11, "jack");
+    treeMap.put(30,"tony");
+    treeMap.put(18, "alice");
+    treeMap.put(25, "jerry");
+
+    //红黑树中最右边的结点
+    System.out.println(treeMap.lastEntry());
+    System.out.println(treeMap.lastKey());
+    //红黑树最左边的结点
+    System.out.println(treeMap.firstKey());
+    //如果有13这个key，那么返回这条记录，否则返回树中比13大的key中最小的那一个
+    System.out.println(treeMap.ceilingEntry(13));
+    //如果有21这个key，那么返回这条记录，否则返回树中比21小的key中最大的那一个
+    System.out.println(treeMap.floorEntry(21));
+    //比11大的key中，最小的那一个
+    System.out.println(treeMap.higherKey(11));
+    //比25小的key中，最大的那一个
+    System.out.println(treeMap.lowerKey(25));
+    //遍历红黑树，是按key有序遍历的
+    for (Map.Entry<Integer, String> record : treeMap.entrySet()) {
+        System.out.println("age:"+record.getKey()+",name:"+record.getValue());
+    }
+}
+```
+
+`TreeMap`的优势是`key`在其中是有序组织的，因此增加、删除、查找`key`的时间复杂度均为`log(2,N)`。
+
+#### 3.SBT树
 
 它是由中国广东中山纪念中学的陈启峰发明的。陈启峰于2006年底完成论文《Size Balanced Tree》，并在2007年的全国青少年信息学奥林匹克竞赛冬令营中发表。**相比红黑树、AVL树等自平衡二叉查找树，SBT更易于实现**。**据陈启峰在论文中称，SBT是“目前为止速度最快的高级二叉搜索树”**。**SBT能在O(log n)的时间内完成所有二叉搜索树(BST)的相关操作**，而与普通二叉搜索树相比，SBT仅仅加入了简洁的核心操作Maintain。由于SBT赖以保持平衡的是size域而不是其他“无用”的域，它可以很方便地实现动态顺序统计中的select和rank操作。
 
@@ -654,7 +1033,7 @@ public class AbstractBinarySearchTree {
 
 ![image-20200103215345867](AlgorithmMediumDay03.resource/image-20200103215345867.png)
 
-### 搜索二叉树调整的步骤：为了平衡性
+### （三）搜索二叉树调整的步骤：为了平衡性
 
 右旋：头结点变成了新头结点的右孩子
 
@@ -678,15 +1057,15 @@ public class AbstractBinarySearchTree {
 
     ![image-20200104114442568](AlgorithmMediumDay03.resource/image-20200104114442568.png)
 
-### 旋转——Rebalance
+#### 1.旋转过程——Rebalance
 
-左旋：
+- 左旋：
 
 ![左旋](https://user-gold-cdn.xitu.io/2019/2/19/169045e933a810ae?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
 
 
-右旋：
+- 右旋：
 
 ![右旋](https://user-gold-cdn.xitu.io/2019/2/19/169045e93488e2a3?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
@@ -728,44 +1107,217 @@ public class AbstractBinarySearchTree {
 
 > 红黑树的调整也是类似的，只不过调整方案更多。面试中一般不会让你手写红黑树（若有兴趣可参见文末附录），但我们一定能说清这些查找二叉树的性质，以及调整平衡的基本操作，再就是这些结构的使用。
 
-### Java中红黑树的使用
-
-Java中红黑树的实现有`TreeSet`和`TreeMap`，前者结点存储的是单一数据，而后者存储的是``的形式。
+AVL 树结构
 
 ```java
-public static void main(String[] args) {
-    TreeMap<Integer,String> treeMap = new TreeMap();
-    treeMap.put(5, "tom");
-    treeMap.put(11, "jack");
-    treeMap.put(30,"tony");
-    treeMap.put(18, "alice");
-    treeMap.put(25, "jerry");
+package nowcoder.advanced.day03;
 
-    //红黑树中最右边的结点
-    System.out.println(treeMap.lastEntry());
-    System.out.println(treeMap.lastKey());
-    //红黑树最左边的结点
-    System.out.println(treeMap.firstKey());
-    //如果有13这个key，那么返回这条记录，否则返回树中比13大的key中最小的那一个
-    System.out.println(treeMap.ceilingEntry(13));
-    //如果有21这个key，那么返回这条记录，否则返回树中比21小的key中最大的那一个
-    System.out.println(treeMap.floorEntry(21));
-    //比11大的key中，最小的那一个
-    System.out.println(treeMap.higherKey(11));
-    //比25小的key中，最大的那一个
-    System.out.println(treeMap.lowerKey(25));
-    //遍历红黑树，是按key有序遍历的
-    for (Map.Entry<Integer, String> record : treeMap.entrySet()) {
-        System.out.println("age:"+record.getKey()+",name:"+record.getValue());
+/**
+ * Not implemented by zuochengyun
+ * <p>
+ * AVL tree implementation.
+ * <p>
+ * In computer science, an AVL tree is a self-balancing binary search tree, and
+ * it was the first such data structure to be invented.[1] In an AVL tree, the
+ * heights of the two child subtrees of any node differ by at most one. Lookup,
+ * insertion, and deletion all take O(log n) time in both the average and worst
+ * cases, where n is the number of nodes in the tree prior to the operation.
+ * Insertions and deletions may require the tree to be rebalanced by one or more
+ * tree rotations.
+ *
+ * @author Ignas Lelys
+ * @created Jun 28, 2011
+ */
+public class AVLTree extends AbstractSelfBalancingBinarySearchTree {
+
+    /**
+     * @see trees.AbstractBinarySearchTree#insert(int)
+     * <p>
+     * AVL tree insert method also balances tree if needed. Additional
+     * height parameter on node is used to track if one subtree is higher
+     * than other by more than one, if so AVL tree rotations is performed
+     * to regain balance of the tree.
+     */
+    @Override
+    public Node insert(int element) {
+        Node newNode = super.insert(element);
+        rebalance((AVLNode) newNode);
+        return newNode;
     }
+
+    /**
+     * @see trees.AbstractBinarySearchTree#delete(int)
+     */
+    @Override
+    public Node delete(int element) {
+        Node deleteNode = super.search(element);
+        if (deleteNode != null) {
+            Node successorNode = super.delete(deleteNode);
+            if (successorNode != null) {
+                // if replaced from getMinimum(deleteNode.right) then come back there and update 
+                //heights
+                AVLNode minimum = successorNode.right != null ?
+                        (AVLNode) getMinimum(successorNode.right) : (AVLNode) successorNode;
+                recomputeHeight(minimum);
+                rebalance((AVLNode) minimum);
+            } else {
+                recomputeHeight((AVLNode) deleteNode.parent);
+                rebalance((AVLNode) deleteNode.parent);
+            }
+            return successorNode;
+        }
+        return null;
+    }
+
+    /**
+     * @see trees.AbstractBinarySearchTree#createNode(int, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node)
+     */
+    @Override
+    protected Node createNode(int value, Node parent, Node left, Node right) {
+        return new AVLNode(value, parent, left, right);
+    }
+
+    /**
+     * Go up from inserted node, and update height and balance informations if needed.
+     * If some node balance reaches 2 or -2 that means that subtree must be rebalanced.
+     *
+     * @param node Inserted Node.
+     */
+    // 结点发现左右子树高度不平衡，修改，然后向父走，一级一级判断修改
+    private void rebalance(AVLNode node) {
+        while (node != null) {
+
+            Node parent = node.parent;
+            // 左树和右树的高度：如果左孩子存在左树高度就是左孩子高度，不在则为 -1，右子树同理。
+            int leftHeight = (node.left == null) ? -1 : ((AVLNode) node.left).height;
+            int rightHeight = (node.right == null) ? -1 : ((AVLNode) node.right).height;
+            int nodeBalance = rightHeight - leftHeight;
+            // rebalance (-2 means left subtree outgrow, 2 means right subtree)
+            if (nodeBalance == 2) {
+                if (node.right.right != null) {
+                    node = (AVLNode) avlRotateLeft(node);
+                    break;
+                } else {
+                    node = (AVLNode) doubleRotateRightLeft(node);
+                    break;
+                }
+            } else if (nodeBalance == -2) {
+                if (node.left.left != null) {
+                    node = (AVLNode) avlRotateRight(node);
+                    break;
+                } else {
+                    node = (AVLNode) doubleRotateLeftRight(node);
+                    break;
+                }
+            } else {
+                updateHeight(node);
+            }
+
+            node = (AVLNode) parent;
+        }
+    }
+
+    /**
+     * Rotates to left side.
+     */
+    private Node avlRotateLeft(Node node) {
+        Node temp = super.rotateLeft(node);
+
+        updateHeight((AVLNode) temp.left);
+        updateHeight((AVLNode) temp);
+        return temp;
+    }
+
+    /**
+     * Rotates to right side.
+     */
+    private Node avlRotateRight(Node node) {
+        Node temp = super.rotateRight(node);
+
+        updateHeight((AVLNode) temp.right);
+        updateHeight((AVLNode) temp);
+        return temp;
+    }
+
+    /**
+     * Take right child and rotate it to the right side first and then rotate
+     * node to the left side.
+     */
+    protected Node doubleRotateRightLeft(Node node) {
+        node.right = avlRotateRight(node.right);
+        return avlRotateLeft(node);
+    }
+
+    /**
+     * Take right child and rotate it to the right side first and then rotate
+     * node to the left side.
+     */
+    protected Node doubleRotateLeftRight(Node node) {
+        node.left = avlRotateLeft(node.left);
+        return avlRotateRight(node);
+    }
+
+    /**
+     * Recomputes height information from the node and up for all of parents. It needs to be done
+     * after delete.
+     */
+    private void recomputeHeight(AVLNode node) {
+        while (node != null) {
+            node.height = maxHeight((AVLNode) node.left, (AVLNode) node.right) + 1;
+            node = (AVLNode) node.parent;
+        }
+    }
+
+    /**
+     * Returns higher height of 2 nodes.
+     */
+    private int maxHeight(AVLNode node1, AVLNode node2) {
+        if (node1 != null && node2 != null) {
+            return node1.height > node2.height ? node1.height : node2.height;
+        } else if (node1 == null) {
+            return node2 != null ? node2.height : -1;
+        } else if (node2 == null) {
+            return node1 != null ? node1.height : -1;
+        }
+        return -1;
+    }
+
+    /**
+     * Updates height and balance of the node.
+     *
+     * @param node Node for which height and balance must be updated.
+     */
+    private static final void updateHeight(AVLNode node) {
+        int leftHeight = (node.left == null) ? -1 : ((AVLNode) node.left).height;
+        int rightHeight = (node.right == null) ? -1 : ((AVLNode) node.right).height;
+        node.height = 1 + Math.max(leftHeight, rightHeight);
+    }
+
+    /**
+     * Node of AVL tree has height and balance additional properties. If balance
+     * equals 2 (or -2) that node needs to be re balanced. (Height is height of
+     * the subtree starting with this node, and balance is difference between
+     * left and right nodes heights).
+     *
+     * @author Ignas Lelys
+     * @created Jun 30, 2011
+     */
+    protected static class AVLNode extends Node {
+        public int height;
+
+        public AVLNode(int value, Node parent, Node left, Node right) {
+            super(value, parent, left, right);
+        }
+    }
+
 }
 ```
 
-`TreeMap`的优势是`key`在其中是有序组织的，因此增加、删除、查找`key`的时间复杂度均为`log(2,N)`。
 
 
 
-## 跳表
+
+## 四、跳表
 
 
 
@@ -777,7 +1329,7 @@ public static void main(String[] args) {
 
 记该结构为`SkipList`，该结构中可以包含有很多结点（`SkipListNode`），每个结点代表一个被添加到该结构的数据项。当实例化`SkipList`时，该对象就会自带一个`SkipListNode`（不代表任何数据项的头结点）。
 
-### 添加数据
+### （一）添加数据
 
 当你向其中添加数据之前，首先会抛硬币，将第一次出现正面朝上时硬币被抛出的次数作为该数据的层数（`level`，**最小为1**），接着将数据和其层数封装成一个`SkipListNode`添加到`SkipList`中。结构初始化时，其头结点的层数为0，但每次添加数据后都会更新头结点的层数为所添数据中层数最大的。比如实例化一个`SkipList`后向其中添加一条层数为`3`的数据`7`：
 
@@ -986,11 +1538,11 @@ public class SkipList {
 
 ```
 
-### 查找数据
+### （二）查找数据
 
 查找数据项的操作和添加数据项的步骤类似，也是游标`curNode`从`head`的最高层出发，每次先尝试向右走来到`nextNode`，如果`nextNode`封装的数据大于查找的目标`target`或`nextNode`为空，那么`curNode`回退并向下走；如果`nextNode`封装的数据小于`target`，那么`curNode`继续向右走，直到`curNode`走到的结点数据与`target`相同表示找到了，否则`curNode`走到了某一结点的根部`null`，那么说明结构中不存在该数据。`->contains()`
 
-### 删除数据
+### （三）删除数据
 
 了解添加数据的过程之后，删除数据其实就是将逻辑倒过来：解除该数据结点的前后引用关系。下图是我在写好上述`add()`方法后，向其中放入`1、2、3、4、5`后形成的结构：
 
@@ -1068,7 +1620,7 @@ public static void main(String[] args) {
 
 ```
 
-### 遍历数据
+### （四）遍历数据
 
 需要遍历跳表中的数据时，我们可以根据每个数据的层数至少为1的特点（每个结点的第一层引用的是比该结点数据大的结点中数据最小的结点）。
 

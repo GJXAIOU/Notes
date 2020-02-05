@@ -7,6 +7,8 @@ custom: GJXAIOU
 
 # AlgorithmEasyDay01
 
+[toc]
+
 ## 一、时间复杂度和空间复杂度
 
 ### （一）时间复杂度

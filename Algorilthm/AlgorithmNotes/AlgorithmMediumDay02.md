@@ -2,6 +2,453 @@
 
 [TOC]
 
+## 一、找到新的被指的新类型字符
+
+```java
+package nowcoder.advanced.day02;
+
+public class Code_03_FindNewTypeChar {
+
+    public static String pointNewchar(String s, int k) {
+        if (s == null || s.equals("") || k < 0 || k >= s.length()) {
+            return "";
+        }
+        char[] chas = s.toCharArray();
+        int uNum = 0;
+        for (int i = k - 1; i >= 0; i--) {
+            if (!isUpper(chas[i])) {
+                break;
+            }
+            uNum++;
+        }
+        if ((uNum & 1) == 1) {
+            return s.substring(k - 1, k + 1);
+        }
+        if (isUpper(chas[k])) {
+            return s.substring(k, k + 2);
+        }
+        return String.valueOf(chas[k]);
+    }
+
+    public static boolean isUpper(char ch) {
+        return !(ch < 'A' || ch > 'Z');
+    }
+
+    public static void main(String[] args) {
+        String str = "aaABCDEcBCg";
+        System.out.println(pointNewchar(str, 7));
+        System.out.println(pointNewchar(str, 4));
+        System.out.println(pointNewchar(str, 10));
+
+    }
+
+}
+
+```
+
+
+
+## 二、字典树（前缀树）的实现
+
+【题目】
+字典树又称为前缀树或Trie树，是处理字符串常见的数据结构。
+假设组成所有单词的字符仅是“a”~“z”，请实现字典树结构，
+并包含以下四个主要功能。
+void insert(String word)：添加word，可重复添加。
+void delete(String word)：删除word，如果word添加过多次，仅删除一个。
+boolean search(String word)：查询word是否在字典树中。
+int prefixNumber(String pre)：返回以字符串pre为前缀的单词数
+
+```java
+package nowcoder.advanced.day02;
+
+public class Code_04_TrieTree {
+
+	public static class TrieNode {
+		public int path;
+		public int end;
+		public TrieNode[] map;
+
+		public TrieNode() {
+			path = 0;
+			end = 0;
+			map = new TrieNode[26];
+		}
+	}
+
+	public static class Trie {
+		private TrieNode root;
+
+		public Trie() {
+			root = new TrieNode();
+		}
+
+		public void insert(String word) {
+			if (word == null) {
+				return;
+			}
+			char[] chs = word.toCharArray();
+			TrieNode node = root;
+			int index = 0;
+			for (int i = 0; i < chs.length; i++) {
+				index = chs[i] - 'a';
+				if (node.map[index] == null) {
+					node.map[index] = new TrieNode();
+				}
+				node = node.map[index];
+				node.path++;
+			}
+			node.end++;
+		}
+
+		public void delete(String word) {
+			if (search(word)) {
+				char[] chs = word.toCharArray();
+				TrieNode node = root;
+				int index = 0;
+				for (int i = 0; i < chs.length; i++) {
+					index = chs[i] - 'a';
+					if (node.map[index].path-- == 1) {
+						node.map[index] = null;
+						return;
+					}
+					node = node.map[index];
+				}
+				node.end--;
+			}
+		}
+
+		public boolean search(String word) {
+			if (word == null) {
+				return false;
+			}
+			char[] chs = word.toCharArray();
+			TrieNode node = root;
+			int index = 0;
+			for (int i = 0; i < chs.length; i++) {
+				index = chs[i] - 'a';
+				if (node.map[index] == null) {
+					return false;
+				}
+				node = node.map[index];
+			}
+			return node.end != 0;
+		}
+
+		public int prefixNumber(String pre) {
+			if (pre == null) {
+				return 0;
+			}
+			char[] chs = pre.toCharArray();
+			TrieNode node = root;
+			int index = 0;
+			for (int i = 0; i < chs.length; i++) {
+				index = chs[i] - 'a';
+				if (node.map[index] == null) {
+					return 0;
+				}
+				node = node.map[index];
+			}
+			return node.path;
+		}
+	}
+
+	public static void main(String[] args) {
+		Trie trie = new Trie();
+		System.out.println(trie.search("zuo"));
+		trie.insert("zuo");
+		System.out.println(trie.search("zuo"));
+		trie.delete("zuo");
+		System.out.println(trie.search("zuo"));
+		trie.insert("zuo");
+		trie.insert("zuo");
+		trie.delete("zuo");
+		System.out.println(trie.search("zuo"));
+		trie.delete("zuo");
+		System.out.println(trie.search("zuo"));
+		trie.insert("zuoa");
+		trie.insert("zuoac");
+		trie.insert("zuoab");
+		trie.insert("zuoad");
+		trie.delete("zuoa");
+		System.out.println(trie.search("zuoa"));
+		System.out.println(trie.prefixNumber("zuo"));
+
+	}
+
+}
+
+```
+
+
+
+## 三、数字的英文表达和中文表达
+
+【题目】
+给定一个32位整数num，写两个函数分别返回num的英文与中文表达字符串。
+【举例】
+num=319
+英文表达字符串为：Three Hundred Nineteen
+中文表达字符串为：三百一十九
+num=1014
+英文表达字符串为：One Thousand, Fourteen
+中文表达字符串为：一千零十四
+num=-2147483648
+英文表达字符串为：Negative, Two Billion, One Hundred Forty Seven Million, Four
+Hundred Eighty Three Thousand, Six Hundred Forty Eight
+中文表达字符串为：负二十一亿四千七百四十八万三千六百四十八
+num=0
+英文表达字符串为：Zero
+中文表达字符串为：零
+
+```java
+package nowcoder.advanced.advanced_class_02;
+
+public class Code_05_EnglishExpression {
+
+	public static String num1To19(int num) {
+		if (num < 1 || num > 19) {
+			return "";
+		}
+		String[] names = { "One ", "Two ", "Three ", "Four ", "Five ", "Six ",
+				"Seven ", "Eight ", "Nine ", "Ten ", "Eleven ", "Twelve ",
+				"Thirteen ", "Fourteen ", "Fifteen ", "Sixteen ", "Sixteen ",
+				"Eighteen ", "Nineteen " };
+		return names[num - 1];
+	}
+
+	public static String num1To99(int num) {
+		if (num < 1 || num > 99) {
+			return "";
+		}
+		if (num < 20) {
+			return num1To19(num);
+		}
+		int high = num / 10;
+		String[] tyNames = { "Twenty ", "Thirty ", "Forty ", "Fifty ",
+				"Sixty ", "Seventy ", "Eighty ", "Ninety " };
+		return tyNames[high - 2] + num1To19(num % 10);
+	}
+
+	public static String num1To999(int num) {
+		if (num < 1 || num > 999) {
+			return "";
+		}
+		if (num < 100) {
+			return num1To99(num);
+		}
+		int high = num / 100;
+		return num1To19(high) + "Hundred " + num1To99(num % 100);
+	}
+
+	public static String getNumEngExp(int num) {
+		if (num == 0) {
+			return "Zero";
+		}
+		String res = "";
+		if (num < 0) {
+			res = "Negative, ";
+		}
+		if (num == Integer.MIN_VALUE) {
+			res += "Two Billion, ";
+			num %= -2000000000;
+		}
+		num = Math.abs(num);
+		int high = 1000000000;
+		int highIndex = 0;
+		String[] names = { "Billion", "Million", "Thousand", "" };
+		while (num != 0) {
+			int cur = num / high;
+			num %= high;
+			if (cur != 0) {
+				res += num1To999(cur);
+				res += names[highIndex] + (num == 0 ? " " : ", ");
+			}
+			high /= 1000;
+			highIndex++;
+		}
+		return res;
+	}
+
+	public static int generateRandomNum() {
+		boolean isNeg = Math.random() > 0.5 ? false : true;
+		int value = (int) (Math.random() * Integer.MIN_VALUE);
+		return isNeg ? value : -value;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(getNumEngExp(0));
+		System.out.println(getNumEngExp(Integer.MAX_VALUE));
+		System.out.println(getNumEngExp(Integer.MIN_VALUE));
+		int num = generateRandomNum();
+		System.out.println(num);
+		System.out.println(getNumEngExp(num));
+
+	}
+
+}
+
+```
+
+
+
+中文表达
+
+```java
+package nowcoder.advanced.day02;
+
+public class Code_06_ChineseExpression {
+
+	public static String num1To9(int num) {
+		if (num < 1 || num > 9) {
+			return "";
+		}
+		String[] names = { "一", "二", "三", "四", "五", "六", "七", "八", "九" };
+		return names[num - 1];
+	}
+
+	public static String num1To99(int num, boolean hasBai) {
+		if (num < 1 || num > 99) {
+			return "";
+		}
+		if (num < 10) {
+			return num1To9(num);
+		}
+		int shi = num / 10;
+		if (shi == 1 && (!hasBai)) {
+			return "十" + num1To9(num % 10);
+		} else {
+			return num1To9(shi) + "十" + num1To9(num % 10);
+		}
+	}
+
+	public static String num1To999(int num) {
+		if (num < 1 || num > 999) {
+			return "";
+		}
+		if (num < 100) {
+			return num1To99(num, false);
+		}
+		String res = num1To9(num / 100) + "百";
+		int rest = num % 100;
+		if (rest == 0) {
+			return res;
+		} else if (rest >= 10) {
+			res += num1To99(rest, true);
+		} else {
+			res += "零" + num1To9(rest);
+		}
+		return res;
+	}
+
+	public static String num1To9999(int num) {
+		if (num < 1 || num > 9999) {
+			return "";
+		}
+		if (num < 1000) {
+			return num1To999(num);
+		}
+		String res = num1To9(num / 1000) + "千";
+		int rest = num % 1000;
+		if (rest == 0) {
+			return res;
+		} else if (rest >= 100) {
+			res += num1To999(rest);
+		} else {
+			res += "零" + num1To99(rest, false);
+		}
+		return res;
+	}
+
+	public static String num1To99999999(int num) {
+		if (num < 1 || num > 99999999) {
+			return "";
+		}
+		int wan = num / 10000;
+		int rest = num % 10000;
+		if (wan == 0) {
+			return num1To9999(rest);
+		}
+		String res = num1To9999(wan) + "万";
+		if (rest == 0) {
+			return res;
+		} else {
+			if (rest < 1000) {
+				return res + "零" + num1To999(rest);
+			} else {
+				return res + num1To9999(rest);
+			}
+		}
+	}
+
+	public static String getNumChiExp(int num) {
+		if (num == 0) {
+			return "零";
+		}
+		String res = num < 0 ? "负" : "";
+		int yi = Math.abs(num / 100000000);
+		int rest = Math.abs((num % 100000000));
+		if (yi == 0) {
+			return res + num1To99999999(rest);
+		}
+		res += num1To9999(yi) + "亿";
+		if (rest == 0) {
+			return res;
+		} else {
+			if (rest < 10000000) {
+				return res + "零" + num1To99999999(rest);
+			} else {
+				return res + num1To99999999(rest);
+			}
+		}
+	}
+
+	// for test
+	public static int generateRandomNum() {
+		boolean isNeg = Math.random() > 0.5 ? false : true;
+		int value = (int) (Math.random() * Integer.MIN_VALUE);
+		return isNeg ? value : -value;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(0);
+		System.out.println(getNumChiExp(0));
+
+		System.out.println(Integer.MAX_VALUE);
+		System.out.println(getNumChiExp(Integer.MAX_VALUE));
+
+		System.out.println(Integer.MIN_VALUE);
+		System.out.println(getNumChiExp(Integer.MIN_VALUE));
+
+		int num = generateRandomNum();
+		System.out.println(num);
+		System.out.println(getNumChiExp(num));
+
+		num = generateRandomNum();
+		System.out.println(num);
+		System.out.println(getNumChiExp(num));
+
+		num = generateRandomNum();
+		System.out.println(num);
+		System.out.println(getNumChiExp(num));
+
+		num = generateRandomNum();
+		System.out.println(num);
+		System.out.println(getNumChiExp(num));
+
+		System.out.println(getNumChiExp(10));
+		System.out.println(getNumChiExp(110));
+		System.out.println(getNumChiExp(1010));
+		System.out.println(getNumChiExp(10010));
+		System.out.println(getNumChiExp(1900000000));
+		System.out.println(getNumChiExp(1000000010));
+		System.out.println(getNumChiExp(1010100010));
+
+	}
+}
+
+```
+
 
 
 ## 窗口： 
