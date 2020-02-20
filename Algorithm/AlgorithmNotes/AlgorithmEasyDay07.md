@@ -43,7 +43,7 @@
 代码
 
 ```java
-package nowcoder.easy.class_07;
+package com.gjxaiou.easy.class_07;
 
 public class Code_01_TrieTree {
 
@@ -221,7 +221,7 @@ public class Code_01_TrieTree {
 代码为：
 
 ```java
-package nowcoder.easy.class_07;
+package com.gjxaiou.easy.class_07;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -339,7 +339,7 @@ profile：3    2     4    9
 代码为：
 
 ```java
-package nowcoder.easy.class_07;
+package com.gjxaiou.easy.class_07;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -405,7 +405,7 @@ public class Code_03_IPO {
 代码：
 
 ```java
-package nowcoder.easy.class_07;
+package com.gjxaiou.easy.class_07;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -620,7 +620,7 @@ public class Code_04_MadianQuick {
 代码：
 
 ```java
-package nowcoder.easy.class_07;
+package com.gjxaiou.easy.class_07;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -685,7 +685,7 @@ bab
 代码：
 
 ```java
-package nowcoder.easy.class_07;
+package com.gjxaiou.easy.class_07;
 
 import java.util.Arrays;
 import java.util.Comparator;

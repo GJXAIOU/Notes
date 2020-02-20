@@ -6,100 +6,116 @@
 
 ## 一、从暴力尝试到动态规划
 
-动态规划不是玄学，也无需去记那些所谓的刻板的“公式”（例如状态转换表达式等），其实动态规划是从暴力递归而来。并不是说一个可以动态规划的题一上来就可以写出动态规划的求解步骤，我们只需要能够写出暴力递归版本，然后对重复计算的子过程结果做一个缓存，最后分析状态依赖寻求最优解，即衍生成了动态规划。本节将以多个例题示例，展示求解过程是如何从暴力尝试，一步步到动态规划的。
+动态规划不是玄学，也无需去记那些所谓的刻板的“公式”（例如状态转换表达式等），**其实动态规划是从暴力递归而来**。并不是说一个可以动态规划的题一上来就可以写出动态规划的求解步骤，==我们只需要能够写出暴力递归版本，然后对重复计算的子过程结果做一个缓存，最后分析状态依赖寻求最优解，即衍生成了动态规划==。本节将以多个例题示例，展示求解过程是如何从暴力尝试，一步步到动态规划的。
 
 ## 二、换钱的方法数
 
 【**题目**】给定数组 arr，arr 中所有的值都为正数且不重复。每个值代表一种面值的货币，每种面值的货币可以使用任意张，再给定一个整数 aim 代表要找的钱数，求换钱有多少种方法。
 
-举例：`arr=[5,10,25,1]，aim=0`：成0元的方法有1种，就是所有面值的货币都不用。所以返回1。`arr=[5,10,25,1]，aim=15`：组成15元的方法有6种，分别为3张5元、1张10元+1张5元、1张10元+5张1元、10张1元+1张5元、2张5元+5张1元和15张1元。所以返回6。`arr=[3,5]，aim=2`：任何方法都无法组成2元。所以返回0。
+【举个栗子】
+
+- `arr = [5,10,25,1]，aim = 0`：组成 0 元的方法有 1 种，就是所有面值的货币都不用。所以返回 1。
+-  `arr = [5,10,25,1]，aim = 15`：组成 15 元的方法有 6 种，分别为 3 张 5 元、1 张 10 元 + 1 张 5 元、1 张 10 元 + 5 张 1 元、10 张 1 元 + 1 张 5 元、2 张 5 元 + 5 张 1 元和 15 张 1 元。所以返回 6。
+- `arr = [3,5]，aim = 2`：任何方法都无法组成 2 元。所以返回 0。
 
 ### （一）暴力尝试
 
-我们可以将该题要求解的问题定义成一个过程：对于下标`index`，`arr`中在`index`及其之后的所有面值不限张数任意组合，该过程最终返回所有有效的组合方案。因此该过程可以描述为`int process(int arr[],int index,int aim)`，题目的解就是调用`process(arr,0,aim)`。那么函数内部具体该如何解决此问题呢？
+我们可以将该题要求解的问题定义成一个过程：对于下标 `index`，`arr` 中在 `index` 及其之后的所有面值不限张数任意组合，该过程最终返回所有有效的组合方案。因此该过程可以描述为 `int process(int arr[],int index,int aim)`，题目的解就是调用 `process(arr,0,aim)`。那么函数内部具体该如何解决此问题呢？
 
-其实所有面值不限张数的任意组合就是对每一个面值需要多少张的一个**决策**，那我们不妨从碰到的第一个面值开始决策，比如 `arr=[5,10,25,1]，aim=15`时，（ 选0张5元之后剩下的面值不限张数组合成15元的方法数 + 选1张5元之后剩下的面值不限张数组合成10元方法数 + 选2张5元之后剩下的面值不限张数组合成5元方法数 + 选3张5元之后剩下的面值不限张数组合成0元方法数 ）就是所给参数对应的解，其中“剩下的面值不限张数组合成一定的钱数”又是同类问题，可以使用相同的过程求解，因此有了如下的暴力递归：
+其实所有面值不限张数的任意组合就是对每一个面值需要多少张的一个**决策**，那我们不妨从碰到的第一个面值开始决策，比如 `arr = [5,10,25,1]，aim = 15`时，（ 选 0 张 5 元之后剩下的面值不限张数组合成 15 元的方法数 + 选 1 张 5 元之后剩下的面值不限张数组合成 10 元方法数 + 选 2 张 5 元之后剩下的面值不限张数组合成 5 元方法数 + 选 3 张 5 元之后剩下的面值不限张数组合成 0 元方法数 ）就是所给参数对应的解，其中“剩下的面值不限张数组合成一定的钱数”又是同类问题，可以使用相同的过程求解，因此有了如下的暴力递归：
 
 ```java
+package nowcoder.advanced.day06;
+
+import java.util.HashMap;
+
 /**
-     * arr中的每个元素代表一个货币面值，使用数组index及其之后的面值（不限张数）
-     * 拼凑成钱数为aim的方法有多少种，返回种数
+ * @author GJXAIOU
+ */
+public class CoinsWay {
+    // 方式一：暴力递归
+    public static int coins1(int[] arr, int aim) {
+        if (arr == null || arr.length == 0 || aim < 0) {
+            return 0;
+        }
+        return process1(arr, 0, aim);
+    }
+
+    /**
      * @param arr
-     * @param index
-     * @param aim
-     * @return
+     * @param index ：可以任意自由使用 index 及其之后所有的钱
+     * @param aim   ：目标钱数
+     * @return ：方法数
      */
-public static int process(int arr[], int index, int aim) {
-    if (index == arr.length) {
-        return aim == 0 ? 1 : 0;
+    public static int process1(int[] arr, int index, int aim) {
+        int res = 0;
+        // 如果到达数组最后一个位置，拿出一定金额之后 aim 值为 0，就说明是一种有效的划分，反之则说明该划分不行；
+        // 所以最后该划分结果是否可行到最后一位之后才可以判断出来；
+        if (index == arr.length) {
+            res = aim == 0 ? 1 : 0;
+        } else {
+            for (int zhangShu = 0; arr[index] * zhangShu <= aim; zhangShu++) {
+                // index 为当前货币金额，已经使用过了，从 index + 1 位置开始往后都可以使用；
+                // aim - arr[index] * zhangShu 为后面需要凑齐的钱数；
+                res += process1(arr, index + 1, aim - arr[index] * zhangShu);
+            }
+        }
+        return res;
     }
-    int res = 0;
-    //index位置面值的决策，从0张开始
-    for (int zhangshu = 0; arr[index] * zhangshu <= aim; zhangshu++) {
-        res += process(arr, index + 1, aim - (arr[index] * zhangshu));
-    }
-    return res;
 }
 
-public static int swapMoneyMethods(int arr[], int aim) {
-    if (arr == null) {
-        return 0;
-    }
-    return process(arr, 0, aim);
-}
-
-public static void main(String[] args) {
-    int arr[] = {5, 10, 25, 1};
-    System.out.println(swapMoneyMethods(arr, 15));
-}
 ```
 
 ### （二）缓存每个状态的结果，以免重复计算
 
-上述的暴力递归是极其暴力的，比如对于参数 `arr=[5，3，1，30，15，20，10]，aim=100`来说，如果已经决策了`3张5元+0张3元+0张1元`的接着会调子过程`process(arr, 3, 85)`；如果已经决策了`0张5元+5张3元+0张1元`接着也会调子过程`process(arr, 3, 85)`；如果已经决策了`0张5元+0张3元+15张1元`接着还是会调子过程`process(arr, 3, 85)`。
+上述的暴力递归是极其暴力的，比如对于参数 `arr=[5，3，1，30，15，20，10]，aim=100 `来说，如果已经决策了`3 张 5 元 + 0 张 3 元 + 0 张 1 元`的接着会调子过程 `process(arr, 3, 85)`；如果已经决策了`0 张 5 元 + 5 张 3 元 + 0 张 1 元` 接着也会调子过程 `process(arr, 3, 85)`；如果已经决策了`0 张 5 元 + 0 张 3 元 + 15 张 1 元`接着还是会调子过程`process(arr, 3, 85)`。
 
-你会发现，这个已知面额种类和要凑的钱数，求凑钱的方法的解是固定的。也就是说不管之前的决策是3张5元的，还是5张3元的，又或是15张1元的，对后续子过程的`[30，15，20，10]`凑成`85`这个问题的解是不影响的，这个解该是多少还是多少。这也是**无后效性问题**。无后效性问题就是某一状态的求解不依赖其他状态，比如著名的N皇后问题就是有后效性问题。
+你会发现，这个已知面额种类和要凑的钱数，求凑钱的方法的解是固定的。也就是说不管之前的决策是 3 张 5 元的，还是 5 张 3 元的，又或是 15 张 1 元的，对后续子过程的 `[30，15，20，10]` 凑成 `85` 这个问题的解是不影响的，这个解该是多少还是多少。这也是==**无后效性问题**。无后效性问题就是某一状态的求解不依赖其他状态==，比如著名的 N 皇后问题就是有后效性问题。
 
 因此，我们不妨再求解一个状态之后，将该状态对应的解做个缓存，在后续的状态求解时先到缓存中找是否有该状态的解，有则直接使用，没有再求解并放入缓存，这样就不会有重复计算的情况了：
 
 ```java
-public static int swapMoneyMethods(int arr[], int aim) {
-    if (arr == null) {
-        return 0;
-    }
-    return process2(arr, 0, aim);
-}
+package nowcoder.advanced.day06;
+
+import java.util.HashMap;
 
 /**
-* 使用哈希表左缓存容器
-* key是某个状态的代号，value是该状态对应的解
-*/
-static HashMap<String,Integer> map = new HashMap();
-
-public static int process2(int arr[], int index, int aim) {
-    if (index == arr.length) {
-        return aim == 0 ? 1 : 0;
-    }
-    int res = 0;
-    for (int zhangshu = 0; arr[index] * zhangshu <= aim; zhangshu++) {
-        //使用index及其之后的面值拼凑成aim的方法数这个状态的代号：index_aim
-        String key = String.valueOf(index) + "_" + String.valueOf(aim);
-        if (map.containsKey(key)) {
-            res += map.get(key);
-        } else {
-            int value = process(arr, index + 1, aim - (arr[index] * zhangshu));
-            key = String.valueOf(index + 1) + "_" + String.valueOf(aim - (arr[index] * zhangshu));
-            map.put(key, value);
-            res += value;
+ * @author GJXAIOU
+ */
+public class CoinsWay {
+    // 方法二：保存状态结果，避免重复计算
+    public static int coins2(int[] arr, int aim) {
+        if (arr == null || arr.length == 0 || aim < 0) {
+            return 0;
         }
+        return processMap(arr, 0, aim);
     }
-    return res;
+
+    // 修改上面的递归方法，因为 index 和 aim 确定，最后返回值结果就确定了，所以计算完之后将该状态和其返回值保存下来可以下次使用
+    // String 格式为："index_aim"，Integer 为该种情况下对应的返回值。
+    // 使用 map 做一个缓存功能(key 为某个状态的代号，value 为该状态对应的解)
+    public static HashMap<String, Integer> map = new HashMap<>();
+
+    public static int processMap(int[] arr, int index, int aim) {
+        int res = 0;
+        if (index == arr.length) {
+            res = aim == 0 ? 1 : 0;
+        } else {
+            for (int zhangshu = 0; arr[index] * zhangshu <= aim; zhangshu++) {
+                int nextAim = aim - arr[index] * zhangshu;
+                String key = String.valueOf(index + 1) + "_" + String.valueOf(nextAim);
+                if (map.containsKey(key)) {
+                    res += map.get(key);
+                } else {
+                    res += processMap(arr, index + 1, nextAim);
+                }
+            }
+        }
+        map.put(String.valueOf(index) + "_" + String.valueOf(aim), res);
+        return res;
+    }
 }
 
-public static void main(String[] args) {
-    int arr[] = {5, 10, 25, 1};
-    System.out.println(swapMoneyMethods(arr, 15));
-}
 ```
 
 ### （三）确定依赖关系，寻找最优解
@@ -108,39 +124,31 @@ public static void main(String[] args) {
 
 从暴力尝试到动态规划，我们只需观察暴力尝试版本的代码，甚至可以忘却题目，按照下面高度套路化的步骤，就可以轻易改出动态规划：
 
-1. 首先每个状态都有两个参数`index`和`aim`（`arr`作为输入参数是不变的），因此可以对应两个变量的变化范围建立一张二维表：
+- 步骤一：**确定参数数量（确定几维表）**首先每个状态都有两个参数 `index` 和 `aim`（`arr` 作为输入参数是不变的），因此可以对应两个变量的变化范围建立一张二维表：
 
-    
+<img src="AlgorithmMediumDay06.resource/169045e9a6f7e45f.jpg" alt="img" style="zoom:80%;" />
 
-    ![img](AlgorithmMediumDay06.resource/169045e9a6f7e45f.jpg)
 
-    
 
-2. 从`base case`中找出特殊位置的解。比如`if(index==arr.length) return aim==0?1:0`，那么上述二维表的最后一行对应的所有状态可以直接求解：
+- 步骤二：**求解特殊位置解** 从 `base case` 中找出特殊位置的解。比如`if(index == arr.length) return aim == 0 ? 1 : 0`，那么上述二维表的最后一行对应的所有状态可以直接求解：
 
-    
+<img src="AlgorithmMediumDay06.resource/169045e9b1614b99.jpg" alt="img" style="zoom:80%;" />
 
-    ![img](AlgorithmMediumDay06.resource/169045e9b1614b99.jpg)
+- 步骤三：**找出状态依赖关系** 从暴力递归中找出普遍位置对应的状态所依赖的其他状态。比如：
 
-    
+```java
+for (int zhangshu = 0; arr[index] * zhangshu <= aim; zhangshu++) {
+    res += process(arr, index + 1, aim - (arr[index] * zhangshu));
+}
+```
 
-3. 从暴力递归中找出普遍位置对应的状态所依赖的其他状态。比如：
+那么对于二维表中的一个普遍位置`(i,j)`，它所依赖的状态如下所示：
 
-    ```java
-    for (int zhangshu = 0; arr[index] * zhangshu <= aim; zhangshu++) {
-        res += process(arr, index + 1, aim - (arr[index] * zhangshu));
-    }
-    ```
+![img](AlgorithmMediumDay06.resource/169045e9b5e7d629.jpg)
 
-    那么对于二维表中的一个普遍位置`(i,j)`，它所依赖的状态如下所示：
+也就是说一个普遍位置的状态依赖它的下一行的几个位置上的状态。那么我们已经知道了最后一行所有位置上的状态，当然可以根据这个依赖关系推出倒数第二行的，继而推出倒数第三行的……整个二维表的所有位置上的状态都能推出来。
 
-    ![img](AlgorithmMediumDay06.resource/169045e9b5e7d629.jpg)
-
-    
-
-    也就是说一个普遍位置的状态依赖它的下一行的几个位置上的状态。那么我们已经知道了最后一行所有位置上的状态，当然可以根据这个依赖关系推出倒数第二行的，继而推出倒数第三行的……整个二维表的所有位置上的状态都能推出来。
-
-4. 找出主问题对应二维表的哪个状态（`(0,maxAim)`），那个状态的值就是问题的解。
+- 步骤四：找出主问题对应二维表的哪个状态（`(0,maxAim)`），那个状态的值就是问题的解。
 
 示例代码：
 
@@ -175,7 +183,7 @@ public static void main(String[] args) {
 
 ![img](AlgorithmMediumDay06.resource/169045e9bce1532b.jpg)
 
-比如你在求解状态A时，可能会将其依赖的状态M,N,P的值累加起来；然后在求解状态B时，有需要将其依赖的状态M,N,P,Q累加起来，你会发现在这个过程中`M+N+P`的计算是重复的，因此还可以有如下优化：
+比如你在求解状态A时，可能会将其依赖的状态 M,N,P 的值累加起来；然后在求解状态 B 时，有需要将其依赖的状态 M,N,P,Q 累加起来，你会发现在这个过程中`M+N+P`的计算是重复的，因此还可以有如下优化：
 
 ```java
 for (int i = arr.length - 1; i >= 0; i--) {
@@ -414,71 +422,81 @@ public class Code_01_CoinsWay {
 
 
 
-
-
 ## 三、排成一条线的纸牌博问题
 
-【**题目**】 给定一个整型数组arr，代表分数不同的纸牌排成一条线。玩家A和玩家B依次拿走每张纸牌，规定玩家A先拿，玩家B后拿，但是每个玩家每次只能拿走最左或最右的纸牌，玩家A和玩家B都绝顶聪明。请返回最后获胜者的分数。
+【**题目**】 给定一个整型数组 arr，代表分数不同的纸牌排成一条线。玩家 A 和玩家 B 依次拿走每张纸牌，规定玩家 A 先拿，玩家 B 后拿，但是每个玩家每次只能拿走最左或最右的纸牌，玩家 A 和玩家 B 都绝顶聪明。请返回最后获胜者的分数。
 
-【**举例**】 `arr=[1,2,100,4]`。开始时玩家A只能拿走1或4。如果玩家A拿走1，则排列变为`[2,100,4]`，接下来玩家B可以拿走2或4，然后继续轮到玩家A。如果开始时玩家A拿走4，则排列变为`[1,2,100]`，接下来玩家B可以拿走1或100，然后继续轮到玩家A。玩家A作为绝顶聪明的人不会先拿4，因为拿4之后，玩家B将拿走100。所以玩家A会先拿1，让排列变为`[2,100,4]`，接下来玩家B不管怎么选，100都会被玩家A拿走。玩家A会获胜，分数为101。所以返回101。`arr=[1,100,2]`。开始时玩家A不管拿1还是2，玩家B作为绝顶聪明的人，都会把100拿走。玩家B会获胜，分数为100。所以返回100。
+【**举个栗子**】 
 
-> 动态规划的题难就难在暴力尝试这个“试”法，只要能够试出了暴力版本，那改为动态规划就是高度套路的。
+- `arr=[1,2,100,4]`
+    - 可能性一：开始时玩家 A 只能拿走 1 或 4。如果玩家 A 拿走 1，则排列变为`[2,100,4]`，接下来玩家 B 可以拿走 2 或 4，然后继续轮到玩家 A。
+    - 可能性二：如果开始时玩家 A 拿走 4，则排列变为 `[1,2,100]`，接下来玩家 B 可以拿走 1 或 100，然后继续轮到玩家 A。
+    - 最优方案：玩家 A 作为绝顶聪明的人不会先拿 4，因为拿 4 之后，玩家 B 将拿走 100。所以玩家 A 会先拿 1，让排列变为 `[2,100,4]`，接下来玩家 B 不管怎么选，100 都会被玩家 A 拿走。玩家 A 会获胜，分数为101。所以返回 101。
+- 示例二：`arr=[1,100,2]`
+    - 开始时玩家 A 不管拿 1 还是 2，玩家 B 作为绝顶聪明的人，都会把 100 拿走。玩家 B 会获胜，分数为100。所以返回 100。
+
+> ==动态规划的题难就难在暴力尝试这个“试”法==，只要能够试出了暴力版本，那改为动态规划就是高度套路的。
 
 ### （一）暴力尝试
 
+```java
+package nowcoder.advanced.day06;
+
+/**
+ * @author GJXAIOU
+ */
+public class CardsInLine {
+    // 方法一：暴力递归
+    public static int win1(int[] arr) {
+        if (arr == null || arr.length == 0) {
+            return 0;
+        }
+        return Math.max(first(arr, 0, arr.length - 1), second(arr, 0, arr.length - 1));
+    }
+
+    public static int first(int[] arr, int beginIndex, int endIndex) {
+        if (beginIndex == endIndex) {
+            return arr[beginIndex];
+        }
+        return Math.max(arr[beginIndex] + second(arr, beginIndex + 1, endIndex),
+                arr[endIndex] + second(arr
+                , beginIndex, endIndex - 1));
+    }
+
+    public static int second(int[] arr, int beginIndex, int endIndex) {
+        if (beginIndex == endIndex) {
+            return 0;
+        }
+        return Math.min(first(arr, beginIndex + 1, endIndex), first(arr, beginIndex, endIndex - 1));
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, 9, 1};
+        System.out.println(win1(arr));
+    }
+}
+
 ```
-public static int maxScoreOfWinner(int arr[]) {
-    if (arr == null) {
-        return 0;
-    }
-    return Math.max(
-        f(arr, 0, arr.length-1),
-        s(arr, 0, arr.length-1));
-}
 
-public static int f(int arr[], int beginIndex, int endIndex) {
-    if (beginIndex == endIndex) {
-        return arr[beginIndex];
-    }
-    return Math.max(
-        arr[beginIndex] + s(arr, beginIndex + 1, endIndex),
-        arr[endIndex] + s(arr, beginIndex, endIndex - 1));
-}
+这个题的试法其实很不容易，笔者直接看别人写出的暴力尝试版本表示根本看不懂，最后还是搜了博文才弄懂。其中`first()`和`second()`就是整个尝试中的思路，与以往穷举法的暴力递归不同，这里是两个函数相互递归调用。
 
-public static int s(int arr[], int beginIndex, int endIndex) {
-    if (beginIndex == endIndex) {
-        return 0;
-    }
-    return Math.min(
-        f(arr, beginIndex + 1, endIndex),
-        f(arr, beginIndex, endIndex - 1));
-}
+`first(int arr[],int beginIndex,int endIndex)`表示如果纸牌只剩下标在 `beginIndex ~ endIndex`之间的几个了，那么作为先拿者，纸牌被拿完后，先拿者能达到的最大分数；而`second(int arr[],int begin,int end)`表示如果纸牌只剩下标在`beginIndex ~ endIndex`之间的几个了，那么作为后拿者，纸牌被拿完后，后拿者能达到的最大分数。
 
-public static void main(String[] args) {
-    int arr[] = {1, 2, 100, 4};
-    System.out.println(maxScoreOfWinner(arr));//101
-}
-```
+在`first()`中，如果只有一张纸牌，那么该纸牌分数就是先拿者能达到的最大分数，直接返回，无需决策。否则先拿者 A 的第一次决策只有两种情况：
 
-这个题的试法其实很不容易，笔者直接看别人写出的暴力尝试版本表示根本看不懂，最后还是搜了博文才弄懂。其中`f()`和`s()`就是整个尝试中的思路，与以往穷举法的暴力递归不同，这里是两个函数相互递归调用。
-
-`f(int arr[],int begin,int end)`表示如果纸牌只剩下标在`begin~end`之间的几个了，那么作为先拿者，纸牌被拿完后，先拿者能达到的最大分数；而`s(int arr[],int begin,int end)`表示如果纸牌只剩下标在`begin~end`之间的几个了，那么作为后拿者，纸牌被拿完后，后拿者能达到的最大分数。
-
-在`f()`中，如果只有一张纸牌，那么该纸牌分数就是先拿者能达到的最大分数，直接返回，无需决策。否则先拿者A的第一次决策只有两种情况：
-
-- 先拿最左边的`arr[beginIndex]`，那么在A拿完这一张之后就会作为后拿者参与到剩下的`(begin+1)~end`之间的纸牌的决策了，这一过程可以交给`s()`来做。
-- 先拿最右边的`arr[endIndex]`，那么在A拿完这一张之后就会作为后拿者参与到剩下的`begin~(end-1)`之间的纸牌的决策了，这一过程可以交给`s()`来做。
+- 先拿最左边的`arr[beginIndex]`，那么在 A 拿完这一张之后就会作为后拿者参与到剩下的`(beginIndex + 1) ~ endIndex`之间的纸牌的决策了，这一过程可以交给 `second()` 来做。
+- 先拿最右边的 `arr[endIndex]`，那么在 A 拿完这一张之后就会作为后拿者参与到剩下的 `beginIndex ~ (endIndex - 1)` 之间的纸牌的决策了，这一过程可以交给`second()`来做。
 
 最后返回两种情况中，**结果较大**的那种。
 
-在`s()`中，如果只有一张纸牌，那么作为后拿者没有纸牌可拿，分数为0，直接返回。否则以假设的方式巧妙的将问题递归了下去：
+在`second()`中，如果只有一张纸牌，那么作为后拿者没有纸牌可拿，分数为 0，直接返回。否则以假设的方式巧妙的将问题递归了下去：
 
-- 假设先拿者A拿到了`arr[beginIndex]`，那么去掉该纸牌后，对于剩下的`(begin+1)~end`之间的纸牌，后拿者B就转变身份成了先拿者，这一过程可以交给`f()`来处理。
-- 假设先拿者A拿到了`arr[endIndex]`，那么去掉该纸牌后，对于剩下的`begin~(end-1)`之间的纸牌，后拿者B就转变身份成了先拿者，这一过程可以交给`f()`来处理。
+- 假设先拿者 A 拿到了 `arr[beginIndex]`，那么去掉该纸牌后，对于剩下的 `(beginIndex + 1) ~ endIndex`之间的纸牌，后拿者 B 就转变身份成了先拿者，这一过程可以交给 `first()`来处理。
+- 假设先拿者 A 拿到了 `arr[endIndex]`，那么去掉该纸牌后，对于剩下的 `beginIndex ~ (endIndex - 1)`之间的纸牌，后拿者 B 就转变身份成了先拿者，这一过程可以交给`first()`来处理。
 
-这里取两种情况中**结果较小**的一种，是因为这两种情况是我们假设的，但先拿者A绝顶聪明，他的选择肯定会让后拿者尽可能拿到更小的分数。比如`arr=[1,2,100,4]`，虽然我们的假设有先拿者拿`1`和拿`4`两种情况，对应`f(arr,1,3)`和`f(arr,0,2)`，但实际上先拿者不会让后拿者拿到`100`，因此取两种情况中结果较小的一种。
+这里取两种情况中**结果较小**的一种，是因为这两种情况是我们假设的，但先拿者 A 绝顶聪明，他的选择肯定会让后拿者尽可能拿到更小的分数。比如`arr=[1,2,100,4]`，虽然我们的假设有先拿者拿`1`和拿`4`两种情况，对应`f(arr,1,3)`和`f(arr,0,2)`，但实际上先拿者不会让后拿者拿到`100`，因此取两种情况中结果较小的一种。
 
-### 改动态规划
+### （二）改动态规划
 
 这里是两个函数相互递归，每个函数的参数列表又都是`beginIndex`和`endIndex`是可变的，因此需要两张二维表保存`(begin,end)`确定时，`f()`和`s()`的状态值。
 

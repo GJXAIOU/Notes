@@ -14,7 +14,7 @@
 其中 x 坐标为 Left - 1，<=x 位置上放置的都是 <= num 值的数，然后依次向右遍历，如果该数大于 num，则 x 不动，直接判断下一个数，如果该数小于等于 num，则该数和 x + 1 位置上的数互换， x 向右移动一位，即 x + 1，然后继续判断下一个数；以此类推；
 
 ```java
-package nowcoder.easy.day01;  
+package com.gjxaiou.easy.day01;  
   
 import java.util.Arrays;  
   
@@ -154,7 +154,7 @@ true
 x 坐标为 L - 1，y 坐标为 R + 1，两边分别表示小于 num 和大于 num 的值，当前位置坐标为 cur，然后依次向右遍历，如果该数小于 num，则该数和小于区域最右边下标（x）的下一个坐标元素交换，小于区域向右扩充（即 x + 1），如果该数等于 num ,则 cur 指向下一个元素，如果大于 num，则该数和大于区域最左边区域的前一个坐标元素交换，大于区域向左扩充一个（即 y - 1），然后这里**交换回来的数还需要按照上面的标准进行判断**，直到 cur 和 又边界相遇停止；
 
 ```java
-package nowcoder.easy.day01;  
+package com.gjxaiou.easy.day01;  
   
 /**  
  * @author GJXAIOU  
@@ -261,7 +261,7 @@ public class NetherlandsFlag {
 根据随机性，随机快速排序的时间复杂度是：$O(N * \log_{2}^{N})$，同时需要空间复杂度为：$O(\log_{2}^{N})$，这里的额外空间主要用于记录每次划分区域的断点；
 
 ```java
-package nowcoder.easy.day01;  
+package com.gjxaiou.easy.day01;  
   
 /**  
  * @author GJXAIOU  
@@ -392,7 +392,7 @@ public class QuickSort {
 然后再将堆的最后一个和堆顶进行交换，同上.....;
 
 ```java
-package sort.nowcoder.easy.day01;
+package sort.com.gjxaiou.easy.day01;
 
 /**
  * @author GJXAIOU
@@ -497,7 +497,7 @@ public class HeapSort {
 例如：使用优先级队列（实质上就是堆）存放自定义对象，然后自定义比较器使得可以比较自定义的类型对象；
 
 ```java
-package sort.nowcoder.easy.day01;
+package sort.com.gjxaiou.easy.day01;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -624,7 +624,7 @@ public class MyComparator {
 最后将辅助数组中各个下标对应的元素值还原，示例：辅助数组为：`[1,2,0,2]`就相当于有 1 个 0,2 个 1,0 个 3,2 个 4，因此结果为：`[0,1,1,4,4]`；
 
 ```java
-package sort.nowcoder.easy.day01;
+package sort.com.gjxaiou.easy.day01;
 
 import java.util.Arrays;
 
@@ -675,7 +675,7 @@ public class BucketSort {
   - 为什么要设置一个空桶：因为至少有一个桶为空，则距离空桶左右最近的两个非空桶：左非空 min .... 左非空 max 。。。空桶 。。。右非空 min....右非空 max，则右非空 min - 左非空 max 的插值一定大于桶内插值，因为其值至少是一个桶的长度，而同一个桶内元素之间的插值是不会大于桶长的， 为了证明：**最大的插值一定不会来自于同一个桶**。**但是空桶仅仅是用于否定最终答案不是在同一个桶中，但是不是答案一定就是在空桶的两边；**示例：非空：13,19；空；非空：30，39；非空：59,63；不是空桶左右俩个的插值最大；
 
 ```java
-package sort.nowcoder.easy.day01;
+package sort.com.gjxaiou.easy.day01;
 
 import java.util.Arrays;
 

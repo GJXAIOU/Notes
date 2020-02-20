@@ -4,52 +4,88 @@
 
 ## 一、不用比较符返回较大数
 
-给定两个数a和b，如何不用比较运算符，返回较大的数。
+给定两个数 a 和 b，如何不用比较运算符，返回较大的数。
+
+【解答】
+
+这里有两种方法进行解决，两种方法原理都一样的，只是第二种是第一种的优化。
+
+首先 sign 函数的功能是返回整数 n 的符号，正数返回 1，负数返回 0。flip 函数的功能是做 n 的异或运算，n 是 1返回 0，n 是 0 返回 1。
+
+**方法一：**
+
+　　我们不能直接比较，那么就用减法来判断，a - b 值的符号，符号为正 a 大，符号为负 b 大。signC 表示 c 的符号，signRevC 表示 c 的相反的符号，scA 是 1 返回 a，scA 是 0 返回 B。但是有局限性，那就是 a - b 的值可能出现溢出，返回结果不正确。
+
+**方法二：**
+
+先比较 a 与 b 两个数的符号，符号不同 `difSab==1`，`sameSab==0`；直接返回符号为正的那个数。
+
+- 如果 a 为 0 或正，那么 b 为负(`signA == 1`,`signB == 0`)，则返回 a;
+
+- 如果 a 为负，那么 b 为 0 或正(`signA == 0`,`signB == 1`)，则返回 b;
+
+如果符号相同 `difSab==0`, `sameSab==1`，这种情况下, a - b 的值绝对不会溢出，那么就看 c 的符号。
+
+- 如果 c = a - b, 为正返回 a;
+
+- 如果 c = a - b, 为负返回 b;
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
-public class Code_01_GetMax {
+public class GetMax {
 
-	public static int flip(int n) {
-		return n ^ 1;
-	}
+    public static int flip(int n) {
+        // 异或，二进制表示，相同输出 0，不同输出 1；
+        return n ^ 1;
+    }
 
-	public static int sign(int n) {
-		return flip((n >> 31) & 1);
-	}
+    public static int sign(int n) {
+        // 二进制中符号位 0 表示正，1 表示负：若正数或 0 返回 1，负数则返回 0
+        return flip((n >> 31) & 1);
+    }
 
-	public static int getMax1(int a, int b) {
-		int c = a - b;
-		int scA = sign(c);
-		int scB = flip(scA);
-		return a * scA + b * scB;
-	}
+    // 方法一：得到 a - b 的符号就可以知道大小（缺点：a - b 值可能出现溢出）
+    public static int getMax1(int a, int b) {
+        int c = a - b;
+        //表示 c 的符号
+        int signC = sign(c);
+        // 表示与 c 相反的符号
+        int signRevC = flip(signC);
+        return a * signC + b * signRevC;
+    }
 
-	public static int getMax2(int a, int b) {
-		int c = a - b;
-		int sa = sign(a);
-		int sb = sign(b);
-		int sc = sign(c);
-		int difSab = sa ^ sb;
-		int sameSab = flip(difSab);
-		int returnA = difSab * sa + sameSab * sc;
-		int returnB = flip(returnA);
-		return a * returnA + b * returnB;
-	}
+    //方法二：
+    public static int getMax2(int a, int b) {
+        int res = a - b;
+        //返回 a 的符号
+        int signA = sign(a);
+        //返回 b 的符号
+        int signB = sign(b);
+        //返回 c 的符号
+        int signC = sign(res);
 
-	public static void main(String[] args) {
-		int a = -16;
-		int b = 1;
-		System.out.println(getMax1(a, b));
-		System.out.println(getMax2(a, b));
-		a = 2147483647;
-		b = -2147480000;
-		System.out.println(getMax1(a, b)); // wrong answer because of overflow
-		System.out.println(getMax2(a, b));
+        /*
+         * 如果a、b的符号相同(+,+)、(-,-)，difSab=0,returnA=signC;如果 sc 是 1,返回 a,否则返回 b
+         * 如果a、b的符号不同(+,-)、(-,+)，disSab=1,returnA=signA;如果 sa 是 1,返回 a,否则返回 b
+         */
+        int difSab = signA ^ signB;
+        int sameSab = flip(difSab);
+        int returnA = difSab * signA + sameSab * signC;
+        int returnB = flip(returnA);
+        return a * returnA + b * returnB;
+    }
 
-	}
-
+    public static void main(String[] args) {
+        int a = -16;
+        int b = 1;
+        System.out.println(getMax1(a, b));
+        System.out.println(getMax2(a, b));
+        a = 2147483647;
+        b = -2147480000;
+        System.out.println(getMax1(a, b)); // wrong answer because of overflow
+        System.out.println(getMax2(a, b));
+    }
 }
 
 ```
@@ -58,10 +94,21 @@ public class Code_01_GetMax {
 
 ## 二、二叉树和为 Sum 的最长路径长度
 
-给定一棵二叉树的头节点head，和一个整数sum，二叉树每个节点上都有数字，我们规定路径必须是从上往下的，求二叉树上累加和为sum的最长路径长度。
+给定一棵二叉树的头节点 head，和一个整数 sum，二叉树每个节点上都有数字，我们规定路径必须是从上往下的，求二叉树上累加和为sum的最长路径长度。
+
+**解答**
+
+这是使用 HashMap（代码中为 sumMap）来保存从头结点 head 喀什的一条路径上的结点累加和。其中 key 值为累加和，value 值为对应累加和在路径中最早出现的层数。
+
+所以对于当前结点来说，需要父结点的累加和 + 当前结点的值（这里使用先序遍历的变形应用）。
+
+如何保证 level 为最早出现这个累加和的层数：
+
+- sumMap 中加入某个累加和时候，判断是否已经存在该累积和，没有就加入否则不加入。
+- 求解以某个结点结尾的情况下，累加和为规定值的最长路径长度。
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 import java.util.HashMap;
 
@@ -89,14 +136,18 @@ public class Code_03_LongestPathSum {
 			return maxLen;
 		}
 		int curSum = preSum + head.value;
+        //保证level为最早出现这个累加和的层数
 		if (!sumMap.containsKey(curSum)) {
 			sumMap.put(curSum, level);
 		}
+        //求解以每个节点结尾的情况下，累加和为规定值的最长路径长度，更新最大路径长度
 		if (sumMap.containsKey(curSum - sum)) {
 			maxLen = Math.max(level - sumMap.get(curSum - sum), maxLen);
 		}
+         //遍历左右子树
 		maxLen = preOrder(head.left, sum, curSum, level + 1, maxLen, sumMap);
 		maxLen = preOrder(head.right, sum, curSum, level + 1, maxLen, sumMap);
+         //返回之前，如果当前累加和是新加入的（通过level判断），则删除
 		if (level == sumMap.get(curSum)) {
 			sumMap.remove(curSum);
 		}
@@ -185,9 +236,11 @@ public class Code_03_LongestPathSum {
 
 每次都是从头开始一个个匹配，但是时间复杂度太高，最差的情况下是：$$O(N * M)$$
 
-**大致思路**：从左到右遍历 str 的每一个字符，然后看如果以当前字符作为第一个字符出发是否匹配出 match。比如str="aaaaaaaaaaaaaaaaab"，match="aaaab"。从 str[0] 出发， 开始匹配，匹配到 str[4]='a' 时发现和 match[4]='b' 不一样，所以匹配失败，说明从 str[0] 出发是不行的。从 str[1] 出发，开始匹配，匹配到 str[5]='a' 时发现和 match[4]='b' 不一样， 所以匹配失败，说明从 str[1] 出发是不行的。从str[2...12]出发，都会一直失败。从 str[13] 出 发，开始匹配，匹配到 str[17]=='b'，时发现和 match[4]='b'—样，match己经全部匹配完，说 明匹配成功，返回13。普通解法的时间复杂度较高，从每个字符串发时，匹配的代价都可能是O(M)，那么一共有N个字符，所以整体的时间复杂度为 O（N*M）。普通解法的时间复杂度这么高，是因为每次遍历到一个字符时，检查工作相当于从无开始，之前的遍历检查 不能优化当前的遍历检查。
+**大致思路**：从左到右遍历 str 的每一个字符，然后看如果以当前字符作为第一个字符出发是否匹配出 match。比如  `str="aaaaaaaaaaaaaaaaab"`，`match="aaaab"`。从 `str[0]` 出发， 开始匹配，匹配到 `str[4]='a'` 时发现和 `match[4]='b'` 不一样，所以匹配失败，说明从 `str[0]` 出发是不行的。从`str[1]` 出发，开始匹配，匹配到 `str[5]='a'` 时发现和 `match[4]='b'` 不一样， 所以匹配失败，说明从 `str[1]` 出发是不行的。然后分别从`str[2...12]`出发，都会一直失败。从 `str[13]` 出 发，开始匹配，匹配到 `str[17]=='b'` 时发现和 `match[4]='b'` —样，match 己经全部匹配完，说明匹配成功，返回 13。
 
-**总结**： 我们发现每次匹配前面的并没有给后面一些指导信息
+普通解法的时间复杂度较高，从每个字符串发时，匹配的代价都可能是 `O(M)`，那么一共有 N 个字符，所以整体的时间复杂度为 `O（N*M）`。普通解法的时间复杂度这么高，是因为每次遍历到一个字符时，检查工作相当于从无开始，之前的遍历检查 不能优化当前的遍历检查。
+
+**总结**： 我们发现每次匹配前面的并没有给后面一些指导信息。
 
 
 
@@ -195,49 +248,70 @@ public class Code_03_LongestPathSum {
 
 - **首先根据 match 生成最大前后缀匹配长度数组 ：**
 
-  首先生成 match 字符串的 nextArr 数组，这个数组的长度与 match 字符串的长度一 样，nextArr[i] 的含义是在 match[i] 之前的字符串 match[0..i-1]中，心须以 match[i-1] 结尾的后缀子串（不能包含match[0]）与必须以 match[0] 开头的前缀子串（不能包含match[i - 1]）最大匹配长度是多少。这个长度就是 nextArr[i] 的值。比如，match="aaaab"字符串，nextArr[4] 的值该是多少呢？`match[4]=="b"`，所以它之前的字符串为 "aaaa"，根据定义这个字符串的后缀子串和前缀子串最大匹配为 "aaa"。也就是当后缀子串等于 match[1...3] = "aaa"，前缀子串等于 `match[0..2]=="aaa"` 时，这时前缀和后缀不仅相等，而且是所有前缀和后缀的可能性中
+  首先生成 match 字符串的 nextArr 数组，这个数组的长度与 match 字符串的长度一 样，**nextArr[i] 的含义是在 match[i] 之前的字符串 match[0..i-1]中，心须以 match[i-1] 结尾的后缀子串（不能包含match[0]）与必须以 match[0] 开头的前缀子串（不能包含match[i - 1]）最大匹配长度是多少**。这个长度就是 nextArr[i] 的值。比如，match="aaaab"字符串，nextArr[4] 的值该是多少呢？`match[4]=="b"`，所以它之前的字符串为 "aaaa"，根据定义这个字符串的后缀子串和前缀子串最大匹配为 "aaa"。也就是当后缀子串等于 `match[1...3] = "aaa"`，前缀子串等于 `match[0..2]=="aaa"` 时，这时前缀和后缀不仅相等，而且是所有前缀和后缀的匹配长度最长的。
 
-注：数组中值表示一个字符之前的所有字符串的最长前缀和最长后缀的匹配长度（前缀不包括数组中最后一个字符，后缀不包含第一个字符）
+简单概括：**nextArr 数组中的值表示一个字符之前的所有字符串的最长前缀和最长后缀的匹配长度（前缀不包括数组中最后一个字符，后缀不包含第一个字符）**
 
-示例：对于数组： a b c a b c d，则元素 d  的最长XXXX为 3
-
-前缀： a       ab         abc             abca          abcab   不能包含最后一个，至此截止，所以最长为 3.    
-
-后缀： c        bc         abc             cabc          bcabc
-
-值：  不等   不等    相等，为3     不等           不等
+示例：对于数组： a b c a b c d，则元素 d  的最长前缀和最长后缀匹配长度为 3
 
 
+前缀：| a | ab| abc | abca | abcab |不能包含最后一个，至此截止，所以最长为 3. 
+---|---|---|---|---|---|---
+后缀：| c |   bc  |       abc   |      cabc   |    bcabc| 不能包含最前一个 d，所以从 c 开始 
+值：|  不等 |  不等 |   相等，为3 |    不等 | 不等|  
 
-**2  从str[i]字符出发---匹配到j位置上发现开始出现不匹配：**
 
-假设从 str[i] 字符出发时候，匹配到 j  位置的字符发现与 match 中的字符不一致，也就是说， str[i] 与 match[0] 一样，并且从这个位置开始一直可以匹配，即 str[i..j-1] 与 match[0..j-i-1] 一样，知道发现 str[j] != match[j -i]，匹配停止，如图所示。
+
+- **步骤一：从 str[i] 字符出发一直匹配到 str[j] 位置上发现开始出现不匹配：**
+
+假设从 str[i] 字符出发时候，匹配到 j  位置的字符发现与 match 中的字符不一致，也就是说， str[i] 与 match[0] 一样，并且从这个位置开始一直可以匹配，即 str[i..j-1] 与 match[0..j-i-1] 一样，直到发现 str[j] != match[j -i]，匹配停止，如图所示。
 
 ![image-20200102144804517](AlgorithmMediumDay01.resource/image-20200102144804517.png)
 
 
 
-**3 下一次 match 数组往右滑动， 滑动大小为 match 当前字符的最大前后缀匹配长度，再让 str[j] 与 match[k] 进行下一次匹配~**
+- **步骤二：下一次 match 数组往右滑动， 滑动大小为 match 当前字符的最大前后缀匹配长度，再让 str[j] 与 match[k] 进行下一次匹配~**
 
-那么下一次的匹配检查不再像普通解法那样退回到str[i+1]重新开始与 match[0] 的匹配过程，而是直接让 str[j] 与 match[k] 进行匹配检查，如图所示.在图中，在 str 中要匹配的位置仍是 j，而不进行退回。对 match来说，相当于向右滑动，让 match[k] 滑动到与 str[j] 同一个位置上，然后进行后续的匹配检查。普通解法 str 要退回到 i+1 位置，然后让 str[i+1] 与 match[0] 进行匹配，而我们的解法在匹配的过程中一直进行这样的滑动匹配的过程，直到在 str 的某一个位置把 match 完全匹配完，就说明str 中有 match。如果 match 滑到最后也没匹配出来，就说明str 中没有 match。
+那么下一次的匹配检查不再像普通解法那样退回到 `str[i+1]` 重新开始与 `match[0]` 的匹配过程，而是**直接让 `str[j]` 与 `match[k]` 进行匹配检查**，如图所示。在图中，**在 str 中要匹配的位置仍是 j，而不进行退回**。对 match 来说，相当于向右滑动，让 match[k] 滑动到与 str[j] 同一个位置上，然后进行后续的匹配检查。
+
+普通解法 str 要退回到 i+1 位置，然后让 str[i+1] 与 match[0] 进行匹配，而我们的解法在匹配的过程中一直进行这样的滑动匹配的过程，直到在 str 的某一个位置把 match 完全匹配完，就说明str 中有 match。如果 match 滑到最后也没匹配出来，就说明str 中没有 match。
 
 ![img](AlgorithmMediumDay01.resource/20180617171300922.png)
 
 
 
-**4 注意为什么加快，主要是str[i]--c前那段不用考虑，因为肯定不能匹配~**
+- **注：注意为什么加快，主要是 str[i] ~ c 前那段不用考虑，因为肯定不能匹配~**
 
-**若有匹配 则出现更大的前后缀匹配长度 ，与最初nextArr[] 定义违背。**
+**若有匹配 则出现更大的前后缀匹配长度 ，与最初 nextArr[] 定义违背。**
 
 ![img](AlgorithmMediumDay01.resource/20180617171438808.png)
 
-**关于nextArr数组的求解：**
+**注：关于nextArr数组的求解：**
 
-![img](https://img-blog.csdn.net/20180617211712204?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+最后需要解释如何快速得到 match 字符串的 nextArr 数组，并且要证明得到 nextArr 数组的时间复杂度为 O(M)。
 
-![img](https://img-blog.csdn.net/20180617214652560?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+对 match[0] 来说，在它之前没有字符，所以 **nextArr[0] 规定为 -1**，对于 match[1] 来说，在它之前有 match[0]，但是 nextArr 数组定义要求任何子串的后缀不能包括第一个字符（这里为 match[0]），所以 match[1] 之前的字符串只有长度为 0 的后缀字符串，所以 **nextArr[1] 为 1**，对于 match[i]（i > 1）来说，求解过程如下：
 
-4.如果向前跳到最左位置（即 match[0] 的位置），此时 nextArr[0] == -1，说明字符 A 之前的字符串不存在前缀和后缀匹配的情况，则令 nextArr[i] = 0。用这种不断向前跳的方式可以算出正确的 nextArr[i] 值的原因还是因为每跳到一个位置 cn，nextArr[cn] 的意义就表示它之前字符串的最大匹配长度。求解 nextArr 数组的具体过程请参照如下代码中的 getNextArray 方法。
+- 因为是从左到右依次求解 nextArr，所以在求解 nextArr[i] 时候，nextArr[0…i - 1] 的值都已经求出。假设 match[i] 字符为下图中的 A 字符，match[i - 1] 为下图中的 B 字符。
+
+    通过 nextArr[i - 1] 的值可以得到 B 字符前的字符串的最长前缀和后缀匹配区域，下图中的 L 区域就是最长匹配的前缀子串， K 区域就是最长匹配的后缀子串，图中字符 C 是 L 区域之后的字符，然后看字符 C 和字符 B 是否相等。
+
+    ![image-20200207135708508](AlgorithmMediumDay01.resource/image-20200207135708508.png)
+
+- 如果字符 C 和字符 B 相等，那么 A字符之前的最长前缀和后缀匹配区域就可以确定，前缀子串为 L 的区域 +C 字符，后缀子串为 K 区域 +  B 字符，即 `nextArr[i + 1] = nextArr[i] + 1;`
+
+- 如果字符 C 和字符 B 不相等，就看字符 C 之前的前缀和后缀匹配情况，假设字符 C 是第 cn 个字符（match[cn]），那么 nextArr[cn] 就是其最长前缀和最长后缀匹配长度。如图所示：
+
+    ![image-20200207140814600](AlgorithmMediumDay01.resource/image-20200207140814600.png)
+
+在图中， m 区域和 n 区域分别是字符 C 之前的字符串的最长匹配的后缀和前缀区域，这是通过 nextArr[cn] 值确定的，当然两个区域是相等的， m’ 区域为 K 区域的最右的区域且长度与 m 区域一样，因为 K 区域和 L 区域是相等的，m‘ 区域 为 K 区域最右区域且长度和 m 区域一样，因为 K 区域和 L 区域是相等的，所以 m 区域和 m’ 区域是相等的，字符 D 为 n 区域之后的一个字符，接下来比较字符 D 是否与字符 B 相等。
+
+- 如果相等，A 字符之前的字符串的最长前缀与后缀匹配区域就可以确定，前缀子串为 n区域 +D 字符，后缀子串为 m’ 区域 + B 字符，则令 `nextArr[i] = nextArr[cn] + 1`。
+- 如果不等，继续往前跳到字符 D，之后的过程和跳到字符C 类似，一直进行这样的跳过程，跳的每一步都会有一个新的字符和 B 比较（就像 C 字符和 D 字符一样），只要有相等的情况，nextArr[i] 的值就能确定。		
+
+
+
+如果向前跳到最左位置（即 match[0] 的位置），此时 nextArr[0] == -1，说明字符 A 之前的字符串不存在前缀和后缀匹配的情况，则令 nextArr[i] = 0。用这种不断向前跳的方式可以算出正确的 nextArr[i] 值的原因还是因为每跳到一个位置 cn，nextArr[cn] 的意义就表示它之前字符串的最大匹配长度。求解 nextArr 数组的具体过程请参照如下代码中的 getNextArray 方法。
 
 
 
@@ -260,7 +334,7 @@ getNextArray 方法中的 while 循环就是求解 nextArr 数组的过程，现
 代码
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 /**
  * @author GJXAIOU
@@ -339,7 +413,7 @@ public class KMP {
 总结： 在 KMP 中 nextArr 数组基础上多求一位终止位，将不是的补上即可
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 /**
  * @author GJXAIOU
@@ -420,7 +494,7 @@ abracadabracadabra
 
 **思路**： 把一棵树序列化（可以先序、中序、后续）为字符串（字符数组）  。如果 str2 是 str1的子串 则T2也是T1的子树。
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 /**
  * 判断树 1 的某棵子树是否包含树 2
@@ -623,7 +697,7 @@ public static char[] manacherString(String str) {
 整体代码如下：
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 /**
  * @Author GJXAIOU
@@ -690,7 +764,7 @@ public class Manacher {
 > 思路：当`R`第一次到达串尾时，做`R`关于`C`的对称点`L`，将`L`之前的字符串逆序就是结果。
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 /**
  * 添加尽可能少的字符使其成为一个回文字符串
@@ -820,7 +894,7 @@ public class ShortestEnd {
 代码：
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 /**
  * @Author GJXAIOU
@@ -889,7 +963,7 @@ public class Manacher {
 用manacher求得回文边界，发现边界与字符串最后位置，停止，求得回文中心C与有边界R，找到回文字符串，用原字符串减去该部分，在逆序就是结果。
 
 ```java
-package nowcoder.advanced.day01;
+package com.gjxaiou.advanced.day01;
 
 /**
  * 添加尽可能少的字符使其成为一个回文字符串
@@ -1089,37 +1163,15 @@ public static void main(String[] args) {
 
 1. 定义一个遍历指针`cur`，该指针首先指向头结点
 
-2. 判断
-
-    ```
-    cur
-    ```
-
-    的左子树是否存在
+2. 判断 `cur`的左子树是否存在
 
     - 如果`cur`的左孩子为空，说明`cur`的左子树不存在，那么`cur`右移来到`cur.right`
-
-    - 如果
-
-        ```
-        cur
-        ```
-
-        的左孩子不为空，说明
-
-        ```
-        cur
-        ```
-
-        的左子树存在，找出该左子树的最右结点，记为
-
-        ```
-        mostRight
-        ```
+    
+    - 如果 `cur`的左孩子不为空，说明 `cur`的左子树存在，找出该左子树的最右结点，记为`mostRight`；
 
         - 如果，`mostRight`的右孩子为空，那就让其指向`cur`（`mostRight.right=cur`），并左移`cur`（`cur=cur.left`）
-        - 如果`mostRight`的右孩子不空，那么让`cur`右移（`cur=cur.right`），并将`mostRight`的右孩子置空
-
+    - 如果`mostRight`的右孩子不空，那么让`cur`右移（`cur=cur.right`），并将`mostRight`的右孩子置空
+    
 3. 经过步骤2之后，如果`cur`不为空，那么继续对`cur`进行步骤2，否则遍历结束。
 
 下图所示举例演示morris遍历的整个过程：
@@ -1142,7 +1194,7 @@ public static void main(String[] args) {
 
 示例代码：
 
-```
+```java
 public static class Node {
     int data;
     Node left;
@@ -1218,7 +1270,6 @@ public static void main(String[] args) {
     mediumOrderByMorris(root);
 
 }
-复制代码
 ```
 
 这里值得注意的是：**morris遍历会来到一个左孩子不为空的结点两次**，而其它结点只会经过一次。因此使用morris遍历打印先序序列时，如果来到的结点无左孩子，那么直接打印即可（这种结点只会经过一次），否则如果来到的结点的左子树的最右结点的右孩子为空才打印（这是第一次来到该结点的时机），这样也就忽略了`cur`经过的结点序列中第二次出现的结点；而使用morris遍历打印中序序列时，如果来到的结点无左孩子，那么直接打印（这种结点只会经过一次，左中右，没了左，直接打印中），否则如果来到的结点的左子树的最右结点不为空时才打印（这是第二次来到该结点的时机），这样也就忽略了`cur`经过的结点序列中第一次出现的重复结点。
@@ -1255,7 +1306,7 @@ public static void main(String[] args) {
 
 其中无非就是在morris遍历中在第二次经过的结点的时机执行一下打印操作。而从下到上打印一棵树的右边界，可以将该右边界上的结点看做以`right`指针为后继指针的链表，将其反转`reverse`然后打印，最后恢复成原始结构即可。示例代码如下（其中容易犯错的地方是`18`行和`19`行的代码不能调换）：
 
-```
+```java
 public static void posOrderByMorris(Node root) {
     if (root == null) {
         return;
@@ -1322,7 +1373,6 @@ public static void main(String[] args) {
     root.right.right = new Node(7);
     posOrderByMorris(root);
 }
-复制代码
 ```
 
 ### 时间复杂度分析
@@ -1421,7 +1471,7 @@ public static void main(String[] args) {
 **代码：** ==还是有问题==
 
 ```java
-package nowcoder.advanced.class01;
+package com.gjxaiou.advanced.class01;
 
 import java.sql.SQLOutput;
 

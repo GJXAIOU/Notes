@@ -36,7 +36,7 @@ custom: GJXAIOU
 二分查找： **二分查找前提是该数组必须有序**，每次进行查找都是将数组划分一半，N 样本的数组一共可以划分 $\log_{2}^{N}$次，因此时间复杂度为$O(\log_{2}^{N})$
 
 ```java
-package sort.nowcoder.easy.day01;
+package sort.com.gjxaiou.easy.day01;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,7 +123,7 @@ public class BubbleSort {
 空间复杂度：$O(1)$
 
 ```java
-package sort.nowcoder;
+package sort.com.gjxaiou;
 
 import java.util.Arrays;
 
@@ -200,7 +200,7 @@ public class InsertionSort {
 
 
 ### （四）归并排序
-归并排序（MERGE-SORT）是利用**归并**的思想实现的排序方法，该算法采用经典的**分治**（divide-and-conquer）策略（分治法将问题**分**(divide)成一些小的问题然后递归求解，而**治(conquer)**的阶段则将分的阶段得到的各答案"修补"在一起，即分而治之)。
+归并排序（MERGE-SORT）是利用**归并**的思想实现的排序方法，该算法采用经典的**分治**（divide-and-conquer）策略（分治法将问题 **分**(divide) 成一些小的问题然后递归求解，而 **治(conquer)** 的阶段则将分的阶段得到的各答案"修补"在一起，即分而治之)。
 
 流程：首先将数组对半分为两个部分，然后分别对左右两边进行排序；最后对整体进行外排；
 重点关注：最后整体的外排
@@ -210,7 +210,7 @@ public class InsertionSort {
 ![](AlgorithmEasyDay01.resource/1024555-20161218194508761-468169540.png)
 
 ```java
-package nowcoder.easy.day01;
+package com.gjxaiou.easy.day01;
 
 import java.util.Arrays;
 
@@ -281,7 +281,7 @@ public class MergeSort {
 例如验证冒泡排序是否正确：
 
 ```java
-package nowcoder.easy.day01;  
+package com.gjxaiou.easy.day01;  
   
 /**  
  * @author GJXAIOU  
@@ -449,7 +449,7 @@ merge操作采用二路归并排序的思想
 假设当前元素为a，a右边比a大的元素个数则为a在小和累加过程出现的次数
 
 ```java
-package nowcoder.easy.day01;  
+package com.gjxaiou.easy.day01;  
   
 /**  
  * 小和问题  

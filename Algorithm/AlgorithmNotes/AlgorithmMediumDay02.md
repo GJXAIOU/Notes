@@ -5,7 +5,7 @@
 ## 一、找到新的被指的新类型字符
 
 ```java
-package nowcoder.advanced.day02;
+package com.gjxaiou.advanced.day02;
 
 public class Code_03_FindNewTypeChar {
 
@@ -54,13 +54,13 @@ public class Code_03_FindNewTypeChar {
 字典树又称为前缀树或Trie树，是处理字符串常见的数据结构。
 假设组成所有单词的字符仅是“a”~“z”，请实现字典树结构，
 并包含以下四个主要功能。
-void insert(String word)：添加word，可重复添加。
-void delete(String word)：删除word，如果word添加过多次，仅删除一个。
-boolean search(String word)：查询word是否在字典树中。
-int prefixNumber(String pre)：返回以字符串pre为前缀的单词数
+`void insert(String word)`：添加word，可重复添加。
+`void delete(String word)`：删除word，如果word添加过多次，仅删除一个。
+`boolean search(String word)`：查询word是否在字典树中。
+`int prefixNumber(String pre)`：返回以字符串pre为前缀的单词数
 
 ```java
-package nowcoder.advanced.day02;
+package com.gjxaiou.advanced.day02;
 
 public class Code_04_TrieTree {
 
@@ -202,7 +202,7 @@ num=0
 中文表达字符串为：零
 
 ```java
-package nowcoder.advanced.advanced_class_02;
+package com.gjxaiou.advanced.advanced_class_02;
 
 public class Code_05_EnglishExpression {
 
@@ -295,7 +295,7 @@ public class Code_05_EnglishExpression {
 中文表达
 
 ```java
-package nowcoder.advanced.day02;
+package com.gjxaiou.advanced.day02;
 
 public class Code_06_ChineseExpression {
 
@@ -522,7 +522,7 @@ public class Code_06_ChineseExpression {
 **代码：**
 
 ```java
-package nowcoder.advanced.class02;
+package com.gjxaiou.advanced.class02;
 
 import java.util.LinkedList;
 
@@ -591,7 +591,7 @@ public class SlidingWindowMaxArray {
 #### 最简单思路： 暴力求解 两个for 依次遍历 
 
 ```java
-package nowcoder.advanced.class02;
+package com.gjxaiou.advanced.class02;
 
 /**
  * @Author GJXAIOU
@@ -650,7 +650,7 @@ public class AllLessNumSubArray {
 代码：
 
 ```java
-package nowcoder.advanced.class02;
+package com.gjxaiou.advanced.class02;
 
 import java.util.LinkedList;
 
@@ -848,7 +848,7 @@ public class Node{
 代码 ==核对一下==
 
 ```java
-package nowcoder.advanced.class01;
+package com.gjxaiou.advanced.class01;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -1018,7 +1018,7 @@ public class MaxTree {
 代码
 
 ```java
-package nowcoder.advanced.class01;
+package com.gjxaiou.advanced.class01;
 
 import java.util.Stack;
 
@@ -1111,7 +1111,7 @@ public class MaximalRectangle {
 ![image-20200103174347520](AlgorithmMediumDay02.resource/image-20200103174347520.png)
 
 ```java
-package nowcoder.advanced.class01;
+package com.gjxaiou.advanced.class01;
 
 import java.awt.*;
 import java.util.Scanner;

@@ -62,7 +62,7 @@ morris遍历的空间复杂度：O（1）
 ![image-20200103185903277](AlgorithmMediumDay03.resource/image-20200103185903277.png)
 
 ```java
-package nowcoder.advanced.class03;
+package com.gjxaiou.advanced.class03;
 
 /**
  * @Author GJXAIOU
@@ -258,7 +258,7 @@ AVL树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平�
 **红黑树结构**
 
 ```java
-package nowcoder.advanced.day03;
+package com.gjxaiou.advanced.day03;
 
 /**
  * Not implemented by zuochengyun
@@ -647,7 +647,7 @@ public static void main(String[] args) {
 原版没有调整的搜索二叉树：不兼顾平衡性
 
 ```java
-package nowcoder.advanced.advanced_class_03;
+package com.gjxaiou.advanced.advanced_class_03;
 
 /**
  * Abstract binary search tree implementation. Its basically fully implemented
@@ -1110,7 +1110,7 @@ public class AbstractBinarySearchTree {
 AVL 树结构
 
 ```java
-package nowcoder.advanced.day03;
+package com.gjxaiou.advanced.day03;
 
 /**
  * Not implemented by zuochengyun
@@ -1676,7 +1676,7 @@ public static void main(String[] args) {
 完整的代码程序
 
 ```java
-package nowcoder.advanced.day03;
+package com.gjxaiou.advanced.day03;
 
 import java.util.ArrayList;
 import java.util.Iterator;

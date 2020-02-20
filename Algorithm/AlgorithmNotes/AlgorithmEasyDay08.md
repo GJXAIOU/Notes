@@ -24,7 +24,7 @@
 **代码**
 
 ```java
-package nowcoder.easy.class_08;
+package com.gjxaiou.easy.class_08;
 
 public class Code_01_Factorial {
     // 递归版本
@@ -95,7 +95,7 @@ arr[2] == 1表示底下的汉诺塔在左间；
 代码：
 
 ```java
-package nowcoder.easy.class_08;
+package com.gjxaiou.easy.class_08;
 
 public class Code_02_Hanoi {
 
@@ -209,7 +209,7 @@ move 1 from 左 to 右
 代码：
 
 ```java
-package nowcoder.easy.class_08;
+package com.gjxaiou.easy.class_08;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -324,7 +324,7 @@ abc
 代码：
 
 ```java
-package nowcoder.easy.class_08;
+package com.gjxaiou.easy.class_08;
 
 import java.util.HashSet;
 
@@ -431,7 +431,7 @@ cca
 
 代码：== 待补充== ，该代码的时间复杂度为： O(n)，将在进阶班优化为  $$O(log^{n})$$。
 ```java
-package nowcoder.easy.day08;
+package com.gjxaiou.easy.day08;
 
 public class Code_05_Cow {
 

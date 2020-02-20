@@ -9,7 +9,7 @@
 - 队列的结构为先进先出，栈是先进后出；
 
 ```java
-package nowcoder.easy.day03;  
+package com.gjxaiou.easy.day03;  
   
 /**  
  * @author GJXAIOU  
@@ -133,7 +133,7 @@ public class ArrayToStackAndQueue {
 **步骤**：放入第一个数据，放入 Data 栈中，同时因为 Min 栈中当前为空，因此放入第一个元素之后最小值也是第一个元素，因此将第一个元素也放入 min 栈中；在 Data 栈中放入第二个数据时候，将当前元素与 min 栈顶比较，如果当前数大于等于 min 栈顶，方法一是不动，方法二是将原来 Min 栈的栈顶元素再次压入一遍；反之如果当前数小于 min 栈顶，就将原来 min 栈顶的元素再次在 min 栈中压入一遍。**push 和 pop 方法都有修改**
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 import java.util.Stack;
 
@@ -265,7 +265,7 @@ public class GetMinStack {
 - 然后互换引用，以此循环；
 
 ```java
-package sort.nowcoder.easy.day03;
+package sort.com.gjxaiou.easy.day03;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -332,7 +332,7 @@ import java.util.Stack;
 如果 pop 栈中仍有数据，则 push 栈不能往 pop 栈中倒数据；
 
 ```java
-package sort.nowcoder.easy.day03;
+package sort.com.gjxaiou.easy.day03;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -420,7 +420,7 @@ public class Cat extends Pet {
 **解答：** 分别建立狗队列和猫队列，然后使用时间戳（这里可以使用一个 count 变量代替），然后只要进入一个动物类就 count + 1，然后将该值封装到该对象中；依次类推。。。
 　
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -612,7 +612,7 @@ cat
 解法：将整体分圈，一圈一圈作为一个整体；一圈打印完之后，左上角和右下角分别沿着主对角线进行缩进，每缩进一次就遍历一圈，一直到两个坐标撞到一起；
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 /**
  * @author GJXAIOU
@@ -693,7 +693,7 @@ public class PrintMatrixSpiralOrder {
 ![顺时针旋转矩阵_20200109100649](AlgorithmEasyDay03.resource/%E9%A1%BA%E6%97%B6%E9%92%88%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5_20200109100649.png)
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 /**
  * @author GJXAIOU
@@ -701,35 +701,37 @@ package nowcoder.easy.day03;
  */
 public class RotateMatrix {
 
-    public static void rotate(int[][] matrix) {
+     public static void rotate(int[][] matrix) {
         int leftTopRow = 0;
         int leftTopColumn = 0;
         int rightBottomRow = matrix.length - 1;
         int rightBottomColumn = matrix[0].length - 1;
         // 因为是正方形，因此只要考虑一个就行，同时不能 =
         while (leftTopRow < rightBottomRow) {
-            rotateEdge(matrix, leftTopRow++, leftTopColumn++, rightBottomRow--, rightBottomColumn--);
+            rotateEdge(matrix, leftTopRow++, leftTopColumn++, rightBottomRow--,
+                    rightBottomColumn--);
         }
     }
 
-    /**
-     * @param matrix
-     * @param leftTopRow     左上角的行
-     * @param leftTopColumn  左上角的列
-     * @param rightBottomRow：右下角的行
-     * @param rightBottomColumn：右下角的列
-     */
-    public static void rotateEdge(int[][] matrix, int leftTopRow, int leftTopColumn, int rightBottomRow, int rightBottomColumn) {
+    public static void rotateEdge(int[][] matrix, int leftTopRow, int leftTopColumn,
+                                  int rightBottomRow, int rightBottomColumn) {
         int times = rightBottomColumn - leftTopColumn;
         int tmp = 0;
         // i 相当于圈数，从0 ~ times -1;（times 为右下角和左上角列数差），因为只需要交换 times 次就可以完成全部交换
         // 这里的圈数是指每一层矩阵中每次矩阵元素交换次数，
         // 具体的交换为一次换四个（对应一边一个）
         for (int i = 0; i != times; i++) {
+            // 保留最上面一行
             tmp = matrix[leftTopRow][leftTopColumn + i];
+            // 最上面一行等于最左边一列
             matrix[leftTopRow][leftTopColumn + i] = matrix[rightBottomRow - i][leftTopColumn];
-            matrix[rightBottomRow - i][leftTopColumn] = matrix[rightBottomRow][rightBottomColumn - i];
-            matrix[rightBottomRow][rightBottomColumn - i] = matrix[leftTopRow + i][rightBottomColumn];
+            // 最左边一列等于最下面一行
+            matrix[rightBottomRow - i][leftTopColumn] =
+                    matrix[rightBottomRow][rightBottomColumn - i];
+            // 最下面一行等于最右边一列
+            matrix[rightBottomRow][rightBottomColumn - i] =
+                    matrix[leftTopRow + i][rightBottomColumn];
+            // 最右边一列等于最上面保留的一行
             matrix[leftTopRow + i][rightBottomColumn] = tmp;
         }
     }
@@ -826,7 +828,7 @@ public class RotateMatrix {
 
 **解答：**
 ```java
-package sort.nowcoder.easy.day03;
+package sort.com.gjxaiou.easy.day03;
 
 public class ReverseList {
 
@@ -948,7 +950,7 @@ Double Linked List: 4 3 2 1 | 1 2 3 4
 ![之字形打印](AlgorithmEasyDay03.resource/%E4%B9%8B%E5%AD%97%E5%BD%A2%E6%89%93%E5%8D%B0.png)
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 /**
  * @author GJXAIOU
@@ -1022,7 +1024,7 @@ public class ZigZagPrintMatrix {
 然后是。。。。
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 /**
  * @author GJXAIOU
@@ -1073,7 +1075,7 @@ public class FindNumInSortedMatrix {
 见代码；
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 /**
  * @author GJXAIOU
@@ -1166,7 +1168,7 @@ Common Part: 2 5
 - 然后分别从两头往中间走，同时比较每个数，直到两者相遇，最后将数据结构恢复到原来的结构；
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 import java.util.Stack;
 
@@ -1439,7 +1441,7 @@ true | true | true |
 - 最后将三个部分连接在一起形成结果；（注意某些链可能没有值） 
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 /**
  * @author GJXAIOU
@@ -1640,7 +1642,7 @@ Node类中的value是节点值，next指针和正常单链表中next指针的意
 - 最后将两个链表分开；
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 import java.util.HashMap;
 
@@ -1808,7 +1810,7 @@ public class CopyListWithRandom {
 - 如果是第三种，以为 loop1 和 loop2 都是入环的第一个节点，只是该结点靠近那个链表近一点而已，默认返回任意一个都行；
 
 ```java
-package nowcoder.easy.day03;
+package com.gjxaiou.easy.day03;
 
 public class FindFirstIntersectNode {
 
