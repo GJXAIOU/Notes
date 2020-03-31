@@ -10,23 +10,23 @@
 
 利用 Morris 遍历实现二叉树的先序、中序、后序遍历，时间复杂度为 O（N），额外空间复杂度为 O（1）。
 
-
-
-经典二叉树，由于没有指向父节点的指针，故遍历时都需要一个栈（递归：系统递归函数帮助压栈，非递归：自己压）来保存有关父节点的信息，都会造成O(H)的额外空间复杂度，H为二叉树高度。
+**经典二叉树，由于没有指向父节点的指针，故遍历时都需要一个栈**（递归：系统递归函数帮助压栈，非递归：自己压）来保存有关父节点的信息，都会造成O(H)的额外空间复杂度，H为二叉树高度。
 
 ```java
-//普通递归版
-public static void process(Node head){
-    if (head == null) { return; }
-    //1
-    //System.out.println(head.value)
-    process(head.left);
-    //2
-    //System.out.println(head.value)
-    process(head.right);
-    //3
-    //System.out.println(head.value)
-}
+// 普通递归版
+ public static void process(Node head) {
+        if (head == null) {
+            return;
+        }
+        // 1，打印放在这里为先序遍历
+        //System.out.println(head.value);
+        process(head.left);
+        // 2，打印放在这里为中序遍历
+        //System.out.println(head.value);
+        process(head.right);	
+        // 3,打印放在这里为后序遍历(第三次回到自己节点时候打印)
+        //System.out.println(head.value);
+ }
 ```
 
 Morris 遍历是利用了二叉树中空闲的结点，例如末子节点的两个引用都是指向的位置为空，但是引用仍然占着空间。利用空闲的空间完成回到上级的操作，即修改原来二叉树结构来实现。
@@ -35,7 +35,7 @@ Morris 遍历是利用了二叉树中空闲的结点，例如末子节点的两�
 
 普通遍历递归，可以三次来到当前节点，按打印时机可分为前中后序。
 
-morris遍历，如果有左子树，可以来到当前节点两次，若没有左子树，来到当前节点一次，可以利用左子树最右节点右指针指向谁来标记第一次还是第二次到这个节点（左子树最右指针指向null，第一次到，指向当前节点，即指向自己，第二次到）。但是在遍历右子树时，无法第三次回到自己。
+morris遍历：如果有左子树，可以来到当前节点两次，若没有左子树，来到当前节点一次，可以利用左子树最右节点右指针指向谁来标记第一次还是第二次到这个节点（左子树最右指针指向null，第一次到，指向当前节点，即指向自己，第二次到）。但是在遍历右子树时，无法第三次回到自己。
 
 morris遍历第一次到时打印，**先序**。第二次到时打印（没有左子树的一次可以理解为直到第一次与第二次重叠在一起），**中序**。
 
@@ -62,26 +62,13 @@ morris遍历的空间复杂度：O（1）
 ![image-20200103185903277](AlgorithmMediumDay03.resource/image-20200103185903277.png)
 
 ```java
-package com.gjxaiou.advanced.class03;
+package com.gjxaiou.advanced.day03;
 
 /**
  * @Author GJXAIOU
  * @Date 2020/1/3 18:49
  */
 public class MorrisTraversal {
-    public static void process(Node head) {
-        if (head == null) {
-            return;
-        }
-        // 1，打印放在这里为先序遍历
-        //System.out.println(head.value);
-        process(head.left);
-        // 2，打印放在这里为中序遍历
-        //System.out.println(head.value);
-        process(head.right);
-        // 3,打印放在这里为中序遍历(第三次回到自己节点时候打印)
-        //System.out.println(head.value);
-    }
 
     public static class Node {
         public int value;
@@ -91,6 +78,39 @@ public class MorrisTraversal {
         public Node(int data) {
             this.value = data;
         }
+    }
+
+    // Morris 遍历改为先序遍历
+    public static void morrisPre(Node head) {
+        if (head == null) {
+            return;
+        }
+        Node cur = head;
+        Node mostRight = null;
+        while (cur != null) {
+            mostRight = cur.left;
+            // 如果当前结点的左孩子不为空，找到该结点左子树的最右节点
+            if (mostRight != null) {
+                while (mostRight.right != null && mostRight.right != cur) {
+                    mostRight = mostRight.right;
+                }
+                // 如果最右结点的 right 指向 null，让其指向 cur，然后 cur 向左移动
+                if (mostRight.right == null) {
+                    mostRight.right = cur;
+                    System.out.print(cur.value + " ");
+                    cur = cur.left;
+                    continue;
+                    // 最右结点的 right 指向 cur，则改为指向 null
+                } else {
+                    mostRight.right = null;
+                }
+                // 此 else 表示当前结点没有左子树的时候，可以认为其第一次到达和第二次到达是重在一起的，没有左孩子，当前结点向右移动
+            } else {
+                System.out.print(cur.value + " ");
+            }
+            cur = cur.right;
+        }
+        System.out.println();
     }
 
     // Morris 中序遍历
@@ -127,35 +147,6 @@ public class MorrisTraversal {
         System.out.println();
     }
 
-    // Morris 遍历改为先序遍历
-    public static void morrisPre(Node head) {
-        if (head == null) {
-            return;
-        }
-        Node cur = head;
-        Node mostRight = null;
-        while (cur != null) {
-            mostRight = cur.left;
-            if (mostRight != null) {
-                while (mostRight.right != null && mostRight.right != cur) {
-                    mostRight = mostRight.right;
-                }
-                if (mostRight.right == null) {
-                    mostRight.right = cur;
-                    System.out.print(cur.value + " ");
-                    cur = cur.left;
-                    continue;
-                } else {
-                    mostRight.right = null;
-                }
-                // 此 else 表示当前结点没有左子树的时候，可以认为其第一次到达和第二次到达是重在一起的
-            } else {
-                System.out.print(cur.value + " ");
-            }
-            cur = cur.right;
-        }
-        System.out.println();
-    }
 
     // Morris 实现后续遍历
     public static void morrisPos(Node head) {
@@ -221,7 +212,7 @@ public class MorrisTraversal {
 
 搜索二叉树的定义：对于一棵二叉树中的任意子树，其左子树上的所有数值小于头结点的数值，其右子树上所有的数值大于头结点的数值，并且树中不存在数值相同的结点。也称二叉查找树。
 
-
+**详细解释见**： AlgorithmEasyDay03.md
 
 
 
@@ -229,7 +220,7 @@ public class MorrisTraversal {
 
 ### （一）平衡性
 
-经典的平衡搜索二叉树结构：在满足搜索二叉树的前提条件下，对于一棵二叉树中的任意子树，其左子树和其右子树的高度相差不超过1。
+经典的平衡搜索二叉树结构：在满足**搜索二叉树的前提条件**下，对于一棵二叉树中的任意子树，其左子树和其右子树的高度相差不超过1。
 
 ![image-20200103211949929](AlgorithmMediumDay03.resource/image-20200103211949929.png)
 

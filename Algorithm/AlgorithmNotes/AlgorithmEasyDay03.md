@@ -9,127 +9,121 @@
 - 队列的结构为先进先出，栈是先进后出；
 
 ```java
-package com.gjxaiou.easy.day03;  
-  
-/**  
- * @author GJXAIOU  
- * 使用数组实现栈和队列结构  
-  */  
-public class ArrayToStackAndQueue {  
-  
-    /**  
- * 数组结构实现大小固定的队列  
-  */  
-  public static class ArrayToStack {  
-        private Integer[] arr;  
-        // index 当前指向栈的位置： 0 ~ size -1  private Integer index;  
-  
-        // 初始化数组  
-  public ArrayToStack(int initSize) {  
-            if (initSize < 0) {  
-                throw new IllegalArgumentException("The init size is less than 0");  
-            }  
-            arr = new Integer[initSize];  
-            index = 0;  
-        }  
-  
-        /**  
- * 实现在栈中压入一个数  
-  *  
- * @param obj：要压入的数 index：指向的是栈中下一个有空位置的数组下标  
-  */  
-  public void push(int obj) {  
-            if (index == arr.length) {  
-                throw new ArrayIndexOutOfBoundsException("The queue is full");  
-            }  
-            // index 位置填上，然后 index++  arr[index++] = obj;  
-        }  
-  
-        // 弹出一个栈顶的元素  
-  public Integer pop() {  
-            if (index == 0) {  
-                throw new ArrayIndexOutOfBoundsException("The queue is empty");  
-            }  
-            return arr[--index];  
-        }  
-  
-        // 只将值返回给我，但是原来栈中该值仍然保存  
-  public Integer peek() {  
-            if (index == 0) {  
-                return null;  
-            }  
-            return arr[index - 1];  
-        }  
-    }  
-  
-  
-    /**  
- * 数组结构实现大小固定的队列  
-  */  
-  public static class ArrayToQueue {  
-        private Integer[] arr;  
-        private Integer size;  
-        private Integer start;  
-        private Integer end;  
-  
-        // 初始化队列  
-  public ArrayToQueue(int initSize) {  
-            if (initSize < 0) {  
-                throw new IllegalArgumentException("The init size is less than 0");  
-            }  
-            arr = new Integer[initSize];  
-            size = 0;  
-            start = 0;  
-            end = 0;  
-        }  
-  
-        /**  
- * 向队列中放入一个数  
-  *  
- * @param obj：需要放进去的数  
-  */  
-  public void push(int obj) {  
-            if (size == arr.length) {  
-                throw new ArrayIndexOutOfBoundsException("The queue is full");  
-            }  
-            size++;  
-            // 该数放在 end 的位置上，因为 end 位置是上下移动的；  
-  arr[end] = obj;  
-            // end 如果到底即 Length-1，就等于 0，从头开始写入数据，可以覆盖之前的元素；如果没有到底就 end + 1;  end = (end == arr.length - 1) ? 0 : end + 1;  
-        }  
-  
-        // 弹出队列头部元素  
-  public Integer poll() {  
-            if (size == 0) {  
-                throw new ArrayIndexOutOfBoundsException("The queue is empty");  
-            }  
-            size--;  
-            // 因为 start 位置要改变，所有使用临时变量 tmp 记录一下 start 位置，最终弹出的是原始 start位置元素；  
-  int tmp = start;  
-            start = (start == arr.length - 1) ? 0 : start + 1;  
-            return arr[tmp];  
-        }  
-  
-        // 取出队列头部的元素，但是队列不动  
-  public Integer peek() {  
-            if (size == 0) {  
-                return null;  
-            }  
-            return arr[start];  
-        }  
-    }  
-  
-    public static void main(String[] args) {  
-  
-    }  
+package com.gjxaiou.easy.day03;
+
+/**
+ * @author GJXAIOU
+ * 使用数组实现栈和队列结构
+ */
+public class ArrayToStackAndQueue {
+
+    /**
+     * 数组结构实现大小固定的队列
+     */
+    public static class ArrayToStack {
+        private Integer[] arr;
+        // index 当前指向栈的位置： 0 ~ size -1
+        private Integer index;
+
+        // 初始化数组
+        public ArrayToStack(int initSize) {
+            if (initSize < 0) {
+                throw new IllegalArgumentException("The init size is less than 0");
+            }
+            arr = new Integer[initSize];
+            index = 0;
+        }
+
+        // 在栈中压入一个数
+        public void push(int value) {
+            if (index == arr.length) {
+                throw new ArrayIndexOutOfBoundsException("The stack is full");
+            }
+            // index：指向的是栈中下一个有空位置的数组下标
+            // index 位置填上，然后 index++
+            arr[index++] = value;
+        }
+
+        // 弹出一个栈顶的元素
+        public Integer pop() {
+            if (index == 0) {
+                throw new ArrayIndexOutOfBoundsException("The stack is empty");
+            }
+            // 这里是 --index，因为 index 为下一个空位置的下标
+            return arr[--index];
+        }
+
+        // 只将值返回给我，但是原来栈中该值仍然保存
+        public Integer peek() {
+            if (index == 0) {
+                return null;
+            }
+            return arr[index - 1];
+        }
+    }
+
+
+    /**
+     * 数组结构实现大小固定的队列
+     */
+    public static class ArrayToQueue {
+        private Integer[] arr;
+        private Integer size;
+        private Integer start;
+        private Integer end;
+
+        // 初始化队列
+        public ArrayToQueue(int initSize) {
+            if (initSize < 0) {
+                throw new IllegalArgumentException("The init size is less than 0");
+            }
+            arr = new Integer[initSize];
+            size = 0;
+            start = 0;
+            end = 0;
+        }
+
+        // 向队列中放入一个数
+        public void push(int obj) {
+            if (size == arr.length) {
+                throw new ArrayIndexOutOfBoundsException("The queue is full");
+            }
+            size++;
+            // 该数放在 end 的位置上，因为 end 位置是上下移动的；
+            arr[end] = obj;
+            // end 如果到底即 Length-1，就等于 0，从头开始写入数据，可以覆盖之前的元素；如果没有到底就 end + 1;
+            end = (end == arr.length - 1) ? 0 : end + 1;
+        }
+
+        // 弹出队列头部元素
+        public Integer poll() {
+            if (size == 0) {
+                throw new ArrayIndexOutOfBoundsException("The queue is empty");
+            }
+            size--;
+            // 因为 start 位置要改变，所有使用临时变量 tmp 记录一下 start 位置，最终弹出的是原始 start 位置元素；
+            int tmp = start;
+            start = (start == arr.length - 1) ? 0 : start + 1;
+            return arr[tmp];
+        }
+
+        // 取出队列头部的元素，但是队列不动
+        public Integer peek() {
+            if (size == 0) {
+                return null;
+            }
+            return arr[start];
+        }
+    }
 }
+
 ```
 
 ### （二）特殊栈的实现：返回栈中最小元素
 **目标**：实现一个特殊的栈，在实现栈的基础功能上，再实现返回栈中最小元素的操作；
 **要求**：pop、push、getMin 的操作的时间复杂度都是 O（1），同时设计的栈类型可以使用现成的栈结构；
 
-**解答思路**： 因为时间复杂度要求：O(1)，因此不能使用遍历，因为遍历的结果就是 O（N），这里使用两个栈；一个栈为 Data 栈，用于存放数据，另一个栈为 min 栈，用于存放最小值，两个栈一起增长；                     
+**解答思路**： 因为时间复杂度要求：O(1)，因此不能使用遍历，因为遍历的结果就是 O（N），这里使用两个栈；一个栈为 Data 栈，用于存放数据，另一个栈为 Min 栈，用于存放最小值，两个栈一起增长；                     
 **步骤**：放入第一个数据，放入 Data 栈中，同时因为 Min 栈中当前为空，因此放入第一个元素之后最小值也是第一个元素，因此将第一个元素也放入 min 栈中；在 Data 栈中放入第二个数据时候，将当前元素与 min 栈顶比较，如果当前数大于等于 min 栈顶，方法一是不动，方法二是将原来 Min 栈的栈顶元素再次压入一遍；反之如果当前数小于 min 栈顶，就将原来 min 栈顶的元素再次在 min 栈中压入一遍。**push 和 pop 方法都有修改**
 
 ```java
@@ -137,11 +131,12 @@ package com.gjxaiou.easy.day03;
 
 import java.util.Stack;
 
+/**
+ * @author GJXAIOU
+ * 返回栈中最小元素
+ */
 public class GetMinStack {
-    /**
-     * @author GJXAIOU
-     * 该方法中当新加入的元素大于原来 Min 栈的栈顶元素时候，不动；
-     */
+    // 该方法中当新加入的元素大于原来 Min 栈的栈顶元素时候，不动；
     public static class MyStack1 {
         // 分别为数据栈和最小值栈
         private Stack<Integer> stackData;
@@ -149,39 +144,38 @@ public class GetMinStack {
 
         // 因为每次都是创建新的栈，因此使用构造函数
         public MyStack1() {
-            this.stackData = new Stack<Integer>();
-            this.stackMin = new Stack<Integer>();
+            stackData = new Stack<Integer>();
+            stackMin = new Stack<Integer>();
         }
 
-        // 生成最小元素栈
         public void push(int newNum) {
             // 如果最小元素栈中没有元素，就将新加入的元素同时压入最小栈，否则需要比较当前数和最小栈中的地栈顶比较，返回最小
-            if (this.stackMin.isEmpty()) {
-                this.stackMin.push(newNum);
+            if (stackMin.isEmpty()) {
+                stackMin.push(newNum);
             } else if (newNum <= this.getmin()) {
-                this.stackMin.push(newNum);
+                stackMin.push(newNum);
             }
             // Data 栈肯定压入最新的数
-            this.stackData.push(newNum);
+            stackData.push(newNum);
         }
 
         public int pop() {
-            if (this.stackData.isEmpty()) {
+            if (stackData.isEmpty()) {
                 throw new RuntimeException("Your stack is empty.");
             }
-            int value = this.stackData.pop();
+            int value = stackData.pop();
             if (value == this.getmin()) {
-                this.stackMin.pop();
+                stackMin.pop();
             }
             return value;
         }
 
         // peek() 返回 min 栈栈顶，但是不弹出；
         public int getmin() {
-            if (this.stackMin.isEmpty()) {
+            if (stackMin.isEmpty()) {
                 throw new RuntimeException("Your stack is empty.");
             }
-            return this.stackMin.peek();
+            return stackMin.peek();
         }
     }
 
@@ -194,35 +188,35 @@ public class GetMinStack {
         private Stack<Integer> stackMin;
 
         public MyStack2() {
-            this.stackData = new Stack<Integer>();
-            this.stackMin = new Stack<Integer>();
+            stackData = new Stack<Integer>();
+            stackMin = new Stack<Integer>();
         }
 
         public void push(int newNum) {
-            if (this.stackMin.isEmpty()) {
-                this.stackMin.push(newNum);
+            if (stackMin.isEmpty()) {
+                stackMin.push(newNum);
             } else if (newNum < this.getmin()) {
-                this.stackMin.push(newNum);
+                stackMin.push(newNum);
             } else {
-                int newMin = this.stackMin.peek();
-                this.stackMin.push(newMin);
+                int newMin = stackMin.peek();
+                stackMin.push(newMin);
             }
-            this.stackData.push(newNum);
+            stackData.push(newNum);
         }
 
         public int pop() {
-            if (this.stackData.isEmpty()) {
+            if (stackData.isEmpty()) {
                 throw new RuntimeException("Your stack is empty.");
             }
             this.stackMin.pop();
-            return this.stackData.pop();
+            return stackData.pop();
         }
 
         public int getmin() {
-            if (this.stackMin.isEmpty()) {
+            if (stackMin.isEmpty()) {
                 throw new RuntimeException("Your stack is empty.");
             }
-            return this.stackMin.peek();
+            return stackMin.peek();
         }
     }
 
@@ -250,7 +244,6 @@ public class GetMinStack {
         System.out.println(stack2.getmin());
     }
 }
-
 ```
 
 
@@ -280,7 +273,7 @@ import java.util.Stack;
   
       public QueueConvertToStack() {  
           // 用双向链表实现，也可以使用动态数组  
-  data = new LinkedList<Integer>();  
+  		  data = new LinkedList<Integer>();  
           help = new LinkedList<Integer>();  
       }  
   
@@ -828,7 +821,7 @@ public class RotateMatrix {
 
 **解答：**
 ```java
-package sort.com.gjxaiou.easy.day03;
+package com.gjxaiou.easy.day03;
 
 public class ReverseList {
 
@@ -853,6 +846,7 @@ public class ReverseList {
 		return pre;
 	}
 
+    
 	public static class DoubleNode {
 		public int value;
 		public DoubleNode last;
@@ -1994,16 +1988,3 @@ public class FindFirstIntersectNode {
 2
 4
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
