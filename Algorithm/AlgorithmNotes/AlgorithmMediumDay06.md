@@ -8,7 +8,14 @@
 
 动态规划不是玄学，也无需去记那些所谓的刻板的“公式”（例如状态转换表达式等），**其实动态规划是从暴力递归而来**。并不是说一个可以动态规划的题一上来就可以写出动态规划的求解步骤，==我们只需要能够写出暴力递归版本，然后对重复计算的子过程结果做一个缓存，最后分析状态依赖寻求最优解，即衍生成了动态规划==。本节将以多个例题示例，展示求解过程是如何从暴力尝试，一步步到动态规划的。
 
-## 二、换钱的方法数
+```text
+先想递归
+发现重复计算
+通过记忆化等方法弄掉重复计算
+最后看下能不能通过利用计算顺序来做到去掉递归用“刷表”方式直接顺序计算，能搞定最好搞不定拉倒
+```
+
+## 二、换钱的方法数（组合问题）
 
 【**题目**】给定数组 arr，arr 中所有的值都为正数且不重复。每个值代表一种面值的货币，每种面值的货币可以使用任意张，再给定一个整数 aim 代表要找的钱数，求换钱有多少种方法。
 
@@ -124,7 +131,7 @@ public class CoinsWay {
 
 从暴力尝试到动态规划，我们只需观察暴力尝试版本的代码，甚至可以忘却题目，按照下面高度套路化的步骤，就可以轻易改出动态规划：
 
-- 步骤一：**确定参数数量（确定几维表）**首先每个状态都有两个参数 `index` 和 `aim`（`arr` 作为输入参数是不变的），因此可以对应两个变量的变化范围建立一张二维表：
+- 步骤一：**确定参数数量（确定几维表）**==首先每个状态都有两个参数 `index` 和 `aim`（`arr` 作为输入参数是不变的），因此可以对应两个变量的变化范围建立一张二维表==：
 
 <img src="AlgorithmMediumDay06.resource/169045e9a6f7e45f.jpg" alt="img" style="zoom:80%;" />
 
@@ -154,16 +161,16 @@ for (int zhangshu = 0; arr[index] * zhangshu <= aim; zhangshu++) {
 
 ```java
 public static int maxMethodsDp(int arr[], int aim) {
-    //二维表
+    // DP 二维表，大小默认就是上面所有状态数量。
     int dp[][] = new int[arr.length + 1][aim + 1];
-    //base case
+    // base case，其他默认都为 0，所以最后一行其他元素也就不需要填充了
     dp[arr.length][0] = 1;
-    //从倒数第二行开始推，推出整个二维表每个位置的状态
+    // 从倒数第二行开始推，推出整个二维表每个位置的状态
     for (int i = arr.length - 1; i >= 0; i--) {
         for (int j = 0; j <= aim; j++) {
-            //i对应的面值取0张
+            // i对应的面值取0张
             dp[i][j] = dp[i + 1][j];
-            //i对应的面值取1张、2张、3张……
+            // i 对应的面值取 1 张、2 张、3 张……
             for (int subAim = j - arr[i]; subAim >= 0; subAim = subAim - arr[i]) {
                 dp[i][j] += dp[i + 1][subAim];
             }
@@ -183,7 +190,7 @@ public static void main(String[] args) {
 
 ![img](AlgorithmMediumDay06.resource/169045e9bce1532b.jpg)
 
-比如你在求解状态A时，可能会将其依赖的状态 M,N,P 的值累加起来；然后在求解状态 B 时，有需要将其依赖的状态 M,N,P,Q 累加起来，你会发现在这个过程中`M+N+P`的计算是重复的，因此还可以有如下优化：
+比如你在求解状态A时，可能会将其依赖的状态 M,N,P 的值累加起来；然后在求解状态 B 时，有需要将其依赖的状态 M,N,P,Q 累加起来，你会发现在这个过程中`M + N + P`的计算是重复的，因此还可以有如下优化：
 
 ```java
 for (int i = arr.length - 1; i >= 0; i--) {
@@ -203,12 +210,15 @@ for (int i = arr.length - 1; i >= 0; i--) {
 ![image-20200111170811167](AlgorithmMediumDay06.resource/image-20200111170811167.png)
 
 ```java
-package nowcoder.advanced.advanced_class_06;
+package com.gjxaiou.advanced.day06;
 
 import java.util.HashMap;
 
-public class Code_01_CoinsWay {
-
+/**
+ * @author GJXAIOU
+ */
+public class CoinsWay {
+    // 方式一：暴力递归
     public static int coins1(int[] arr, int aim) {
         if (arr == null || arr.length == 0 || aim < 0) {
             return 0;
@@ -229,25 +239,26 @@ public class Code_01_CoinsWay {
         if (index == arr.length) {
             res = aim == 0 ? 1 : 0;
         } else {
-            for (int zhangshu = 0; arr[index] * zhangshu <= aim; zhangshu++) {
+            for (int zhangShu = 0; arr[index] * zhangShu <= aim; zhangShu++) {
                 // index 为当前货币金额，已经使用过了，从 index + 1 位置开始往后都可以使用；
-                // aim - arr[index] * zhangshu 为后面需要凑齐的钱数；
-                res += process1(arr, index + 1, aim - arr[index] * zhangshu);
+                // aim - arr[index] * zhangShu 为后面需要凑齐的钱数；
+                res += process1(arr, index + 1, aim - arr[index] * zhangShu);
             }
         }
         return res;
     }
 
-    /**
-     * 上述暴力方法问题： 200,100,50,10,5,2,1 aim = 1000；则选择 2 张 200,0 张 100，或者 0 张 200,4 张 100，都会需要在 50,
-     * 10,5,2,1 中选择得到 600 元，造成重复计算。
-     * 同时该问题为无后效性问题，即让后面一串钱搞定 600 元和前面怎么到的 600 元这个状态无关。
-     * 一般面试都是无后效性问题。
-     */
+    // 方法二：保存状态结果，避免重复计算
+    public static int coins2(int[] arr, int aim) {
+        if (arr == null || arr.length == 0 || aim < 0) {
+            return 0;
+        }
+        return processMap(arr, 0, aim);
+    }
 
-    // 暴力修改（修改上面的递归方法），因为 index 和 aim 确定，最后返回值结果就确定了，所以计算完之后将该状态和其返回值保存下来可以下次使用
+    // 修改上面的递归方法，因为 index 和 aim 确定，最后返回值结果就确定了，所以计算完之后将该状态和其返回值保存下来可以下次使用
     // String 格式为："index_aim"，Integer 为该种情况下对应的返回值。
-    // 使用 map 做一个缓存功能
+    // 使用 map 做一个缓存功能(key 为某个状态的代号，value 为该状态对应的解)
     public static HashMap<String, Integer> map = new HashMap<>();
 
     public static int processMap(int[] arr, int index, int aim) {
@@ -270,52 +281,7 @@ public class Code_01_CoinsWay {
     }
 
 
-    public static int coinsOther(int[] arr, int aim) {
-        if (arr == null || arr.length == 0 || aim < 0) {
-            return 0;
-        }
-        return processOther(arr, arr.length - 1, aim);
-    }
-
-    public static int processOther(int[] arr, int index, int aim) {
-        int res = 0;
-        if (index == -1) {
-            res = aim == 0 ? 1 : 0;
-        } else {
-            for (int i = 0; arr[index] * i <= aim; i++) {
-                res += processOther(arr, index - 1, aim - arr[index] * i);
-            }
-        }
-        return res;
-    }
-
-    public static int coins2(int[] arr, int aim) {
-        if (arr == null || arr.length == 0 || aim < 0) {
-            return 0;
-        }
-        int[][] map = new int[arr.length + 1][aim + 1];
-        return process2(arr, 0, aim, map);
-    }
-
-    public static int process2(int[] arr, int index, int aim, int[][] map) {
-        int res = 0;
-        if (index == arr.length) {
-            res = aim == 0 ? 1 : 0;
-        } else {
-            int mapValue = 0;
-            for (int i = 0; arr[index] * i <= aim; i++) {
-                mapValue = map[index + 1][aim - arr[index] * i];
-                if (mapValue != 0) {
-                    res += mapValue == -1 ? 0 : mapValue;
-                } else {
-                    res += process2(arr, index + 1, aim - arr[index] * i, map);
-                }
-            }
-        }
-        map[index][aim] = res == 0 ? -1 : res;
-        return res;
-    }
-
+    // 方法三：使用动态规划
     public static int coins3(int[] arr, int aim) {
         if (arr == null || arr.length == 0 || aim < 0) {
             return 0;
@@ -340,6 +306,7 @@ public class Code_01_CoinsWay {
         return dp[arr.length - 1][aim];
     }
 
+    // 方法五：动态规划优化
     public static int coins4(int[] arr, int aim) {
         if (arr == null || arr.length == 0 || aim < 0) {
             return 0;
@@ -360,6 +327,7 @@ public class Code_01_CoinsWay {
         return dp[arr.length - 1][aim];
     }
 
+    // 使用一维 DP 数组
     public static int coins5(int[] arr, int aim) {
         if (arr == null || arr.length == 0 || aim < 0) {
             return 0;
@@ -376,6 +344,8 @@ public class Code_01_CoinsWay {
         return dp[aim];
     }
 
+
+    ////////////////////////////// 测试程序 //////////////////////////////////
     public static void main(String[] args) {
         int[] coins = {10, 5, 1, 25};
         int aim = 2000;
@@ -385,44 +355,51 @@ public class Code_01_CoinsWay {
         start = System.currentTimeMillis();
         System.out.println(coins1(coins, aim));
         end = System.currentTimeMillis();
-        System.out.println("cost time : " + (end - start) + "(ms)");
-
-        start = System.currentTimeMillis();
-        System.out.println(coinsOther(coins, aim));
-        end = System.currentTimeMillis();
-        System.out.println("cost time : " + (end - start) + "(ms)");
-
-        aim = 20000;
+        System.out.println("暴力递归 cost time : " + (end - start) + "(ms)");
 
         start = System.currentTimeMillis();
         System.out.println(coins2(coins, aim));
         end = System.currentTimeMillis();
-        System.out.println("cost time : " + (end - start) + "(ms)");
+        System.out.println("缓存值 cost time : " + (end - start) + "(ms)");
+
+        aim = 2000;
 
         start = System.currentTimeMillis();
         System.out.println(coins3(coins, aim));
         end = System.currentTimeMillis();
-        System.out.println("cost time : " + (end - start) + "(ms)");
+        System.out.println("DP cost time : " + (end - start) + "(ms)");
 
         start = System.currentTimeMillis();
         System.out.println(coins4(coins, aim));
         end = System.currentTimeMillis();
-        System.out.println("cost time : " + (end - start) + "(ms)");
+        System.out.println("优化 DP cost time : " + (end - start) + "(ms)");
 
         start = System.currentTimeMillis();
         System.out.println(coins5(coins, aim));
         end = System.currentTimeMillis();
-        System.out.println("cost time : " + (end - start) + "(ms)");
-
+        System.out.println("一维 DP cost time : " + (end - start) + "(ms)");
     }
-
 }
+```
 
+测试结果：
+
+```java
+1103021
+暴力递归 cost time : 566(ms)
+1103021
+缓存值 cost time : 106(ms)
+1103021
+DP cost time : 7(ms)
+1103021
+优化 DP cost time : 0(ms)
+1103021
+一维 DP cost time : 0(ms)
 ```
 
 
 
-## 三、排成一条线的纸牌博问题
+## 三、轮流抽取纸牌获取最大和问题
 
 【**题目**】 给定一个整型数组 arr，代表分数不同的纸牌排成一条线。玩家 A 和玩家 B 依次拿走每张纸牌，规定玩家 A 先拿，玩家 B 后拿，但是每个玩家每次只能拿走最左或最右的纸牌，玩家 A 和玩家 B 都绝顶聪明。请返回最后获胜者的分数。
 
@@ -439,50 +416,11 @@ public class Code_01_CoinsWay {
 
 ### （一）暴力尝试
 
-```java
-package nowcoder.advanced.day06;
-
-/**
- * @author GJXAIOU
- */
-public class CardsInLine {
-    // 方法一：暴力递归
-    public static int win1(int[] arr) {
-        if (arr == null || arr.length == 0) {
-            return 0;
-        }
-        return Math.max(first(arr, 0, arr.length - 1), second(arr, 0, arr.length - 1));
-    }
-
-    public static int first(int[] arr, int beginIndex, int endIndex) {
-        if (beginIndex == endIndex) {
-            return arr[beginIndex];
-        }
-        return Math.max(arr[beginIndex] + second(arr, beginIndex + 1, endIndex),
-                arr[endIndex] + second(arr
-                , beginIndex, endIndex - 1));
-    }
-
-    public static int second(int[] arr, int beginIndex, int endIndex) {
-        if (beginIndex == endIndex) {
-            return 0;
-        }
-        return Math.min(first(arr, beginIndex + 1, endIndex), first(arr, beginIndex, endIndex - 1));
-    }
-
-    public static void main(String[] args) {
-        int[] arr = {1, 9, 1};
-        System.out.println(win1(arr));
-    }
-}
-
-```
-
-这个题的试法其实很不容易，笔者直接看别人写出的暴力尝试版本表示根本看不懂，最后还是搜了博文才弄懂。其中`first()`和`second()`就是整个尝试中的思路，与以往穷举法的暴力递归不同，这里是两个函数相互递归调用。
+其中`first()`和`second()`就是整个尝试中的思路，与以往穷举法的暴力递归不同，这里是两个函数相互递归调用。
 
 `first(int arr[],int beginIndex,int endIndex)`表示如果纸牌只剩下标在 `beginIndex ~ endIndex`之间的几个了，那么作为先拿者，纸牌被拿完后，先拿者能达到的最大分数；而`second(int arr[],int begin,int end)`表示如果纸牌只剩下标在`beginIndex ~ endIndex`之间的几个了，那么作为后拿者，纸牌被拿完后，后拿者能达到的最大分数。
 
-在`first()`中，如果只有一张纸牌，那么该纸牌分数就是先拿者能达到的最大分数，直接返回，无需决策。否则先拿者 A 的第一次决策只有两种情况：
+在`first()`中，如果只有一张纸牌，那么该纸牌分数就是先拿者在该轮能达到的最大分数，直接返回，无需决策。否则先拿者 A 的第一次决策只有两种情况：
 
 - 先拿最左边的`arr[beginIndex]`，那么在 A 拿完这一张之后就会作为后拿者参与到剩下的`(beginIndex + 1) ~ endIndex`之间的纸牌的决策了，这一过程可以交给 `second()` 来做。
 - 先拿最右边的 `arr[endIndex]`，那么在 A 拿完这一张之后就会作为后拿者参与到剩下的 `beginIndex ~ (endIndex - 1)` 之间的纸牌的决策了，这一过程可以交给`second()`来做。
@@ -496,240 +434,243 @@ public class CardsInLine {
 
 这里取两种情况中**结果较小**的一种，是因为这两种情况是我们假设的，但先拿者 A 绝顶聪明，他的选择肯定会让后拿者尽可能拿到更小的分数。比如`arr=[1,2,100,4]`，虽然我们的假设有先拿者拿`1`和拿`4`两种情况，对应`f(arr,1,3)`和`f(arr,0,2)`，但实际上先拿者不会让后拿者拿到`100`，因此取两种情况中结果较小的一种。
 
-### （二）改动态规划
-
-这里是两个函数相互递归，每个函数的参数列表又都是`beginIndex`和`endIndex`是可变的，因此需要两张二维表保存`(begin,end)`确定时，`f()`和`s()`的状态值。
-
-1. 确定`base case`对应的特殊位置上的状态值：
-
-    
-
-    ![img](AlgorithmMediumDay06.resource/169045e9c7b642a2.jpg)
-
-    
-
-    可以发现两张表的对角线位置上的状态值都是可以确定的，`begin<=end`，因此对角线左下方的区域不用管。
-
-2. 由递归调用逻辑找出状态依赖。
-
-    `f()`依赖的状态：
-
-    ```
-    return Math.max(
-                    arr[beginIndex] + s(arr, beginIndex + 1, endIndex),
-                    arr[endIndex] + s(arr, beginIndex, endIndex - 1));
-    复制代码
-    ```
-
-    F表的`(begin,end)`依赖S表`(begin+1,end)`和`(begin,end-1)`。
-
-    `s()`依赖的状态：
-
-    ```
-    return Math.min(
-                    f(arr, beginIndex + 1, endIndex),
-                    f(arr, beginIndex, endIndex - 1));
-    复制代码
-    ```
-
-    S表的`(begin,end)`依赖F表的`(begin+1,end)`和`(begin,end-1)`。
-
-    ![img](AlgorithmMediumDay06.resource/169045e9cc6ec168.jpg)
-
-    
-
-    如此的话，对于对角线的右上区域，对角线位置上的状态能推出倒数第二长对角线位置上的状态，进而推出倒数第三长位置上的状态……右上区域每个位置的状态都能推出。
-
-3. 确定主问题对应的状态：
-
-    ```
-    return Math.max(
-                    f(arr, 0, arr.length-1),
-                    s(arr, 0, arr.length-1));
-    复制代码
-    ```
-
-示例代码：
-
-```
-public static int maxScoreOfWinnerDp(int arr[]) {
-    if (arr == null || arr.length == 0) {
-        return 0;
-    }
-
-    int F[][] = new int[arr.length][arr.length];
-    int S[][] = new int[arr.length][arr.length];
-    for (int i = 0; i < arr.length; i++) {
-        for (int j = 0; j < arr.length; j++) {
-            if (i == j) {
-                F[i][i] = arr[i];
-            }
-        }
-    }
-    //依次推出每条对角线，一共n-1条
-    for (int i = 1; i < arr.length; i++) {
-        for (int row = 0; row < arr.length - i; row++) {
-            int col = row + i;
-            F[row][col] = Math.max(arr[row] + S[row + 1][col], arr[col] + S[row][col - 1]);
-            S[row][col] = Math.min(F[row + 1][col], F[row][col - 1]);
-        }
-    }
-
-    return Math.max(F[0][arr.length - 1], S[0][arr.length - 1]);
-}
-
-public static void main(String[] args) {
-    int arr[] = {1, 2, 100, 4};
-    System.out.println(maxScoreOfWinnerDp(arr));
-}
-复制代码
-```
-
-代码优化：
-
-```
-if (arr == null || arr.length == 0) {
-    return 0;
-}
-int[][] f = new int[arr.length][arr.length];
-int[][] s = new int[arr.length][arr.length];
-for (int j = 0; j < arr.length; j++) {
-    f[j][j] = arr[j];
-    for (int i = j - 1; i >= 0; i--) {
-        f[i][j] = Math.max(arr[i] + s[i + 1][j], arr[j] + s[i][j - 1]);
-        s[i][j] = Math.min(f[i + 1][j], f[i][j - 1]);
-    }
-}
-return Math.max(f[0][arr.length - 1], s[0][arr.length - 1]);
-复制代码
-```
-
-最终代码
-
 ```java
-package nowcoder.advanced.advanced_class_06;
+package com.gjxaiou.advanced.day06;
 
-public class Code_02_CardsInLine {
-    /**
-     * 暴力破解
-     *
-     * @param arr
-     * @return
-     */
+/**
+ * @author GJXAIOU
+ */
+public class CardsInLine {
+    // 方法一：暴力递归
     public static int win1(int[] arr) {
         if (arr == null || arr.length == 0) {
             return 0;
         }
-        return Math.max(f(arr, 0, arr.length - 1), s(arr, 0, arr.length - 1));
+        return Math.max(first(arr, 0, arr.length - 1), second(arr, 0, arr.length - 1));
     }
 
-    public static int f(int[] arr, int i, int j) {
-        if (i == j) {
-            return arr[i];
+    // first 表示在剩余的 beginIndex ~ endIndex 中，先拿者会得到最大分数。
+    public static int first(int[] arr, int beginIndex, int endIndex) {
+        // 如果只剩一个，则只能拿这个了，这就是先拿者能在该步骤获得的最大值
+        if (beginIndex == endIndex) {
+            return arr[beginIndex];
         }
-        return Math.max(arr[i] + s(arr, i + 1, j), arr[j] + s(arr, i, j - 1));
+        // 如果剩余的不止一个，能获得的最大值就是在 先着拿开始位置 + 后者拿剩下的 和 先者拿末尾位置 + 后者拿剩下的 中的最大的一个
+        return Math.max(arr[beginIndex] + second(arr, beginIndex + 1, endIndex),
+                arr[endIndex] + second(arr, beginIndex, endIndex - 1));
     }
 
-    public static int s(int[] arr, int i, int j) {
-        if (i == j) {
+    // second 表示在剩余的 beginIndex ~ endIndex 中，后拿者会得到最大分数。
+    public static int second(int[] arr, int beginIndex, int endIndex) {
+        // 如果只有一张牌，后者就没有的拿了，返回 0
+        if (beginIndex == endIndex) {
             return 0;
         }
-        return Math.min(f(arr, i + 1, j), f(arr, i, j - 1));
+        // 假设先拿者拿到了 beginIndex]，对于剩下的 (beginIndex + 1) ~ endIndex 之间的纸牌，后拿者就转变身份成了先拿者，这一过程可以交给 `first()`来处理。
+        // 假设先拿者拿到了 endIndex，对于剩下的 `beginIndex ~ (endIndex - 1)`之间的纸牌，后拿者就转变身份成了先拿者，这一过程可以交给`first()`来处理。
+        // 这里取两种情况中**结果较小**的一种，是因为这两种情况是我们假设的，但先拿者 A 绝顶聪明，他的选择肯定会让后拿者尽可能拿到更小的分数
+        return Math.min(first(arr, beginIndex + 1, endIndex), first(arr, beginIndex,
+                endIndex - 1));
     }
 
+    public static void main(String[] args) {
+        int[] arr = {1, 9, 1, 3};
+        System.out.println(win1(arr))；
+    }
+}
+
+```
+
+### （二）改动态规划
+
+- 步骤一：**确定参数数量（确定几维表）**==首先每个状态都有两个参数 `beginIndex` 和 `endIndex`（`arr` 作为输入参数是不变的），因此可以对应两个变量的变化范围建立一张二维表==：
+
+但是这里是两个函数相互递归，因此需要两张二维表保存`(begin,end)`确定时，`first()`和`second()`的状态值。
+
+- 步骤二：确定`base case`对应的特殊位置上的状态值：
+
+    - 针对 first() ：当 `beginIndex == endIndex` 时候，值是确定的。值分别为 `arr[0], arr[1]...arr[arr.length - 1]`
+
+        ```java
+        public static int first(int[] arr, int beginIndex, int endIndex) {
+            // 如果只剩一个，则只能拿这个了，这就是先拿者能在该步骤获得的最大值
+            if (beginIndex == endIndex) {
+                return arr[beginIndex];
+            }
+        ```
+
+    - 针对 second()：当 `beginIndex == endIndex` 时候，值也是确定的，均为 0
+
+        ```java
+        public static int second(int[] arr, int beginIndex, int endIndex) {
+            // 如果只有一张牌，后者就没有的拿了，返回 0
+            if (beginIndex == endIndex) {
+                return 0;
+            }
+        ```
+
+    对应的 DP 表如下所示：
+
+    **注意**：题目中有一个隐形条件，`beginIndex <= endIndex`所以只要考虑对角线上方区域即可。
+
+![img](AlgorithmMediumDay06.resource/169045e9c7b642a2.jpg)
+
+- **步骤三**：由递归调用逻辑找出状态依赖。
+
+`first()`依赖的状态：
+
+```
+return Math.max(arr[beginIndex] + second(arr, beginIndex + 1, endIndex),
+                arr[endIndex] + second(arr, beginIndex, endIndex - 1));
+```
+
+first 表的`(begin,end)`依赖S表`(begin+1,end)`和`(begin,end-1)`。
+
+`second()`依赖的状态：
+
+```
+return Math.min(first(arr, beginIndex + 1, endIndex), 
+				first(arr, beginIndex,endIndex - 1));
+```
+
+second 表的`(begin,end)`依赖F表的`(begin+1,end)`和`(begin,end-1)`。
+
+![img](AlgorithmMediumDay06.resource/169045e9cc6ec168.jpg)
+
+
+
+如此的话，对于对角线的右上区域，对角线位置上的状态能推出倒数第二长对角线位置上的状态，进而推出倒数第三长位置上的状态……右上区域每个位置的状态都能推出。
+
+- 步骤四：确定主问题对应的状态：
+
+```
+return Math.max(
+                first(arr, 0, arr.length-1),
+                second(arr, 0, arr.length-1));
+```
+
+示例代码：
+
+```java
+package com.gjxaiou.advanced.day06;
+
+/**
+ * @author GJXAIOU
+ */
+public class CardsInLine {
+
+    // 方法二：动态规划
     public static int win2(int[] arr) {
         if (arr == null || arr.length == 0) {
             return 0;
         }
-        int[][] f = new int[arr.length][arr.length];
-        int[][] s = new int[arr.length][arr.length];
+        int[][] first = new int[arr.length][arr.length];
+        int[][] second = new int[arr.length][arr.length];
         for (int j = 0; j < arr.length; j++) {
-            f[j][j] = arr[j];
+            // 首先对对角线上元素赋 base 值
+            first[j][j] = arr[j];
+            // 填充其他元素
             for (int i = j - 1; i >= 0; i--) {
-                f[i][j] = Math.max(arr[i] + s[i + 1][j], arr[j] + s[i][j - 1]);
-                s[i][j] = Math.min(f[i + 1][j], f[i][j - 1]);
+                first[i][j] = Math.max(arr[i] + second[i + 1][j], arr[j] + second[i][j - 1]);
+                second[i][j] = Math.min(first[i + 1][j], first[i][j - 1]);
             }
         }
-        return Math.max(f[0][arr.length - 1], s[0][arr.length - 1]);
+        return Math.max(first[0][arr.length - 1], second[0][arr.length - 1]);
     }
 
     public static void main(String[] args) {
-        int[] arr = {1, 9, 1};
+        int[] arr = {1, 9, 1, 3};
         System.out.println(win1(arr));
         System.out.println(win2(arr));
-
     }
-
 }
 
 ```
 
 
+
+最终代码（两种代码合并）
+
+```java
+package com.gjxaiou.advanced.day06;
+
+/**
+ * @author GJXAIOU
+ */
+public class CardsInLine {
+    // 方法一：暴力递归
+    public static int win1(int[] arr) {
+        if (arr == null || arr.length == 0) {
+            return 0;
+        }
+        return Math.max(first(arr, 0, arr.length - 1), second(arr, 0, arr.length - 1));
+    }
+
+    // first 表示在剩余的 beginIndex ~ endIndex 中，先拿者会得到最大分数。
+    public static int first(int[] arr, int beginIndex, int endIndex) {
+        // 如果只剩一个，则只能拿这个了，这就是先拿者能在该步骤获得的最大值
+        if (beginIndex == endIndex) {
+            return arr[beginIndex];
+        }
+        // 如果剩余的不止一个，能获得的最大值就是在 先着拿开始位置 + 后者拿剩下的 和 先者拿末尾位置 + 后者拿剩下的 中的最大的一个
+        return Math.max(arr[beginIndex] + second(arr, beginIndex + 1, endIndex),
+                arr[endIndex] + second(arr, beginIndex, endIndex - 1));
+    }
+
+    // second 表示在剩余的 beginIndex ~ endIndex 中，后拿者会得到最大分数。
+    public static int second(int[] arr, int beginIndex, int endIndex) {
+        // 如果只有一张牌，后者就没有的拿了，返回 0
+        if (beginIndex == endIndex) {
+            return 0;
+        }
+        // 假设先拿者拿到了 beginIndex]，对于剩下的 (beginIndex + 1) ~ endIndex 之间的纸牌，后拿者就转变身份成了先拿者，这一过程可以交给
+        //`first()`来处理。
+        // 假设先拿者拿到了 endIndex，对于剩下的 `beginIndex ~ (endIndex - 1)
+        //`之间的纸牌，后拿者就转变身份成了先拿者，这一过程可以交给`first()`来处理。
+        // 这里取两种情况中**结果较小**的一种，是因为这两种情况是我们假设的，但先拿者 A 绝顶聪明，他的选择肯定会让后拿者尽可能拿到更小的分数
+        return Math.min(first(arr, beginIndex + 1, endIndex), first(arr, beginIndex,
+                endIndex - 1));
+    }
+
+    // 方法二：动态规划
+    public static int win2(int[] arr) {
+        if (arr == null || arr.length == 0) {
+            return 0;
+        }
+        int[][] first = new int[arr.length][arr.length];
+        int[][] second = new int[arr.length][arr.length];
+        for (int j = 0; j < arr.length; j++) {
+            // 首先对对角线上元素赋 base 值
+            first[j][j] = arr[j];
+            // 填充其他元素
+            for (int i = j - 1; i >= 0; i--) {
+                first[i][j] = Math.max(arr[i] + second[i + 1][j], arr[j] + second[i][j - 1]);
+                second[i][j] = Math.min(first[i + 1][j], first[i][j - 1]);
+            }
+        }
+        return Math.max(first[0][arr.length - 1], second[0][arr.length - 1]);
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, 9, 1, 3};
+        System.out.println(win1(arr));
+        System.out.println(win2(arr));
+    }
+}
+```
 
 
 
 ## 四、机器人走路问题
 
-给你标号为1、2、3、……、N的N个位置，机器人初始停在M位置上，走P步后停在K位置上的走法有多少种。注：机器人在1位置上时只能向右走，在N位置上时只能向左走，其它位置既可向右又可向左。
+**问题**：给你标号为 1、2、3、……、N 的 N 个位置，机器人初始停在 M 位置上，走 P 步后停在 K 位置上的走法有多少种。注：机器人在 1 位置上时只能向右走，在 N 位置上时只能向左走，其它位置既可向右又可向左。
 
-```
-public static int process(int N, int M, int P, int K) {
-    if (P == 0) {
-        return M == K ? 1 : 0;
-    }
-    if (M == 1) {
-        return process(N, M + 1, P - 1, K);
-    } else if (M == N) {
-        return process(N, M - 1, P - 1, K);
-    }
-    return process(N, M + 1, P - 1, K) + process(N, M - 1, P - 1, K);
-}
+**示意图**：
 
-public static void main(String[] args) {
-    System.out.println(process(5, 2, 3, 3));
-}
-```
-
-这里暴力递归参数列表的可变变量有`M`和`P`，根据`base case`和其它特殊情况画出二维表：
-
-![img](AlgorithmMediumDay06.resource/169045e9cc779045.jpg)
-
-
-
-动态规划示例代码：
-
-```
-public static int robotWalkWaysDp(int N, int M, int P, int K) {
-    int dp[][] = new int[N + 1][P + 1];
-    dp[K][0] = 1;
-    for (int j = 1; j <= P; j++) {
-        for (int i = 1; i <= N; i++) {
-            if (i - 1 < 1) {
-                dp[i][j] = dp[i + 1][j - 1];
-            } else if (i + 1 > N) {
-                dp[i][j] = dp[i - 1][j - 1];
-            } else {
-                dp[i][j] = dp[i + 1][j - 1] + dp[i - 1][j - 1];
-            }
-        }
-    }
-    return dp[M][P];
-}
-
-public static void main(String[] args) {
-    System.out.println(robotWalkWaysDp(5, 2, 3, 3));
-}
-复制代码
-```
-
-
-
-![image-20200112105906639](AlgorithmMediumDay06.resource/image-20200112105906639.png)
-
-暴力破解代码为：
+![image-20200402212429024](AlgorithmMediumDay06.resource/image-20200402212429024.png)
 
 ```java
-package nowcoder.advanced.advanced_class_06;
+package com.gjxaiou.advanced.day06;
 
 /**
  * @Author GJXAIOU
@@ -758,7 +699,7 @@ public class Robot {
         int res = 0;
         // 只能往右走了
         if (curPosition == 1) {
-            res = ways(N, curPosition + 1, restSteps - 1, K);
+            res += ways(N, curPosition + 1, restSteps - 1, K);
             // 到达最右边了，只能往左走
         } else if (curPosition == N) {
             res += ways(N, curPosition - 1, restSteps - 1, K);
@@ -772,7 +713,85 @@ public class Robot {
 
 ```
 
+**步骤一：确定参数数量，即确定 DP 为几维表**。很明显一个状态由两个位置决定 `curPosition` 和 `restSteps`，所以是一个二维表，参数范围分别为：`1 ~ N` 和 `0 ~ P`，所以二维表如下所示：
 
+![image-20200402214423221](AlgorithmMediumDay06.resource/image-20200402214423221.png)
+
+**步骤二**：根据 baseCase 填充二维表
+
+```java
+// 取出一些不可能的情况
+if (N < 2 || curPosition < 1 || curPosition > N || restSteps < 0 || K < 1 || K > N) {
+    return 0;
+}
+// 不剩下步数了，看是否停在了 K 位置
+if (restSteps == 0) {
+    return curPosition == K ? 1 : 0;
+}
+```
+
+![img](AlgorithmMediumDay06.resource/169045e9cc779045.jpg)
+
+**步骤三**：由递归调用逻辑找出状态依赖。
+
+```java
+// 只能往右走了
+if (curPosition == 1) {
+    res += ways(N, curPosition + 1, restSteps - 1, K);
+    // 到达最右边了，只能往左走
+} else if (curPosition == N) {
+    res += ways(N, curPosition - 1, restSteps - 1, K);
+} else {
+    res += ways(N, curPosition + 1, restSteps - 1, K) + ways(N, curPosition - 1,
+                                                             restSteps - 1, K);
+}
+```
+
+最终二维表为：
+
+![image-20200402214934451](AlgorithmMediumDay06.resource/image-20200402214934451.png)
+
+**步骤四**：确定最终状态位置
+
+动态规划示例代码：
+
+```java
+package com.gjxaiou.advanced.day06;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2020/1/12 10:35
+ */
+public class Robot {
+    // DP
+    public static int ways2(int N, int curPosition, int restSteps, int k) {
+        int[][] dp = new int[N + 1][restSteps + 1];
+        // 赋 base case 值
+        dp[k][0] = 1;
+        // 填表，这里是一列一列填，不是一行一行
+        for (int j = 1; j <= restSteps; j++) {
+            // j 从 1 开始，因为 0 列已经赋值结束了
+            for (int i = 1; i <= N; i++) {
+                if (i == 1) {
+                    dp[i][j] = dp[i + 1][j - 1];
+                } else if (i == N) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = dp[i - 1][j - 1] + dp[i + 1][j - 1];
+                }
+            }
+        }
+        return dp[curPosition][restSteps];
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(Robot.ways1(5, 2, 3, 3));
+        System.out.println(Robot.ways2(5, 2, 3, 3));
+    }
+}
+
+```
 
 
 
