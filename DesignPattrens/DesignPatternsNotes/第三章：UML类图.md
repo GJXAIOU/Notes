@@ -10,9 +10,7 @@
 
 ## 二、UML 图
 
-![UML 各个组件功能]($resource/UML%20%E5%90%84%E4%B8%AA%E7%BB%84%E4%BB%B6%E5%8A%9F%E8%83%BD.png)
-
-画 UML 图与写文章差不多，都是把自己的思想描述给别人看，关键在于思路和条理。
+![UML 各个组件功能](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/UML%20%E5%90%84%E4%B8%AA%E7%BB%84%E4%BB%B6%E5%8A%9F%E8%83%BD.png)
 
 ### （一）UML 图分类
 
@@ -48,7 +46,7 @@ public class Person{ //代码形式->类图
 }
 ```
 
-![对应的类图]($resource/%E5%AF%B9%E5%BA%94%E7%9A%84%E7%B1%BB%E5%9B%BE.png)
+![对应的类图](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/%E5%AF%B9%E5%BA%94%E7%9A%84%E7%B1%BB%E5%9B%BE.png)
 
 ### （一）类图—依赖关系（Dependence）
 
@@ -79,7 +77,7 @@ public class Person{}
 public class  Department{}
 ```
 
-![PersonServiceBean 2]($resource/PersonServiceBean%202.png)
+![PersonServiceBean 2](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/PersonServiceBean%202.png)
 
 **小结**
 
@@ -109,7 +107,7 @@ public class PersonServiceBean extends DaoSupport {
 }
 ```
 
-![DaoSupport]($resource/DaoSupport.png)
+![DaoSupport](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/DaoSupport.png)
 
 **小结**:
 
@@ -134,7 +132,7 @@ public class PersonServiceBean implements PersonService{
 }
 ```
 
-![implementation]($resource/implementation.png)
+![implementation](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/implementation.png)
 
 ### （四）类图—关联关系（Association）
 
@@ -168,8 +166,8 @@ public class ID{
 
 两者的 UML 图为：
 
-![association1]($resource/association1.png)
-![association2]($resource/association2.png)
+![association1](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/association1.png)
+![association2](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/association2.png)
 
 ### （五）类图—聚合关系（Aggregation）
 
@@ -183,7 +181,7 @@ public class ID{
 **应用实例** 
 如果电脑和鼠标、显示器可以分开就是聚合关系，如果不可以分开就是组合关系
 
-![aggregation]($resource/aggregation.png)
+![aggregation](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/aggregation.png)
 
 ### （六）类图—组合关系（Composition）
 
