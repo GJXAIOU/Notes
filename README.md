@@ -1,14 +1,18 @@
-🟥🟧🟨🟩🟦🟪🟫🟥🟧🟨🟩🟦🟪🟫🟥🟧🟨🟩🟦🟪🟫🟥🟧🟨🟩🟦🟪🟫🟥🟧🟨🟩🟦🟪🟫🟥
+https://img.shields.io/github/repo-size/GJXAIOU/Notes   https://img.shields.io/aur/license/Notes
 
-
+[版权声明]：本仓库所有笔记代码遵守 Apache2.0，博客之类引用请在文章开头处注明来源即可：https://github.com/GJXAIOU。
 
 ## :bulb:使用说明
 
 ### 🎨Git 和 GitHub 基本使用
 
-对 Git 和 GitHub 使用过程中有疑问的可以先看看[这里](https://github.com/GJXAIOU/Notes/blob/master/Tools/GitWithGithub/Git%26Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)。
+- 对 Git 和 GitHub 使用过程中有疑问的可以先看看[这篇自己整理的笔记](https://github.com/GJXAIOU/Notes/blob/master/Tools/GitWithGithub/Git%26Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)。
 
-### 🎨图片加载失败方法
+- **仓库文件下载慢解决方案**：
+    - 【推荐】方式一：kexueshangwang；
+    - 方式二：注册“码云”账号，然后导入 GitHub 仓库，最后从”码云” 下载；
+
+### 🎨笔记图片加载失败方法
 
 - 【推荐】**方法一**：使用 Typora 时候，需要设置：文件 -> 偏好设置 -> 图像 -> 选择“复制到指定路径” -> 路径格式为：`./${filename}.resource`，正逐步将文件中图片链接更改为此种方式；
   
@@ -16,15 +20,16 @@
     
     - 软件下载地址： https://www.typora.io/ 
     
-- **方法二**：因为笔记软件的原因，造成上传的笔记中图片无法加载，会逐渐将笔记中的图片链接从本地更改为图库的链接，在此过程中，如果想完整的查看笔记中的插图，请使用软件：Yu Writer ，将整个目录放入笔记默认的文件夹下：即可，当然也可也使用软件导入外部文件进行查看。
+- **【不再推荐】方法二**：因为笔记软件的原因，造成上传的笔记中图片无法加载，会逐渐将笔记中的图片链接从本地更改为图库的链接，在此过程中，如果想完整的查看笔记中的插图，请使用软件：Yu Writer ，将整个目录放入笔记默认的文件夹下：即可，当然也可也使用软件导入外部文件进行查看。
 
     - 软件下载地址：https://ivarptr.github.io/yu-writer.site/
 
--  **方法三**：当然也可以直接打开仓库中每个文件对应的 `.resources` 文件查看文件中包含的图片；
+-  **【不推荐】方法三**：当然也可以直接打开仓库中每个文件对应的 `.resources` 文件查看文件中包含的图片；
 
 ### 🎨完整笔记获取
 
-- 如果需要完整笔记，或者需要 PDF 版本，可以提交 issue 或者发送邮件到上面邮箱，说明需要具体的笔记名即可，一般晚上会查看 Github 和查阅邮箱。
+- 如果需要完整笔记，或者需要 PDF 版本，可以提交 issue 或者发送邮件到邮箱：gjxaiou@gmail.com，说明需要具体的笔记名即可，一般晚上会查看 Github 和查阅邮箱。
+- 推荐使用下面 Fork 方式每次使用之前更新一下，因为很多笔记都处于不断整理过程中，新版本更加利于阅读。
 
 ### 🎨Fork 之后保证笔记更新
 
@@ -44,8 +49,8 @@
 
 ### 🎨排版规范
 
-- **Java 代码规范参照** ：[AlibabaJavaCodeGuide](https://github.com/GJXAIOU/Notes/blob/master/Java/CodeGuide/AlibabaJavaCodeGuide1.3.0.md)
-- **中文排版参照**：[ChineseCopywritingGuidelines](https://github.com/GJXAIOU/Notes/blob/master/Java/CodeGuide/ChineseCopywritingGuidelines.md)
+- **Java 代码规范参照** ：[Alibaba Java Code Guide](https://github.com/GJXAIOU/Notes/blob/master/Java/CodeGuide/AlibabaJavaCodeGuide1.3.0.md)
+- **中文排版参照**：[Chinese Copy writing Guidelines](https://github.com/GJXAIOU/Notes/blob/master/Java/CodeGuide/ChineseCopywritingGuidelines.md)
 
 
 
@@ -66,10 +71,10 @@
     - JavaEE 
     - MySQL
     - HTML、CSS、JSP、JQuery
-    - Spring、SpringMVC、Mybatis、Hibernate、Struts2、SpringBoot
+    - Spring、SpringMVC、Mybatis、Struts、Hibernate、SpringBoot
     - Redis、Shiro
 - JavaConcurrency:open_file_folder:
-- JavaVirtualMachine【已基本完成】:open_file_folder:
+- JavaVirtualMachine :open_file_folder:
     - JVM 内存结构
     - 类加载机制
     - 垃圾回收
