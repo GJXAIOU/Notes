@@ -451,35 +451,29 @@ public class Code_06_ChineseExpression {
 
 
 
-## 窗口： 
+## 四、滑动窗口
 
 **介绍窗口以及窗口内最大值或者最小值的更新结构（单调双向队列）**
 
-**什么是窗口：**
+### （一）滑动窗口的概念
 
-就是一个数组------有L和R指针，默认两个指针均位于数组的最左边即下标为 -1 的位置， 当有数字进入时R向右移动  当有数字删除时则L向右移动 且L 和R 不会回退且 L 不能到 R 右边~
+**就是一个数组------有 L 和 R指 针，默认两个指针均位于数组的最左边即下标为 -1 的位置， 当有数字进入时 R 向右移动。当有数字删除时则 L 向右移动 且L 和R 不会回退且 L 不能到 R 右边。**
 
-
-
-思路： **双端队列（链表）**：双端队列中既需要放置数据又需要放置位置下标，本质上存放下标就行，对应值从数组中就能获取。
-
-**可以从头 尾入 可以从尾 头出**
-
-**规则： L< R  且 L,R 永远不回退~**
+思路： **双端队列（链表）**：双端队列中既需要放置数据又需要放置位置下标，本质上存放下标就行，对应值根据下标从数组中就能获取。
 
 ![增加元素过程](AlgorithmMediumDay02.resource/%E5%A2%9E%E5%8A%A0%E5%85%83%E7%B4%A0%E8%BF%87%E7%A8%8B.jpg)
 
 
 
-**分析逻辑为：** 如果想实现窗口内最大值的更新结构： 使得双端队列保证从大到小的顺序 
+**上图运行逻辑为：** 如果想实现窗口内最大值的更新结构： 使得双端队列保证从大到小的顺序 
 
-当放入元素时候 ：
+- 当放入元素时候 ：
 
-​           （R增加） 头部始终存放的是当前最大的元素--- 如果即将进入双端队列的元素（因为 R 增加而从数组中取出放入双端队列中的元素）比上一个进入双端队列的元素小，则从尾部进入，新进入的元素直接连接在后面，否则 原来双端队列的尾部一直弹出（包含相等情况，因为晚过期） 直到为即将要放入的元素找到合适的位置，或者整个队列为空，然后放入新加入的元素。（见上面示例）
+    （R增加） **头部始终存放的是当前最大的元素**--- 如果即将进入双端队列的元素（因为 R 增加而从数组中取出放入双端队列中的元素）比上一个进入双端队列的元素小，则从尾部进入，新进入的元素直接连接在后面，否则 原来双端队列的尾部一直弹出（包含相等情况，因为晚过期） 直到为即将要放入的元素找到合适的位置，或者整个队列为空，然后放入新加入的元素。（见上面示例）
 
-当窗口减数时候：
+- 当删除元素时候：
 
-​            （L增加） ---L向右移---（index下标一定得保留）则需要检查当前头部元素index是否过期 若过期则需要从头部进行弹出
+    （L增加） ---L向右移---（index下标一定得保留）则需要检查当前头部元素index是否过期 若过期则需要从头部进行弹出
 
 ![img](AlgorithmMediumDay02.resource/20180621232650862.png)
 
@@ -487,11 +481,9 @@ public class Code_06_ChineseExpression {
 
 
 
-#### **具体应用：**
+### （二）应用一：生成窗口最大值数组
 
-#### **生成窗口最大值数组：** 
-
-**题目**
+**1.题目**：
 
 有一个整型数组 arr 和一个大小为 w 的窗口从数组的最左边滑到最右边，窗口每次向右滑一个位置。
 
@@ -522,7 +514,7 @@ public class Code_06_ChineseExpression {
 **代码：**
 
 ```java
-package com.gjxaiou.advanced.class02;
+package com.gjxaiou.advanced.day02;
 
 import java.util.LinkedList;
 
@@ -536,25 +528,26 @@ public class SlidingWindowMaxArray {
             return null;
         }
         // LinkedList 就是一个标准的双向链表
-        LinkedList<Integer> qmax = new LinkedList<Integer>();
+        LinkedList<Integer> maxList = new LinkedList<Integer>();
         // 生成的结果数组
         int[] res = new int[arr.length - w + 1];
         int index = 0;
         for (int i = 0; i < arr.length; i++) {
-            //更新双端队列，如果双端队列不为空，并且尾结点(存的是下标)对应数组中的值是否小于等于当前值
-            while (!qmax.isEmpty() && arr[qmax.peekLast()] <= arr[i]) {
-                qmax.pollLast();
+            // 更新双端队列，如果双端队列不为空，并且尾结点(存的是下标)对应数组中的值是否小于等于当前值
+            while (!maxList.isEmpty() && arr[maxList.peekLast()] <= arr[i]) {
+                maxList.pollLast();
             }
             // 上面一直弹出，直到不符合然后加上当前值。
-            qmax.addLast(i);
+            maxList.addLast(i);
             // 上面加法是通用的，但是减法是针对该题定制的
-            // 当过期的时候（当窗口形成之后再扩充才算过期），窗口形成过程中不会过期
-            if (qmax.peekFirst() == i - w) {
-                qmax.pollFirst();
+            // 当过期的时候（当窗口形成之后再扩充才算过期）即窗口长度 > w，窗口形成过程中不会过期, i - w表示过期的下标
+            if (maxList.peekFirst() == i - w) {
+                maxList.pollFirst();
             }
-            //判断下标过期
+            // 判断下标过期
             if (i >= w - 1) {
-                res[index++] = arr[qmax.peekFirst()];
+                // 当窗口已经形成了，记录每一步的res
+                res[index++] = arr[maxList.peekFirst()];
             }
         }
         return res;
@@ -576,7 +569,7 @@ public class SlidingWindowMaxArray {
 
 
 
-## 最大值-最小值<=num的子数组数量:
+### （二）应用二：最大值-最小值<=num的子数组数量:
 
 **题目**：给定数组 arr 和整数 num，共返回有多少个子数组满足如下情况：`max(arr[i...j]) - min(arr[i...j]) <= num`，其中 `max(arr[i...j])` 表示子数组 `arr[i...j]` 中最大值，`min(arr[i...j])` 表示子数组 `arr[i...j]` 中的最小值。
 
@@ -588,7 +581,7 @@ public class SlidingWindowMaxArray {
 
 
 
-#### 最简单思路： 暴力求解 两个for 依次遍历 
+**最简单思路： 暴力求解 两个for 依次遍历** 
 
 ```java
 package com.gjxaiou.advanced.class02;
@@ -631,7 +624,7 @@ public class AllLessNumSubArray {
 
 
 
-#### 最优解思路：
+**最优解思路：**
 
 - 如果有一个子数组 L~R 已经符合要求（并且其最大值为 max，最小值为 min），则其中内部的子数组一定也符合要求，因为内部空间（即范围小于 L ~ R）中的最大值只会 <= max，并且最小值只会 >=min，所有相减的结果肯定小于等于 num。
 
@@ -732,7 +725,7 @@ public class AllLessNumSubArray {
 
 
 
-# 单调栈：
+## 五、单调栈
 
 问题描述：给定一个数组 请确定每个元素左右距离最近的比它大的数字
 
@@ -762,9 +755,9 @@ public class AllLessNumSubArray {
 
 
 
-## 具体应用：
 
-## **1  构造数组的maxtree:**
+
+### （一） 应用一：构造数组的maxtree
 
 定义二叉树的节点如下：
 
@@ -789,12 +782,12 @@ public class Node{
 
 给定一个没有重复元素的数组arr，写出生成这个数组的MaxTree的函数，要求如果数组长度为N，则时间负责度为O(N)、额外空间负责度为O(N)。
 
-## 实现思路
+#### 实现思路
 
 对每一个元素，从左边和右边各选择第一个比这个元素大的值，选择值较小的元素作为父节点。
   在【生成窗口最大数组】里面，已经掌握了，在O(N)时间复杂度里面，找到每个元素位置最近的比元素大的元素，同个这个套路，就可以构造一棵MaxTree了。
 
-## 证明
+#### 证明
 
 1 构造的不是森林
 2 是一棵二叉树
@@ -973,7 +966,7 @@ public class MaxTree {
 
 
 
-## 2  求最大子矩阵的大小： 
+### （二）求最大子矩阵的大小： 
 
 ![img](https://img-blog.csdn.net/20180625223145661?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
@@ -1086,7 +1079,7 @@ public class MaximalRectangle {
 
 
 
-### 回形山
+### （三）回形山
 
 使用一个数组表示环形山，然后每座山上放烽火，相邻山之间的烽火可以看见；因为任意两座山之间可以通过顺时针或者逆时针的方式互相到达，如果两种方式中一条经过的数字都不大于两座山值的较小的一个，则两座山相互可见（如 3,4 之间可以看见），返回能返回相互看见的山峰有多少对。
 

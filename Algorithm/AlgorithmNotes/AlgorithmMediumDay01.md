@@ -4,9 +4,9 @@
 
 ## 一、不用比较符返回较大数
 
-给定两个数 a 和 b，如何不用比较运算符，返回较大的数。
+**题目**：给定两个数 a 和 b，如何不用比较运算符，返回较大的数。
 
-【解答】
+**解答**
 
 这里有两种方法进行解决，两种方法原理都一样的，只是第二种是第一种的优化。
 
@@ -14,7 +14,7 @@
 
 **方法一：**
 
-　　我们不能直接比较，那么就用减法来判断，a - b 值的符号，符号为正 a 大，符号为负 b 大。signC 表示 c 的符号，signRevC 表示 c 的相反的符号，scA 是 1 返回 a，scA 是 0 返回 B。但是有局限性，那就是 a - b 的值可能出现溢出，返回结果不正确。
+我们不能直接比较，那么就用减法来判断，a - b 值的符号，符号为正 a 大，符号为负 b 大。signC 表示 c 的符号，signRevC 表示 c 的相反的符号，scA 是 1 返回 a，scA 是 0 返回 b。但是有局限性，那就是 a - b 的值可能出现溢出，返回结果不正确。
 
 **方法二：**
 
@@ -35,6 +35,16 @@ package com.gjxaiou.advanced.day01;
 
 public class GetMax {
 
+    // 方法一：得到 a - b 的符号就可以知道大小（缺点：a - b 值可能出现溢出）
+    public static int getMax1(int a, int b) {
+        int c = a - b;
+        // signC 表示 c 的符号
+        int signC = sign(c);
+        // 表示与 c 相反的符号
+        int signRevC = flip(signC);
+        return a * signC + b * signRevC;
+    }
+
     public static int flip(int n) {
         // 异或，二进制表示，相同输出 0，不同输出 1；
         return n ^ 1;
@@ -42,17 +52,11 @@ public class GetMax {
 
     public static int sign(int n) {
         // 二进制中符号位 0 表示正，1 表示负：若正数或 0 返回 1，负数则返回 0
+        // 这里是有符号数，n >> 31 表示将所有位上值右移 31 位，最终结果就是最后一位放的是原来数的第一位（即符号位），
+        // 然后前面所有高位补符号位，如果是正数，所有前面所有高位补 0，反之补 1。
+        // 所以如果 n 为正数，(n >> 31) & 1 结果为 0，然后调用 flip 实现 n ^ 1 结果为 1；
+        // 如果 n 为负数，(n >> 31) & 1 结果为 1，然后调用 flip 实现 n ^ 1 结果为 0.
         return flip((n >> 31) & 1);
-    }
-
-    // 方法一：得到 a - b 的符号就可以知道大小（缺点：a - b 值可能出现溢出）
-    public static int getMax1(int a, int b) {
-        int c = a - b;
-        //表示 c 的符号
-        int signC = sign(c);
-        // 表示与 c 相反的符号
-        int signRevC = flip(signC);
-        return a * signC + b * signRevC;
     }
 
     //方法二：
@@ -87,7 +91,6 @@ public class GetMax {
         System.out.println(getMax2(a, b));
     }
 }
-
 ```
 
 
