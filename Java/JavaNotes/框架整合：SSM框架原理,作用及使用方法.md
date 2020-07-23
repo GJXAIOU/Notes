@@ -17,9 +17,9 @@ SSM 框架是 spring MVC ，spring 和 mybatis 框架的整合，是标准的 MV
 ### （二）实现原理
 
 - **spring MVC**
-  - DNS 负责域名的解析, 比如访问www.baidu.com 先找到DNS获取相应的服务器IP和端口；
-  - 请求消息到达端口以后由**TOMCAT主动去询问**自己占用的端口是否由请求发来；
-  - 如果有请求TOMCAT**交给对应的项目**处理；
+  - DNS 负责域名的解析, 比如访问`www.baidu.com` 先通过DNS获取相应的服务器IP和端口；
+  - 请求消息到达端口以后由**Tomcat 主动去询问**自己占用的端口是否由请求发来；
+  - 如果有请求 Tomcat **交给对应的项目**处理；
   - 客户端发送请求到 DispacherServlet（前端控制器即分发器），这里可以设置拦截器，对请求进行过滤处理；
   - 由 DispacherServlet 控制器查询 HanderMapping，通过解析请求，判断请求希望执行的具体方法，即找到处理请求的 Controller；
 这个map表由很多key:value键值对组成, key值是controller的名字(@mapping ...), value值是该controller所在类的地址和方法签名;
@@ -33,10 +33,10 @@ SSM 框架是 spring MVC ，spring 和 mybatis 框架的整合，是标准的 MV
 ![SpringMVC 流程](%E6%A1%86%E6%9E%B6%E6%95%B4%E5%90%88%EF%BC%9ASSM%E6%A1%86%E6%9E%B6%E5%8E%9F%E7%90%86,%E4%BD%9C%E7%94%A8%E5%8F%8A%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95.resource/SpringMVC%20%E6%B5%81%E7%A8%8B.png)
 
 **上面补充：**
-- 拦截器：拦截器主要是在 SpringMVC 的 controller 处理请求之前，对请求做一些处理，拦截器拦截的是 Controller，拦截器分为：HandlerInterceptro（springmvc 的）和 WebRequestInterceptor（spring 的），同时里面一共有三个方法，可以实现部分，主要是拦截位置不同，整体的指向顺序为： preHandle ->进入控制器（controller）-> postHandler -> JSP -> afterCompletion；
+- 拦截器：拦截器主要是在 SpringMVC 的 controller 处理请求之前，对请求做一些处理，**拦截器拦截的是 Controller**，拦截器分为：HandlerInterceptor（springmvc 的）和 WebRequestInterceptor（spring 的），同时里面一共有三个方法，可以实现部分，主要是拦截位置不同，整体的指向顺序为： preHandle ->进入控制器（controller）-> postHandler -> JSP -> afterCompletion；
 
 - **配置文件**
-  - web.xml：在 <servlet> 中要配置前端控制器，springmvc 的配置文件位置、自启动、拦截器以及编码过滤器；
+  - web.xml：在 `<servlet>` 中要配置前端控制器，springmvc 的配置文件位置、自启动、拦截器以及编码过滤器；
   - springmvc.xml ：配置扫描包，即项目中所有 controller 位置，配置注解驱动（一般使用注解），配置不要拦截静态资源、自定义视图解析器（就是前后缀，可以和 controller 的返回值相连接，构成完整的页面路径）；
   - controller 中代码示例：
 ```java
@@ -76,8 +76,8 @@ public class demo(){
 
 DataBase --> Entity --> Mapper.xml --> Mapper.Java --> Service.java --> Controller.java --> .Jsp
 
-
 **说明：**
+
 - Spring MVC  拥有控制器，作用跟Struts2 类似，接收外部请求，**解析参数传给服务层**
 - Spring 容器属于协调上下文，**管理对象间的依赖，提供事务机制**
 - mybatis 属于orm持久层框架，**将业务实体与数据表联合起来**；
@@ -123,7 +123,7 @@ DataBase --> Entity --> Mapper.xml --> Mapper.Java --> Service.java --> Controll
 *   Controller，View层因为耦合度比较高，因而要结合在一起开发，但是也可以看作一个整体独立于前两个层进行开发。这样，在层与层之前我们只需要知道接口的定义，调用接口即可完成所需要的逻辑单元应用，一切显得非常清晰简单。
 
 *   Service逻辑层设计
-    *   Service层是建立在DAO层之上的，建立了DAO层后才可以建立Service层，而Service层又是在Controller层之下的，因而Service层应该既调用DAO层的接口，又要提供接口给Controller层的类来进行调用，它刚好处于一个中间层的位置。每个模型都有一个Service接口，每个接口分别封装各自的业务处理方法。
+    *   Service层是建立在DAO层之上的，建立了DAO层后才可以建立Service层，而Service层又是在Controller层之下的，**因而Service层应该既调用DAO层的接口，又要提供接口给Controller层的类来进行调用**，它刚好处于一个中间层的位置。每个模型都有一个Service接口，每个接口分别封装各自的业务处理方法。
 
 
 
@@ -193,7 +193,7 @@ Java反射博大精深，我也不很懂，具体请查看[Java基础之—反�
 *   IOC
     *   **ioc（inverse of control）控制反转：** 所谓反转就是把创建对象（bean）和维护对象（bean）之间的关系的权利从程序转移到spring的容器（spring-config.xml）
         ![这里写图片描述](%E6%A1%86%E6%9E%B6%E6%95%B4%E5%90%88%EF%BC%9ASSM%E6%A1%86%E6%9E%B6%E5%8E%9F%E7%90%86,%E4%BD%9C%E7%94%A8%E5%8F%8A%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95.resource/20180415162059434.png)
-        说明：`<bean></bean>`这对标签元素的作用：**当我们加载spring框架时，spring就会自动创建一个bean对象，并放入内存**相当于我们常规的new一个对象，而`<property></property>`中的value则是实现了“**对象.set方法**”，这里也体现了注入了概念
+        ==说明：`<bean></bean>`这对标签元素的作用：**当我们加载spring框架时，spring就会自动创建一个bean对象，并放入内存**相当于我们常规的new一个对象，而`<property></property>`中的value则是实现了“**对象.set方法**”，这里也体现了注入了概念==
 *   DI
 
     *   **di（dependency injection）依赖注入：** 实际上di和ioc是同一个概念，spring的设计者，**认为di更准确的表示spring的核心**
@@ -287,8 +287,7 @@ test模块支持使用JUnit和TestNG对spring组件进行测试。
 *   **springmvc是spring框架的一个模块，springmvc和spring无需通过中间整合层进行整合。**
 
 *   springmvc是一个基于mvc的web框架。
-    ![这里写图片描述](%E6%A1%86%E6%9E%B6%E6%95%B4%E5%90%88%EF%BC%9ASSM%E6%A1%86%E6%9E%B6%E5%8E%9F%E7%90%86,%E4%BD%9C%E7%94%A8%E5%8F%8A%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95.resource/20180503140031318.png)
-
+    
 *   **mvc**
 
     *   mvc在b/s系统 下的应用：

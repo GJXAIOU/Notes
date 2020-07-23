@@ -11,7 +11,7 @@ tags:
 table仅仅只是用来布局用的,form则是用来封装数据的,通常是 form 里面包含 table；
 ## 一、复习
 ### 表单
-- <from></from>
+- `<from></from>`
   - action:提交数据的地址，即 URL；当提交表单时，表单数据会提交到名为 "XXX"（action 后面的参数） 的页面
     - URL  ：向何处发送表单数据。
           可能的值：
@@ -24,7 +24,8 @@ table仅仅只是用来布局用的,form则是用来封装数据的,通常是 fo
 
 
 
-- <input></input>
+- `<input></input>`
+  
   - type:
     - text:可视化文本，是缺省属性；
     - password: 密文
@@ -35,13 +36,14 @@ table仅仅只是用来布局用的,form则是用来封装数据的,通常是 fo
     - hidden:隐藏传递数据，适用于文件上传时候，先行告知服务器数据大小；
     - submit:提交数据
     - button：按钮，这里需要配合 JS 使用；
-    - reset：重置；
+  - reset：重置；
+  
+- `<select></select>` **下拉菜单框**
 
-- <select></select>**下拉菜单框**
+- `<textarea rows = “” cols=“”></textarea>`
 
-- <textarea rows = “” cols=“”></textarea>
-单选框和多选框默认选择是使用 checked;
-下拉菜单默认选择是 selected;
+  单选框和多选框默认选择是使用 checked;
+  下拉菜单默认选择是 selected;
 
 - <p align = “ ”> </p> 创建一个段落；其中的“”值可以有：left、center、right 表示三种对齐方式；
 
@@ -133,7 +135,8 @@ td 表示一行里面的一个单元格
   - method表示提交方式 GET/POST DELETE    	
     - GET是通过URL传递参数的，传递参数之后，URL中会明文显示参数
     - POST是隐含传递参数，可以使用浏览器里面的开发者工具->netword->找到发送给哪一个文件->from data
-   
+  
+
 整体标准格式为：
 ```html
 <form action="2.html" method="post">

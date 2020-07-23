@@ -1,0 +1,58 @@
+---
+tag:
+- 未看
+flag: yellow
+---
+# Mybatis配置之元素详述
+
+2017年05月15日 07:23:53 [DreamMakers](https://me.csdn.net/andamajing) 阅读数 2200更多
+
+分类专栏： [Mybatis](https://blog.csdn.net/andamajing/article/category/6902012) [Mybatis应用及原理探析](https://blog.csdn.net/andamajing/article/category/6902014) [深入了解Mybatis使用及实现原理](https://blog.csdn.net/andamajing/article/category/9268791)
+
+[](http://creativecommons.org/licenses/by-sa/4.0/)版权声明：本文为博主原创文章，遵循[ CC 4.0 BY-SA ](http://creativecommons.org/licenses/by-sa/4.0/)版权协议，转载请附上原文出处链接和本声明。
+
+本文链接：[https://blog.csdn.net/andamajing/article/details/72085580](https://blog.csdn.net/andamajing/article/details/72085580) 
+
+在上篇文章中，我们对<typeHandlers>配置及背后的源码进行了比较详细的说明，今天，我们来对下一个元素<objectFactory>进行详细说明。
+
+这个元素，大家在使用mybatis的时候设置吗？我是从来没有设置过啊。使用mybatis为我们已经写好的默认实现已经能够满足绝大多数的场景需求。那么这个元素又是干什么的呢？
+
+官方文档上是这么说的：
+
+**MyBatis 每次创建结果对象的新实例时，它都会使用一个对象工厂（ObjectFactory）实例来完成。 默认的对象工厂需要做的仅仅是实例化目标类，要么通过默认构造方法，要么在参数映射存在的时候通过参数构造方法来实例化。 如果想覆盖对象工厂的默认行为，则可以通过创建自己的对象工厂来实现。**
+
+我理解的意思就是说，这个类其实是为了在对查询结果集中获取数据被封装成所希望的Java实体类型时用到的，使用这个工厂类通过反射的方式来进行实例对象的创建。所有的工厂类都必须实现ObjectFactory接口。我们来看看这个接口的定义：
+
+```
+public interface ObjectFactory {   /**   * Sets configuration properties.   * @param properties configuration properties   */  void setProperties(Properties properties);   /**   * Creates a new object with default constructor.    * @param type Object type   * @return   */  <T> T create(Class<T> type);   /**   * Creates a new object with the specified constructor and params.   * @param type Object type   * @param constructorArgTypes Constructor argument types   * @param constructorArgs Constructor argument values   * @return   */  <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs);    /**   * Returns true if this object can have a set of other objects.   * It's main purpose is to support non-java.util.Collection objects like Scala collections.   *    * @param type Object type   * @return whether it is a collection or not   * @since 3.1.0   */  <T> boolean isCollection(Class<T> type); }
+```
+
+ 从这个接口定义可以看出，它包含了两种通过反射机制构造实体类对象的方法，一种是通过无参构造函数，一种是通过带参数的构造函数。另外，为了使的这个工厂类能接收设置的附带属性，还提供了setProperties()方法。mybatis为我们实现了一个默认实现，那就是DefaultObjectFactory，我们来看看默认是怎么实现的。
+
+```
+public class DefaultObjectFactory implements ObjectFactory, Serializable {   private static final long serialVersionUID = -8855120656740914948L;   @Override  public <T> T create(Class<T> type) {    return create(type, null, null);  }   @SuppressWarnings("unchecked")  @Override  public <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {    Class<?> classToCreate = resolveInterface(type);    // we know types are assignable    return (T) instantiateClass(classToCreate, constructorArgTypes, constructorArgs);  }   @Override  public void setProperties(Properties properties) {    // no props for default  }   <T> T instantiateClass(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {    try {      Constructor<T> constructor;      if (constructorArgTypes == null || constructorArgs == null) {        constructor = type.getDeclaredConstructor();        if (!constructor.isAccessible()) {          constructor.setAccessible(true);        }        return constructor.newInstance();      }      constructor = type.getDeclaredConstructor(constructorArgTypes.toArray(new Class[constructorArgTypes.size()]));      if (!constructor.isAccessible()) {        constructor.setAccessible(true);      }      return constructor.newInstance(constructorArgs.toArray(new Object[constructorArgs.size()]));    } catch (Exception e) {      StringBuilder argTypes = new StringBuilder();      if (constructorArgTypes != null && !constructorArgTypes.isEmpty()) {        for (Class<?> argType : constructorArgTypes) {          argTypes.append(argType.getSimpleName());          argTypes.append(",");        }        argTypes.deleteCharAt(argTypes.length() - 1); // remove trailing ,      }      StringBuilder argValues = new StringBuilder();      if (constructorArgs != null && !constructorArgs.isEmpty()) {        for (Object argValue : constructorArgs) {          argValues.append(String.valueOf(argValue));          argValues.append(",");        }        argValues.deleteCharAt(argValues.length() - 1); // remove trailing ,      }      throw new ReflectionException("Error instantiating " + type + " with invalid types (" + argTypes + ") or values (" + argValues + "). Cause: " + e, e);    }  }   protected Class<?> resolveInterface(Class<?> type) {    Class<?> classToCreate;    if (type == List.class || type == Collection.class || type == Iterable.class) {      classToCreate = ArrayList.class;    } else if (type == Map.class) {      classToCreate = HashMap.class;    } else if (type == SortedSet.class) { // issue #510 Collections Support      classToCreate = TreeSet.class;    } else if (type == Set.class) {      classToCreate = HashSet.class;    } else {      classToCreate = type;    }    return classToCreate;  }   @Override  public <T> boolean isCollection(Class<T> type) {    return Collection.class.isAssignableFrom(type);  } }
+```
+
+ 从上面的源码来看，创建实例对象最终都是通过instantiateClass()方法能实现的，在这个方法中，获取实体类的无参构造函数或者带参构造函数，然后采用反射的机制来实例化实体类对象出来。 
+
+如果我们想定义一个自定义的对象工厂类，我们可以实现ObjectFactory这个接口，但是这样我们就需要自己去实现一些在DefaultObjectFactory已经实现好了的东西，因此如果想自定义一个，可以继承这个DefaultObjectFactory类，这样可以使得实现起来更为简单。
+
+下面我们来举个示例，我们假设需要自定义一个对象工厂类ExampleObjectFactory，在要创建我之前定义的User对象时会给属性字段author赋值为我的名字，接下来我们看看怎么实现。
+
+首先我们定义实现这个对象工厂类：
+
+```
+package com.majing.learning.mybatis.reflect.objectfactory; import org.apache.ibatis.reflection.factory.DefaultObjectFactory; import com.majing.learning.mybatis.entity.User; public class ExampleObjectFactory extends DefaultObjectFactory{ 	private static final long serialVersionUID = 3608715667301891724L; 	@Override	public <T> T create(Class<T> type) {		T result = super.create(type);		if(type.equals(User.class)){			((User)result).setAuthor("马靖");		}		return result;	} }
+```
+
+ 在这个工厂类中，我们对User类中无惨构造函数构造出来的对象做了个特殊处理，加了个我的名字。接下来，我们在配置文件中配置这个类为我们想要的对象工厂类。
+
+```
+<objectFactory type="com.majing.learning.mybatis.reflect.objectfactory.ExampleObjectFactory"></objectFactory>
+```
+
+ 然后我们执行测试代码，查询一条用户记录出来，发现返回的对象中的确设置了我的名字，如下所示：
+
+![](https://img-blog.csdn.net/20170515071916680?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbWFqaW5nZ29nb2dv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+至此，关于mybatis中的对象工厂相关的知识点便讲解的差不多了，下一篇文章我们再来看看<Mappers>的配置和使用，敬请期待。

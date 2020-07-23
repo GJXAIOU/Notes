@@ -22,7 +22,7 @@ synchronized (锁对象) {
           同步的代码
       }
 ```
-      
+
   - 同步函数(还没有讲)
   
 - TCP/IP UDP:
@@ -101,7 +101,7 @@ synchronized (锁对象) {
 
 
 - **常见的属性**：
-  - <br />表示换行
+  - `<br />`表示换行
   - vlink 表示点击后的链接颜色
   - alink 表示鼠标放在上面时链接颜色
   - link 表示没有点击过的链接颜色
@@ -110,8 +110,8 @@ synchronized (锁对象) {
   - http 不是安全连接
   - text = "green" 文本颜色为绿色
   - bgcolor = " " 整个页面的背景为XXX
- 
-   - <a href = "地址"></a> 为超链接
+
+   - `<a href = "地址"></a>` 为超链接
 ```html
 <!DOCTYPE HTML>
 <html>
@@ -180,7 +180,7 @@ X<sup>2</sup> 表示：x的平方  y<sub>2</sub> 表示y的下标2
             <li>啦 3</li>
 </ul>
 ```
-  
+
 - 有序列表：
         ol可以添加type属性，属性值可以是A/a/I/1 还可以有start 从哪一个开始
 ```html
@@ -199,7 +199,7 @@ X<sup>2</sup> 表示：x的平方  y<sub>2</sub> 表示y的下标2
     <dd>内容三</dd>
 </dl>
 ```
-         
+
 ### （七）超链接标签：
 超链接标签为：`<a></a>`
     href:目标地址/mailto/tel

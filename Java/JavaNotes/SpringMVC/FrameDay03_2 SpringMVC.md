@@ -72,7 +72,8 @@ public class DemoController {
 ```jsp
 <body>
     request:${requestScope.req} <br/>
-    session:${sessionScope.session} <br/>
+    session:${sessionScope.sessio
+    n} <br/>
     sessionParam:${sessionScope.sessionParam}<br/>
     application:${applicationScope.application}<br/>
 </body>

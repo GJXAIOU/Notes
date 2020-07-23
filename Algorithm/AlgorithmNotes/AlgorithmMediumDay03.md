@@ -2,8 +2,6 @@
 
 [TOC]
 
-
-
 ## 一、Morris遍历
 
 介绍一种时间复杂度O(N)，额外空间复杂度O(1)的二叉树的遍历方式，N为二叉树的节点个数（不要求是完全二叉树）
@@ -29,13 +27,13 @@
  }
 ```
 
-Morris 遍历是利用了二叉树中空闲的结点，例如末子节点的两个引用都是指向的位置为空，但是引用仍然占着空间。利用空闲的空间完成回到上级的操作，即修改原来二叉树结构来实现。
+==Morris 遍历是利用了二叉树中空闲的结点，例如末子节点的两个引用都是指向的位置为空，但是引用仍然占着空间。利用空闲的空间完成回到上级的操作，即修改原来二叉树结构来实现。==
 
 
 
 普通遍历递归，可以三次来到当前节点，按打印时机可分为前中后序。
 
-morris遍历：如果有左子树，可以来到当前节点两次，若没有左子树，来到当前节点一次，可以利用左子树最右节点右指针指向谁来标记第一次还是第二次到这个节点（左子树最右指针指向null，第一次到，指向当前节点，即指向自己，第二次到）。但是在遍历右子树时，无法第三次回到自己。
+morris 遍历：如果有左子树，可以来到当前节点两次，若没有左子树，来到当前节点一次，可以利用左子树最右节点右指针指向谁来标记第一次还是第二次到这个节点（左子树最右指针指向null，第一次到，指向当前节点，即指向自己，第二次到）。但是在遍历右子树时，无法第三次回到自己。
 
 morris遍历第一次到时打印，**先序**。第二次到时打印（没有左子树的一次可以理解为直到第一次与第二次重叠在一起），**中序**。
 
@@ -53,9 +51,9 @@ morris**后序**，**只关注能来到两次的节点**，在第二次来到这
 
 morris遍历的空间复杂度：O（1）
 
-- 来到的当前节点记为cur，如果cur无左孩子，cur向右移动（cur = cur.right）
+- 来到的当前节点记为 cur，如果 cur 无左孩子，cur 向右移动（cur = cur.right）
 
-- 如果cur有左孩子，找到 cur 左子树上最右的节点，记为 mostright
+- 如果 cur 有左孩子，找到 cur 左子树上最右的节点，记为 mostright
     - 若 mostright 的 right 指针指向空，让其指向 cur，然后 cur 向左移动（cur = cur.left）
     - 若 mostright 的 right 指针指向 cur，让其指向空，cur 向右移动
 
@@ -206,11 +204,263 @@ public class MorrisTraversal {
 
 
 
+## morris 遍历二叉树
+
+> 关于二叉树先序、中序、后序遍历的递归和非递归版本，这6种遍历算法的时间复杂度都需要`O(H)`（其中`H`为树高）的额外空间复杂度，因为二叉树遍历过程中只能向下查找孩子节点而无法回溯父结点，因此这些算法借助栈来保存要回溯的父节点（递归的实质是系统帮我们压栈），并且栈要保证至少能容纳下`H`个元素（比如遍历到叶子结点时回溯父节点，要保证其所有父节点在栈中）。而morris遍历则能做到时间复杂度仍为`O(N)`的情况下额外空间复杂度只需`O(1)`。
+
+### 遍历规则
+
+首先在介绍morris遍历之前，我们先把先序、中序、后序定义的规则抛之脑后，比如先序遍历在拿到一棵树之后先遍历头结点然后是左子树最后是右子树，并且在遍历过程中对于子树的遍历仍是这样。
+
+忘掉这些遍历规则之后，我们来看一下morris遍历定义的标准：
+
+1. 定义一个遍历指针`cur`，该指针首先指向头结点
+
+2. 判断 `cur`的左子树是否存在
+
+    - 如果`cur`的左孩子为空，说明`cur`的左子树不存在，那么`cur`右移来到`cur.right`
+
+    - 如果 `cur`的左孩子不为空，说明 `cur`的左子树存在，找出该左子树的最右结点，记为`mostRight`；
+
+        - 如果，`mostRight`的右孩子为空，那就让其指向`cur`（`mostRight.right=cur`），并左移`cur`（`cur=cur.left`）
+    - 如果`mostRight`的右孩子不空，那么让`cur`右移（`cur=cur.right`），并将`mostRight`的右孩子置空
+
+3. 经过步骤2之后，如果`cur`不为空，那么继续对`cur`进行步骤2，否则遍历结束。
+
+下图所示举例演示morris遍历的整个过程：
 
 
-## 二、搜索二叉树
 
-搜索二叉树的定义：对于一棵二叉树中的任意子树，其左子树上的所有数值小于头结点的数值，其右子树上所有的数值大于头结点的数值，并且树中不存在数值相同的结点。也称二叉查找树。
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e86eb7cac7?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+### 先序、中序序列
+
+遍历完成后对`cur`进过的节点序列稍作处理就很容易得到该二叉树的先序、中序序列：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8a7c5bf81?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+示例代码：
+
+```java
+public static class Node {
+    int data;
+    Node left;
+    Node right;
+    public Node(int data) {
+        this.data = data;
+    }
+}
+
+public static void preOrderByMorris(Node root) {
+    if (root == null) {
+        return;
+    }
+    Node cur = root;
+    while (cur != null) {
+        if (cur.left == null) {
+            System.out.print(cur.data+" ");
+            cur = cur.right;
+        } else {
+            Node mostRight = cur.left;
+            while (mostRight.right != null && mostRight.right != cur) {
+                mostRight = mostRight.right;
+            }
+            if (mostRight.right == null) {
+                System.out.print(cur.data+" ");
+                mostRight.right = cur;
+                cur = cur.left;
+            } else {
+                cur = cur.right;
+                mostRight.right = null;
+            }
+        }
+    }
+    System.out.println();
+}
+
+public static void mediumOrderByMorris(Node root) {
+    if (root == null) {
+        return;
+    }
+    Node cur = root;
+    while (cur != null) {
+        if (cur.left == null) {
+            System.out.print(cur.data+" ");
+            cur = cur.right;
+        } else {
+            Node mostRight = cur.left;
+            while (mostRight.right != null && mostRight.right != cur) {
+                mostRight = mostRight.right;
+            }
+            if (mostRight.right == null) {
+                mostRight.right = cur;
+                cur = cur.left;
+            } else {
+                System.out.print(cur.data+" ");
+                cur = cur.right;
+                mostRight.right = null;
+            }
+        }
+    }
+    System.out.println();
+}
+
+public static void main(String[] args) {
+    Node root = new Node(1);
+    root.left = new Node(2);
+    root.right = new Node(3);
+    root.left.left = new Node(4);
+    root.left.right = new Node(5);
+    root.right.left = new Node(6);
+    root.right.right = new Node(7);
+    preOrderByMorris(root);
+    mediumOrderByMorris(root);
+
+}
+```
+
+这里值得注意的是：**morris遍历会来到一个左孩子不为空的结点两次**，而其它结点只会经过一次。因此使用morris遍历打印先序序列时，如果来到的结点无左孩子，那么直接打印即可（这种结点只会经过一次），否则如果来到的结点的左子树的最右结点的右孩子为空才打印（这是第一次来到该结点的时机），这样也就忽略了`cur`经过的结点序列中第二次出现的结点；而使用morris遍历打印中序序列时，如果来到的结点无左孩子，那么直接打印（这种结点只会经过一次，左中右，没了左，直接打印中），否则如果来到的结点的左子树的最右结点不为空时才打印（这是第二次来到该结点的时机），这样也就忽略了`cur`经过的结点序列中第一次出现的重复结点。
+
+### 后序序列
+
+使用morris遍历得到二叉树的后序序列就没那么容易了，因为对于树种的非叶结点，morris遍历最多会经过它两次，而我们后序遍历实在第三次来到该结点时打印该结点的。因此要想得到后序序列，仅仅改变在morris遍历时打印结点的时机是无法做到的。
+
+但其实，在morris遍历过程中，如果在每次遇到第二次经过的结点时，将该结点的左子树的右边界上的结点从下到上打印，最后再将整个树的右边界从下到上打印，最终就是这个数的后序序列：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8ace72a83?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8ad102b9d?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8ae36d836?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8c2a5f049?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+其中无非就是在morris遍历中在第二次经过的结点的时机执行一下打印操作。而从下到上打印一棵树的右边界，可以将该右边界上的结点看做以`right`指针为后继指针的链表，将其反转`reverse`然后打印，最后恢复成原始结构即可。示例代码如下（其中容易犯错的地方是`18`行和`19`行的代码不能调换）：
+
+```java
+public static void posOrderByMorris(Node root) {
+    if (root == null) {
+        return;
+    }
+    Node cur = root;
+    while (cur != null) {
+        if (cur.left == null) {
+            cur = cur.right;
+        } else {
+            Node mostRight = cur.left;
+            while (mostRight.right != null && mostRight.right != cur) {
+                mostRight = mostRight.right;
+            }
+            if (mostRight.right == null) {
+                mostRight.right = cur;
+                cur = cur.left;
+            } else {
+                mostRight.right = null;
+                printRightEdge(cur.left);
+                cur = cur.right;
+            }
+        }
+    }
+    printRightEdge(root);
+}
+
+private static void printRightEdge(Node root) {
+    if (root == null) {
+        return;
+    }
+    //reverse the right edge
+    Node cur = root;
+    Node pre = null;
+    while (cur != null) {
+        Node next = cur.right;
+        cur.right = pre;
+        pre = cur;
+        cur = next;
+    }
+    //print 
+    cur = pre;
+    while (cur != null) {
+        System.out.print(cur.data + " ");
+        cur = cur.right;
+    }
+    //recover
+    cur = pre;
+    pre = null;
+    while (cur != null) {
+        Node next = cur.right;
+        cur.right = pre;
+        pre = cur;
+        cur = next;
+    }
+}
+
+public static void main(String[] args) {
+    Node root = new Node(1);
+    root.left = new Node(2);
+    root.right = new Node(3);
+    root.left.left = new Node(4);
+    root.left.right = new Node(5);
+    root.right.left = new Node(6);
+    root.right.right = new Node(7);
+    posOrderByMorris(root);
+}
+```
+
+### 时间复杂度分析
+
+因为morris遍历中，只有左孩子非空的结点才会经过两次而其它结点只会经过一次，也就是说遍历的次数小于`2N`，因此使用morris遍历得到先序、中序序列的时间复杂度自然也是`O(1)`；但产生后序序列的时间复杂度还要算上`printRightEdge`的时间复杂度，但是你会发现整个遍历的过程中，所有的`printRightEdge`加起来也只是遍历并打印了`N`个结点：
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e8c715ba38?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+因此时间复杂度仍然为`O(N)`。
+
+> morris遍历结点的顺序不是先序、中序、后序，而是按照自己的一套标准来决定接下来要遍历哪个结点。
+>
+> morris遍历的独特之处就是充分利用了叶子结点的无效引用（引用指向的是空，但该引用变量仍然占内存），从而实现了`O(1)`的时间复杂度。
+
+
+
+
+
+
+
+
+
+## 二、搜索二叉树（BST）
+
+**二叉查找树**（Binary Search Tree），也称为**二叉搜索树**、**有序二叉树**（ordered binary tree）或**排序二叉树**（sorted binary tree），是指一棵空树或者具有下列性质的[二叉树](https://zh.wikipedia.org/wiki/二叉树)：
+
+1. 若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
+2. 若任意节点的右子树不空，则右子树上所有节点的值均大于或等于它的根节点的值；
+3. 任意节点的左、右子树也分别为二叉查找树；
+
+二叉查找树相比于其他数据结构的优势在于查找、插入的[时间复杂度](https://zh.wikipedia.org/wiki/时间复杂度)较低。为 $O(log^N)$，最坏情况为：O(N)
 
 **详细解释见**： AlgorithmEasyDay03.md
 
@@ -230,9 +480,9 @@ public class MorrisTraversal {
 
 #### 1.AVL树
 
-AVL树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平衡性呢？那就是**所有子树的左子树和右子树的高度相差不超过1**。弊端是，每次发现因为插入、删除操作破坏了这种严苛的平衡性之后，都需要作出相应的调整以使其恢复平衡，调整较为频繁。
+AV L树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平衡性呢？那就是**所有子树的左子树和右子树的高度相差不超过1**。弊端是，每次发现因为插入、删除操作破坏了这种严苛的平衡性之后，都需要作出相应的调整以使其恢复平衡，调整较为频繁。
 
-#### 2.红黑树
+#### ==2.红黑树==
 
 红黑树是每个节点都带有颜色属性的搜索二叉树，颜色或红色或黑色。在搜索二叉树强制一般要求以外，对于任何有效的红黑树我们增加了如下的额外要求:
 
@@ -242,9 +492,9 @@ AVL树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平�
 - 性质4 每个红色节点的两个子节点都是黑色。(从每个叶子到根的所有路径上不能有两个连续的红色节点)
 - 性质5. 从任一节点到其每个叶子的所有路径都包含相同数目的黑色节点。
 
-这些约束强制了红黑树的关键性质: **从根到叶子的最长的可能路径不多于最短的可能路径的两倍长**。结果是这个树**大致上是平衡**的。因为操作比如插入、删除和查找某个值的最坏情况时间都要求与树的高度成比例，这个在高度上的理论上限允许红黑树在最坏情况下都是高效的，而不同于普通的二叉查找树。
+这些约束强制了红黑树的关键性质:==**从根到叶子的最长的可能路径不多于最短的可能路径的两倍长**==。结果是这个树**大致上是平衡**的。因为操作比如插入、删除和查找某个值的最坏情况时间都要求与树的高度成比例，这个在高度上的理论上限允许红黑树在最坏情况下都是高效的，而不同于普通的二叉查找树。
 
-要知道为什么这些特性确保了这个结果，注意到**性质4导致了路径不能有两个毗连的红色节点**就足够了。**最短的可能路径都是黑色节点，最长的可能路径有交替的红色和黑色节点**。因为根据性质5所有最长的路径都有相同数目的黑色节点，这就表明了没有路径能多于任何其他路径的两倍长。
+因为**性质 4 导致了路径不能有两个毗连的红色节点**就足够了。**最短的可能路径都是黑色节点，最长的可能路径有交替的红色和黑色节点**。因为根据性质5所有最长的路径都有相同数目的黑色节点，这就表明了没有路径能多于任何其他路径的两倍长。
 
 **红黑树结构**
 
@@ -586,7 +836,7 @@ public class RedBlackTree extends AbstractSelfBalancingBinarySearchTree {
 
 **Java中红黑树的使用**
 
-Java中红黑树的实现有`TreeSet`和`TreeMap`，前者结点存储的是单一数据，而后者存储的是``的形式。
+Java中红黑树的实现有`TreeSet`和`TreeMap`，前者结点存储的是单一数据，而后者存储的是`key-value`的形式。
 
 ```java
 public static void main(String[] args) {
@@ -619,7 +869,7 @@ public static void main(String[] args) {
 
 `TreeMap`的优势是`key`在其中是有序组织的，因此增加、删除、查找`key`的时间复杂度均为`log(2,N)`。
 
-#### 3.SBT树
+#### 3.SBT 树
 
 它是由中国广东中山纪念中学的陈启峰发明的。陈启峰于2006年底完成论文《Size Balanced Tree》，并在2007年的全国青少年信息学奥林匹克竞赛冬令营中发表。**相比红黑树、AVL树等自平衡二叉查找树，SBT更易于实现**。**据陈启峰在论文中称，SBT是“目前为止速度最快的高级二叉搜索树”**。**SBT能在O(log n)的时间内完成所有二叉搜索树(BST)的相关操作**，而与普通二叉搜索树相比，SBT仅仅加入了简洁的核心操作Maintain。由于SBT赖以保持平衡的是size域而不是其他“无用”的域，它可以很方便地实现动态顺序统计中的select和rank操作。
 
@@ -1026,9 +1276,9 @@ public class AbstractBinarySearchTree {
 
 ### （三）搜索二叉树调整的步骤：为了平衡性
 
-右旋：头结点变成了新头结点的右孩子
+==右旋：头结点变成了新头结点的右孩子==
 
-左旋：头结点变成了新头结点的左孩子
+==左旋：头结点变成了新头结点的左孩子==
 
 ![image-20200103223229101](AlgorithmMediumDay03.resource/image-20200103223229101.png)
 
@@ -1049,18 +1299,6 @@ public class AbstractBinarySearchTree {
     ![image-20200104114442568](AlgorithmMediumDay03.resource/image-20200104114442568.png)
 
 #### 1.旋转过程——Rebalance
-
-- 左旋：
-
-![左旋](https://user-gold-cdn.xitu.io/2019/2/19/169045e933a810ae?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
-
-- 右旋：
-
-![右旋](https://user-gold-cdn.xitu.io/2019/2/19/169045e93488e2a3?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
 
 每种平衡二叉树都有自己的一套在插入、删除等操作改变树结构而破坏既定平衡性时的应对措施（但都是左旋操作和右旋操作的组合），以AVL数为例（有四种平衡调整操作，其中的数字只是结点代号而非结点数值）：
 
@@ -1304,25 +1542,17 @@ public class AVLTree extends AbstractSelfBalancingBinarySearchTree {
 }
 ```
 
-
-
-
-
 ## 四、跳表
 
+![img](AlgorithmMediumDay03.resource/169045e96cbc2217.jpg)
 
-
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e96cbc2217?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
-
-跳表有着和红黑树、SBT树相同的功能，都能实现在`O(log(2,N))`内实现对数据的增删改查操作。但跳表不是以二叉树为原型的，其设计细节如下：
+跳表有着和红黑树、SBT树相同的功能，都能实现在$O(log_2^N))$内实现对数据的增删改查操作。但跳表不是以二叉树为原型的，其设计细节如下：
 
 记该结构为`SkipList`，该结构中可以包含有很多结点（`SkipListNode`），每个结点代表一个被添加到该结构的数据项。当实例化`SkipList`时，该对象就会自带一个`SkipListNode`（不代表任何数据项的头结点）。
 
 ### （一）添加数据
 
-当你向其中添加数据之前，首先会抛硬币，将第一次出现正面朝上时硬币被抛出的次数作为该数据的层数（`level`，**最小为1**），接着将数据和其层数封装成一个`SkipListNode`添加到`SkipList`中。结构初始化时，其头结点的层数为0，但每次添加数据后都会更新头结点的层数为所添数据中层数最大的。比如实例化一个`SkipList`后向其中添加一条层数为`3`的数据`7`：
+当你向其中添加数据之前，首先会抛硬币，将第一次出现正面朝上时硬币被抛出的次数作为该数据的层数（`level`，**最小为1**），接着将数据和其层数封装成一个`SkipListNode`添加到`SkipList`中。**结构初始化时，其头结点的层数为0，但每次添加数据后都会更新头结点的层数为所添数据中层数最大的**。比如实例化一个`SkipList`后向其中添加一条层数为`3`的数据`7`：
 
 
 
@@ -1330,7 +1560,7 @@ public class AVLTree extends AbstractSelfBalancingBinarySearchTree {
 
 
 
-这时如果再添加一条层数为`2`的数据`5`呢？首先游标`curNode`会从`head`的最高层出发往右走，走到数据项为7的结点，发现`7>5`，于是又退回来走向下一层：
+这时如果再添加一条层数为`2`的数据`5`呢？首先游标`curNode`会从`head`的最高层出发往右走，走到数据项为 7 的结点，发现`7>5`，于是又退回来走向下一层：
 
 
 
@@ -1354,9 +1584,9 @@ public class AVLTree extends AbstractSelfBalancingBinarySearchTree {
 
 
 
-至此层数为2的数据项`5`的添加操作完毕。
+至此层数为 `2` 的数据项`5`的添加操作完毕。
 
-那如果添加一个层数较高的数据项该如何处理呢？以添加层数为4的数据`10`为例：
+那如果添加一个层数较高的数据项该如何处理呢？以添加层数为 `4`的数据`10`为例：
 
 
 

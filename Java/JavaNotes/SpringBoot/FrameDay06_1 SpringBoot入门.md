@@ -12,7 +12,7 @@
 
 - 微服务：架构风格（服务微化）
 
-- 一个应用应该是一组小型服务，之间可以通过HTTP的方式进行互通；
+- 一个应用应该是一组小型服务，之间可以通过 HTTP 的方式进行互通；
 
 - 之前：单体应用：ALL IN ONE
 
@@ -20,14 +20,12 @@
 
 [详细参照微服务文档](https://martinfowler.com/articles/microservices.html#MicroservicesAndSoa)
 
-
-
 ## 三、环境准备
 
 - 环境约束
-    - jdk1.8：Spring Boot 推荐jdk1.7及以上；java version "1.8.0_112"
+    - jdk1.8：Spring Boot 推荐 jdk1.7 及以上；java version "1.8.0_112"
     
-    - maven3.6：maven 3.3以上版本；Apache Maven 3.3.9
+    - maven3.6：maven 3.3 以上版本；Apache Maven 3.3.9
     
     - IntelliJ IDEA2019：
     
@@ -56,21 +54,21 @@
 
 
 
-## 四、Spring Boot： HelloWorld实现
+## 四、Spring Boot： HelloWorld 实现
 
-实现的功能：浏览器发送hello请求，服务器接受请求并处理，响应Hello World字符串；
+实现的功能：浏览器发送 hello 请求，服务器接受请求并处理，响应 Hello World 字符串；
 
 ### （一）项目搭建
 
 - 方式一：
-    - 创建一个maven工程；（jar）
-    - 导入spring boot相关的依赖（maven.xml）
+    - 创建一个 maven 工程；（jar）
+    - 导入 spring boot 相关的依赖（maven.xml）
 
 ```xml
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.9.RELEASE</version>
+        <version>2.2.2.RELEASE</version>
     </parent>
     <dependencies>
         <dependency>
@@ -153,7 +151,7 @@ public class HelloController {
 
 ### （一）POM文件
 
-#### 1、父项目
+#### 1、父项目：作为版本仲裁
 
 ```xml
 <parent>
@@ -287,7 +285,7 @@ public @interface SpringBootApplication {
         public @interface EnableAutoConfiguration {
         ```
 
-        而点击 @AutoConfigurationPackage得到
+        而点击 @AutoConfigurationPackage 得到
 
         ```java
         @Target(ElementType.TYPE)
@@ -302,7 +300,7 @@ public @interface SpringBootApplication {
 
         - **@Import(AutoConfigurationPackages.Registrar.class)**：
 
-            `@Import（）`属于 Spring 的底层注解给容器中导入一个组件；导入的组件由`AutoConfigurationPackages.Registrar.class` 类来指定；点击之后在 registrar 类中的 registerBeanDefinitions方法（L122）
+            `@Import（）`属于 Spring 的底层注解给容器中导入一个组件；导入的组件由`AutoConfigurationPackages.Registrar.class` 类来指定；点击之后在 registrar 类中的 registerBeanDefinitions 方法（L122）
 
             ```java
             static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImports {
@@ -313,9 +311,9 @@ public @interface SpringBootApplication {
             }
             ```
 
-            通过 在 register 那行打断点然后 debug 之后，可以看到元数据 metadata 中的 注解（看调试窗口的 Variables 中 的 metadata 的 annotations ）是标注在 SPringBootApplication 中的，然后下面的 introspectedClass 可以看出是在 HelloXXXX 上面的，然后选择`new PackageImpot(metadata).getPackageName()`，右击选择`evalate expression`，计算包值得到 `result = com.gjxiaou`
+            通过在 register 那行打断点然后 debug 之后，可以看到元数据 metadata 中的 注解（看调试窗口的 Variables 中 的 metadata 的 annotations ）是标注在 SPringBootApplication 中的，然后下面的 introspectedClass 可以看出是在 HelloXXXX 上面的，然后选择`new PackageImpot(metadata).getPackageName()`，右击选择`evalate expression`，计算包值得到 `result = com.gjxiaou`
 
-        - 因此@**AutoConfigurationPackage**真正的是含义是：==将主配置类（用@SpringBootApplication标注的类）的所在包及下面所有子包里面的所有组件扫描到 Spring 容器；==
+        - 因此@**AutoConfigurationPackage**真正的是含义是：==将主配置类（用 @SpringBootApplication 标注的类）的所在包及下面所有子包里面的所有组件扫描到 Spring 容器；==
 
     - @**Import**(EnableAutoConfigurationImportSelector.class)；
     

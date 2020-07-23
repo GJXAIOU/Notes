@@ -11,9 +11,9 @@ style: summer
 
 - 数据库软件称为**DBMS（数据库管理系统**）；例如 MySQL
 - 数据库是通过 DBMS 创建和操纵的容器；
-- 模式：（schema）是关于数据库和表布局及特性的信息；
+- **模式：（schema）是关于数据库和表布局及特性的信息**；
 - 主键：（primary key）可以是一列或者一组列，其值能够唯一区分表中每一行；
-  - **表中列成为主键的条件**：
+  - **==表中列成为主键的条件==**：
     - 任意两行都不具有相同的主键值；
     - 每个行都必须有一个主键值（即主键值不能为 null）；
 
@@ -27,7 +27,7 @@ style: summer
 
 ## 章四：检索数据
 - MySQL4.1 之后的版本中 SQL 语句不区分大小写；
-- 使用`distinct`进行去重的时候，作用范围是所有列，不仅仅是前置它的列；
+- 使用`distinct`进行去重的时候，作用范围是**所有列**，不仅仅是前置它的列；
 - 使用`select`检索的结果中，第一行为行 0，即从 0 开始计数；
 - 使用`limit`限制显示行数，如果结果中没有足够的行，则只返回能返回的所有结果；
 
@@ -122,7 +122,9 @@ $    |   文本的结尾
 
 ### 拼接字段
 - 使用`concat()`函数来拼接两个列；
-实例：`select concat(vend_name,' (',vend_country,')') from vendors order by vend_name;`，这里是四个元素进行拼接，分别为列 `vend_name `、`(` 、`vend_country`、`)`
+实例：`select concat(vend_name,' (',vend_country,')') as XXX from vendors order by vend_name;`，这里是四个元素进行拼接，分别为列 `vend_name `、`(` 、`vend_country`、`)`
+最终是查询结果是按照列拼接的这种格式
+
 - 去除空格：
   - 删除数据左侧多余空格 ltrim()
   - 删除数据两侧多余空格 trim()

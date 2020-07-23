@@ -20,7 +20,7 @@
 
 ### （二）SpringMVC 运行原理图
 
-![SpringMVC 运行原理图](FrameDay03_1%20SpringMVC.resource/SpringMVC%20%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86%E5%9B%BE.png)
+<img src="FrameDay03_1%20SpringMVC.resource/SpringMVC%20%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86%E5%9B%BE.png" alt="SpringMVC 运行原理图" style="zoom: 67%;" />
 
 ### （三）Spring 容器和 SpringMVC 容器的关系
 
@@ -85,7 +85,7 @@
 	<!-- org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter -->
 	<!--下面配置相当于配置了上面两个-->
 	<mvc:annotation-driven></mvc:annotation-driven>
-	<!-- 配置不要拦截静态资源（js/css/html/图片文件），location为路径， mapping只是配置匹配规则-->
+	<!-- 配置不要拦截静态资源（js/css/html/图片文件），location 为路径， mapping 只是配置匹配规则-->
     <!-- /js/*： 表示 JS文件下所有文件，/js/**：表示js文件夹下面所有文件及其子文件-->
 	<mvc:resources location="/js/" mapping="/js/**"></mvc:resources>
 	<mvc:resources location="/css/" mapping="/css/**"></mvc:resources>

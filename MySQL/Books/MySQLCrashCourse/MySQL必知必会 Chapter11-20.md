@@ -1,5 +1,6 @@
 ---
 tags: [MySQL]
+style: summer
 ---
 
 # MySQL 必知必会 Chapter11-20
@@ -9,8 +10,6 @@ tags: [MySQL]
 ## 章十一：使用数据处理函数
 
 减少使用函数，但是函数的可移植性却不强；
-
-
 
 ### 文本处理函数
 
@@ -82,12 +81,12 @@ SUM()       |     返回某列值之和
 `SELECT avg(prod_price) AS avg_price FROM products;`
   - avg()只能作用于单列，获取 多列的平均值，要使用多个avg()
 `SELECT avg(item_price) AS avg_itemprice,avg(quantity) AS avg_quantity FROM orderitems;`
-  - avg()函数忽略列值为 null 的行；
+  - **avg()函数忽略列值为 null 的行**；
 
 - COUNT()实例
-  - COUNT(*)对表中行的数目进行计数，不忽略空值 
+  - **COUNT(*)对表中行的数目进行计数，不忽略空值** 
 `SELECT COUNT(*) AS num_cust FROM customers; `
-  - 使用COUNT(column)对特定列中具有值的行进行计数，忽略NULL值
+  - **使用COUNT(column)对特定列中具有值的行进行计数，忽略NULL值**
 `SELECT COUNT(cust_email) AS num_cust FROM customers;`  
 
 - max() & min()
@@ -136,7 +135,7 @@ FROM
 
 - GROUP BY 分组 
   - **如果分组列中具有 null 值，将 null 作为一个分组返回，如果有多组 null 值，则将他们分为一组**；
-  - **GROUP BY 子句必须出现在 WHERE 子句之后，order by 子句之前**；
+  - **==GROUP BY 子句必须出现在 WHERE 子句之后，order by 子句之前==**；
   - 示例：
 按vend_id**排序并分组**数据
 `SELECT vend_id, COUNT(*) AS num_prods FROM products GROUP BY vend_id;`
@@ -149,7 +148,7 @@ FROM
 `SELECT cust_id, COUNT(*) AS orders FROM orders GROUP BY cust_id HAVING COUNT(*)>=2;`
 或者使用：`SELECT cust_id, COUNT(*) AS orders FROM orders GROUP BY cust_id HAVING orders >= 2;`
 
-**WHERE 在数据分组前进行过滤，HAVING 在数据分组之后进行过滤；**
+==WHERE 在数据分组前进行过滤，HAVING 在数据分组之后进行过滤==；
 
 - WHERE和HAVING组合使用 （进行递进式查询）
 列出具有2个（含）以上、价格为10（含）以上的产品的供应商
@@ -185,7 +184,7 @@ ORDER BY ordertotal;
 **一般在使用 GROUP BY 子句时，同时给出 order by 子句，保证数据正确排序；**
 
 - SELECT子句总结及顺序 
-子句      |      说明             |           是否必须使用 
+子句     |      说明            |           是否必须使用 
 |---|---|---
 SELECT     |   要返回的列或表达式  |     是 
 FROM       |     从中检索数据的表  |       仅在从表选择数据时使用 
@@ -211,8 +210,8 @@ FROM customers
 WHERE cust_id IN (SELECT cust_id
                   FROM orders
                   WHERE order_num IN (SELECT order_num
-                                      FROM orderitems
-                                      WHERE prod_id = 'TNT2'));
+                              FROM orderitems
+                              WHERE prod_id ='TNT2'));
 ```
 
 - 子查询不要嵌套太多；
@@ -226,7 +225,7 @@ WHERE cust_id IN (SELECT cust_id
 
 - 关系表的定义
 关系表的设计就是要保证把信息分解成多个表，一类数据一个表，各表通过某些常用的值（即关系设计中的关系）互相连接；
-- 外键(foreign key): 外键为某个表的一列，它包含另一个表的主键值，定义了两个表之间的关系；
+- **外键(foreign key): 外键为某个表的一列，它包含另一个表的主键值，定义了两个表之间的关系**；
 - 联结：联结不是物理实体，在实际的数据库中不存在，联结仅仅存在于查询的执行中；
 
 ### 创建联结 
@@ -286,7 +285,7 @@ SELECT concat(rtrim(vend_name),' (',rtrim(vend_country),')') AS vend_title
  FROM vendors order by vend_name;
 ```
 
-**注意：** **表的别名只能在查询执行中使用，表别名不返回客户机**；
+**注意：表的别名只能在查询执行中使用，表别名不返回客户机**；
  给表起别名 
 ```sql
  SELECT cust_name,cust_contact 
@@ -330,7 +329,7 @@ and prod_id = 'FB';
 ### （三） 外部联结 
 **联结包含了那些在相关表中没有关联行的行**，这种联结称为外部联结；
 
-**注：**在使用 OUTER JOIN 语法时候，必须使用 RIGHT 或者 LEFT 关键字指定包括其所有行的表（RIGHT 指出的是 OUTER JOIN 右边的表，而 LEFT 指出的是 OUTER JOIN 左边的表）。
+**注：**==在使用 OUTER JOIN 语法时候，必须使用 RIGHT 或者 LEFT 关键字指定包括其所有行的表==（RIGHT 指出的是 OUTER JOIN 右边的表，而 LEFT 指出的是 OUTER JOIN 左边的表）。
 
 检索所有客户及其订单,包括那些没有订单的客户
 01 ： 左外部联结

@@ -1975,7 +1975,7 @@ public class LongestSubarrayLessSumAwesomeSolution {
 | 8      | 1                            |
 | 9      | 2                            |
 
-如果链表结点数为n，报数到m杀人，那么结点的新旧编号对应关系如下（其中`s`为报数为m的结点编号）：
+如果链表结点数为 n，报数到 m 杀人，那么结点的新旧编号对应关系如下（其中`s`为报数为m的结点编号）：
 
 
 

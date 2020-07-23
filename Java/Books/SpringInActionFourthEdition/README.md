@@ -1,5 +1,5 @@
 
-![Spring实战（第四版）]($resource/Spring%E5%AE%9E%E6%88%98%EF%BC%88%E7%AC%AC%E5%9B%9B%E7%89%88%EF%BC%89.png)
+![Spring实战（第四版）](https://github.com/GJXAIOU/Notes/blob/master/Java/Books/SpringInActionFourthEdition/README.resource/Spring%E5%AE%9E%E6%88%98%EF%BC%88%E7%AC%AC%E5%9B%9B%E7%89%88%EF%BC%89.png)
 
 
 - 书名：Spring 实战（第 4 版）

@@ -218,7 +218,8 @@ ${pageContext.request.contextPath }<br>
   	<jsp:forward page="WEB-INF/test.jsp"></jsp:forward>
 ```
 
-2 . JSTL标签
+## 2 . JSTL标签
+
  JSP Standard Tag Library JSP标准标签库 
  这是一个不断完善的JSP标签库，是由apache组织完不断维护的
 

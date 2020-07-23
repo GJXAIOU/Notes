@@ -1,7 +1,7 @@
 ---
 style: summer
 ---
-# FrameDay01_1 Mybatis3
+# FrameDay01_1 MyBatis3
 
 ## 一、前言：数据库 SQL命令
 
@@ -37,7 +37,7 @@ Createtable 表名(
 
 - M: Model 模型；实体类和业务和 dao
 - V: view 视图 ；现在一般使用. JSP
-- C: Controller 控制器，现在使用servlet
+- C: Controller 控制器，现在使用 servlet
   
   - 作用：视图和逻辑分离
 - MVC 适用场景:大型项目开发.
@@ -48,14 +48,13 @@ Createtable 表名(
   
   - 持久层DAO
   
-- 业务逻辑
-  
+  - 业务逻辑
+    
   - 控制器
   
   - 视图
-    
   
-    ![MVC开发模式](FrameDay01_1%20Mybatis.resource/MVC%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F.png)
+    <img src="FrameDay01_1%20Mybatis.resource/MVC%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F.png" alt="MVC开发模式" style="zoom:50%;" />
 
 ## 四、框架概念
 
@@ -80,7 +79,7 @@ Createtable 表名(
   - 底层是对 JDBC 的封装.
 
 - mybatis 优点之一:
-  - **使用 mybatis 时不需要编写实现类，只需要写需要执行的 sql 命令。**
+  - ==**使用 mybatis 时不需要编写实现类，只需要写需要执行的 sql 命令。**==
 
 
 ## 六、MyBatis 使用
@@ -108,7 +107,7 @@ slf4j-log4j.jar| 日志包
   - **在全局配置文件中引入 DTD 或 schema**【使用见 Blogs -> DTD】
     - 如果导入 dtd 后没有提示：Window--> preference --> XML --> XMl catalog --> add 按钮
   - 全局配置文件内容【MyBatis.xml】
-```MyBatis_xml
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!--注意这里是 configuration ，下面为 mybatis-3-config -->
 <!DOCTYPE configuration

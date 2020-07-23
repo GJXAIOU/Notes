@@ -2,15 +2,13 @@
 
 [TOC]
 
-
-
-## 一、实现二叉树的先序、中序、后序遍历
+## ==一、实现二叉树的先序、中序、后序遍历==
 
 二叉树的示例结构为：
 
 ![二叉树结构](AlgorithmEasyDay04.resource/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%BB%93%E6%9E%84.png)
 
-实际函数访问结点的顺序为：1 2 4 4 4 2 5 5 5 2 1 3 6 6 6 3 7 7 7 3 1 结束
+实际函数访问结点的顺序为：`1 2 4 4 4 2 5 5 5 2 1 3 6 6 6 3 7 7 7 3 1` 
 
 ### （一）使用递归的方式
 
@@ -18,86 +16,87 @@
 
 观察先序、中序、后序三个递归方法你会发现，不同点在于打印当前结点的值这一操作的时机。**你会发现==每个结点会被访问三次==**：进入方法时算一次、递归处理左子树完成之后返回时算一次、递归处理右子树完成之后返回时算一次。因此在 `preOrderRecursive` 中**将打印语句放到方法开始时就产生了先序遍历**；在`midOrderRecursive`中，**将打印语句放到递归处理左子树完成之后就产生了中序遍历**；同理**放在第三次访问时候打印就是后续遍历**。
 
-**实现代码**
+**实现代码：**
 
 ```java
-package com.gjxaiou.easy.day04;  
-  
-import java.util.Stack;  
-  
-/**  
- * 递归版本的先序、中序、后序遍历 
- * @author GJXAIOU  
+package com.gjxaiou.easy.day04;
+
+import java.util.Stack;
+
+/**
+ * 递归版和非递归版本的先序、中序、后序遍历
+ * @author GJXAIOU
  */
-public class PreInPosTraversal {  
-  
-    public static class Node {  
-        public int value;  
-        public Node left;  
-        public Node right;  
-  
-        public Node(int data) {  
-            this.value = data;  
-        }  
-    }  
-  
-    /**  
- * 递归版本实现先序、中序、后序遍历，唯一变化就是 print() 函数位置不同。 */ 
-    // 先序遍历  
-    public static void preOrderRecur(Node head) {  
-        if (head == null) {  
-            return;  
-        }  
-        System.out.print(head.value + " ");  
-        preOrderRecur(head.left);  
-        preOrderRecur(head.right);  
-    }  
-  
-    // 中序遍历  
-  public static void inOrderRecur(Node head) {  
-        if (head == null) {  
-            return;  
-        }  
-        inOrderRecur(head.left);  
-        System.out.print(head.value + " ");  
-        inOrderRecur(head.right);  
-    }  
-  
-    // 后序遍历  
-  public static void posOrderRecur(Node head) {  
-        if (head == null) {  
-            return;  
-        }  
-        posOrderRecur(head.left);  
-        posOrderRecur(head.right);  
-        System.out.print(head.value + " ");  
-    }  
-   
-    public static void main(String[] args) {  
-        Node head = new Node(5);  
-        head.left = new Node(3);  
-        head.right = new Node(8);  
-        head.left.left = new Node(2);  
-        head.left.right = new Node(4);  
-        head.left.left.left = new Node(1);  
-        head.right.left = new Node(7);  
-        head.right.left.left = new Node(6);  
-        head.right.right = new Node(10);  
-        head.right.right.left = new Node(9);  
-        head.right.right.right = new Node(11);  
-  
-        // recursive  
-  System.out.println("==============递归版本==============");  
-        System.out.print("pre-order: ");  
-        preOrderRecur(head);  
-        System.out.println();  
-        System.out.print("in-order: ");  
-        inOrderRecur(head);  
-        System.out.println();  
-        System.out.print("pos-order: ");  
-        posOrderRecur(head);  
-        System.out.println();  
-    }  
+public class PreInPosTraversal {
+
+    public static class Node {
+        public int value;
+        public Node left;
+        public Node right;
+
+        public Node(int data) {
+            this.value = data;
+        }
+    }
+
+    /**
+     * 递归版本实现先序、中序、后序遍历，唯一变化就是 print() 函数位置不同。
+     */
+    // 先序遍历：中（当前节点）、左、右
+    public static void preOrderRecur(Node head) {
+        if (head == null) {
+            return;
+        }
+        System.out.print(head.value + " ");
+        preOrderRecur(head.left);
+        preOrderRecur(head.right);
+    }
+
+    // 中序遍历：左、中（当前结点）、右
+    public static void inOrderRecur(Node head) {
+        if (head == null) {
+            return;
+        }
+        inOrderRecur(head.left);
+        System.out.print(head.value + " ");
+        inOrderRecur(head.right);
+    }
+
+    // 后序遍历：左、右、中（当前结点）
+    public static void posOrderRecur(Node head) {
+        if (head == null) {
+            return;
+        }
+        posOrderRecur(head.left);
+        posOrderRecur(head.right);
+        System.out.print(head.value + " ");
+    }
+
+    public static void main(String[] args) {
+        Node head = new Node(5);
+        head.left = new Node(3);
+        head.right = new Node(8);
+        head.left.left = new Node(2);
+        head.left.right = new Node(4);
+        head.left.left.left = new Node(1);
+        head.right.left = new Node(7);
+        head.right.left.left = new Node(6);
+        head.right.right = new Node(10);
+        head.right.right.left = new Node(9);
+        head.right.right.right = new Node(11);
+
+        // 递归版本
+        System.out.println("==============递归版本==============");
+        System.out.print("pre-order: ");
+        preOrderRecur(head);
+        System.out.println();
+        System.out.print("in-order: ");
+        inOrderRecur(head);
+        System.out.println();
+        System.out.print("pos-order: ");
+        posOrderRecur(head);
+        System.out.println();
+    }
 }
 ```
 
@@ -113,18 +112,16 @@ pos-order: 1 2 4 3 6 7 9 11 10 8 5
 
 
 
-
-
 ### （二）非递归方式
 因为递归使用的是栈，这里只需要自己实现一个栈结构即可；
 
 - **先序遍历**
-  ==拿到一棵树的根结点后，首先打印该结点的值，然后将其非空右孩子、非空左孩子依次压栈。栈非空循环：从栈顶弹出结点（一棵子树的根节点）并打印其值，再将其非空右孩子、非空左孩子依次压栈==。你会发现压栈的顺序和打印的顺序是相反的，压栈是先根结点，然后有右孩子就压右孩子、有左孩子就压左孩子，这是利用栈的后进先出。每次获取到一棵子树的根节点之后就可以获取其左右孩子，因此无需保留其信息，直接弹出并打印，然后保留其左右孩子到栈中即可。
-  **举个栗子**：先压入 1 ，然后弹出 1，先压入节点 1 的右孩子 3，然后压入左孩子 2，然后弹出栈顶 2，然后压入节点 2 的右孩子和左孩子，现在栈中顺序为：4 5 3，然后弹出 4，压入 4 的右孩子和左孩子，发现都没有，弹出栈顶 5，压入 5 的右孩子和左孩子，发现都没有，弹出栈顶 3，然后压入 3 的右孩子和左孩子，然后弹出栈顶 6，然后压入 6 的右、左孩子，都没有，弹出 7，压入右孩子、左孩子，没有，弹出发现为空，结束；
+  ==拿到一棵树的根结点后，首先打印该结点的值，然后将其非空右孩子、非空左孩子依次压栈。栈非空循环：从栈顶弹出结点（一棵子树的根节点）并打印其值，再将其非空右孩子、非空左孩子依次压栈==。即压栈的顺序和打印的顺序是相反的，压栈是先根结点，然后有右孩子就压右孩子、有左孩子就压左孩子，这是利用栈的后进先出。每次获取到一棵子树的根节点之后就可以获取其左右孩子，因此无需保留其信息，直接弹出并打印，然后保留其左右孩子到栈中即可。
+  **举个栗子**：先压入 1 ；然后弹出 1，先压入节点 1 的右孩子 3，然后压入左孩子 2，然后弹出栈顶 2，然后压入节点 2 的右孩子和左孩子，现在栈中顺序为：4 5 3，然后弹出 4，压入 4 的右孩子和左孩子，发现都没有，弹出栈顶 5，压入 5 的右孩子和左孩子，发现都没有，弹出栈顶 3，然后压入 3 的右孩子和左孩子，然后弹出栈顶 6，然后压入 6 的右、左孩子，都没有，弹出 7，压入右孩子、左孩子，没有，弹出发现为空，结束；
 
 
 - **中序遍历**
-  对于一棵树，将该树的左边界全部压栈，`root`的走向是只要左孩子不为空就走向左孩子。当左孩子为空时弹出栈顶结点（此时该结点是一棵左子树为空的树的根结点，根据中序遍历可以直接打印该结点，然后中序遍历该结点的右子树）打印，如果该结点的右孩子非空（说明有右子树），那么将其右孩子压栈，这个右孩子又可能是一棵子树的根节点，因此将这棵子树的左边界压栈，这时回到了开头，以此类推。
+  对于一棵树，将该树的左边界全部压栈，`root` 的走向是只要左孩子不为空就走向左孩子。当左孩子为空时弹出栈顶结点（此时该结点是一棵左子树为空的树的根结点，根据中序遍历可以直接打印该结点，然后中序遍历该结点的右子树）打印，如果该结点的右孩子非空（说明有右子树），那么将其右孩子压栈，这个右孩子又可能是一棵子树的根节点，因此将这棵子树的左边界压栈，这时回到了开头，以此类推。
 
   ==当前结点不为空的时候，将当前结点压入栈中，结点指针左移，指向左结点，直到当前结点为空，则从栈中将栈顶弹出打印，然后指针右移==；因为中序遍历输出顺序为左、中、右，所以先压当前的，然后压左边，弹出，在押右边。
   **举个栗子**：首先头结点 1 不为空，将该结点压入，然后指向节点 2，然后压入结点 2，然后压入结点 4，然后指向 null，因为栈不等于空，还得遍历，进入 else，弹出栈顶为 结点 4 ，指针指向 4，然后指向结点 4 的右结点为 null，然后再次弹出节点 2，然后指向结点 2 的右子节点 5，然后。。。。
@@ -133,15 +130,17 @@ pos-order: 1 2 4 3 6 7 9 11 10 8 5
 
 
 - **后序遍历**
-  **思路一**：准备两个栈，一个栈用来保存遍历时的结点信息，另一个栈用来排列后根顺序（根节点先进栈，右孩子再进，左孩子最后进）。
-  **思路二**：只用一个栈。借助两个变量`head`和`stackTopNode`，head 代表最近一次打印过的结点，`stackTopNode`代表栈顶结点。首先将根结点压栈，此后栈非空循环，令 `stackTopNode` 等于栈顶元素（`stackTopNode = stack.peek()`）执行以下三个分支：
-- `stackTopNode`的左右孩子是否与`head`相等，如果都不相等，说明`stackTopNode`的左右孩子都不是最近打印过的结点，同时因为左右孩子分别为左右子树的根节点，根据后序遍历的特点（左右中），左右子树肯定都没打印过，那么将左孩子压栈（打印左子树）。
-  - 分支 1 没有执行说明`stackTopNode`的左孩子要么不存在；要么左子树刚打印过了；要么右子树刚打印过了。这时如果是前两种情况中的一种，那就轮到打印右子树了，因此如果`stackTopNode`的右孩子非空就压栈。
-  - 如果前两个分支都没执行，说明`stackTopNode`的左右子树都打印完了，因此弹出并打印`stackTopNode`结点，更新一下`head`。
-
-
-
-**整体思路：** 后序遍历是左右中打印（需要用到两个栈，代码方式二是用的一个栈，不太好理解）；因为先序遍历是中、左、右，就是当前结点先压右孩子然后压左孩子，那么先使用中右左顺序（就是当前结果先压左孩子然后压右孩子）压入所有元素，同时将原来使用打印的语句更改为：将该元素存放到另一个栈中，但是不打印，全部遍历完成之后，将栈中的元素全部打印出来即可，这时候的顺序就是左右中了即为后序遍历；
+  
+  
+  - **思路一**：准备两个栈，一个栈用来保存遍历时的结点信息，另一个栈用来排列后根顺序（根节点先进栈，右孩子再进，左孩子最后进）。
+  - **思路二**：只用一个栈。借助两个变量`head`和`stackTopNode`，head 代表最近一次打印过的结点，`stackTopNode`代表栈顶结点。首先将根结点压栈，此后栈非空循环，令 `stackTopNode` 等于栈顶元素（`stackTopNode = stack.peek()`）执行以下三个分支：
+    
+    - `stackTopNode`的左右孩子是否与`head`相等，如果都不相等，说明`stackTopNode`的左右孩子都不是最近打印过的结点，同时因为左右孩子分别为左右子树的根节点，根据后序遍历的特点（左右中），左右子树肯定都没打印过，那么将左孩子压栈（打印左子树）。
+      
+      - 分支 1 没有执行说明`stackTopNode`的左孩子要么不存在；要么左子树刚打印过了；要么右子树刚打印过了。这时如果是前两种情况中的一种，那就轮到打印右子树了，因此如果`stackTopNode`的右孩子非空就压栈。
+      - 如果前两个分支都没执行，说明`stackTopNode`的左右子树都打印完了，因此弹出并打印`stackTopNode`结点，更新一下`head`。
+  
+  **整体思路：** 后序遍历是左右中打印（需要用到两个栈，代码方式二是用的一个栈，不太好理解）；因为先序遍历是中、左、右，就是当前结点先压右孩子然后压左孩子，那么先使用中右左顺序（就是当前结果先压左孩子然后压右孩子）压入所有元素，同时将原来使用打印的语句更改为：将该元素存放到另一个栈中，但是不打印，全部遍历完成之后，将栈中的元素全部打印出来即可，这时候的顺序就是左右中了即为后序遍历；
 
 **非递归方式实现**
 
@@ -152,7 +151,6 @@ import java.util.Stack;
 
 /**
  * 递归版和非递归版本的先序、中序、后序遍历
- *
  * @author GJXAIOU
  */
 public class PreInPosTraversal {
@@ -169,15 +167,14 @@ public class PreInPosTraversal {
 
     /**
      * 非递归版本实现先序、中序、后序遍历
-     *
-     * @param head
      */
+    // 非递归版本实现先序遍历
     public static void preOrderUnRecur(Node head) {
         System.out.print("pre-order: ");
         if (head != null) {
             // 准备一个栈
             Stack<Node> stack = new Stack<Node>();
-            // 放入头结点
+            // 首先放入头结点
             stack.add(head);
             while (!stack.isEmpty()) {
                 head = stack.pop();
@@ -193,6 +190,7 @@ public class PreInPosTraversal {
         System.out.println();
     }
 
+    // 非递归方式实现中序遍历
     public static void inOrderUnRecur(Node head) {
         System.out.print("in-order: ");
         if (head != null) {
@@ -213,7 +211,7 @@ public class PreInPosTraversal {
         System.out.println();
     }
 
-    // 后序遍历：先使用中左右的顺序将元素压入栈中，然后遍历栈弹出即可
+    // 后序遍历方式一：先使用中左右的顺序将元素压入栈中，然后遍历栈弹出即可
     public static void posOrderUnRecur1(Node head) {
         System.out.print("pos-order: ");
         if (head != null) {
@@ -232,6 +230,7 @@ public class PreInPosTraversal {
                     stack1.push(head.right);
                 }
             }
+
             // 逐个弹出栈 stack2 中元素即为左、右、中顺序
             while (!stack2.isEmpty()) {
                 System.out.print(stack2.pop().value + " ");
@@ -240,7 +239,7 @@ public class PreInPosTraversal {
         System.out.println();
     }
 
-    // 另一种实现后续：使用一个栈
+    // 后续遍历方式二：使用一个栈
     // head 表示最近被打印的结点
     public static void posOrderUnRecur2(Node head) {
         System.out.print("pos-order: ");
@@ -281,7 +280,7 @@ public class PreInPosTraversal {
         head.right.right.left = new Node(9);
         head.right.right.right = new Node(11);
 
-        // unRecursive
+        // 非递归版本
         System.out.println("============非递归版本=============");
         preOrderUnRecur(head);
         inOrderUnRecur(head);
@@ -289,7 +288,6 @@ public class PreInPosTraversal {
         posOrderUnRecur2(head);
     }
 }
-
 ```
 程序运行结果：
 ```java
@@ -429,28 +427,27 @@ public class Node {
     }
 }
 ```
-该结构比普通二叉树节点结构多了一个指向父节点的 parent 指针。假设有一 棵 Node 类型的节点组成的二叉树，树中每个节点的 parent 指针都正确地指向自己的父节点，头节点的 parent 指向 null。只给一个在二叉树中的某个节点 node，请实现返回 node 的后继节点的函数。
+> 该结构比普通二叉树节点结构多了一个指向父节点的 parent 指针。假设有一 棵 Node 类型的节点组成的二叉树，树中每个节点的 parent 指针都正确地指向自己的父节点，头节点的 parent 指向 null。只给一个在二叉树中的某个节点 node，请实现返回 node 的后继节点的函数。
 
 【概念】==在二叉树中，前驱结点和后继结点是按照二叉树中两个结点被**中序遍历**的先后顺序来划分的==。以下面的树形结构为例，中序遍历结果为：`4 2 5 1 6 3 7`，则 `1` 的后继结点为 `6`，前驱结点为 `5`；
 
 ![二叉树结构](AlgorithmEasyDay04.resource/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%BB%93%E6%9E%84.png)
 
 
-【解答】
-- **一般方法**：可以通过给定结点的 parent 指针一直找到根结点，然后从根节点中序遍历整个树，在遍历到该结点的时候标记一下，那么下一个要打印的结点就是该结点的后继结点。最后根据中序遍历的结果得到每个结点的后继结点；
+【解答方法】
+- **一般方法**：==通过给定结点的 parent 指针一直找到根结点，然后从根节点中序遍历整个树，在遍历到该结点的时候标记一下，那么下一个要打印的结点就是该结点的后继结点。最后根据中序遍历的结果得到每个结点的后继结点；==
 	- 时间复杂度为：O(N)
 - **改进解法**：
-  例如 5 的后继结点为 1，能不能通过 5 2 1 这样的结构找到，即当前结点距离后继结点的距离长度就是所要的复杂度；
-  - **具体方案**：
-    - 如果一个结点有右子树，则后继结点就是其右子树上最左边的结点；例：1 的后继为 6；
-    - 如果没有右子树，则使用 parent 指针一直向上找（指向当前结点的指针和 parent 指针同时向上移动），一直到当前指向的结点是当前结点父结点的左孩子就停止，则该父结点就是所求结点的后继结点；
-    示例图：
-    ![题目三寻找后继结点示例](AlgorithmEasyDay04.resource/%E9%A2%98%E7%9B%AE%E4%B8%89%E5%AF%BB%E6%89%BE%E5%90%8E%E7%BB%A7%E7%BB%93%E7%82%B9%E7%A4%BA%E4%BE%8B.png)
-    以结点 11 为例，其父结点为 5，11 不是 5 的左结点，向上，5 的父结点为 2，5 不是 2 的左结点，向上，2 是 1 的左结点，则节点 11 的后继结点为 1；
+  例如 5 的后继结点为 1，能不能通过 5 2 1 这样的结构找到，即当前结点距离后继结点的距离长度就是所要的复杂度；**具体方案为：**
+  - ==如果一个结点有右子树，则后继结点就是其右子树上最左边的结点==；例：1 的后继为 6；
+  - ==如果没有右子树，则使用 parent 指针一直向上找（指向当前结点的指针和 parent 指针同时向上移动），一直到当前指向的结点是当前结点父结点的左孩子就停止，则该父结点就是所求结点的后继结点；==
+  **示例图**：以结点 11 为例，其父结点为 5，11 不是 5 的左结点，向上，5 的父结点为 2，5 不是 2 的左结点，向上，2 是 1 的左结点，则节点 11 的后继结点为 1；
+  ![题目三寻找后继结点示例](AlgorithmEasyDay04.resource/%E9%A2%98%E7%9B%AE%E4%B8%89%E5%AF%BB%E6%89%BE%E5%90%8E%E7%BB%A7%E7%BB%93%E7%82%B9%E7%A4%BA%E4%BE%8B.png)
 
-**补充：求前驱结点：**方案如下：
-如果结点有左子树，该结点的前驱就是左子树的最右边结点；
-如果结点没有左子树，就一直往上找，直到指向的结点是其父结点的右孩子为止；
+### 补充问题：求直接前驱结点的方案如下
+
+- 如果结点有左子树，该结点的前驱就是左子树的最右边结点；
+- 如果结点没有左子树，就一直往上找，直到指向的结点是其父结点的右孩子为止；
 
 
 ```java
@@ -483,7 +480,7 @@ public class SuccessorNode {
             return getLeftMost(root.right);
         } else {
             Node parent = root.parent;
-            // 当前节点是父结点的左孩子则停止；整棵树最右边的节点是没有后继的，例如节点7，最终一直上升到节点1，但是节点1的 parent指向null，所有最后返回
+            // 当前节点是父结点的左孩子则停止；整棵树最右边的节点是没有后继的，例如节点7，最终一直上升到节点1，但是节点1的 parent指向null，所有最后返回o
             // null表示没有后继；
             while (parent != null && parent.left != root) {
                 root = parent;
@@ -493,6 +490,7 @@ public class SuccessorNode {
         }
     }
 
+    // 获取以该结点为根节点的树上最左的结点
     public static Node getLeftMost(Node node) {
         if (node == null) {
             return node;
@@ -503,6 +501,7 @@ public class SuccessorNode {
         return node;
     }
 
+    //////  测试程序
     public static void main(String[] args) {
         Node head = new Node(6);
         head.parent = null;
@@ -547,7 +546,6 @@ public class SuccessorNode {
         System.out.println(test.value + " next: " + getSuccessorNode(test));
     }
 }
-
 ```
 程序运行结果为：
 ```java
@@ -901,21 +899,24 @@ down down up down down up up down down down up up down up up
 
 
 
-## 六、判断一棵二叉树是否是平衡二叉树
+## ==六、判断一棵二叉树是否是平衡二叉树==
 
-【**平衡二叉树概念**】当二叉树的任意一棵子树的左子树的高度和右子树的高度相差不超过 1 时，该二叉树为平衡二叉树。
+### （一）平衡二叉树概念
 
-【**解答方案**】根据定义可知，要确认一个二叉树是否是平衡二叉树势必要遍历所有结点。
+当二叉树的任意一棵子树的左子树的高度和右子树的高度相差不超过 1 时，该二叉树为平衡二叉树。
 
-即将问题分解为：只要保证以每个结点为根节点的树是否平衡；而遍历到每个结点时，要想知道以该结点为根结点的子树是否是平衡二叉树，首先判断该结点的左子树是否平衡，然后判断该结点的右子树是否平衡，如果两个子树都平衡，分别计算左子树和右子树的高度。因此我们要收集两个信息：
+### （二）解答方案：确保以每个结点为根节点的树都是平衡二叉树
 
-- 该结点的左子树、右子树是否是平衡二叉树
+将问题分解为：只要保证以二叉树的每个结点为根节点的树是否平衡；而遍历到每个结点时，要想知道以该结点为根结点的子树是否是平衡二叉树，首先判断该结点的左子树是否平衡，然后判断该结点的右子树是否平衡，如果两个子树都平衡，分别计算左子树和右子树的高度。因此我们要收集两个信息：
 
-- 左右子树的高度分别是多少，相差是否超过 1
+- 该结点的左子树、右子树是否是平衡二叉树。
+
+- 左右子树的高度分别是多少，相差是否超过 1。
 
 那么我们来到某个结点时（子过程），我们需要向上层（父过程）**返回的信息就是该结点为根结点的树是否是平衡二叉树以及以该结点为根的树高度**，这样的话，父过程就能继续向上层返回应该收集的信息。
 
-【**方案改进**】
+### （三）方案改进：通过递归收集左右子树信息
+
 因为使用递归进行二叉树的遍历的时候，每个递归函数会到一个节点 3 次：首先会到一次，然后访问左子树之后会回来一次，最后访问右子树之后会回来一次； 对于二叉树使用递归的时候，首先想办法收集一下左子树上的信息，然后想办法收集一下右子树上的信息，最后将这些信息进行整合皆可以得到该结点所在的整棵树符不符合标准；本题中的标准就是判断该数是否平衡；
 
 ```java
@@ -983,7 +984,7 @@ public class IsBalancedTree {
 true
 ```
 
-### 注：递归过程总结
+### ==注：递归过程总结==
 
 递归很好用，该题中的递归用法也是一种经典用法，可以高度套路：
 
@@ -995,153 +996,163 @@ true
 
   
 
-## 七、判断一棵树是否是搜索二叉树或者完全二叉树
+## 七、判断是否是搜索二叉树或者完全二叉树
 ### （一）搜索二叉树 BST
-【**搜索二叉树 BST 概念**】对于二叉树的任意一棵子树，其左子树上的**所有**结点的值小于该子树的根节点的值，而其右子树上的**所有**结点的值大于该子树的根结点的值，并且整棵树上任意两个结点的值不同（重复的结点的值可以通过 List 的形式进行存放）。
+【**搜索二叉树 BST 概念**】
+
+==对于二叉树的任意一棵子树，其左子树上的**所有**结点的值小于该子树的根节点的值，而其右子树上的**所有**结点的值大于该子树的根结点的值，并且整棵树上任意两个结点的值不同（重复的结点的值可以通过 List 的形式进行存放）。==
 
 【**解答方案**】 **根据二叉树的中序遍历看是否递增**
-根据定义，搜索二叉树的**中序遍历**打印将是一个升序序列。因此我们可以利用二叉树的中序遍历的非递归方式，比较中序遍历时相邻两个结点的大小，只要有一个结点的值小于其后继结点的那就不是搜索二叉树。
+根据定义，==搜索二叉树的**中序遍历**打印将是一个升序序列==。因此我们可以利用二叉树的中序遍历的非递归方式，比较中序遍历时相邻两个结点的大小，只要有一个结点的值小于其后继结点的那就不是搜索二叉树。
 下面代码提供的是递归版本，如果想要非递归版本，只要将中序遍历的非递归版本的打印方法去掉，然后改成与上一个结点值的比较即可（可以采用一个变量保存上一个结点的值）；
 
 
 ### （二）完全二叉树 CBT 
-【**完全二叉树 CBT 概念**】如果二叉树上某个结点有右孩子无左孩子则一定不是完全二叉树；如果二叉树上某个结点有左孩子而没有右孩子，那么该结点所在的那一层上，该结点右侧的所有结点应该都是叶子结点，否则不是完全二叉树。
+【**完全二叉树 CBT 概念**】
+
+==如果二叉树上某个结点有右孩子无左孩子则一定不是完全二叉树；如果二叉树上某个结点有左孩子而没有右孩子，那么该结点所在的那一层上，该结点右侧的所有结点应该都是叶子结点，否则不是完全二叉树。==
 
 【**解答方案**】 将二叉树**按层遍历**，如果结点有右孩子但是没有左孩子则一定不是完全二叉树，如果不符合上面，则接着判断是否是有左孩子没有右孩子或者是两个都没有，如果是这种情况则该结点下面的所有节点都必须是叶子结点；否则就不是完全二叉树；
 
 
 ```java
-package com.gjxaiou.easy.day04;  
-  
-import java.util.LinkedList;  
-import java.util.Queue;  
-  
-/**  
- * 判断是否为搜索二叉树、完全二叉树 
- * @author GJXAIOU  
+package com.gjxaiou.easy.day04;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+/**
+ * 判断是否为搜索二叉树、完全二叉树
+ *
+ * @author GJXAIOU
  */
- public class IsBSTAndCBT {  
-  
-    public static class Node {  
-        public int value;  
-        public Node left;  
-        public Node right;  
-  
-        public Node(int data) {  
-            this.value = data;  
-        }  
-    }  
-  
-   /**  
-    * 判断是否为搜索二叉树 
-    */  
-     public static boolean isBST(Node head) {  
-        if (head == null) {  
-            return true;  
-        }  
-        boolean res = true;  
-        Node pre = null;  
-        Node cur1 = head;  
-        Node cur2 = null;  
-        while (cur1 != null) {  
-            cur2 = cur1.left;  
-            if (cur2 != null) {  
-                while (cur2.right != null && cur2.right != cur1) {  
-                    cur2 = cur2.right;  
-                }  
-                if (cur2.right == null) {  
-                    cur2.right = cur1;  
-                    cur1 = cur1.left;  
-                    continue;  
-                } else {  
-                    cur2.right = null;  
-                }  
-            }  
-            // 中序遍历之后如果不是递增数列，就不是搜索二叉树  
-  if (pre != null && pre.value > cur1.value) {  
-                res = false;  
-            }  
-            pre = cur1;  
-            cur1 = cur1.right;  
-        }  
-        return res;  
-    }  
-  
-    /**  
+public class IsBSTAndCBT {
+
+    public static class Node {
+        public int value;
+        public Node left;
+        public Node right;
+
+        public Node(int data) {
+            this.value = data;
+        }
+    }
+
+    /**
+     * 判断是否为搜索二叉树
+     * 方法：中序遍历为递增
+     */
+    public static boolean isBST(Node head) {
+        if (head == null) {
+            return true;
+        }
+        boolean res = true;
+        Node pre = null;
+        Node cur1 = head;
+        Node cur2 = null;
+        while (cur1 != null) {
+            cur2 = cur1.left;
+            // 如果当前结点的左孩子存在
+            if (cur2 != null) {
+                // 当前结点的左孩子的右孩子不为空并且不等于当前结点
+                while (cur2.right != null && cur2.right != cur1) {
+                    cur2 = cur2.right;
+                }
+                if (cur2.right == null) {
+                    cur2.right = cur1;
+                    cur1 = cur1.left;
+                    continue;
+                } else {
+                    cur2.right = null;
+                }
+            }
+            // 中序遍历之后如果不是递增数列，就不是搜索二叉树
+            if (pre != null && pre.value > cur1.value) {
+                res = false;
+            }
+            pre = cur1;
+            cur1 = cur1.right;
+        }
+        return res;
+    }
+
+    /**
      * 判断是否为完全二叉树
-     */  
-  public static boolean isCBT(Node head) {  
-        if (head == null) {  
-            return true;  
-        }  
-        Queue<Node> queue = new LinkedList<Node>();  
-        boolean leaf = false;  
-        Node l = null;  
-        Node r = null;  
-        queue.offer(head);  
-        while (!queue.isEmpty()) {  
-            head = queue.poll();  
-            l = head.left;  
-            r = head.right;  
-            if ((leaf && (l != null || r != null)) || (l == null && r != null)) {  
-                return false;  
-            }  
-            if (l != null) {  
-                queue.offer(l);  
-            }  
-            if (r != null) {  
-                queue.offer(r);  
-            } else {  
-                // 左等于空或者右等于空 则开启。因为上面代码已经去掉左等于空的情况，因此这里只需要判断右是否为空；  
-  leaf = true;  
-            }  
-        }  
-        return true;  
-    }  
-  
-    // for test -- print tree  
-  public static void printTree(Node head) {  
-        System.out.println("Binary Tree:");  
-        printInOrder(head, 0, "H", 17);  
-        System.out.println();  
-    }  
-  
-    public static void printInOrder(Node head, int height, String to, int len) {  
-        if (head == null) {  
-            return;  
-        }  
-        printInOrder(head.right, height + 1, "v", len);  
-        String val = to + head.value + to;  
-        int lenM = val.length();  
-        int lenL = (len - lenM) / 2;  
-        int lenR = len - lenM - lenL;  
-        val = getSpace(lenL) + val + getSpace(lenR);  
-        System.out.println(getSpace(height * len) + val);  
-        printInOrder(head.left, height + 1, "^", len);  
-    }  
-  
-    public static String getSpace(int num) {  
-        String space = " ";  
-        StringBuffer buf = new StringBuffer("");  
-        for (int i = 0; i < num; i++) {  
-            buf.append(space);  
-        }  
-        return buf.toString();  
-    }  
-  
-    public static void main(String[] args) {  
-        Node head = new Node(4);  
-        head.left = new Node(2);  
-        head.right = new Node(6);  
-        head.left.left = new Node(1);  
-        head.left.right = new Node(3);  
-        head.right.left = new Node(5);  
-  
-        printTree(head);  
-        System.out.println(isBST(head));  
-        System.out.println(isCBT(head));  
-  
-    }  
+     */
+    public static boolean isCBT(Node head) {
+        if (head == null) {
+            return true;
+        }
+        Queue<Node> queue = new LinkedList<Node>();
+        boolean leaf = false;
+        Node left = null;
+        Node right = null;
+        queue.offer(head);
+        while (!queue.isEmpty()) {
+            head = queue.poll();
+            left = head.left;
+            right = head.right;
+            // 有右孩子没有左孩子一定不是；如果两个孩子都没有，该结点下面结点必须是叶子结点；有左孩子没有右孩子则下面所有节点都是叶子节点。
+            if ((leaf && (left != null || right != null)) || (left == null && right != null)) {
+                return false;
+            }
+            if (left != null) {
+                queue.offer(left);
+            }
+            if (right != null) {
+                queue.offer(right);
+            } else {
+                // 左等于空或者右等于空 则开启。因为上面代码已经去掉左等于空的情况，因此这里只需要判断右是否为空；
+                leaf = true;
+            }
+        }
+        return true;
+    }
+    
+
+    // 测试程序：打印二叉树
+    public static void printTree(Node head) {
+        System.out.println("Binary Tree:");
+        printInOrder(head, 0, "H", 17);
+        System.out.println();
+    }
+
+    public static void printInOrder(Node head, int height, String to, int len) {
+        if (head == null) {
+            return;
+        }
+        printInOrder(head.right, height + 1, "v", len);
+        String val = to + head.value + to;
+        int lenM = val.length();
+        int lenL = (len - lenM) / 2;
+        int lenR = len - lenM - lenL;
+        val = getSpace(lenL) + val + getSpace(lenR);
+        System.out.println(getSpace(height * len) + val);
+        printInOrder(head.left, height + 1, "^", len);
+    }
+
+    public static String getSpace(int num) {
+        String space = " ";
+        StringBuffer buf = new StringBuffer("");
+        for (int i = 0; i < num; i++) {
+            buf.append(space);
+        }
+        return buf.toString();
+    }
+
+    public static void main(String[] args) {
+        Node head = new Node(4);
+        head.left = new Node(2);
+        head.right = new Node(6);
+        head.left.left = new Node(1);
+        head.left.right = new Node(3);
+        head.right.left = new Node(5);
+
+        printTree(head);
+        System.out.println(isBST(head));
+        System.out.println(isCBT(head));
+
+    }
 }
 ```
 程序运行结果
@@ -1159,13 +1170,20 @@ true
 ```
 
 ## 八、已知一棵完全二叉树，求其节点的个数
-要求：时间复杂度低于O(N)，N为这棵树的节点个数
+要求：时间复杂度低于 O(N)，N 为这棵树的节点个数
+
+### （一）获取完全二叉树的高度
 
 **遍历到左子树的最左边结点就得到了树的高度**
 
+### （二）满二叉树结点数目
+
 如果我们遍历二叉树的每个结点来计算结点个数，那么时间复杂度将是 $O(N^2)$，我们可以利用满二叉树的结点个数为 $2^{h} -1$（h 为树的层数）来加速这个过程。
 
-首先对于完全二叉树，如果其右子树的最左结点在树的最后一层，那么其左子树肯定是满二叉树，且高度为 h - 1（注意：是左子树的高度为 h - 1）；否则其右子树肯定是满二叉树，且高度为 h - 2（如果右子树的高度为 `h - 1`，则说明左子树是满二叉树，如果右子树高度为 `h - 2` 则说明右子树是满二叉树）。也就是说，对于一个完全二叉树结点个数的求解，我们可以分解求解过程：1个根结点+ 一棵满二叉树（高度为 h - 1 或者 h - 2）+ 一棵完全二叉树（高度为 h - 1）。前两者的结点数是可求的（$1 + 2^{level} - 1$ = $2^{level}$），后者就又成了求一棵完全二叉树结点数的问题了，可以使用递归。
+### （三）计算过程
+
+- 首先对于完全二叉树，如果其右子树的最左结点在树的最后一层，那么其左子树肯定是满二叉树，且高度为 h - 1（注意：是左子树的高度为 h - 1）；
+- 否则其右子树肯定是满二叉树，且高度为 h - 2（如果右子树的高度为 `h - 1`，则说明左子树是满二叉树，如果右子树高度为 `h - 2` 则说明右子树是满二叉树）。也就是说，对于一个完全二叉树结点个数的求解，我们可以分解求解过程：1个根结点+ 一棵满二叉树（高度为 h - 1 或者 h - 2）+ 一棵完全二叉树（高度为 h - 1）。前两者的结点数是可求的（$1 + 2^{level} - 1$ = $2^{level}$），后者就又成了求一棵完全二叉树结点数的问题了，可以使用递归。
 
 ![image-20200219120345996](AlgorithmEasyDay04.resource/image-20200219120345996.png)
 

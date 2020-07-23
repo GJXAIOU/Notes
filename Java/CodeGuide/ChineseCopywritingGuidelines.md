@@ -1,43 +1,5 @@
 # 中文文案排版指北
-[![devDependency Status](https://david-dm.org/mzlogin/chinese-copywriting-guidelines/dev-status.svg)](https://david-dm.org/mzlogin/chinese-copywriting-guidelines#info=devDependencies)
-
-统一中文文案、排版的相关用法，降低团队成员之间的沟通成本，增强网站气质。
-
-Other languages:
-
-- [English](README.en.md)
-- [Chinese Traditional](https://github.com/sparanoid/chinese-copywriting-guidelines)
-- [Chinese Simplified](README.md)
-
------
-
-## 目录
-
-<!-- vim-markdown-toc GFM -->
-
-* [空格](#空格)
-    * [中英文之间需要增加空格](#中英文之间需要增加空格)
-    * [中文与数字之间需要增加空格](#中文与数字之间需要增加空格)
-    * [数字与单位之间无需增加空格](#数字与单位之间无需增加空格)
-    * [全角标点与其他字符之间不加空格](#全角标点与其他字符之间不加空格)
-    * [`-ms-text-autospace` to the rescue?](#-ms-text-autospace-to-the-rescue)
-* [标点符号](#标点符号)
-    * [不重复使用标点符号](#不重复使用标点符号)
-* [全角和半角](#全角和半角)
-    * [使用全角中文标点](#使用全角中文标点)
-    * [数字使用半角字符](#数字使用半角字符)
-    * [遇到完整的英文整句、特殊名词，其內容使用半角标点](#遇到完整的英文整句特殊名词其內容使用半角标点)
-* [名词](#名词)
-    * [专有名词使用正确的大小写](#专有名词使用正确的大小写)
-    * [不要使用不地道的缩写](#不要使用不地道的缩写)
-* [争议](#争议)
-    * [链接之间增加空格](#链接之间增加空格)
-    * [简体中文使用直角引号](#简体中文使用直角引号)
-* [工具](#工具)
-* [谁在这样做？](#谁在这样做)
-* [参考文献](#参考文献)
-
-<!-- vim-markdown-toc -->
+> 文章引用自：https://github.com/sparanoid/chinese-copywriting-guidelines
 
 ## 空格
 

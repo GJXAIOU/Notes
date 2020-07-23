@@ -420,6 +420,7 @@ public class SpittleControllerTest {
     @Test
     public void shouldShowRecentSpittles() throws Exception {
         List<Spittle> expectedSpittles = createSpittleList(20);
+        // 首先创建 SpittleRepository 接口的 mock 实现，这个实现从 findSpittles() 方法中返回 20 个 Spittle 对象；
         SpittleRepository mockRepository = Mockito.mock(SpittleRepository.class);
         Mockito.when(mockRepository.findSpittles(Long.MAX_VALUE, 20)).thenReturn(expectedSpittles);
 
@@ -448,6 +449,12 @@ public class SpittleControllerTest {
 ```
 
 SpittleController中，使用@Autowired注解注入了spittleRepository属性。
+
+
+
+==到P151 页了，少了一个 Controller 方法==
+
+
 
 需要注意的是`spittles()`方法使用了Model（_控制器和视图之间传递的数据_）作为入参，Model本质上是一个map，它会被传送至view，因此数据可以提供给客户端。如果在调用`addAttribute()`方法时没有指定key，那么就会从传入的对象中获取，比如代码中传入的参数属性是List，那么key就是spittleList。最后，该方法返回spittles作为传动给model的视图名称。
 

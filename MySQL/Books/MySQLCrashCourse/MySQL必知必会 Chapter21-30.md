@@ -1,5 +1,6 @@
 ---
 tags: [MySQL]
+style: summer
 ---
 
 # MySQL 必知必会 Chapter21-30
@@ -69,7 +70,7 @@ rename table backup_customers to customer,
 
 - 视图（需要 MySQL5.0 以上）提供了一种MySQL的SELECT语句层次的封装，可用来简化数据处理以及重新格式化基础数据或保护基础数据。 
 
-- 视图是虚拟的表，它不包含表中应该有的任何列或者数据，视图只包含使用时动态检索数据的 SQL 查询；
+- **视图是虚拟的表，它不包含表中应该有的任何列或者数据，视图只包含使用时动态检索数据的 SQL 查询**；
 
 - 使用视图的作用：
   - 重用 SQL 语句；
