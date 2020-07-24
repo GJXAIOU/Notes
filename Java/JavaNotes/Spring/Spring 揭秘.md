@@ -607,19 +607,19 @@ propertyPostProcessor.setLocation(new ClassPathResource("..."));
 
 **除了 BeanFactory 之外拓展功能**：统一资源加载策略、国际化信息支持、容器内部事件发布、多配置模块加载的简化。BeanFactoryPostProcessor、BeanPostProcessor 以及其他特殊类型 bean 的自动识别，容器启动后 bean 实例的自动初始化。
 
-Spring 为基本的 BeanFactory 类型容器提供了 XmlBeanFactory 实现，同样为 ApplicationContext 类型提供了 FileSystemXmlApplicationContext、ClassPathXmlApplicationContext、XmlWebApplicationContext 常见的实现，分别表示从文件系统、Classpath 加载 bean 定义以及相应资源的 ApplicationContext 实现。和用于 web 资源的 ApplicationContext 实现。
+Spring 为基本的 BeanFactory 类型容器提供了 XmlBeanFactory 实现，同样为 ApplicationContext 类型提供了 `FileSystemXmlApplicationContext`、`ClassPathXmlApplicationContext`、`XmlWebApplicationContext` 常见的实现，分别表示从文件系统、Classpath 加载 bean 定义以及相应资源和用于 web 资源的 ApplicationContext 实现。
 
 ### 5.1 统一资源加载策略
 
-标准类 java.net.URL 中，URL（Uniform Resource Locator）统一资源定位符，其基本实现通常局限于网络形式发布的资源的查找和定位工作，即基本上只提供了基于 HTTP、FTP、File 等协议的资源定位问题。但是资源可以以任何资源形式存在，包括二进制、字节流、文件等等形式，存放位置也包括文件系统、classpath等位置。**所以 url 类功能职责划分不清、资源查找和表示没有清晰的界限，资源查找后的形式多种多样，没有统一的抽象**。**要实现：资源查找完成返回给客户端的应该是一个统一的资源抽象接口，客户端对资源的处理应该基于资源抽象接口界定，不是资源查找和定位需要关系的事情**。
+标准类 `java.net.URL` 中，URL（Uniform Resource Locator）统一资源定位符，其基本实现通常局限于网络形式发布的资源的查找和定位工作，即基本上只提供了基于 HTTP、FTP、File 等协议的资源定位问题。但是资源可以以任何资源形式存在，包括二进制、字节流、文件等等形式，存放位置也包括文件系统、classpath等位置。**所以 url 类功能职责划分不清、资源查找和表示没有清晰的界限，资源查找后的形式多种多样，没有统一的抽象**。**要实现：资源查找完成返回给客户端的应该是一个统一的资源抽象接口，客户端对资源的处理应该基于资源抽象接口界定，不是资源查找和定位需要关系的事情**。
 
 #### 5.1.1 Spring 中的 Resource 接口
 
 使用 `core.io.Resource` 接口作为所有资源的抽象和访问接口，该接口根据**资源的不同类型或者资源处于不同场合，Spring 给出了不同的实现类**：都在 core.io 包里面：
 
-- ClassPathResource：该实现从 Java 程序的 ClassPath 中加载具体资源并进行封装，可以使指定的类加载器或者指定的类进行资源加载。
-- FileSystemResource：对 Java.io.File 类型进行封装，我们可以以文件或者 URL 的形式对该类型资源进行访问。
-- ByteArrayResource：将字节（byte）数组提供的数据作为一种资源进行封装。如果用 InputStream 形式访问该类型资源，会根据字节数组的数据构建相对应的 ByteArrayInputStream 返回。
+- `ClassPathResource`：该实现从 Java 程序的 ClassPath 中加载具体资源并进行封装，可以使指定的类加载器或者指定的类进行资源加载。
+- `FileSystemResource`：对 Java.io.File 类型进行封装，我们可以以文件或者 URL 的形式对该类型资源进行访问。
+- `ByteArrayResource`：将字节（byte）数组提供的数据作为一种资源进行封装。如果用 InputStream 形式访问该类型资源，会根据字节数组的数据构建相对应的 ByteArrayInputStream 返回。
 - 可以自定义自己实现，实现该接口就行，该接口中包括：`exists()`/`isOpen()`、`getURL()`/`getFile()`等方法。来查询资源状态、访问资源内容等等。一般不用。
 
 #### 5.1.2 ResourceLoader
@@ -764,9 +764,9 @@ CommonAnnotationBeanPostProcessor一并注册到了容器中，所以，依赖�
 >
 > 系统需求：开发过程中需要测试或者对系统进行监控，需要为业务需求的实现对象添加日志功能或者方法需要权限控制从而需要进行安全检查。虽然需求比较明确，但是如果以 OOP 集成到系统，就不是一个需求一个实现了，系统中每个业务对象都需要加入日志和安全检查，会遍及所有的业务对象。
 
-**AOP（Aspect-Oriented Programing）将日志记录、安全检查、事务管理等系统需求进行模块化**，简化系统需求和实现之间的对比关系。AOP 引入 Aspect 来将系统中的横切关注点（就是上面的系统需求）进行模块块，Aspect 对于 AOP 类似于 Class 对于 OOP。AOP 是 OOP 的补充，即把以 Class 形式模块化的业务需求和以 Aspect 形式模块化的系统需求拼合就实现了整个系统。
+**AOP（Aspect-Oriented Programing）将日志记录、安全检查、事务管理等系统需求进行模块化**，简化系统需求和实现之间的对比关系。AOP 引入 Aspect 来将系统中的横切关注点（就是上面的系统需求）进行模块化，Aspect 对于 AOP 类似于 Class 对于 OOP。AOP 是 OOP 的补充，即把以 Class 形式模块化的业务需求和以 Aspect 形式模块化的系统需求拼合就实现了整个系统。
 
-![image-20200616094033696](Spring%20%E6%8F%AD%E7%A7%98.resource/image-20200616094033696.png)
+<img src="Spring%20%E6%8F%AD%E7%A7%98.resource/image-20200616094033696.png" alt="image-20200616094033696" style="zoom: 80%;" />
 
 
 
@@ -977,7 +977,7 @@ Spring 提供了数据访问层，该层划分为三个部分：
 
 - JDBC（Java Database Connectivity，Java 数据库连接）API 的最佳实践。
 
-    **JDBC 是一套数据访问标准，规范了哥哥数据库厂商之间的数据访问接口**。但是具体的异常信息全部由各个 RDBMS（Relational Database Management System 关系数据库管理系统）来**自行界定**。从而导致应用程序需要根据具体的数据库提供商来判断异常中所提供的信息的含义。同时 JDBC API 更加贴近底层，使用起来比较繁琐。
+    **JDBC 是一套数据访问标准，规范了各个数据库厂商之间的数据访问接口**。但是具体的异常信息全部由各个 RDBMS（Relational Database Management System 关系数据库管理系统）来**自行界定**。从而导致应用程序需要根据具体的数据库提供商来判断异常中所提供的信息的含义。同时 JDBC API 更加贴近底层，使用起来比较繁琐。
 
 - 统一的方式对各种 ORM 方案进行集成。
 
