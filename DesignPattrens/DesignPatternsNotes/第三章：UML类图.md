@@ -21,32 +21,12 @@
 **说明**
 
 - **类图是描述类与类之间的关系的，是 UML 图中最核心的**；
-- 在讲解设计模式时，我们必然会使用类图，为了让学员们能够把设计模式学到位，需要先给大家讲解类图；
-- 温馨提示：如果已经掌握 UML 类图的学员，可以直接听设计模式的章节；
+
 
 ## 三、UML 类图
 
 - 用于描述系统中的**类(对象)本身的组成和类(对象)之间的各种静态关系**。
 - 类之间的关系：**依赖、泛化（继承）、实现、关联、聚合与组合**。
-
-- 类图简单举例
-
-```java
-public class Person{ //代码形式->类图
-    private Integer id;
-    private String name;
-
-    public void setName(String name){ 
-         this.name=name;
-    }
-
-    public String  getName(){ 
-        return  name;
-    }
-}
-```
-
-![对应的类图](%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AUML%E7%B1%BB%E5%9B%BE.resource/%E5%AF%B9%E5%BA%94%E7%9A%84%E7%B1%BB%E5%9B%BE.png)
 
 ### （一）类图—依赖关系（Dependence）
 
@@ -89,7 +69,7 @@ public class  Department{}
 
 ### （二）类图—泛化关系(generalization）
 
-- **泛化关系实际上就是继承关系**，他是**依赖关系的特例**
+**泛化关系实际上就是继承关系**，是**依赖关系的特例**
 
 ```java
 package com.gjxaiou.uml.generalization;
@@ -116,7 +96,7 @@ public class PersonServiceBean extends DaoSupport {
 
 ### （三） 类图—实现关系（Implementation）
 
-实现关系实际上就**是A类实现B接口**，他是**依赖关系的特**例
+实现关系实际上就**是A类实现B接口**，是**依赖关系的特**例
 
 ```java
 public interface PersonService {
@@ -185,7 +165,6 @@ public class ID{
 
 ### （六）类图—组合关系（Composition）
 
-==这里理论和最后的类图不符合==
 **基本介绍**
 这是代码中：因为使用 new ，就是组合关系，就是computer创建的时候，两个属性同时创建了
 
