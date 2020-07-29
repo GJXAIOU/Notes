@@ -53,11 +53,9 @@ https://juejin.im/post/5ebcb20d5188256d4c558a65
 
 ## Redis 数据类型
 
-https://my.oschina.net/xsh1208/blog/2218494
-
 **包括字符串 String、列表 List、哈希 Hash、集合 Set、有序集合 Zset**。 Redis 后续又丰富了几种数据类型Bitmaps、HyperLogLogs、GEO。
 
-- String 类型是二进制安全的，意思是 Redis 的 String 类型可以包含任何数据，比如 JPG 图片或者序列化的对象。String 类型的值最大能存储 512M。常用命令：get、set、incr、decr、mget等
+- String 类型是二进制安全的，及其 String 类型可以包含任何数据，比如 JPG 图片或者序列化的对象。String 类型的值最大能存储 512M。常用命令：`get、set、incr、decr、mget` 等
 - List 列表是字符串列表，按照插入顺序排序，**可以添加一个元素到列表的头部或尾部**。常用命令：`lpush`, `rpush`, `lpop`, `rpop`, `lrange` 等。
     应用场景：**关注列表、粉丝列表等**；消息队列；**最新消息排行**。
 - Hash 是一个键值(字段-值)的集合。Hash 适合存储对象。常用命令：`hset`, `hget`, `hgetall` 等。
@@ -75,7 +73,7 @@ https://my.oschina.net/xsh1208/blog/2218494
     - 有序集合保存的元素数量小于 128 个
     - 有序集合保存的所有元素的长度小于 64 字节
 
-- 当`ziplist` 作为 zset  的底层存储结构时候，**每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素的成员，第二个元素保存元素的分值。**
+- 当`ziplist` 作为 zset  的底层存储结构时候，**每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素的成员值（value)，第二个元素保存元素的分值（score）。**
 
     格式如下图，紧挨着的是元素 memeber 和分值 score，整体数据是有序格式。
 
@@ -89,9 +87,9 @@ https://my.oschina.net/xsh1208/blog/2218494
 
 
 
-Redis为了满足对外使用的5种数据类型，开发了属于自己独有的一套基础数据结构，使用这些数据结构来实现5种数据类型。Redis底层的数据结构包括：**简单动态数组SDS、链表、字典、跳跃链表、整数集合、压缩列表、对象**。
+Redis底层的数据结构包括：**简单动态数组SDS、链表、字典、跳跃链表、整数集合、压缩列表、对象**。使用它们实现了五种数据类型。
 
-Redis为了平衡空间和时间效率，针对value的具体类型在底层会采用不同的数据结构来实现，其中**哈希表**和**压缩列表**是复用比较多的数据结构，如下图展示了对外数据类型和底层数据结构之间的映射关系：
+Redis为了平衡空间和时间效率，针对value的具体数据类型在底层会采用不同的数据结构来实现（如图）：
 
 ![image-20200406221939106](../../../../../Yu%2520Writer%2520Libraries/Interview/InterviewExperience/Redis.resource/image-20200406221939106.png)
 
