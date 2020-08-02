@@ -11,6 +11,8 @@ note: Git&GitHub使用说明,2019-2-11号形成初稿，2019-7-31进行整体迭
 
 # Git & GitHub 使用说明
 
+[TOC]
+
 ==原则：不要在远程仓库（GitHub）中直接修改文件，应该在本地修改之后 push 到远程仓库。==
 
 ## 一、Git
@@ -488,11 +490,49 @@ build/
 `git commit --amend -m '提交原因'`
 修改最新一条提交记录的提交原因
 
-
 `git commit -C HEAD`
 将当前文件改动提交到 `HEAD` 或当前分支的历史ID
 
+
+
+
+
+- 修改最新的commit的message：`git commit --amend`
+
+    –amend 不只是修改最新commit的message 而是会创建一个将暂存区的内容生成一个commit，再将当前最新的commit替换成新生成的那一个
+
+- 修改老旧的commit的message：`git rebase -i parent_commit_id`
+
+    然后对要修改的message前的cmd改为`reword`，保存退出后修改message
+
+> 其中， rebase -i 会产生分离头指针的状态。
+> 因为：
+>
+> *   git rebase工作的过程中，就是用了分离头指针。rebase意味着基于新base的commit来变更部分commits。它处理的时候，把HEAD指向base的commit，此时如果该commit没有对应branch，就处于分离头指针的状态，然后重新一个一个生成新的commit，当rebase创建完最后一个commit后，结束分离头状态，Git让变完基的分支名指向HEAD。
+
+> 这里有一个问题就是rebase后面跟的是父commit的哈希值，那么第一个commit的message如何修改？
+
+
+
+- 将连续的多个commit整理成一个：`git rebase -i 开始commit [结束commit]`
+
+    然后对要修改的message前的cmd改为`squash`，保存退出后可以在new commit下加一句总体的commit message
+
+> 在执行这个命令时
+>
+> *   如果没有指定 结束commit,那么结束commit 默认为当前分支最新的 commit，那么rebase 结束后会自动更新当前分支指向的 commit, 如果指定了结束 commit，而且结束 commit不是当前分支最新的
+>     commit，那么rebase 后会有生成一个 游离的 head,，而且当前分支指向的commit 不会更新
+
+- 将间隔的多个的commit合并成一个commit
+
+    `git rebase -i 最靠前需要合并的commit的父commit_id，如果是第一个commit，那么直接就是第一个commit_id`
+
+    然后将要合并的几条commit的message放到一起（紧挨着最靠前的需要合并的commit），且相关commit前的cmd改为`squash` 然后保存退出。
+
+> 后面解决冲突后，先 git add，在git rebase --continue
+
 #### git mv
+
 移动或重命名文件、目录
 
 `git mv a.md b.md -f`
@@ -532,6 +572,28 @@ build/
 
 - `git branch -vv`
 查看带有最后提交id、最近提交原因等信息的本地版本库分支列表 
+
+**新建分支**：`git branch new_branch_name`
+
+**为分支重命名**：`git branch -m oldName newName`
+
+**查看当前有哪些分支**：`git branch`
+
+**切换到 new_branch_name**: `git checkout new_branch_name`
+
+**将 new_branch_name 合并到 master 分支**
+
+```
+git checkout master
+git merge new_branch_name
+```
+
+**删除新分支**：`git  branch -d new_branch_name`
+
+
+
+
+
 
 
 #### git merge 将其它分支合并到当前分支
@@ -602,6 +664,8 @@ build/
 ### 操作历史
 
 #### git log 显示提交历史记录
+
+提交记录可能会非常多，按 `J` 键往下翻，按 `K` 键往上翻，按 `Q` 键退出查看
 
 * `git log -p`
 显示带提交差异对比的历史记录
@@ -803,7 +867,7 @@ pick 0d4a808 添加pull的说明
 
 
 
-# 使用 GitHub 搭建个人网站
+## 使用 GitHub 搭建个人网站
 使用 GitHub 搭建的网站是静态网站，搭建的操作分为两类：
 - 完全基于新的仓库搭建：
   - 首先创建新的仓库，仓库名为：用户名.github.io
@@ -815,8 +879,307 @@ pick 0d4a808 添加pull的说明
   - 在 Tagline 中填写项目名称；
 
 
-# 附录：
+## 附录：
 
 
 ![github开源协议区分](Git&Github%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.resource/github%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E5%8C%BA%E5%88%86.png)
+
+## 正规开发过程中各个分支管理
+
+以下就是 Git-Flow 的经典流程图：
+
+![](https://jaeger.itscoder.com/img/postimg/git-flow.png)
+
+如果你熟悉 Git-Flow，那么你对上图中的各种分支和线应该都能够理解，如果你之前没了解过相关的知识，那你可能会有点懵，不过在读完本文之后再看这张图，应该就能够理解了。
+
+### 2\. 分支管理规范
+
+#### 2.1 分支说明和操作
+
+* **master 分支**
+
+    *   主分支，永远处于稳定状态，对应当前线上版本
+    *   以 tag 标记一个版本，因此在 master 分支上看到的每一个 tag 都应该对应一个线上版本
+    *   不允许在该分支直接提交代码
+
+* **develop 分支**
+
+    * 开发分支，包含了项目最新的功能和代码，所有开发都依赖 develop 分支进行
+
+    * 小的改动可以直接在 develop 分支进行，改动较多时切出新的 feature 分支进行
+
+        **注：** 更好的做法是 develop 分支作为开发的主分支，也不允许直接提交代码。小改动也应该以 feature 分支提 merge request 合并，目的是保证每个改动都经过了强制代码 review，降低代码风险
+
+* **feature 分支**
+
+    *   功能分支，开发新功能的分支
+    *   开发新的功能或者改动较大的调整，从 develop 分支切换出 feature 分支，分支名称为 `feature/xxx`
+    *   开发完成后合并回 develop 分支并且删除该 feature/xxx 分支
+
+* **release 分支**
+
+    *   发布分支，新功能合并到 develop 分支，准备发布新版本时使用的分支
+    *   当 develop 分支完成功能合并和部分 bug fix，准备发布新版本时，切出一个 release 分支，来做发布前的准备，分支名约定为`release/xxx`
+    *   发布之前发现的 bug 就直接在这个分支上修复，确定准备发版本就合并到 master 分支，完成发布，同时合并到 develop 分支
+
+* **hotfix 分支**
+
+    *   紧急修复线上 bug 分支
+    *   当线上版本出现 bug 时，从 master 分支切出一个 `hotfix/xxx` 分支，完成 bug 修复，然后将 `hotfix/xxx` 合并到 master 和 develop 分支(如果此时存在 release 分支，则应该合并到 release 分支)，合并完成后删除该 `hotfix/xxx` 分支
+
+以上就是在项目中应该出现的分支以及每个分支功能的说明。 其中稳定长期存在的分支只有 master 和 develop 分支，别的分支在完成对应的使命之后都会合并到这两个分支然后被删除。简单总结如下：
+
+*   master 分支: 线上稳定版本分支
+*   develop 分支: 开发分支，衍生出 feature 分支和 release 分支
+*   release 分支: 发布分支，准备待发布版本的分支，存在多个，版本发布之后删除
+*   feature 分支: 功能分支，完成特定功能开发的分支，存在多个，功能合并之后删除
+*   hotfix 分支: 紧急热修复分支，存在多个，紧急版本发布之后删除
+
+#### 2.2 分支间操作注意事项
+
+在团队开发过程中，避免不了和其他人一起协作， 同时也会遇到合并分支等一些操作，这里提交 2 个个人觉得比较好的分支操作规范。
+
+* **同一分支 `git pull` 使用 rebase**
+
+    首先看一张图：
+
+    ![](https://jaeger.itscoder.com/img/postimg/git_pull_no_rebase.jpg)
+
+    看到这样的  提交线图，想从中看出一条清晰的提交线几乎是不可能的，充满了 `Merge remote-tracking branch 'origin/xxx' into xxx` 这样的提交记录，同时也将提交线弄成了交错纵横的图，没有了可读性。
+
+    这里最大的原因就是因为默认的 `git pull` 使用的是 merge 行为，当你更新代码时，如果本地存在未推送到远程的提交，就会产生一个这样的 merge 提交记录。因此在同一个分支上更新代码时推荐使用 `git pull --rebase`。
+
+    下面这张图展示了默认的 `git pull` 和 `git pull --rebase` 的结果差异，使用 `git pull --rebase` 目的是修整提交线图，使其形成一条直线。![](https://jaeger.itscoder.com/img/postimg/git_pull_rebase_diff.jpg)
+
+    默认的 `git pull` 行为是 merge，可以进行如下设置修改默认的 `git pull` 行为：
+
+    ```
+    # 为某个分支单独设置，这里是设置 dev 分支
+    git config branch.dev.rebase true
+    # 全局设置，所有的分支 git pull 均使用 --rebase
+    git config --global pull.rebase true
+    git config --global branch.autoSetupRebase always
+    
+    ```
+
+    这里需要说明一下，在我看来使用 `git pull --rebase` 操作是比较好的，能够得到一条很清晰的提交直线图，方便查看提交记录和 code review，但是由于 rebase 会改变提交历史，也存在一些不好的影响。这里就不做过多的讨论了，有兴趣的话可以移步知乎上的讨论：[在开发过程中使用 git rebase 还是 git merge，优缺点分别是什么？](https://www.zhihu.com/question/36509119)
+
+* **分支合并使用 `--no-ff`**
+
+    ```
+      # 例如当前在 develop 分支，需要合并 feature/xxx 分支
+      git merge --no-ff feature/xxx
+    
+    ```
+
+    在解释这个命令之前，先解释下 Git 中的 fast-forward： 举例来说，开发一直在 `develop` 分支进行，此时有个新功能需要开发，新建一个 `feature/a` 分支，并在其上进行一系列开发和提交。当完成功能开发时，此时回到 `develop` 分支，此时 `develop` 分支在创建 `feature/a` 分支之后没有产生任何的 commit，那么此时的合并就叫做 fast-forward。
+
+    fast-forward 合并的结果如下图所示，这种 merge 的结果就是一条直线了，无法明确看到切出一个新的 feature 分支，并完成了一个新的功能开发，因此此时比较推荐使用 `git merge --no-ff`，得到的结果就很明确知道，新的一系列提交是完成了一个新的功能，如果需要对这个功能进行 code review，那么只需要检视叉的那条线上的提交即可。
+
+    ![](https://jaeger.itscoder.com/img/postimg/git_merge_diff.svg)
+
+    关于以上两个分支间的操作建议，如果需要了解更多，可以阅读[洁癖者用 Git：pull --rebase 和 merge --no-ff](http://hungyuhei.github.io/2012/08/07/better-git-commit-graph-using-pull---rebase-and-merge---no-ff.html) 这篇文章。
+
+#### 2.3 项目分支操作流程示例
+
+这部分内容结合日常项目的开发流程，涉及到开发新功能、分支合并、发布新版本以及发布紧急修复版本等操作，展示常用的命令和操作。
+
+1. 切到 develop 分支，更新 develop 最新代码
+
+    ```
+    git checkout develop
+    git pull --rebase
+    
+    ```
+
+2. 新建 feature 分支，开发新功能
+
+    ```
+    git checkout -b feature/xxx
+    ...
+    git add <files>
+    git commit -m "feat(xxx): commit a"
+    git commit -m "feat(xxx): commit b"
+    # 其他提交
+    ...
+    
+    ```
+
+    如果此时 develop 分支有一笔提交，影响到你的 feature 开发，可以 rebase develop 分支，前提是 该 feature 分支只有你自己一个在开发，如果多人都在该分支，需要进行协调：
+
+    ```
+    # 切换到 develop 分支并更新 develop 分支代码
+    git checkout develop
+    git pull --rebase
+    
+    # 切回 feature 分支
+    git checkout feature/xxx
+    git rebase develop
+    
+    # 如果需要提交到远端，且之前已经提交到远端，此时需要强推(强推需慎重！)
+    git push --force
+    
+    ```
+
+    上述场景也可以通过 `git cherry-pick` 来实现，有兴趣的可以去了解一下这个指令。
+
+3. 完成 feature 分支，合并到 develop 分支
+
+    ```
+    # 切到 develop 分支，更新下代码
+    git check develop
+    git pull --rebase
+    
+    # 合并 feature 分支
+    git merge feature/xxx --no-ff
+    
+    # 删除 feature 分支
+    git branch -d feature/xxx
+    
+    # 推到远端
+    git push origin develop
+    
+    ```
+
+4. 当某个版本所有的 feature 分支均合并到 develop 分支，就可以切出 release 分支，准备发布新版本，提交测试并进行 bug fix
+
+    ```
+    # 当前在 develop 分支
+    git checkout -b release/xxx
+    
+    # 在 release/xxx 分支进行 bug fix
+    git commit -m "fix(xxx): xxxxx"
+    ...
+    
+    ```
+
+5. 所有 bug 修复完成，准备发布新版本
+
+    ```
+    # master 分支合并 release 分支并添加 tag
+    git checkout master
+    git merge --no-ff release/xxx --no-ff
+    # 添加版本标记，这里可以使用版本发布日期或者具体的版本号
+    git tag 1.0.0
+    
+    # develop 分支合并 release 分支
+    git checkout develop
+    git merge --no-ff release/xxx
+    
+    # 删除 release 分支
+    git branch -d release/xxx
+    
+    ```
+
+    至此，一个新版本发布完成。
+
+6. 线上出现 bug，需要紧急发布修复版本
+
+    ```
+    # 当前在 master 分支
+    git checkout master
+    
+    # 切出 hotfix 分支
+    git checkout -b hotfix/xxx
+    
+    ... 进行 bug fix 提交
+    
+    # master 分支合并 hotfix 分支并添加 tag(紧急版本)
+    git checkout master
+    git merge --no-ff hotfix/xxx --no-ff
+    # 添加版本标记，这里可以使用版本发布日期或者具体的版本号
+    git tag 1.0.1
+    
+    # develop 分支合并 hotfix 分支(如果此时存在 release 分支的话，应当合并到 release 分支)
+    git checkout develop
+    git merge --no-ff hotfix/xxx
+    
+    # 删除 hotfix 分支
+    git branch -d hotfix/xxx
+    
+    ```
+
+    至此，紧急版本发布完成。
+
+
+
+
+
+
+
+
+
+# Commit Message 格式
+
+目前规范使用较多的是 [Angular 团队的规范](https://link.zhihu.com/?target=https%3A//github.com/angular/angular.js/blob/master/DEVELOPERS.md%23-git-commit-guidelines), 继而衍生了 [Conventional Commits specification](https://link.zhihu.com/?target=https%3A//conventionalcommits.org/). 很多工具也是基于此规范, 它的 message 格式如下:
+
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+复制代码
+```
+
+我们通过 git commit 命令带出的 vim 界面填写的最终结果应该类似如上这个结构, 大致分为三个部分(使用空行分割):
+
+- 标题行: 必填, 描述主要修改类型和内容
+- 主题内容: 描述为什么修改, 做了什么样的修改, 以及开发的思路等等
+- 页脚注释: 放 Breaking Changes 或 Closed Issues
+
+分别由如下部分构成:
+
+- type: commit 的类型
+    - feat: 新特性
+    - fix: 修改问题
+    - refactor: 代码重构
+    - docs: 文档修改
+    - style: 代码格式修改, 注意不是 css 修改
+    - test: 测试用例修改
+    - chore: 其他修改, 比如构建流程, 依赖管理.
+- scope: commit 影响的范围, 比如: route, component, utils, build...
+- subject: commit 的概述, 建议符合  [50/72 formatting](https://link.zhihu.com/?target=https%3A//stackoverflow.com/questions/2290016/git-commit-messages-50-72-formatting)
+- body: commit 具体修改内容, 可以分为多行, 建议符合 [50/72 formatting](https://link.zhihu.com/?target=https%3A//stackoverflow.com/questions/2290016/git-commit-messages-50-72-formatting)
+- footer: 一些备注, 通常是 BREAKING CHANGE 或修复的 bug 的链接.
+
+
+
+注：50/72 格式简记为：
+
+- 第一行不超过50个字符
+- 然后是空白行
+- 剩余文字应以72个字符换行
+
+## git commit 模板
+
+如果你只是个人的项目, 或者想尝试一下这样的规范格式, 那么你可以为 git 设置 commit template, 每次 git commit 的时候在 vim 中带出, 时刻提醒自己:
+
+修改 ~/.gitconfig, 添加:
+
+```
+[commit]
+template = ~/.gitmessage
+复制代码
+```
+
+新建 ~/.gitmessage 内容可以如下:
+
+```
+# head: <type>(<scope>): <subject>
+# - type: feat, fix, docs, style, refactor, test, chore
+# - scope: can be empty (eg. if the change is a global or difficult to assign to a single component)
+# - subject: start with verb (such as 'change'), 50-character line
+#
+# body: 72-character wrapped. This should answer:
+# * Why was this change necessary?
+# * How does it address the problem?
+# * Are there any side effects?
+#
+# footer: 
+# - Include a link to the ticket, if any.
+# - BREAKING CHANGE
+#
+复制代码
+```
 
