@@ -235,7 +235,7 @@ Binary Tree:
 
 
 
-## 一、KMP：求解一个字符串中是否包含另一个字符串
+## 三、KMP：求解一个字符串中是否包含另一个字符串
 
 ### （一）基本知识
 
@@ -286,7 +286,7 @@ Binary Tree:
 后缀：| c |   bc  |       abc   |      cabc   |    bcabc| 不能包含最前一个 d，所以从 c 开始 
 值：|  不等 |  不等 |   相等，为3 |    不等 | 不等|  
 
-
+#### 1.整体求解步骤
 
 - **步骤一：从 str[i] 字符出发一直匹配到 str[j] 位置上发现开始出现不匹配：**
 
@@ -298,46 +298,38 @@ Binary Tree:
 
 - **步骤二：下一次 match 数组往右滑动， 滑动大小为 match 当前字符的最大前后缀匹配长度，再让 str[j] 与 match[k] 进行下一次匹配，反过来比较好理解：让 `match[k]` 和 `str[j]` 来匹配。**
 
-那么下一次的匹配检查不再像普通解法那样退回到 `str[i+1]` 重新开始与 `match[0]` 的匹配过程，而是**直接让 `str[j]` 与 `match[k]` 进行匹配检查**，如图所示。在图中，**在 str 中要匹配的位置仍是 j，而不进行退回**。对 match 来说，相当于向右滑动，让 match[k] 滑动到与 str[j] 同一个位置上，然后进行后续的匹配检查。
-
-普通解法 str 要退回到 i+1 位置，然后让 str[i+1] 与 match[0] 进行匹配，而我们的解法在匹配的过程中一直进行这样的滑动匹配的过程，直到在 str 的某一个位置把 match 完全匹配完，就说明str 中有 match。如果 match 滑到最后也没匹配出来，就说明str 中没有 match。
+    那么下一次的匹配检查不再像普通解法那样退回到 `str[i+1]` 重新开始与 `match[0]` 的匹配过程，而是**直接让 `str[j]` 与 `match[k]` 进行匹配检查**，如图所示。在图中，**在 str 中要匹配的位置仍是 j，而不进行退回**。对 match 来说，相当于向右滑动，让 match[k] 滑动到与 str[j] 同一个位置上，然后进行后续的匹配检查。直到在 str 的某一个位置把 match 完全匹配完，就说明str 中有 match。如果 match 滑到最后也没匹配出来，就说明str 中没有 match。
 
 ![img](AlgorithmMediumDay01.resource/20180617171300922.png)
 
 
 
-- **注：注意为什么加快，主要是 str[i] ~ c 前那段不用考虑，因为肯定不能匹配~**
+> 注：注意为什么加快，主要是 str[i] ~ c 前那段不用考虑，因为肯定不能匹配，若有匹配 则出现更大的前后缀匹配长度 ，与最初 nextArr[] 定义违背。
 
-**若有匹配 则出现更大的前后缀匹配长度 ，与最初 nextArr[] 定义违背。**
+#### 2. match 字符串的 nextArr 数组求解和时间复杂度 O(M) 的证明
 
-![img](AlgorithmMediumDay01.resource/20180617171438808.png)
+对 `match[0]` 来说，在它之前没有字符，所以 **`nextArr[0]` 规定为 `-1`**，对于 `match[1]` 来说，在它之前有 `match[0]`，但是 nextArr 数组定义要求任何子串的后缀不能包括第一个字符（这里为 `match[0]`），所以 `match[1]` 之前的字符串只有长度为 `0` 的后缀字符串，所以 **`nextArr[1]` 为 `1`**，对于 `match[i]（i > 1）`来说，求解过程如下：
 
-**注：关于nextArr数组的求解：**
+因为是从左到右依次求解 `nextArr`，所以在求解 `nextArr[i]` 时候，`nextArr[0…i - 1]` 的值都已经求出。假设 `match[i]` 字符为下图中的 `A` 字符，`match[i - 1]` 为下图中的 `B` 字符。
 
-最后需要解释如何快速得到 match 字符串的 nextArr 数组，并且要证明得到 nextArr 数组的时间复杂度为 O(M)。
-
-对 match[0] 来说，在它之前没有字符，所以 **nextArr[0] 规定为 -1**，对于 match[1] 来说，在它之前有 match[0]，但是 nextArr 数组定义要求任何子串的后缀不能包括第一个字符（这里为 match[0]），所以 match[1] 之前的字符串只有长度为 0 的后缀字符串，所以 **nextArr[1] 为 1**，对于 match[i]（i > 1）来说，求解过程如下：
-
-因为是从左到右依次求解 nextArr，所以在求解 nextArr[i] 时候，nextArr[0…i - 1] 的值都已经求出。假设 match[i] 字符为下图中的 A 字符，match[i - 1] 为下图中的 B 字符。
-
-通过 nextArr[i - 1] 的值可以得到 B 字符前的字符串的最长前缀和后缀匹配区域，下图中的 L 区域就是最长匹配的前缀子串， K 区域就是最长匹配的后缀子串，图中字符 C 是 L 区域之后的字符，然后看字符 C 和字符 B 是否相等。
+通过 `nextArr[i - 1]` 的值可以得到 `B` 字符前的字符串的最长前缀和后缀匹配区域，下图中的 `L` 区域就是最长匹配的前缀子串， `K` 区域就是最长匹配的后缀子串，图中字符 `C` 是 `L` 区域之后的字符，然后看字符 `C` 和字符 `B` 是否相等。
 
 ![image-20200207135708508](AlgorithmMediumDay01.resource/image-20200207135708508.png)
 
-- 如果字符 C 和字符 B 相等，那么 A字符之前的最长前缀和后缀匹配区域就可以确定，前缀子串为 L 的区域 +C 字符，后缀子串为 K 区域 +  B 字符，即 `nextArr[i + 1] = nextArr[i] + 1;`
+- 如果字符 `C` 和字符 `B` 相等，那么 `A` 字符之前的最长前缀和后缀匹配区域就可以确定，前缀子串为 `L` 的区域 +`C` 字符，后缀子串为 `K` 区域 + `B` 字符，即 `nextArr[i + 1] = nextArr[i] + 1;`
 
-- 如果字符 C 和字符 B 不相等，就看字符 C 之前的前缀和后缀匹配情况，假设字符 C 是第 cn 个字符（match[cn]），那么 nextArr[cn] 就是其最长前缀和最长后缀匹配长度。如图所示：
+- 如果字符 `C` 和字符 `B` 不相等，就看字符 `C` 之前的前缀和后缀匹配情况，假设字符 `C` 是第 `cn` 个字符（match[cn]），那么 `nextArr[cn]` 就是其最长前缀和最长后缀匹配长度。如图所示：
 
     ![image-20200207140814600](AlgorithmMediumDay01.resource/image-20200207140814600.png)
-
-在图中， m 区域和 n 区域分别是字符 C 之前的字符串的最长匹配的后缀和前缀区域，这是通过 nextArr[cn] 值确定的，当然两个区域是相等的， m’ 区域为 K 区域的最右的区域且长度与 m 区域一样，因为 K 区域和 L 区域是相等的，m‘ 区域 为 K 区域最右区域且长度和 m 区域一样，因为 K 区域和 L 区域是相等的，所以 m 区域和 m’ 区域是相等的，字符 D 为 n 区域之后的一个字符，接下来比较字符 D 是否与字符 B 相等。
-
-- 如果相等，A 字符之前的字符串的最长前缀与后缀匹配区域就可以确定，前缀子串为 n区域 +D 字符，后缀子串为 m’ 区域 + B 字符，则令 `nextArr[i] = nextArr[cn] + 1`。
-- 如果不等，继续往前跳到字符 D，之后的过程和跳到字符C 类似，一直进行这样的跳过程，跳的每一步都会有一个新的字符和 B 比较（就像 C 字符和 D 字符一样），只要有相等的情况，nextArr[i] 的值就能确定。		
-
-如果向前跳到最左位置（即 match[0] 的位置），此时 nextArr[0] == -1，说明字符 A 之前的字符串不存在前缀和后缀匹配的情况，则令 nextArr[i] = 0。用这种不断向前跳的方式可以算出正确的 nextArr[i] 值的原因还是因为每跳到一个位置 cn，nextArr[cn] 的意义就表示它之前字符串的最大匹配长度。求解 nextArr 数组的具体过程请参照如下代码中的 getNextArray 方法。
-
-
+    
+    在图中， `m` 区域和 `n` 区域分别是字符 `C` 之前的字符串的最长匹配的后缀和前缀区域，这是通过 `nextArr[cn]` 值确定的，当然两个区域是相等的， `m’` 区域为 `K` 区域的最右的区域且长度与 `m` 区域一样，因为 `K` 区域和 `L` 区域是相等的，`m‘` 区域 为 `K` 区域最右区域且长度和 `m` 区域一样，因为 `K` 区域和 `L` 区域是相等的，所以 `m` 区域和 `m’` 区域是相等的，字符 `D` 为 `n` 区域之后的一个字符，接下来比较字符 `D` 是否与字符 `B` 相等。
+    
+    - 如果相等，`A` 字符之前的字符串的最长前缀与后缀匹配区域就可以确定，前缀子串为 `n` 区域 + `D` 字符，后缀子串为 `m’` 区域 + `B` 字符，则令 `nextArr[i] = nextArr[cn] + 1`。
+    - 如果不等，继续往前跳到字符 `D`，之后的过程和跳到字符 `C` 类似，一直进行这样的跳过程，跳的每一步都会有一个新的字符和 `B` 比较（就像 `C` 字符和 `D` 字符一样），只要有相等的情况，`nextArr[i]` 的值就能确定。		
+    
+    如果向前跳到最左位置（即 `match[0]` 的位置），此时 `nextArr[0] == -1`，说明字符 `A` 之前的字符串不存在前缀和后缀匹配的情况，则令 `nextArr[i] = 0`。用这种不断向前跳的方式可以算出正确的 `nextArr[i]` 值的原因还是因为每跳到一个位置 `cn`，`nextArr[cn]` 的意义就表示它之前字符串的最大匹配长度。求解 `nextArr` 数组的具体过程请参照如下代码中的 `getNextArray` 方法。
+    
+    
 
 **讨论计算复杂度：**
 
@@ -388,28 +380,34 @@ public class KMP {
         return (matchIndex == matchArray.length) ? strIndex - matchIndex : -1;
     }
 
-    // 求解 next 数组方法
+    /**
+     * 求解 nextArr 方法
+     */
     public static int[] getNextArray(char[] match) {
         if (match.length == 1) {
             return new int[]{-1};
         }
-        int[] next = new int[match.length];
-        next[0] = -1;
-        next[1] = 0;
+        int[] nextArr = new int[match.length];
+        nextArr[0] = -1;
+        nextArr[1] = 0;
+
         // 从第二个位置开始求值
-        int pos = 2;
+        int curIndex = 2;
         int cn = 0;
-        while (pos < next.length) {
-            if (match[pos - 1] == match[cn]) {
-                next[pos] = ++cn;
-                pos++;
+        while (curIndex < nextArr.length) {
+            // 如果 B 位置值等于 C 位置值，则 L + C = K + B
+            if (match[curIndex - 1] == match[cn]) {
+                // 则长度就是从 0 到 cn，即 ++cn 的长度
+                nextArr[curIndex] = ++cn;
+                curIndex++;
+                // cn 换值，curIndex 不变，继续循环
             } else if (cn > 0) {
-                cn = next[cn];
+                cn = nextArr[cn];
             } else {
-                next[pos++] = 0;
+                nextArr[curIndex++] = 0;
             }
         }
-        return next;
+        return nextArr;
     }
 
     public static void main(String[] args) {
@@ -418,7 +416,6 @@ public class KMP {
         System.out.println(getIndexOf(str, match));
     }
 }
-
 ```
 程序运行结果为：`6`
 
@@ -426,7 +423,7 @@ public class KMP {
 
 【题目】给定一个字符串如何加最短的字符（只能在原始串的后面进行添加）使其构成一个长的字符串且包含两个原始字符串，并且开始位置还得不一样
 
-示例：abcabc ---->abcabcabc 最少增加 3 个
+【示例】：`abcabc ---->abcabcabc` 最少增加 3 个
 
 **思路：**其实就是最大前后缀长度数组
 
@@ -442,53 +439,51 @@ package com.gjxaiou.advanced.day01;
  */
 public class ShortestHaveTwice {
 
-    public static String answer(String str) {
-        if (str == null || str.length() == 0) {
+    public static String answer(String inputStr) {
+        if (inputStr == null || inputStr.length() == 0) {
             return "";
         }
-        char[] strArray = str.toCharArray();
-        if (strArray.length == 1) {
-            return str + str;
+        char[] inputArray = inputStr.toCharArray();
+        if (inputArray.length == 1) {
+            return inputStr + inputStr;
         }
-        if (strArray.length == 2) {
-            return strArray[0] == strArray[1] ? (str + String.valueOf(strArray[0])) : (str + str);
+        if (inputArray.length == 2) {
+            return inputArray[0] == inputArray[1] ? (inputStr + inputArray[0]) :
+                    (inputStr + inputStr);
         }
-        int endNext = endNextLength(strArray);
-        return str + str.substring(endNext);
+        // 获取长度
+        int endNextArrLength = endNextLength(inputArray);
+        return inputStr + inputStr.substring(endNextArrLength);
     }
 
-    public static int endNextLength(char[] chas) {
+    public static int endNextLength(char[] inputArray) {
         // 多求一位
-        int[] next = new int[chas.length + 1];
-        next[0] = -1;
-        next[1] = 0;
-        int pos = 2;
+        int[] nextArr = new int[inputArray.length + 1];
+        nextArr[0] = -1;
+        nextArr[1] = 0;
+        int curIndex = 2;
         int cn = 0;
-        while (pos < next.length) {
-            if (chas[pos - 1] == chas[cn]) {
-                next[pos++] = ++cn;
+        while (curIndex < nextArr.length) {
+            if (inputArray[curIndex - 1] == inputArray[cn]) {
+                nextArr[curIndex++] = ++cn;
             } else if (cn > 0) {
-                cn = next[cn];
+                cn = nextArr[cn];
             } else {
-                next[pos++] = 0;
+                nextArr[curIndex++] = 0;
             }
         }
-        return next[next.length - 1];
+        return nextArr[nextArr.length - 1];
     }
 
     public static void main(String[] args) {
         String test1 = "a";
         System.out.println(answer(test1));
-
         String test2 = "aa";
         System.out.println(answer(test2));
-
         String test3 = "ab";
         System.out.println(answer(test3));
-
         String test4 = "abcdabcd";
         System.out.println(answer(test4));
-
         String test5 = "abracadabra";
         System.out.println(answer(test5));
     }
@@ -503,7 +498,7 @@ abcdabcdabcd
 abracadabracadabra
 ```
 
-### （三）给定两个树（值可以相同或者不同） 判断树 1 的某棵子树是否包含树 2（结构和值完全相同）
+### （六）给定两个树（值可以相同或者不同） 判断树 1 的某棵子树是否包含树 2（结构和值完全相同）
 
 **子树就是从某个头结点开始下面所有子节点都要**，下图第一个图就是可以 true，另一个图就是 false。
 
@@ -523,101 +518,103 @@ package com.gjxaiou.advanced.day01;
  */
 public class T1SubtreeEqualsT2 {
 
-    public static class Node {
+    public static class TreeNode {
         public int value;
-        public Node left;
-        public Node right;
+        public TreeNode left;
+        public TreeNode right;
 
-        public Node(int data) {
+        public TreeNode(int data) {
             this.value = data;
         }
     }
 
-    public static boolean isSubtree(Node t1, Node t2) {
-        String t1Str = serialByPre(t1);
-        String t2Str = serialByPre(t2);
+    // 首先对两棵树进行序列化，然后就可以按照字符串进行判断
+    public static boolean isSubtree(TreeNode t1, TreeNode t2) {
+        String t1Str = treeSerialToString(t1);
+        String t2Str = treeSerialToString(t2);
         return getIndexOf(t1Str, t2Str) != -1;
     }
 
-    public static String serialByPre(Node head) {
+    // 将树结构序列化为字符串，这里使用前序遍历
+    public static String treeSerialToString(TreeNode head) {
         if (head == null) {
             return "#!";
         }
         String res = head.value + "!";
-        res += serialByPre(head.left);
-        res += serialByPre(head.right);
+        res += treeSerialToString(head.left);
+        res += treeSerialToString(head.right);
         return res;
     }
 
-    // KMP
-    public static int getIndexOf(String s, String m) {
-        if (s == null || m == null || m.length() < 1 || s.length() < m.length()) {
+    // 按照 KMP 算法即可
+    public static int getIndexOf(String str, String match) {
+        if (str == null || match == null || match.length() < 1 || str.length() < match.length()) {
             return -1;
         }
-        char[] ss = s.toCharArray();
-        char[] ms = m.toCharArray();
-        int[] nextArr = getNextArray(ms);
-        int index = 0;
-        int mi = 0;
-        while (index < ss.length && mi < ms.length) {
-            if (ss[index] == ms[mi]) {
-                index++;
-                mi++;
-            } else if (nextArr[mi] == -1) {
-                index++;
+        char[] strArray = str.toCharArray();
+        char[] matchArray = match.toCharArray();
+        int[] nextArr = getNextArray(matchArray);
+        int strIndex = 0;
+        int matchIndex = 0;
+        while (strIndex < strArray.length && matchIndex < matchArray.length) {
+            if (strArray[strIndex] == matchArray[matchIndex]) {
+                strIndex++;
+                matchIndex++;
+            } else if (nextArr[matchIndex] == -1) {
+                strIndex++;
             } else {
-                mi = nextArr[mi];
+                matchIndex = nextArr[matchIndex];
             }
         }
-        return mi == ms.length ? index - mi : -1;
+        return matchIndex == matchArray.length ? strIndex - matchIndex : -1;
     }
 
-    public static int[] getNextArray(char[] ms) {
-        if (ms.length == 1) {
+    public static int[] getNextArray(char[] matchArray) {
+        if (matchArray.length == 1) {
             return new int[]{-1};
         }
-        int[] nextArr = new int[ms.length];
+        int[] nextArr = new int[matchArray.length];
         nextArr[0] = -1;
         nextArr[1] = 0;
-        int pos = 2;
+        int curIndex = 2;
         int cn = 0;
-        while (pos < nextArr.length) {
-            if (ms[pos - 1] == ms[cn]) {
-                nextArr[pos++] = ++cn;
+        while (curIndex < nextArr.length) {
+            if (matchArray[curIndex - 1] == matchArray[cn]) {
+                nextArr[curIndex++] = ++cn;
             } else if (cn > 0) {
                 cn = nextArr[cn];
             } else {
-                nextArr[pos++] = 0;
+                nextArr[curIndex++] = 0;
             }
         }
         return nextArr;
     }
 
     public static void main(String[] args) {
-        Node t1 = new Node(1);
-        t1.left = new Node(2);
-        t1.right = new Node(3);
-        t1.left.left = new Node(4);
-        t1.left.right = new Node(5);
-        t1.right.left = new Node(6);
-        t1.right.right = new Node(7);
-        t1.left.left.right = new Node(8);
-        t1.left.right.left = new Node(9);
+        TreeNode t1 = new TreeNode(1);
+        t1.left = new TreeNode(2);
+        t1.right = new TreeNode(3);
+        t1.left.left = new TreeNode(4);
+        t1.left.right = new TreeNode(5);
+        t1.right.left = new TreeNode(6);
+        t1.right.right = new TreeNode(7);
+        t1.left.left.right = new TreeNode(8);
+        t1.left.right.left = new TreeNode(9);
 
-        Node t2 = new Node(2);
-        t2.left = new Node(4);
-        t2.left.right = new Node(8);
-        t2.right = new Node(5);
-        t2.right.left = new Node(9);
+        TreeNode t2 = new TreeNode(2);
+        t2.left = new TreeNode(4);
+        t2.left.right = new TreeNode(8);
+        t2.right = new TreeNode(5);
+        t2.right.left = new TreeNode(9);
 
         System.out.println(isSubtree(t1, t2));
     }
 }
-
 ```
 
 
-- 判断一个大字符串是否由一个小字符串重复得到，就是某个字符串是否为某个小字符串 * n 得到；
+
+### （七）判断一个大字符串是否由一个小字符串重复得到，就是某个字符串是否为某个小字符串 * n 得到；
 
 **思路**：转换为 一个前缀和后缀相差整数倍的问题
 
@@ -625,9 +622,9 @@ public class T1SubtreeEqualsT2 {
 
 ## 二、Manacher 算法：求字符串中最长回文子串长度
 
-给定一个字符串 str，返回 str 中最长回文子串的长度。
+【题目】：给定一个字符串 str，返回 str 中最长回文子串的长度。
 
-常规思路： 
+【常规思路】： 
 
 - 总是从中间那个字符出发，向两边开始扩展，观察回文，然后每个字符都得进行一遍
 
@@ -635,25 +632,25 @@ public class T1SubtreeEqualsT2 {
 
 -  经过规律发现 无论是哪种情况 总是 `最大值/2` 即为最大回文串长度
 
-处理回文子串长度为偶数的问题：上面拿`abcdcb`来举例，其中`bcdcb`属于一个回文子串，但如果回文子串长度为偶数呢？像`cabbac`，按照上面定义的“扩”的逻辑岂不是每个字符的回文半径都是0，但事实上`cabbac`的最长回文子串的长度是6。==**因为我们上面“扩”的逻辑默认是将回文子串当做奇数长度的串来看的，因此我们在使用Manacher算法之前还需要将字符串处理一下**==，这里有一个小技巧，那就是将字符串的首尾和每个字符之间加上一个特殊符号，这样就能将输入的串统一转为奇数长度的串了。比如`abba`处理过后为`#a#b#b#a`，这样的话就有`charArr[4]='#'`的回文半径为 4，也即原串的最大回文子串长度为 4。相应代码如下：
+处理回文子串长度为偶数的问题：上面拿`abcdcb`来举例，其中`bcdcb`属于一个回文子串，但如果回文子串长度为偶数呢？像`cabbac`，按照上面定义的“扩”的逻辑岂不是每个字符的回文半径都是0，但事实上`cabbac`的最长回文子串的长度是6。==**因为我们上面“扩”的逻辑默认是将回文子串当做奇数长度的串来看的，因此我们在使用Manacher算法之前还需要将字符串处理一下**==。
+
+处理方式为：将字符串的首尾和每个字符之间加上一个特殊符号，这样就能将输入的串统一转为奇数长度的串了。比如`abba`处理过后为`#a#b#b#a#`，这样的话就有`charArr[4]='#'`的回文半径为 4，也即原串的最大回文子串长度为 4。相应代码如下：
 
 前提是要处理字符串形式，加入特殊字符占位 #（其实什么字符都行）进行填充（在开头结尾和每个中间加入）
 
- 这种方法是暴力法，时间复杂度为$$O(n^2)$$-----而Manacher算法可以降到O(n)
+ 这种方法是暴力法，时间复杂度为$$O(n^2)$$-----==而Manacher算法可以降到O(n)==
 
 <img src="AlgorithmMediumDay01.resource/20180619213235664.png" alt="img" style="zoom:50%;" />
 
-**概念汇总**
+**概念汇总**：Manacher 算法中定义了如下几个概念：
 
-Manacher 算法中定义了如下几个概念：
-
-- 回文半径：串中某个字符最多能向外扩的字符**个数**称为该字符的回文半径。比如`abcdcb`中字符`d`，能扩一个`c`，还能再扩一个`b`，再扩就到字符串右边界了，再**算上字符本身**，字符`d`的回文半径是3。
+- 回文半径：串中某个字符最多能向外扩的字符**个数**（加上字符本身）称为该字符的回文半径。比如`abcdcb`中字符`d`，能扩一个`c`，还能再扩一个`b`，再扩就到字符串右边界了，再**算上字符本身**，字符`d`的回文半径是3。
 
 - 回文**半径**数组`pArr`：长度和字符串长度一样，保存串中每个字符的回文半径。比如`charArr="abcdcb"`，其中`charArr[0]='a'`一个都扩不了，但算上其本身有`pArr[0]=1`；而`charArr[3]='d'`最多扩2个，算上其本身有`pArr[3]=3`。
 
-- 最右回文右边界`R`：遍历过程中，“扩”这一操作扩到的最右的字符的下标。比如`charArr=“abcdcb”`，当遍历到`a`时，只能扩`a`本身，向外扩不动，所以`R=0`；当遍历到`b`时，也只能扩`b`本身，所以更新`R=1`；但当遍历到`d`时，能向外扩两个字符到`charArr[5]=b`，所以`R`更新为5。
+- 最右回文右边界`R`：遍历过程中，“扩”这一操作扩到的最右的字符的下标。比如`charArr=“abcdcb”`，当遍历到`a`时，只能扩`a`本身，向外扩不动，所以`R=0`；当遍历到`b`时，也只能扩`b`本身，所以更新`R=1`；但当遍历到`d`时，能向外扩两个字符到`charArr[5]=b`，所以`R`更新为5。【即能扩充到的最右边的下标】。
 
-    如图所示，刚开始默认在 -1 位置，然后当到 0 位置，回文半径只能到 0 位置，所以最右的回文半径为 0  位置，当到 1 位置时候，回文半径扩充到 2 位置，则最右回文半径扩充到 2 位置，当移动到 3 位置时候，最右回文半径为 6
+    > 如图所示，刚开始默认在 -1 位置，然后当到 0 位置，回文半径只能到 0 位置，所以最右的回文半径为 0  位置，当到 1 位置时候，回文半径扩充到 2 位置，则最右回文半径扩充到 2 位置，当移动到 3 位置时候，最右回文半径为 6
 
     ![image-20191231163310036](AlgorithmMediumDay01.resource/image-20191231163310036.png)
 
@@ -661,31 +658,31 @@ Manacher 算法中定义了如下几个概念：
 
 ### （二）Manacher 算法详解
 
-针对 i 位置的回文串求法
+针对 `i` 位置的回文串求法
 
-- 如果 i 位置当前不在最右回文半径中，只能采用上面的方式暴力破：O(N )
+- 如果 `i` 位置当前不在最右回文半径中，只能采用上面的方式暴力破：O(N )
 
     ![image-20191231164036523](AlgorithmMediumDay01.resource/image-20191231164036523.png)
 
-- i 位置在回文右边界内：则设当前回文中心为 C，则 i 位置肯定是在回文中心 C 和回文右边界之间，做 i 位置关于中心 C 的对称点 i’，则针对 i’ 的所在的回文区域与整个回文区域关系有不同情况
+- `i` 位置在回文右边界内：则设当前回文中心为 `C`，则 `i` 位置肯定是在回文中心 `C` 和回文右边界之间，做 `i` 位置关于中心 `C` 的对称点 `i’`，则针对 `i’` 的所在的回文区域与整个回文区域关系有不同情况
 
-    - i' 所在的回文区域在整个回文区域之间：O(1)
+    - `i'` 所在的回文区域在整个回文区域之间：O(1)
 
         ![image-20191231165149527](AlgorithmMediumDay01.resource/image-20191231165149527.png)
+        
+        **则 `i` 回文长度大小和 `i’` 回文长度相同**。证明：使用对称和区间内小回文，整个大区间大回文的结论可以证明 i 对应的区域是回文，并且是最大的。
+        
+    - `i'` 所在的回文区域在整个回文区域相交：O(1)
     
-    **则 i 回文长度大小和 i’ 回文长度相同**。证明：使用对称和区间内小回文，整个大区间大回文的结论可以证明 i 对应的区域是回文，并且是最大的。
-    
-- i' 所在的回文区域在整个回文区域相交：O(1)
-
     ![image-20191231170010115](AlgorithmMediumDay01.resource/image-20191231170010115.png)
-
-    **则 i 回文长度为 i 到 R 长度**。
-
-- i' 所在的回文区域与整个回文区域之间边界重叠
+    
+    ​		**则 `i` 回文长度为 `i` 到 `R` 长度**。
+    
+- `i'` 所在的回文区域与整个回文区域之间边界重叠
 
     ![image-20200101132409088](AlgorithmMediumDay01.resource/image-20200101132409088.png)
 
-这种情况下，只能保证 i 到 R  区间的数据不需要进行暴力破，相当于可以从 R + 1 位置开始判断。
+这种情况下，只能保证 `i` 到 `R`  区间的数据不需要进行暴力破，相当于可以从 `R + 1` 位置开始判断。
 
 ```java
 package com.gjxaiou.advanced.day01;
@@ -695,32 +692,39 @@ package com.gjxaiou.advanced.day01;
  * @Date 2020/1/1 14:22
  */
 public class Manacher {
-    public static char[] manacherString(String str) {
-        char[] charArr = str.toCharArray();
-        char[] res = new char[str.length() * 2 + 1];
+    // 将输入字符串构造前后和中间加上特殊符号，构成奇数长度。
+    public static char[] inputStringToOddNum(String str) {
+        char[] strArray = str.toCharArray();
+
+        char[] resArray = new char[str.length() * 2 + 1];
         int index = 0;
-        for (int i = 0; i != res.length; i++) {
-            res[i] = (i & 1) == 0 ? '#' : charArr[index++];
+        for (int i = 0; i != resArray.length; i++) {
+            resArray[i] = (i & 1) == 0 ? '#' : strArray[index++];
         }
-        return res;
+        return resArray;
     }
 
-    public static int maxLcpsLength(String str) {
+    public static int maxLoopsLength(String str) {
         if (str == null || str.length() == 0) {
             return 0;
         }
-        char[] charArr = manacherString(str);
+        char[] charArr = inputStringToOddNum(str);
         // 回文半径数组
         int[] pArr = new int[charArr.length];
-        // index  为对称中心 C
-        int index = -1;
+        // indexC 为对称中心 C
+        int indexC = -1;
         int pR = -1;
-        int max = Integer.MIN_VALUE;
+        int maxResLength = Integer.MIN_VALUE;
         for (int i = 0; i != charArr.length; i++) {
-       // 2 * index - 1 就是对应 i' 位置，R> i,表示 i 在回文右边界里面，则最起码有一个不用验的区域，
-            pArr[i] = pR > i ? Math.min(pArr[2 * index - i], pR - i) : 1;
+            /**
+             *  i < pR,表示 i 在回文右边界里面
+             *  2 * indexC - 1 就是对应 i' 位置
+             *  i 只要在回文右边界里面，则 i 的回文半径 pArr[i] 为 i'的回文半径 或者 pR - i 两者中最小的一个。
+             *  如果 i > pR 则只能暴力破解
+             */
+            pArr[i] = i < pR ? Math.min(pArr[2 * indexC - i], pR - i) : 1;
             // 四种情况都让扩一下，其中 1 和 4 会成功，但是 2 ，3 会失败则回文右边界不改变；可以自己写成 if-else 问题。
-            while (i + pArr[i] < charArr.length && i - pArr[i] > -1) {
+            while ((i + pArr[i] < charArr.length) && (i - pArr[i] > -1)) {
                 if (charArr[i + pArr[i]] == charArr[i - pArr[i]]) {
                     pArr[i]++;
                 } else {
@@ -729,15 +733,15 @@ public class Manacher {
             }
             if (i + pArr[i] > pR) {
                 pR = i + pArr[i];
-                index = i;
+                indexC = i;
             }
-            max = Math.max(max, pArr[i]);
+            maxResLength = Math.max(maxResLength, pArr[i]);
         }
-        return max - 1;
+        return maxResLength - 1;
     }
 
     public static void main(String[] args) {
-        int length = maxLcpsLength("123abccbadbccba4w2");
+        int length = maxLoopsLength("123abccbadbccba4w2");
         System.out.println(length);
     }
 }
@@ -745,7 +749,7 @@ public class Manacher {
 
 
 
-### 题目拓展：添加字符形成回文串
+### （三）题目拓展：添加字符形成回文串
 
 一个字符串，只能向后面添加字符，怎么将整个串都变成回文串，要求添加字符最短。
 
@@ -753,7 +757,7 @@ public class Manacher {
 
 即求，在包含最后一个字符情况下，最长回文串多少，前面不是的部分，逆序添加即可。
 
-用manacher求得回文边界，发现边界与字符串最后位置，停止，求得回文中心C与有边界R，找到回文字符串，用原字符串减去该部分，在逆序就是结果。
+用 manacher 求得回文边界，发现边界与字符串最后位置，停止，求得回文中心C与有边界R，找到回文字符串，用原字符串减去该部分，在逆序就是结果。
 
 >思路：当`R`第一次到达串尾时，做`R`关于`C`的对称点`L`，将`L`之前的字符串逆序就是结果。
 
@@ -820,30 +824,33 @@ public class ShortestEnd {
 }
 ```
 
-
-
-## 三、BFPRT 算法
-
- **这个算法其实就是用来解决 ： 求解最小/最大的 k 个数问题，不是第 K 个数。**
+## 三、BFPRT 算法：求解最小/最大的 k 个数问题，不是第 K 个数
 
 - 最暴力的方法是：排序然后查找：$$O(N*log^N)$$
 
 - 常规的做法 就是 平均时间复杂度为 O(n) 的 partition 函数的应用，划分结果为小于某个数的放左边，等于某个数的放中间，大于某个数的放右边，然后看等于的左右边界，例如第一次划分结果左右边界为：500 ~ 600 位，查找的是第 300 小的数，则将小于区域按照上面方式再次使用 partition 函数进行划分，如果等于区域命中就结束过程，依次类推。  
-    - 缺点：是概率式的，无法避免最差的情况（因为每次选取的划分值是随机的，很难保证大于和小于该值的区间长度差不多）。因此最终期望为：$$O(N)$$
+
+    缺点：是概率式的，无法避免最差的情况（因为每次选取的划分值是随机的，很难保证大于和小于该值的区间长度差不多）。因此最终期望为：$$O(N)$$
 
 - BFPRT算法优点是确定性的，严格的 $$O(N)$$。
 
-大概思路：
+### （一）BFPRT 算法思路
 
 - 步骤一：将整个数组以 `5` 个数字一组划分 ,最后不满 `5` 个的单独成组，分别进行组内排序（组间不排序） ，因为只是 `5` 个数排序，所有时间复杂度为 `O(1)`， 同时因为整个数组分为 `N/5` 组，所以则总共时间复杂度为 O(N)。
 
-- 步骤二：把每个组内的中位数拿出来构成一个新数组，若为偶数则拿其上中位数即可，数组长度为 N/5
+- 步骤二：把每个组内的中位数拿出来构成一个新数组，若为偶数则拿其上中位数即可，数组长度为 N/5；
 
-- 递归调用该 bfprt 函数，传入刚才的中位数数组 和 中位数数组长度的一半 （继续求中位数）【BFPRT 函数格式为： int BFPRT（arr,k) 输入数组 arr 和要求的第 k 小的值】
+- 递归调用该 BFPRT 函数，传入刚才的中位数数组 和 中位数数组长度的一半 （继续求中位数）【BFPRT 函数格式为： int BFPRT（arr,k) 输入数组 arr 和要求的第 k 小的值】
 
 - 将上一步返回的值作为原始数组划分值，一直以该值作为 paritition 函数的划分值，然后后面同上的 Partition 过程。
 
-例子：
+**举个栗子**：
+
+BFPRT(arr,k)，求第二大的值
+
+- 步骤一：将原数组划分为 5 个一组：          3 2 1 4 6      0 1 2 3 5      2 3 7 5 6      4 2 1 3 2       5 3 2 4
+- 步骤二：对每个划分之后的数排序：          1 2 3 4 6      0 1 2 3 5      2 3 5 6 7      1 2 2 3 4       2 3 4 5
+- 步骤三：对每个数组取中位数构成新数组：    3                  2                 5                   2                3
 
 ![BFPRT 示例](AlgorithmMediumDay01.resource/BFPRT%20%E7%A4%BA%E4%BE%8B.png)
 
