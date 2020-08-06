@@ -842,7 +842,7 @@ arr={3,4,5,1,2}
 
 那么3,4,5,1,2的MaxTree如下：
 
-![img](https://img-blog.csdn.net/2018100412265543?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FSUE9TUEY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+![img](AlgorithmMediumDay02.resource/2018100412265543)
 
 为什么通过这个方法能够正确地生成MaxTree呢？现给出证明：
 
@@ -895,7 +895,7 @@ arr={3,4,5,1,2}
 
  3  若一个元素左右两个元素均存在 则选择其中最小的那个作为父节点
 
-![img](https://img-blog.csdn.net/20180625222059635?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+![img](AlgorithmMediumDay02.resource/20180625222059635)
 
 注意： 一定只能构成一棵树，不会成为多叉树或者森林：
 
@@ -1026,31 +1026,31 @@ public class MaxTree {
 
 
 
-### （二）求最大子矩阵的大小： 
+### （二）求最大子矩阵的大小
 
-题目描述：给定一个整型矩阵map，其中的值只有0和1两种，求其中全是1的所有矩形区域中，最大的矩形区域为1的数量
+【题目】给定一个整型矩阵 `map`，其中的值只有 `0` 和 `1` 两种，求其中全是 `1` 的所有矩形区域中，最大的矩形区域为 `1` 的数量。
 
-例如：
+【举个栗子】
 
-1 1 1 0
+- `1 1 1 0`
 
-其中，最大的矩形区域有3个1，所以返回3
+    其中，最大的矩形区域有 3 个 1，所以返回 3
 
-再如：
+- 示例 2
 
+```
 1 0 1 1
-
 1 1 1 1
-
 1 1 1 0
+```
 
-其中，最大的矩形区域有6个1，所以返回6
+其中，最大的矩形区域有 6 个 1，所以返回 6
 
 
 
 **类似的，下图的直方图** （值可以相等），以每个矩阵的中心高度为杠---然后分别向左右去扩展，到比它小的时候就停止 ---并记录能够达成的最大格子数目
 
-![img](https://img-blog.csdn.net/20180625223536951?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+<img src="AlgorithmMediumDay02.resource/image-20200807001945121.png" alt="image-20200807001945121" style="zoom:50%;" />
 
 **解法:**   此题用单调栈，但是是找到左边和右边离他最近的比它小的数---从小到大的顺序  
 
@@ -1060,7 +1060,7 @@ public class MaxTree {
 
 若到最后栈里有元素 但是没有主动让元素弹出的右端元素 则可以最右到达右边界 左边就是下面的元素（两边不可达）
 
-![img](AlgorithmMediumDay01.resource/20180625224236941.png)
+![img](AlgorithmMediumDay02.resource/20180625224236941.png)
 
 **转换到原始问题中** ：
 
@@ -1072,19 +1072,13 @@ public class MaxTree {
 
 目的就是找到 每一行打底的最大的1的长方形
 
-![img](AlgorithmMediumDay01.resource/201806252302410.png)
+![img](AlgorithmMediumDay02.resource/201806252302410.png)
 
 
 分析时间复杂度：因为每行运算都是 O（m），然后一共 N 行，所以是 O（n*m ) 就是遍历一遍矩阵
 
-![img](AlgorithmMediumDay01.resource/2018062523051320.png)
-
-
-
-代码
-
 ```java
-package com.gjxaiou.advanced.class01;
+package com.gjxaiou.advanced.day02;
 
 import java.util.Stack;
 
@@ -1147,7 +1141,6 @@ public class MaximalRectangle {
         System.out.println("maxArea = " + maxArea);
     }
 }
-
 ```
 
 
@@ -1177,9 +1170,8 @@ public class MaximalRectangle {
 ![image-20200103174347520](AlgorithmMediumDay02.resource/image-20200103174347520.png)
 
 ```java
-package com.gjxaiou.advanced.class01;
+package com.gjxaiou.advanced.day02;
 
-import java.awt.*;
 import java.util.Scanner;
 import java.util.Stack;
 
