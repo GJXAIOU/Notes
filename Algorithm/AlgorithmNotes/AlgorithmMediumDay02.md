@@ -6,21 +6,31 @@
 
 新类型字符的定义如下：　
 
-　　1、新类型字符是长度为1或者2的字符串
+　　1、新类型字符是长度为 1 或者 2 的字符串
 
-　　2、表现形式可以仅是小写字母，例如，"e"；也可以是大写字母+小写字母，例如，"Ab"；还可以是大写字母+大写字母，例如，"DC"
+　　2、表现形式可以仅是小写字母，例如："e"；也可以是大写字母+小写字母，例如："Ab"；还可以是大写字母+大写字母，例如："DC"
 
-　　现在给定一个字符串str，str一定是若干新类型字符正确组合的结果。比如"eaCCBi"，由新类型字符"e"，"a"，"CC"和"Bi"拼成。再给定一个整数k，代表str中的位置。请返回被k位置指中的新类型字符
+　　现在给定一个字符串 str，str 一定是若干新类型字符正确组合的结果。比如"eaCCBi"，由新类型字符"e"，"a"，"CC"和"Bi"拼成。再给定一个整数 k，代表 str 中的位置。请返回被 k 位置指中的新类型字符
 
-　　**举例：**
+　　**举个栗子**：
 
 　　　　str="aaABCDEcBCg"
 
-　　　　1、k=7时，返回"Ec"
+　　　　1、k=7 时，返回"Ec"
 
-　　　　2、k=4时，返回"CD"
+　　　　2、k=4 时，返回"CD"
 
-　　　　3、k=10时，返回"g"
+　　　　3、k=10 时，返回"g"
+
+**思路**：
+ 
+    从 k-1 位置开始 向左统计连续出现的大写字母数量 uNum 遇到小写字母就停止 
+
+    - 如果 `nNum` 为奇数， `str[k -1..k]` 是被选中的新型字符
+
+    - 如果 `nNum` 为偶数，且 `str[k]` 是大写字母，`str[k..k+1]` 是被选中的新型字符
+
+    - 如果 `nNum` 为偶数，且 `srt[k]` 是小写字母，`str[k]` 是被选中的新类型字符
 
 ```java
 package com.gjxaiou.advanced.day02;
@@ -64,26 +74,52 @@ public class Code_03_FindNewTypeChar {
 
 ```
 
+**网上示例**：
+
+```java
+//找到被指的新类型字符
+    public static String pointNewChar(String s, int k){
+        if(s==null||s.equals("")||k>s.length()||k<0){
+            return "";
+        }
+        char[] chas=s.toCharArray();
+        int uNum=0;//chas[k]左边连续出现的大写字母数
+        for(int i=k-1;i>=0;i--){
+            if(!Character.isUpperCase(chas[i])){//遇到小写就停止寻找左边的大写字母个数
+                break;
+            }
+            uNum++;
+        }
+        if((uNum&1)==1){//第一种情况：左边出现的大写字母为奇数
+            return s.substring(k-1, k+1);//大写字母不能单独出现，所以一定和当前k字符共同组成新字符
+        }
+        if(Character.isUpperCase(chas[k])){//第二种情况，左边大写偶数，当前k字符是大写
+            return s.substring(k, k+2);//大写字母不能单独出现，所以一定和后面的k+1字符共同组成新字符
+        }
+        return String.valueOf(chas[k]);//第三种情况，左边大写偶数，当前k字符是小写，返回当前k字符即可
+    }
+```
 
 
 ## 三、数字的英文表达和中文表达
 
 【题目】
-给定一个32位整数num，写两个函数分别返回num的英文与中文表达字符串。
-【举例】
-num=319
-英文表达字符串为：Three Hundred Nineteen
-中文表达字符串为：三百一十九
-num=1014
-英文表达字符串为：One Thousand, Fourteen
-中文表达字符串为：一千零十四
-num=-2147483648
-英文表达字符串为：Negative, Two Billion, One Hundred Forty Seven Million, Four
-Hundred Eighty Three Thousand, Six Hundred Forty Eight
-中文表达字符串为：负二十一亿四千七百四十八万三千六百四十八
-num=0
-英文表达字符串为：Zero
-中文表达字符串为：零
+给定一个 32 位整数 num，写两个函数分别返回 num 的英文与中文表达字符串。
+【举个栗子】
+- num=319
+  - 英文表达字符串为：Three Hundred Nineteen
+  - 中文表达字符串为：三百一十九
+- num=1014
+  - 英文表达字符串为：One Thousand, Fourteen
+  - 中文表达字符串为：一千零十四
+- num=-2147483648
+  - 英文表达字符串为：Negative, Two Billion, One Hundred Forty Seven Million, Four Hundred Eighty Three Thousand, Six Hundred Forty Eight
+  - 中文表达字符串为：负二十一亿四千七百四十八万三千六百四十八
+- num=0
+  - 英文表达字符串为：Zero
+  - 中文表达字符串为：零
+
+**解析见**：https://www.jianshu.com/p/f08b03200f58
 
 ```java
 package com.gjxaiou.advanced.advanced_class_02;
@@ -94,6 +130,7 @@ public class Code_05_EnglishExpression {
 		if (num < 1 || num > 19) {
 			return "";
 		}
+               // 可以通过枚举的方式,将所有19个可能性放入到一个String数组中
 		String[] names = { "One ", "Two ", "Three ", "Four ", "Five ", "Six ",
 				"Seven ", "Eight ", "Nine ", "Ten ", "Eleven ", "Twelve ",
 				"Thirteen ", "Fourteen ", "Fifteen ", "Sixteen ", "Sixteen ",
@@ -101,6 +138,9 @@ public class Code_05_EnglishExpression {
 		return names[num - 1];
 	}
 
+       /**
+        * 当我们传入16是,就找出这个数组中16-1,下标为15的表达.十分简单,现在完成了1---19的表达,然后我们来完成1---99的表达,我们通过/运算得到十位,用一个数组来承担,然后通过%运算得到低位,然后使用num1to19来表达
+        */
 	public static String num1To99(int num) {
 		if (num < 1 || num > 99) {
 			return "";
@@ -113,7 +153,7 @@ public class Code_05_EnglishExpression {
 				"Sixty ", "Seventy ", "Eighty ", "Ninety " };
 		return tyNames[high - 2] + num1To19(num % 10);
 	}
-
+       // 依次类推,我们现在知道了1---99的表达,然后我们通过/和%运算就可以得到1---999的表达了,但是要注意,在中间加上,"Hundred".
 	public static String num1To999(int num) {
 		if (num < 1 || num > 999) {
 			return "";
@@ -125,14 +165,18 @@ public class Code_05_EnglishExpression {
 		return num1To19(high) + "Hundred " + num1To99(num % 100);
 	}
 
+        // 主函数
 	public static String getNumEngExp(int num) {
+               // 第一步判断num是不是0,如果是0的话直接返回 Zero
 		if (num == 0) {
 			return "Zero";
 		}
 		String res = "";
+                // 第二步判断是不是负数,如果num<0,我们家在操作之前加上negative,
 		if (num < 0) {
 			res = "Negative, ";
 		}
+                // 重点来了,我们这儿为什么要将Integer.MIN_VALUE单另的拿出来做判断.因为如果不做处理的话,将Integer.MIN_VALUE转化成整数的话,就会溢出
 		if (num == Integer.MIN_VALUE) {
 			res += "Two Billion, ";
 			num %= -2000000000;
@@ -341,7 +385,7 @@ public class Code_06_ChineseExpression {
 
 ### （一）滑动窗口的概念
 
-**就是一个数组------有 L 和 R指 针，默认两个指针均位于数组的最左边即下标为 -1 的位置， 当有数字进入时 R 向右移动。当有数字删除时则 L 向右移动 且L 和R 不会回退且 L 不能到 R 右边。**
+**就是一个数组------有 `L` 和 `R` 指 针，默认两个指针均位于数组的最左边即下标为 `-1` 的位置， 当有数字进入时 `R` 向右移动。当有数字删除时则 `L` 向右移动 且 `L` 和 `R` 不会回退且 `L` 不能到 `R` 右边。**
 
 思路： **双端队列（链表）**：双端队列中既需要放置数据又需要放置位置下标，本质上存放下标就行，对应值根据下标从数组中就能获取。
 
@@ -367,9 +411,7 @@ public class Code_06_ChineseExpression {
 
 ### （二）应用一：生成窗口最大值数组
 
-**1.题目**：
-
-有一个整型数组 arr 和一个大小为 w 的窗口从数组的最左边滑到最右边，窗口每次向右滑一个位置。
+【题目】：有一个整型数组 arr 和一个大小为 w 的窗口从数组的最左边滑到最右边，窗口每次向右滑一个位置。
 
 例如，数组为 [4,3,5,4,3,3,6,7]，窗口大小为 3 时候：
 
@@ -389,9 +431,9 @@ public class Code_06_ChineseExpression {
 
 请实现一个函数：
 
-输入：整型数组 arr，窗口大小为 w。
+- 输入：整型数组 arr，窗口大小为 w。
 
-输出：一个长度为 n - w + 1 的数组 res，res[i]表示每一种窗口状态下的最大值。
+- 输出：一个长度为 n - w + 1 的数组 res，res[i]表示每一种窗口状态下的最大值。
 
 上面的结果应该返回{5,5,5,4,6,7}
 
@@ -455,14 +497,12 @@ public class SlidingWindowMaxArray {
 
 ### （二）应用二：最大值-最小值<=num的子数组数量:
 
-**题目**：给定数组 arr 和整数 num，共返回有多少个子数组满足如下情况：`max(arr[i...j]) - min(arr[i...j]) <= num`，其中 `max(arr[i...j])` 表示子数组 `arr[i...j]` 中最大值，`min(arr[i...j])` 表示子数组 `arr[i...j]` 中的最小值。
+【题目】：给定数组 arr 和整数 num，共返回有多少个子数组满足如下情况：`max(arr[i...j]) - min(arr[i...j]) <= num`，其中 `max(arr[i...j])` 表示子数组 `arr[i...j]` 中最大值，`min(arr[i...j])` 表示子数组 `arr[i...j]` 中的最小值。
 
 **要求**：如果数组长度为 N，请实现时间复杂度为 O（N）的解法。
 
 
-
 - 子数组（必须连续）一共有：$$N^2$$ 个（0~1,0~2，。。。0~n；1~1，。。。）
-
 
 
 **最简单思路： 暴力求解 两个for 依次遍历** 
@@ -502,15 +542,11 @@ public class AllLessNumSubArray {
 
 ```
 
-
-
-分析时间复杂度： o(N3) n的3次方
-
-
+时间复杂度： $$O(N^3)$$
 
 **最优解思路：**
 
-- 如果有一个子数组 L~R 已经符合要求（并且其最大值为 max，最小值为 min），则其中内部的子数组一定也符合要求，因为内部空间（即范围小于 L ~ R）中的最大值只会 <= max，并且最小值只会 >=min，所有相减的结果肯定小于等于 num。
+- 如果有一个子数组 `L~R` 已经符合要求（并且其最大值为 max，最小值为 min），则其中内部的子数组一定也符合要求，因为内部空间（即范围小于 `L ~ R`）中的最大值只会 <= max，并且最小值只会 >=min，所有相减的结果肯定小于等于 num。
 
 - 同理如果已经不达标 则往两边扩也肯定不达标（因为扩大返回只会导致 max 值变大，min 值变小）。
 
@@ -641,7 +677,7 @@ public class AllLessNumSubArray {
 
 
 
-### （一） 应用一：构造数组的maxtree
+### （一） 应用一：构造数组的 maxtree
 
 定义二叉树的节点如下：
 
@@ -658,18 +694,18 @@ public class Node{
 
 
 
-一个数组的MaxTree定义：
+一个数组的 MaxTree 定义：
 
 - 数组必须没有重复元素
-- MaxTree是一棵二叉树，数组的每一个值对应一个二叉树节点
-- 包括MaxTree树在内且在其中的每一棵子树上，值最大的节点都是树的头
+- MaxTree 是一棵二叉树，数组的每一个值对应一个二叉树节点
+- 包括 MaxTree 树在内且在其中的每一棵子树上，值最大的节点都是树的头
 
-给定一个没有重复元素的数组arr，写出生成这个数组的MaxTree的函数，要求如果数组长度为N，则时间负责度为O(N)、额外空间负责度为O(N)。
+给定一个没有重复元素的数组 arr，写出生成这个数组的 MaxTree 的函数，要求如果数组长度为 N，则时间负责度为 O(N)、额外空间负责度为 O(N)。
 
 #### 实现思路
 
 对每一个元素，从左边和右边各选择第一个比这个元素大的值，选择值较小的元素作为父节点。
-  在【生成窗口最大数组】里面，已经掌握了，在O(N)时间复杂度里面，找到每个元素位置最近的比元素大的元素，同个这个套路，就可以构造一棵MaxTree了。
+  在【生成窗口最大数组】里面，已经掌握了，在 O(N) 时间复杂度里面，找到每个元素位置最近的比元素大的元素，同个这个套路，就可以构造一棵 MaxTree 了。
 
 #### 证明
 
@@ -885,7 +921,6 @@ public class MaxTree {
 ![img](AlgorithmMediumDay01.resource/201806252302410.png)
 
 
-
 分析时间复杂度：因为每行运算都是 O（m），然后一共 N 行，所以是 O（n*m ) 就是遍历一遍矩阵
 
 ![img](AlgorithmMediumDay01.resource/2018062523051320.png)
@@ -965,7 +1000,7 @@ public class MaximalRectangle {
 
 ### （三）回形山
 
-使用一个数组表示环形山，然后每座山上放烽火，相邻山之间的烽火可以看见；因为任意两座山之间可以通过顺时针或者逆时针的方式互相到达，如果两种方式中一条经过的数字都不大于两座山值的较小的一个，则两座山相互可见（如 3,4 之间可以看见），返回能返回相互看见的山峰有多少对。
+【题目】 使用一个数组表示环形山，然后每座山上放烽火，相邻山之间的烽火可以看见；因为任意两座山之间可以通过顺时针或者逆时针的方式互相到达，如果两种方式中一条经过的数字都不大于两座山值的较小的一个，则两座山相互可见（如 3,4 之间可以看见），返回能返回相互看见的山峰有多少对。
 
 ![image-20200103164426898](AlgorithmMediumDay02.resource/image-20200103164426898.png)
 
@@ -1086,10 +1121,4 @@ public class MountainsAndFlame {
         return res;
     }
 }
-
 ```
-
-
-
-
-
