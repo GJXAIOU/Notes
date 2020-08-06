@@ -4,108 +4,95 @@
 
 ## 一、找到新的被指的新类型字符
 
-新类型字符的定义如下：　
+【题目】新类型字符的定义如下：　
 
-　　1、新类型字符是长度为 1 或者 2 的字符串
+- 新类型字符是长度为 1 或者 2 的字符串
 
-　　2、表现形式可以仅是小写字母，例如："e"；也可以是大写字母+小写字母，例如："Ab"；还可以是大写字母+大写字母，例如："DC"
+- 表现形式可以仅是小写字母，例如："e"；也可以是大写字母+小写字母，例如："Ab"；还可以是大写字母+大写字母，例如："DC"
 
-　　现在给定一个字符串 str，str 一定是若干新类型字符正确组合的结果。比如"eaCCBi"，由新类型字符"e"，"a"，"CC"和"Bi"拼成。再给定一个整数 k，代表 str 中的位置。请返回被 k 位置指中的新类型字符
+现在给定一个字符串 str，str 一定是若干新类型字符正确组合的结果。比如"eaCCBi"，由新类型字符"e"，"a"，"CC"和"Bi"拼成。再给定一个整数 k，代表 str 中的位置。请返回被 k 位置指中的新类型字符
 
-　　**举个栗子**：
+**举个栗子**：`str="aaABCDEcBCg"`
 
-　　　　str="aaABCDEcBCg"
+- k=7 时，返回"Ec"
 
-　　　　1、k=7 时，返回"Ec"
+- k=4 时，返回"CD"
 
-　　　　2、k=4 时，返回"CD"
-
-　　　　3、k=10 时，返回"g"
+- k=10 时，返回"g"
 
 **思路**：
- 
-    从 k-1 位置开始 向左统计连续出现的大写字母数量 uNum 遇到小写字母就停止 
 
-    - 如果 `nNum` 为奇数， `str[k -1..k]` 是被选中的新型字符
+从 k-1 位置开始向左统计连续出现的大写字母数量 upperNum 遇到小写字母就停止 
 
-    - 如果 `nNum` 为偶数，且 `str[k]` 是大写字母，`str[k..k+1]` 是被选中的新型字符
+- 如果 `upperNum` 为奇数， `str[k -1..k]` 是被选中的新型字符
 
-    - 如果 `nNum` 为偶数，且 `srt[k]` 是小写字母，`str[k]` 是被选中的新类型字符
+- 如果 `upperNum` 为偶数，且 `str[k]` 是大写字母，`str[k..k+1]` 是被选中的新型字符
+
+- 如果 `upperNum` 为偶数，且 `srt[k]` 是小写字母，`str[k]` 是被选中的新类型字符
 
 ```java
 package com.gjxaiou.advanced.day02;
 
-public class Code_03_FindNewTypeChar {
+/**
+ * @author GJXAIOU
+ */
+public class FindNewTypeChar {
 
-    public static String pointNewchar(String s, int k) {
+    public static String pointNewChar(String s, int k) {
         if (s == null || s.equals("") || k < 0 || k >= s.length()) {
             return "";
         }
-        char[] chas = s.toCharArray();
-        int uNum = 0;
+
+        char[] inputArray = s.toCharArray();
+        // inputArray[k] 左边连续出现的大写字母数
+        int upperNum = 0;
         for (int i = k - 1; i >= 0; i--) {
-            if (!isUpper(chas[i])) {
+            // 遇到小写就停止寻找左边的大写字母个数
+            if (!isUpper(inputArray[i])) {
                 break;
             }
-            uNum++;
+            upperNum++;
         }
-        if ((uNum & 1) == 1) {
+        // 第一种情况：左边出现的大写字母为奇数
+        if ((upperNum & 1) == 1) {
+            //大写字母不能单独出现，所以一定和当前 k 字符共同组成新字符，即 [k-1,k]
             return s.substring(k - 1, k + 1);
         }
-        if (isUpper(chas[k])) {
+
+        // 第二种情况，左边大写偶数，当前 k 字符是大写
+        if (isUpper(inputArray[k])) {
+            // 大写字母不能单独出现，所以一定和后面的 k+1 字符共同组成新字符
             return s.substring(k, k + 2);
         }
-        return String.valueOf(chas[k]);
+
+        //第三种情况，左边大写偶数，当前k字符是小写，返回当前k字符即可
+        return String.valueOf(inputArray[k]);
     }
 
+    // 判断字符是否为大写
     public static boolean isUpper(char ch) {
         return !(ch < 'A' || ch > 'Z');
     }
 
+
     public static void main(String[] args) {
         String str = "aaABCDEcBCg";
-        System.out.println(pointNewchar(str, 7));
-        System.out.println(pointNewchar(str, 4));
-        System.out.println(pointNewchar(str, 10));
+        System.out.println(pointNewChar(str, 7));
+        System.out.println(pointNewChar(str, 4));
+        System.out.println(pointNewChar(str, 10));
 
     }
-
 }
-
 ```
 
-**网上示例**：
 
-```java
-//找到被指的新类型字符
-    public static String pointNewChar(String s, int k){
-        if(s==null||s.equals("")||k>s.length()||k<0){
-            return "";
-        }
-        char[] chas=s.toCharArray();
-        int uNum=0;//chas[k]左边连续出现的大写字母数
-        for(int i=k-1;i>=0;i--){
-            if(!Character.isUpperCase(chas[i])){//遇到小写就停止寻找左边的大写字母个数
-                break;
-            }
-            uNum++;
-        }
-        if((uNum&1)==1){//第一种情况：左边出现的大写字母为奇数
-            return s.substring(k-1, k+1);//大写字母不能单独出现，所以一定和当前k字符共同组成新字符
-        }
-        if(Character.isUpperCase(chas[k])){//第二种情况，左边大写偶数，当前k字符是大写
-            return s.substring(k, k+2);//大写字母不能单独出现，所以一定和后面的k+1字符共同组成新字符
-        }
-        return String.valueOf(chas[k]);//第三种情况，左边大写偶数，当前k字符是小写，返回当前k字符即可
-    }
-```
 
 
 ## 三、数字的英文表达和中文表达
 
-【题目】
-给定一个 32 位整数 num，写两个函数分别返回 num 的英文与中文表达字符串。
+【题目】给定一个 32 位整数 num，写两个函数分别返回 num 的英文与中文表达字符串。
 【举个栗子】
+
 - num=319
   - 英文表达字符串为：Three Hundred Nineteen
   - 中文表达字符串为：三百一十九
@@ -119,262 +106,261 @@ public class Code_03_FindNewTypeChar {
   - 英文表达字符串为：Zero
   - 中文表达字符串为：零
 
-**解析见**：https://www.jianshu.com/p/f08b03200f58
-
 ```java
-package com.gjxaiou.advanced.advanced_class_02;
+package com.gjxaiou.advanced.day02;
 
-public class Code_05_EnglishExpression {
+public class EnglishExpression {
 
-	public static String num1To19(int num) {
-		if (num < 1 || num > 19) {
-			return "";
-		}
-               // 可以通过枚举的方式,将所有19个可能性放入到一个String数组中
-		String[] names = { "One ", "Two ", "Three ", "Four ", "Five ", "Six ",
-				"Seven ", "Eight ", "Nine ", "Ten ", "Eleven ", "Twelve ",
-				"Thirteen ", "Fourteen ", "Fifteen ", "Sixteen ", "Sixteen ",
-				"Eighteen ", "Nineteen " };
-		return names[num - 1];
-	}
+    // 如果是 1- 19，直接取值；可以通过枚举的方式,将所有19个可能性放入到一个String数组中
+    public static String num1To19(int num) {
+        if (num < 1 || num > 19) {
+            return "";
+        }
+        String[] names = {"One ", "Two ", "Three ", "Four ", "Five ", "Six ",
+                "Seven ", "Eight ", "Nine ", "Ten ", "Eleven ", "Twelve ",
+                "Thirteen ", "Fourteen ", "Fifteen ", "Sixteen ", "Sixteen ",
+                "Eighteen ", "Nineteen "};
+        return names[num - 1];
+    }
 
-       /**
-        * 当我们传入16是,就找出这个数组中16-1,下标为15的表达.十分简单,现在完成了1---19的表达,然后我们来完成1---99的表达,我们通过/运算得到十位,用一个数组来承担,然后通过%运算得到低位,然后使用num1to19来表达
-        */
-	public static String num1To99(int num) {
-		if (num < 1 || num > 99) {
-			return "";
-		}
-		if (num < 20) {
-			return num1To19(num);
-		}
-		int high = num / 10;
-		String[] tyNames = { "Twenty ", "Thirty ", "Forty ", "Fifty ",
-				"Sixty ", "Seventy ", "Eighty ", "Ninety " };
-		return tyNames[high - 2] + num1To19(num % 10);
-	}
-       // 依次类推,我们现在知道了1---99的表达,然后我们通过/和%运算就可以得到1---999的表达了,但是要注意,在中间加上,"Hundred".
-	public static String num1To999(int num) {
-		if (num < 1 || num > 999) {
-			return "";
-		}
-		if (num < 100) {
-			return num1To99(num);
-		}
-		int high = num / 100;
-		return num1To19(high) + "Hundred " + num1To99(num % 100);
-	}
+    /**
+     * 当我们传入16是,就找出这个数组中16-1,下标为15的表达.十分简单,现在完成了1---19的表达,然后我们来完成1---99的表达,我们通过/运算得到十位,用一个数组来承担,
+     * 然后通过%运算得到低位,然后使用num1to19来表达
+     */
+    public static String num1To99(int num) {
+        if (num < 1 || num > 99) {
+            return "";
+        }
+        if (num < 20) {
+            return num1To19(num);
+        }
+        int high = num / 10;
+        String[] tyNames = {"Twenty ", "Thirty ", "Forty ", "Fifty ",
+                "Sixty ", "Seventy ", "Eighty ", "Ninety "};
+        return tyNames[high - 2] + num1To19(num % 10);
+    }
 
-        // 主函数
-	public static String getNumEngExp(int num) {
-               // 第一步判断num是不是0,如果是0的话直接返回 Zero
-		if (num == 0) {
-			return "Zero";
-		}
-		String res = "";
-                // 第二步判断是不是负数,如果num<0,我们家在操作之前加上negative,
-		if (num < 0) {
-			res = "Negative, ";
-		}
-                // 重点来了,我们这儿为什么要将Integer.MIN_VALUE单另的拿出来做判断.因为如果不做处理的话,将Integer.MIN_VALUE转化成整数的话,就会溢出
-		if (num == Integer.MIN_VALUE) {
-			res += "Two Billion, ";
-			num %= -2000000000;
-		}
-		num = Math.abs(num);
-		int high = 1000000000;
-		int highIndex = 0;
-		String[] names = { "Billion", "Million", "Thousand", "" };
-		while (num != 0) {
-			int cur = num / high;
-			num %= high;
-			if (cur != 0) {
-				res += num1To999(cur);
-				res += names[highIndex] + (num == 0 ? " " : ", ");
-			}
-			high /= 1000;
-			highIndex++;
-		}
-		return res;
-	}
+    // 依次类推,我们现在知道了1---99的表达,然后我们通过/和%运算就可以得到1---999的表达了,但是要注意,在中间加上,"Hundred".
+    public static String num1To999(int num) {
+        if (num < 1 || num > 999) {
+            return "";
+        }
+        if (num < 100) {
+            return num1To99(num);
+        }
+        int high = num / 100;
+        return num1To19(high) + "Hundred " + num1To99(num % 100);
+    }
 
-	public static int generateRandomNum() {
-		boolean isNeg = Math.random() > 0.5 ? false : true;
-		int value = (int) (Math.random() * Integer.MIN_VALUE);
-		return isNeg ? value : -value;
-	}
+    // 主函数
+    public static String getNumEngExp(int num) {
+        // 第一步判断num是不是0,如果是0的话直接返回 Zero
+        if (num == 0) {
+            return "Zero";
+        }
+        String res = "";
+        // 第二步判断是不是负数,如果num<0,我们家在操作之前加上negative,
+        if (num < 0) {
+            res = "Negative, ";
+        }
+        // 重点来了,我们这儿为什么要将Integer.MIN_VALUE单另的拿出来做判断.因为如果不做处理的话,将Integer.MIN_VALUE转化成整数的话,就会溢出
+        if (num == Integer.MIN_VALUE) {
+            res += "Two Billion, ";
+            num %= -2000000000;
+        }
+        num = Math.abs(num);
+        int high = 1000000000;
+        int highIndex = 0;
+        String[] names = {"Billion", "Million", "Thousand", ""};
+        while (num != 0) {
+            int cur = num / high;
+            num %= high;
+            if (cur != 0) {
+                res += num1To999(cur);
+                res += names[highIndex] + (num == 0 ? " " : ", ");
+            }
+            high /= 1000;
+            highIndex++;
+        }
+        return res;
+    }
 
-	public static void main(String[] args) {
-		System.out.println(getNumEngExp(0));
-		System.out.println(getNumEngExp(Integer.MAX_VALUE));
-		System.out.println(getNumEngExp(Integer.MIN_VALUE));
-		int num = generateRandomNum();
-		System.out.println(num);
-		System.out.println(getNumEngExp(num));
+    /**
+     * 测试程序
+     */
+    public static int generateRandomNum() {
+        boolean isNeg = Math.random() > 0.5 ? false : true;
+        int value = (int) (Math.random() * Integer.MIN_VALUE);
+        return isNeg ? value : -value;
+    }
 
-	}
-
+    public static void main(String[] args) {
+        System.out.println(getNumEngExp(0));
+        System.out.println(getNumEngExp(Integer.MAX_VALUE));
+        System.out.println(getNumEngExp(Integer.MIN_VALUE));
+        int num = generateRandomNum();
+        System.out.println(num);
+        System.out.println(getNumEngExp(num));
+    }
 }
-
 ```
 
 
 
-中文表达
+中文表达：https://www.jianshu.com/p/f08b03200f58
 
 ```java
 package com.gjxaiou.advanced.day02;
 
-public class Code_06_ChineseExpression {
+public class ChineseExpression {
 
-	public static String num1To9(int num) {
-		if (num < 1 || num > 9) {
-			return "";
-		}
-		String[] names = { "一", "二", "三", "四", "五", "六", "七", "八", "九" };
-		return names[num - 1];
-	}
+    public static String num1To9(int num) {
+        if (num < 1 || num > 9) {
+            return "";
+        }
+        String[] names = {"一", "二", "三", "四", "五", "六", "七", "八", "九"};
+        return names[num - 1];
+    }
 
-	public static String num1To99(int num, boolean hasBai) {
-		if (num < 1 || num > 99) {
-			return "";
-		}
-		if (num < 10) {
-			return num1To9(num);
-		}
-		int shi = num / 10;
-		if (shi == 1 && (!hasBai)) {
-			return "十" + num1To9(num % 10);
-		} else {
-			return num1To9(shi) + "十" + num1To9(num % 10);
-		}
-	}
+    public static String num1To99(int num, boolean hasBai) {
+        if (num < 1 || num > 99) {
+            return "";
+        }
+        if (num < 10) {
+            return num1To9(num);
+        }
+        int shi = num / 10;
+        if (shi == 1 && (!hasBai)) {
+            return "十" + num1To9(num % 10);
+        } else {
+            return num1To9(shi) + "十" + num1To9(num % 10);
+        }
+    }
 
-	public static String num1To999(int num) {
-		if (num < 1 || num > 999) {
-			return "";
-		}
-		if (num < 100) {
-			return num1To99(num, false);
-		}
-		String res = num1To9(num / 100) + "百";
-		int rest = num % 100;
-		if (rest == 0) {
-			return res;
-		} else if (rest >= 10) {
-			res += num1To99(rest, true);
-		} else {
-			res += "零" + num1To9(rest);
-		}
-		return res;
-	}
+    public static String num1To999(int num) {
+        if (num < 1 || num > 999) {
+            return "";
+        }
+        if (num < 100) {
+            return num1To99(num, false);
+        }
+        String res = num1To9(num / 100) + "百";
+        int rest = num % 100;
+        if (rest == 0) {
+            return res;
+        } else if (rest >= 10) {
+            res += num1To99(rest, true);
+        } else {
+            res += "零" + num1To9(rest);
+        }
+        return res;
+    }
 
-	public static String num1To9999(int num) {
-		if (num < 1 || num > 9999) {
-			return "";
-		}
-		if (num < 1000) {
-			return num1To999(num);
-		}
-		String res = num1To9(num / 1000) + "千";
-		int rest = num % 1000;
-		if (rest == 0) {
-			return res;
-		} else if (rest >= 100) {
-			res += num1To999(rest);
-		} else {
-			res += "零" + num1To99(rest, false);
-		}
-		return res;
-	}
+    public static String num1To9999(int num) {
+        if (num < 1 || num > 9999) {
+            return "";
+        }
+        if (num < 1000) {
+            return num1To999(num);
+        }
+        String res = num1To9(num / 1000) + "千";
+        int rest = num % 1000;
+        if (rest == 0) {
+            return res;
+        } else if (rest >= 100) {
+            res += num1To999(rest);
+        } else {
+            res += "零" + num1To99(rest, false);
+        }
+        return res;
+    }
 
-	public static String num1To99999999(int num) {
-		if (num < 1 || num > 99999999) {
-			return "";
-		}
-		int wan = num / 10000;
-		int rest = num % 10000;
-		if (wan == 0) {
-			return num1To9999(rest);
-		}
-		String res = num1To9999(wan) + "万";
-		if (rest == 0) {
-			return res;
-		} else {
-			if (rest < 1000) {
-				return res + "零" + num1To999(rest);
-			} else {
-				return res + num1To9999(rest);
-			}
-		}
-	}
+    public static String num1To99999999(int num) {
+        if (num < 1 || num > 99999999) {
+            return "";
+        }
+        int wan = num / 10000;
+        int rest = num % 10000;
+        if (wan == 0) {
+            return num1To9999(rest);
+        }
+        String res = num1To9999(wan) + "万";
+        if (rest == 0) {
+            return res;
+        } else {
+            if (rest < 1000) {
+                return res + "零" + num1To999(rest);
+            } else {
+                return res + num1To9999(rest);
+            }
+        }
+    }
 
-	public static String getNumChiExp(int num) {
-		if (num == 0) {
-			return "零";
-		}
-		String res = num < 0 ? "负" : "";
-		int yi = Math.abs(num / 100000000);
-		int rest = Math.abs((num % 100000000));
-		if (yi == 0) {
-			return res + num1To99999999(rest);
-		}
-		res += num1To9999(yi) + "亿";
-		if (rest == 0) {
-			return res;
-		} else {
-			if (rest < 10000000) {
-				return res + "零" + num1To99999999(rest);
-			} else {
-				return res + num1To99999999(rest);
-			}
-		}
-	}
+    public static String getNumChiExp(int num) {
+        if (num == 0) {
+            return "零";
+        }
+        String res = num < 0 ? "负" : "";
+        int yi = Math.abs(num / 100000000);
+        int rest = Math.abs((num % 100000000));
+        if (yi == 0) {
+            return res + num1To99999999(rest);
+        }
+        res += num1To9999(yi) + "亿";
+        if (rest == 0) {
+            return res;
+        } else {
+            if (rest < 10000000) {
+                return res + "零" + num1To99999999(rest);
+            } else {
+                return res + num1To99999999(rest);
+            }
+        }
+    }
 
-	// for test
-	public static int generateRandomNum() {
-		boolean isNeg = Math.random() > 0.5 ? false : true;
-		int value = (int) (Math.random() * Integer.MIN_VALUE);
-		return isNeg ? value : -value;
-	}
+    // for test
+    public static int generateRandomNum() {
+        boolean isNeg = Math.random() > 0.5 ? false : true;
+        int value = (int) (Math.random() * Integer.MIN_VALUE);
+        return isNeg ? value : -value;
+    }
 
-	public static void main(String[] args) {
-		System.out.println(0);
-		System.out.println(getNumChiExp(0));
+    public static void main(String[] args) {
+        System.out.println(0);
+        System.out.println(getNumChiExp(0));
 
-		System.out.println(Integer.MAX_VALUE);
-		System.out.println(getNumChiExp(Integer.MAX_VALUE));
+        System.out.println(Integer.MAX_VALUE);
+        System.out.println(getNumChiExp(Integer.MAX_VALUE));
 
-		System.out.println(Integer.MIN_VALUE);
-		System.out.println(getNumChiExp(Integer.MIN_VALUE));
+        System.out.println(Integer.MIN_VALUE);
+        System.out.println(getNumChiExp(Integer.MIN_VALUE));
 
-		int num = generateRandomNum();
-		System.out.println(num);
-		System.out.println(getNumChiExp(num));
+        int num = generateRandomNum();
+        System.out.println(num);
+        System.out.println(getNumChiExp(num));
 
-		num = generateRandomNum();
-		System.out.println(num);
-		System.out.println(getNumChiExp(num));
+        num = generateRandomNum();
+        System.out.println(num);
+        System.out.println(getNumChiExp(num));
 
-		num = generateRandomNum();
-		System.out.println(num);
-		System.out.println(getNumChiExp(num));
+        num = generateRandomNum();
+        System.out.println(num);
+        System.out.println(getNumChiExp(num));
 
-		num = generateRandomNum();
-		System.out.println(num);
-		System.out.println(getNumChiExp(num));
+        num = generateRandomNum();
+        System.out.println(num);
+        System.out.println(getNumChiExp(num));
 
-		System.out.println(getNumChiExp(10));
-		System.out.println(getNumChiExp(110));
-		System.out.println(getNumChiExp(1010));
-		System.out.println(getNumChiExp(10010));
-		System.out.println(getNumChiExp(1900000000));
-		System.out.println(getNumChiExp(1000000010));
-		System.out.println(getNumChiExp(1010100010));
+        System.out.println(getNumChiExp(10));
+        System.out.println(getNumChiExp(110));
+        System.out.println(getNumChiExp(1010));
+        System.out.println(getNumChiExp(10010));
+        System.out.println(getNumChiExp(1900000000));
+        System.out.println(getNumChiExp(1000000010));
+        System.out.println(getNumChiExp(1010100010));
 
-	}
+    }
 }
-
 ```
 
 
@@ -385,7 +371,7 @@ public class Code_06_ChineseExpression {
 
 ### （一）滑动窗口的概念
 
-**就是一个数组------有 `L` 和 `R` 指 针，默认两个指针均位于数组的最左边即下标为 `-1` 的位置， 当有数字进入时 `R` 向右移动。当有数字删除时则 `L` 向右移动 且 `L` 和 `R` 不会回退且 `L` 不能到 `R` 右边。**
+**数组中包括 `L` 和 `R` 指 针，默认两个指针均位于数组的最左边即下标为 `-1` 的位置， 当有数字进入时 `R` 向右移动。当有数字删除时则 `L` 向右移动 且 `L` 和 `R` 不会回退且 `L` 不能到 `R` 右边。**
 
 思路： **双端队列（链表）**：双端队列中既需要放置数据又需要放置位置下标，本质上存放下标就行，对应值根据下标从数组中就能获取。
 
@@ -397,11 +383,11 @@ public class Code_06_ChineseExpression {
 
 - 当放入元素时候 ：
 
-    （R增加） **头部始终存放的是当前最大的元素**--- 如果即将进入双端队列的元素（因为 R 增加而从数组中取出放入双端队列中的元素）比上一个进入双端队列的元素小，则从尾部进入，新进入的元素直接连接在后面，否则 原来双端队列的尾部一直弹出（包含相等情况，因为晚过期） 直到为即将要放入的元素找到合适的位置，或者整个队列为空，然后放入新加入的元素。（见上面示例）
+    （R 增加） **头部始终存放的是当前最大的元素**--- 如果即将进入双端队列的元素（因为 R 增加而从数组中取出放入双端队列中的元素）比上一个进入双端队列的元素小，则从尾部进入，新进入的元素直接连接在后面，否则 原来双端队列的尾部一直弹出（包含相等情况，因为晚过期） 直到为即将要放入的元素找到合适的位置，或者整个队列为空，然后放入新加入的元素。（见上面示例）
 
 - 当删除元素时候：
 
-    （L增加） ---L向右移---（index下标一定得保留）则需要检查当前头部元素index是否过期 若过期则需要从头部进行弹出
+    （L 增加）即 L 向右移---（index下标一定得保留）则需要检查当前头部元素 index是否过期，若过期则需要从头部进行弹出
 
 ![img](AlgorithmMediumDay02.resource/20180621232650862.png)
 
@@ -427,13 +413,11 @@ public class Code_06_ChineseExpression {
 
 4 3 5 4 3 [3 6 7]   窗口中最大值为：7
 
-如果数组长度为 n，窗口大小为 w，则一共产生 n - w + 1 个窗口的最大值。
-
-请实现一个函数：
+如果数组长度为 n，窗口大小为 w，则一共产生 n - w + 1 个窗口的最大值。请实现一个函数：
 
 - 输入：整型数组 arr，窗口大小为 w。
 
-- 输出：一个长度为 n - w + 1 的数组 res，res[i]表示每一种窗口状态下的最大值。
+- 输出：一个长度为 n - w + 1 的数组 res，res[i] 表示每一种窗口状态下的最大值。
 
 上面的结果应该返回{5,5,5,4,6,7}
 
@@ -453,32 +437,36 @@ public class SlidingWindowMaxArray {
         if (arr == null || w < 1 || arr.length < w) {
             return null;
         }
-        // LinkedList 就是一个标准的双向链表
+
         LinkedList<Integer> maxList = new LinkedList<Integer>();
-        // 生成的结果数组
-        int[] res = new int[arr.length - w + 1];
+        int[] resList = new int[arr.length - w + 1];
         int index = 0;
         for (int i = 0; i < arr.length; i++) {
             // 更新双端队列，如果双端队列不为空，并且尾结点(存的是下标)对应数组中的值是否小于等于当前值
             while (!maxList.isEmpty() && arr[maxList.peekLast()] <= arr[i]) {
                 maxList.pollLast();
             }
+
             // 上面一直弹出，直到不符合然后加上当前值。
             maxList.addLast(i);
-            // 上面加法是通用的，但是减法是针对该题定制的
+
             // 当过期的时候（当窗口形成之后再扩充才算过期）即窗口长度 > w，窗口形成过程中不会过期, i - w表示过期的下标
             if (maxList.peekFirst() == i - w) {
                 maxList.pollFirst();
             }
+
             // 判断下标过期
             if (i >= w - 1) {
-                // 当窗口已经形成了，记录每一步的res
-                res[index++] = arr[maxList.peekFirst()];
+                // 当窗口已经形成了，记录每一步的 res
+                resList[index++] = arr[maxList.peekFirst()];
             }
         }
-        return res;
+        return resList;
     }
 
+    /**
+     * 测试程序
+     */
     public static void printArray(int[] array) {
         for (int i = 0; i < array.length; i++) {
             System.out.print(array[i] + " ");
@@ -502,10 +490,10 @@ public class SlidingWindowMaxArray {
 **要求**：如果数组长度为 N，请实现时间复杂度为 O（N）的解法。
 
 
-- 子数组（必须连续）一共有：$$N^2$$ 个（0~1,0~2，。。。0~n；1~1，。。。）
 
+**最简单思路： 暴力求解 两个for 依次遍历** ，时间复杂度： $$O(N^3)$$
 
-**最简单思路： 暴力求解 两个for 依次遍历** 
+子数组（必须连续）一共有：$$N^2$$ 个（0~1,0~2，。。。0~n；1~1，。。。）
 
 ```java
 package com.gjxaiou.advanced.class02;
@@ -542,28 +530,24 @@ public class AllLessNumSubArray {
 
 ```
 
-时间复杂度： $$O(N^3)$$
+
 
 **最优解思路：**
 
-- 如果有一个子数组 `L~R` 已经符合要求（并且其最大值为 max，最小值为 min），则其中内部的子数组一定也符合要求，因为内部空间（即范围小于 `L ~ R`）中的最大值只会 <= max，并且最小值只会 >=min，所有相减的结果肯定小于等于 num。
+- 如果有一个子数组 `L~R` 已经符合要求（并且其最大值为 max，最小值为 min），则其中内部的子数组一定也符合要求，**因为内部空间（即范围小于 `L ~ R`）中的最大值只会 <= max，并且最小值只会 >=min，所有相减的结果肯定小于等于 num**。
 
-- 同理如果已经不达标 则往两边扩也肯定不达标（因为扩大返回只会导致 max 值变大，min 值变小）。
+- 同理如果已经不达标则往两边扩也肯定不达标（因为扩大返回只会导致 max 值变大，min 值变小）。
 
-- 总计规律： 就是L一直往右走 不回退 R也跟着往右扩大范围
+- 总计规律： 就是 `L` 一直往右走 不回退 `R` 也跟着往右扩大范围
 
 首先数组左边固定在 0 位置，然后右边界一直扩充，但是同时维护一个窗口内最大值更新结构和窗口内最小值更新结构，使得每次扩充值之后都可以比较当前数组是否满足最大值 - 最小值 <= max 的情况，比如当到 X 下标的时候是满足的，但是 X + 1 下标就不满足的时候，则表示以 0 开头的满足的子数组数目为 X +1 个（0 ~ 0,0 ~1，。。0 ~X）。
 
 然后 L 缩一个位置，到 1 的位置，然后更新现有的最大和最小窗口更新结构（因为更新结构中 0 下标的值需要弹出），然后 R 继续向右走进行判断，直到不可以了就可以得到所有以 1 开头的子数组个数。
 
-其他类型，以此类推。
-
-
-
-代码：
+其他类型，以此类推
 
 ```java
-package com.gjxaiou.advanced.class02;
+package com.gjxaiou.advanced.day02;
 
 import java.util.LinkedList;
 
@@ -572,30 +556,6 @@ import java.util.LinkedList;
  * @Date 2020/1/1 20:59
  */
 public class AllLessNumSubArray {
-    // 暴力解法:O(N^3)
-    public static int getNum1(int[] arr, int num) {
-        int res = 0;
-        // 双层 for 循环穷尽所有的子数组可能性。
-        for (int start = 0; start < arr.length; start++) {
-            for (int end = start; end < arr.length; end++) {
-                if (isValid(arr, start, end, num)) {
-                    res++;
-                }
-            }
-        }
-        return res;
-    }
-
-    public static boolean isValid(int[] arr, int start, int end, int num) {
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
-        for (int i = start; i <= end; i++) {
-            max = Math.max(max, arr[i]);
-            min = Math.min(min, arr[i]);
-        }
-        return max - min <= num;
-    }
-
     /**
      * 使用双向最大最小值更新结构，时间复杂度为 O（N）
      */
@@ -604,32 +564,33 @@ public class AllLessNumSubArray {
             return 0;
         }
         // 分别准备最大值和最小值更新结构
-        LinkedList<Integer> qmax = new LinkedList<Integer>();
-        LinkedList<Integer> qmin = new LinkedList<Integer>();
+        LinkedList<Integer> maxList = new LinkedList<Integer>();
+        LinkedList<Integer> minList = new LinkedList<Integer>();
         int L = 0;
         int R = 0;
         int res = 0;
         while (L < arr.length) {
             while (R < arr.length) {
-                while (!qmin.isEmpty() && arr[qmin.peekLast()] >= arr[R]) {
-                    qmin.pollLast();
+                while (!minList.isEmpty() && arr[minList.peekLast()] >= arr[R]) {
+                    minList.pollLast();
                 }
-                qmin.addLast(R);
-                while (!qmax.isEmpty() && arr[qmax.peekLast()] <= arr[R]) {
-                    qmax.pollLast();
+                minList.addLast(R);
+                while (!maxList.isEmpty() && arr[maxList.peekLast()] <= arr[R]) {
+                    maxList.pollLast();
                 }
-                qmax.addLast(R);
+                maxList.addLast(R);
                 // 不达标
-                if (arr[qmax.getFirst()] - arr[qmin.getFirst()] > num) {
+                if (arr[maxList.getFirst()] - arr[minList.getFirst()] > num) {
                     break;
                 }
                 R++;
             }
-            if (qmin.peekFirst() == L) {
-                qmin.pollFirst();
+
+            if (minList.peekFirst() == L) {
+                minList.pollFirst();
             }
-            if (qmax.peekFirst() == L) {
-                qmax.pollFirst();
+            if (maxList.peekFirst() == L) {
+                maxList.pollFirst();
             }
             res += R - L;
             // 换一个开头
@@ -638,22 +599,17 @@ public class AllLessNumSubArray {
         return res;
     }
 }
-
 ```
-
-
 
 
 
 ## 五、单调栈
 
-问题描述：给定一个数组 请确定每个元素左右距离最近的比它大的数字
+【问题】给定一个数组 请确定每个元素左右距离**最近的比它大的数字**
 
 ![img](AlgorithmMediumDay02.resource/20180624215316588.png)
 
-**常规想法：** 到某一个元素时，通过两个for 分别获取其左边比它大的和右边比他大的数字 时间复杂度为 $$O(n^2)$$
-
-
+**常规想法：** 到某一个元素时，通过两个for 分别获取其左边比它大的和右边比他大的数字 时间复杂度为 $$O(n^2)$$。
 
 **最优解思路（单调栈）**，栈中实际放置下标即可。O(N)
 
@@ -661,9 +617,7 @@ public class AllLessNumSubArray {
 
 ![img](AlgorithmMediumDay02.resource/20180624215839593.png)
 
-注意： 到数组末尾时 但是栈中依然有元素 则此时元素弹出 右为null 而左边为栈中的下一元素
-
-记得 观察 这个元素弹出的驱动是啥？  之前的是因为右边要压栈的比栈顶元素要大 所以可以弹出并记录信息
+注意： 到数组末尾时 但是栈中依然有元素 则此时元素弹出，该元素的右为null 而左边为栈中的下一元素。
 
 ![img](AlgorithmMediumDay02.resource/20180625215803883.png)
 
@@ -673,7 +627,172 @@ public class AllLessNumSubArray {
 
 ![image-20200101220719195](AlgorithmMediumDay02.resource/image-20200101220719195.png)
 
+```java
+package com.gjxaiou.advanced.day02;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2020/8/6 22:15
+ */
+public class MonotonousStack {
+    // 没有重复元素可以用这个
+    public static int[][] getNearLessNoRepeat(int[] arr) {
+        int[][] res = new int[arr.length][2];
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < arr.length; i++) {
+            while (!stack.isEmpty() && arr[stack.peek()] > arr[i]) {
+                int popIndex = stack.pop();
+                int leftLessIndex = stack.isEmpty() ? -1 : stack.peek();
+                res[popIndex][0] = leftLessIndex;
+                res[popIndex][1] = i;
+            }
+            stack.push(i);
+        }
+        while (!stack.isEmpty()) {
+            int popIndex = stack.pop();
+            int leftLessIndex = stack.isEmpty() ? -1 : stack.peek();
+            res[popIndex][0] = leftLessIndex;
+            res[popIndex][1] = -1;
+        }
+        return res;
+    }
+
+    // 针对所有情况都可以
+    public static int[][] getNearLess(int[] arr) {
+        int[][] res = new int[arr.length][2];
+        Stack<List<Integer>> stack = new Stack<>();
+        for (int i = 0; i < arr.length; i++) {
+            while (!stack.isEmpty() && arr[stack.peek().get(0)] > arr[i]) {
+                List<Integer> popIs = stack.pop();
+                // 取位于下面位置的列表中，最晚加入的那个
+                int leftLessIndex = stack.isEmpty() ? -1 : stack.peek().get(
+                        stack.peek().size() - 1);
+                for (Integer popi : popIs) {
+                    res[popi][0] = leftLessIndex;
+                    res[popi][1] = i;
+                }
+            }
+            if (!stack.isEmpty() && arr[stack.peek().get(0)] == arr[i]) {
+                stack.peek().add(Integer.valueOf(i));
+            } else {
+                ArrayList<Integer> list = new ArrayList<>();
+                list.add(i);
+                stack.push(list);
+            }
+        }
+        while (!stack.isEmpty()) {
+            List<Integer> popIs = stack.pop();
+            // 取位于下面位置的列表中，最晚加入的那个
+            int leftLessIndex = stack.isEmpty() ? -1 : stack.peek().get(
+                    stack.peek().size() - 1);
+            for (Integer popi : popIs) {
+                res[popi][0] = leftLessIndex;
+                res[popi][1] = -1;
+            }
+        }
+        return res;
+    }
+
+
+    // for test
+    public static int[] getRandomArrayNoRepeat(int size) {
+        int[] arr = new int[(int) (Math.random() * size) + 1];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = i;
+        }
+        for (int i = 0; i < arr.length; i++) {
+            int swapIndex = (int) (Math.random() * arr.length);
+            int tmp = arr[swapIndex];
+            arr[swapIndex] = arr[i];
+            arr[i] = tmp;
+        }
+        return arr;
+    }
+
+    // for test
+    public static int[] getRandomArray(int size, int max) {
+        int[] arr = new int[(int) (Math.random() * size) + 1];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = (int) (Math.random() * max) - (int) (Math.random() * max);
+        }
+        return arr;
+    }
+
+    // for test
+    public static int[][] rightWay(int[] arr) {
+        int[][] res = new int[arr.length][2];
+        for (int i = 0; i < arr.length; i++) {
+            int leftLessIndex = -1;
+            int rightLessIndex = -1;
+            int cur = i - 1;
+            while (cur >= 0) {
+                if (arr[cur] < arr[i]) {
+                    leftLessIndex = cur;
+                    break;
+                }
+                cur--;
+            }
+            cur = i + 1;
+            while (cur < arr.length) {
+                if (arr[cur] < arr[i]) {
+                    rightLessIndex = cur;
+                    break;
+                }
+                cur++;
+            }
+            res[i][0] = leftLessIndex;
+            res[i][1] = rightLessIndex;
+        }
+        return res;
+    }
+
+    // for test
+    public static boolean isEqual(int[][] res1, int[][] res2) {
+        if (res1.length != res2.length) {
+            return false;
+        }
+        for (int i = 0; i < res1.length; i++) {
+            if (res1[i][0] != res2[i][0] || res1[i][1] != res2[i][1]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // for test
+    public static void printArray(int[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i] + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        int size = 10;
+        int max = 20;
+        int testTimes = 2000000;
+        for (int i = 0; i < testTimes; i++) {
+            int[] arr1 = getRandomArrayNoRepeat(size);
+            int[] arr2 = getRandomArray(size, max);
+            if (!isEqual(getNearLessNoRepeat(arr1), rightWay(arr1))) {
+                System.out.println("Oops!");
+                printArray(arr1);
+                break;
+            }
+            if (!isEqual(getNearLess(arr2), rightWay(arr2))) {
+                System.out.println("Oops!");
+                printArray(arr2);
+                break;
+            }
+        }
+    }
+}
+```
 
 
 
@@ -681,7 +800,7 @@ public class AllLessNumSubArray {
 
 定义二叉树的节点如下：
 
-```
+```java
 public class Node{
     public int value;
     public Node left;
@@ -692,8 +811,6 @@ public class Node{
 }
 ```
 
-
-
 一个数组的 MaxTree 定义：
 
 - 数组必须没有重复元素
@@ -701,6 +818,44 @@ public class Node{
 - 包括 MaxTree 树在内且在其中的每一棵子树上，值最大的节点都是树的头
 
 给定一个没有重复元素的数组 arr，写出生成这个数组的 MaxTree 的函数，要求如果数组长度为 N，则时间负责度为 O(N)、额外空间负责度为 O(N)。
+
+思考：
+
+举例说明如何在满足时间和空间复杂度的要求下生成MaxTree。
+
+arr={3,4,5,1,2}
+
+3的左边第一个比3大的数：无      3的右边第一个比3大的数：4
+
+4的左边第一个比4大的数：无      4的右边第一个比4大的数：5
+
+5的左边第一个比5大的数：无      5的右边第一个比5大的数：无
+
+1的左边第一个比1大的数：5      1的右边第一个比1大的数：2
+
+2的左边第一个比2大的数：5       2的右边第一个比2大的数：无
+
+以下列原则来建立这棵树：
+
+- 每一个数的父结点是它左边第一个比它大的数和它右边第一个比它大的数中，较小的那个
+- 如果一个数左边没有比它大的数，右边也没有。也就是说，这个数是整个数组的最大值，那么这个数就是MaxTree的头节点
+
+那么3,4,5,1,2的MaxTree如下：
+
+![img](https://img-blog.csdn.net/2018100412265543?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FSUE9TUEY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+为什么通过这个方法能够正确地生成MaxTree呢？现给出证明：
+
+1. 通过这个方法，所有的数能够生成一棵树，这棵树可能不是二叉树，但肯定是一棵树，而不是多棵树（森林）。在数组中的所有数都不同，而一个较小的数肯定会以一个比自己大的数作为父节点，那么最终所有的数向上找都会找到数组中的最大值，所以它们会有一个共同的头。
+2. 通过这个方法，所有的数最多只有两个孩子。也就是说，这棵树可以用二叉树表示，而不需要多叉数。
+
+如何尽可能快地找到每一个数左右两边第一个比它大的数呢？利用栈。找每个数左边第一个比它大的数，从左到右遍历每个数，栈中保持递减序列，新来的数不停地利用Pop出栈顶，直到栈顶比新数大或没有数。同样的方法可以求得每个数往右第一个比它大的数。
+
+
+
+
+
+
 
 #### 实现思路
 
@@ -725,12 +880,6 @@ public class Node{
 - 当b1 < b2：
       当x < b2时，b1不会选择p作为父节点，选择b2作为父节点.
       当x > b2时，b2不会选择p作为父节点，选择x作为父节点.
-
-![img](https://img-blog.csdn.net/20180625221545761?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-​         ![img](https://img-blog.csdn.net/201806252217091?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-
 
 **注意**：树不要求一定要平衡
 
@@ -758,20 +907,18 @@ public class Node{
 
 
 
-代码 ==核对一下==
-
 ```java
-package com.gjxaiou.advanced.class01;
+package com.gjxaiou.advanced.day02;
 
 import java.util.HashMap;
 import java.util.Stack;
 
 /**
  * @Author GJXAIOU
- * @Date 2020/1/3 15:05
+ * @Date 2020/8/6 22:52
  */
 public class MaxTree {
-    public static class Node {
+    private static class Node {
         public int value;
         public Node left;
         public Node right;
@@ -781,68 +928,66 @@ public class MaxTree {
         }
     }
 
-    public static Node getMaxTree(int[] arr) {
+    private static Node getMaxTree(int[] arr) {
         Node[] nArr = new Node[arr.length];
-        for (int i = 0; i < arr.length; i++) {
+        for (int i = 0; i != arr.length; i++) {
             nArr[i] = new Node(arr[i]);
         }
+        Stack<Node> stack = new Stack<Node>();
         HashMap<Node, Node> lBigMap = new HashMap<Node, Node>();
         HashMap<Node, Node> rBigMap = new HashMap<Node, Node>();
-        Stack<Node> stack = new Stack<Node>();
-        for (int i = arr.length - 1; i >= 0; i--) {
-            Node curNode = nArr[i];
-            while ((!stack.isEmpty()) && stack.peek().value < curNode.value) {
+        for (int i = 0; i < nArr.length; i++) {
+            Node currNode = nArr[i];
+            while ((!stack.isEmpty()) && stack.peek().value < currNode.value) {
                 popStackSetMap(stack, lBigMap);
             }
-            stack.push(curNode);
+            stack.push(currNode);
         }
         while (!stack.isEmpty()) {
             popStackSetMap(stack, lBigMap);
         }
-
         for (int i = nArr.length - 1; i != -1; i--) {
-            Node curNode = nArr[i];
-            while ((!stack.isEmpty()) && stack.peek().value < curNode.value) {
+            Node currNode = nArr[i];
+            while ((!stack.isEmpty()) && stack.peek().value < currNode.value) {
                 popStackSetMap(stack, rBigMap);
             }
-            stack.push(curNode);
+            stack.push(currNode);
         }
         while (!stack.isEmpty()) {
             popStackSetMap(stack, rBigMap);
         }
-
         Node head = null;
         for (int i = 0; i != nArr.length; i++) {
-            Node curNode = nArr[i];
-            Node left = lBigMap.get(curNode);
-            Node right = rBigMap.get(curNode);
+            Node currNode = nArr[i];
+            Node left = lBigMap.get(currNode);
+            Node right = rBigMap.get(currNode);
             if (left == null && right == null) {
-                head = curNode;
+                head = currNode;
             } else if (left == null) {
                 if (right.left == null) {
-                    right.left = curNode;
+                    right.left = currNode;
                 } else {
-                    right.right = curNode;
+                    right.right = currNode;
                 }
             } else if (right == null) {
                 if (left.left == null) {
-                    left.left = curNode;
+                    left.left = currNode;
                 } else {
-                    left.right = curNode;
+                    left.right = currNode;
                 }
             } else {
-                Node parent = left.value < left.value ? left : right;
+                Node parent = left.value < right.value ? left : right;
                 if (parent.left == null) {
-                    parent.left = curNode;
+                    parent.left = currNode;
                 } else {
-                    parent.right = curNode;
+                    parent.right = currNode;
                 }
             }
         }
         return head;
     }
 
-    public static void popStackSetMap(Stack<Node> stack, HashMap<Node, Node> map) {
+    private static void popStackSetMap(Stack<Node> stack, HashMap<Node, Node> map) {
         Node popNode = stack.pop();
         if (stack.isEmpty()) {
             map.put(popNode, null);
@@ -851,7 +996,7 @@ public class MaxTree {
         }
     }
 
-    public static void printPreOrder(Node head) {
+    private static void printPreOrder(Node head) {
         if (head == null) {
             return;
         }
@@ -860,37 +1005,46 @@ public class MaxTree {
         printPreOrder(head.right);
     }
 
+    private static void printInOrder(Node head) {
+        if (head == null) {
+            return;
+        }
+        printPreOrder(head.left);
+        System.out.print(head.value + " ");
+        printPreOrder(head.right);
+    }
+
     public static void main(String[] args) {
-        int[] uniqueArr ={3, 4, 5, 1, 2};
+        int[] uniqueArr = {3, 4, 5, 1, 2};
         Node head = getMaxTree(uniqueArr);
         printPreOrder(head);
         System.out.println();
-        printPreOrder(head);
+        printInOrder(head);
     }
 }
-
-
 ```
-
-
-
-代码：
-
-![img](https://img-blog.csdn.net/20180628215634109?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-   ![img](https://img-blog.csdn.net/20180628215700907?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-![img](https://img-blog.csdn.net/20180628215813854?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-
-![img](https://img-blog.csdn.net/20180628215841863?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
 
 ### （二）求最大子矩阵的大小： 
 
-![img](https://img-blog.csdn.net/20180625223145661?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1b2R1bzE4dXA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+题目描述：给定一个整型矩阵map，其中的值只有0和1两种，求其中全是1的所有矩形区域中，最大的矩形区域为1的数量
 
+例如：
 
+1 1 1 0
+
+其中，最大的矩形区域有3个1，所以返回3
+
+再如：
+
+1 0 1 1
+
+1 1 1 1
+
+1 1 1 0
+
+其中，最大的矩形区域有6个1，所以返回6
 
 
 
