@@ -4,15 +4,13 @@
 
 ## 一、Morris遍历
 
-介绍一种时间复杂度O(N)，额外空间复杂度O(1)的二叉树的遍历方式，N为二叉树的节点个数（不要求是完全二叉树）
+利用 Morris 遍历实现二叉树的先序、中序、后序遍历，时间复杂度为 O（N），额外空间复杂度为 O（1），N 为二叉树的节点个数（不要求是完全二叉树）。
 
-利用 Morris 遍历实现二叉树的先序、中序、后序遍历，时间复杂度为 O（N），额外空间复杂度为 O（1）。
-
-**经典二叉树，由于没有指向父节点的指针，故遍历时都需要一个栈**（递归：系统递归函数帮助压栈，非递归：自己压）来保存有关父节点的信息，都会造成O(H)的额外空间复杂度，H为二叉树高度。
+**经典二叉树，由于没有指向父节点的指针，故遍历时都需要一个栈**（递归：系统递归函数帮助压栈，非递归：自己压）来保存有关父节点的信息，都会造成 O(H) 的额外空间复杂度，H 为二叉树高度。
 
 ```java
 // 普通递归版
- public static void process(Node head) {
+public static void process(Node head) {
         if (head == null) {
             return;
         }
@@ -448,25 +446,7 @@ public static void main(String[] args) {
 
 
 
-
-
-
-
-## 二、搜索二叉树（BST）
-
-**二叉查找树**（Binary Search Tree），也称为**二叉搜索树**、**有序二叉树**（ordered binary tree）或**排序二叉树**（sorted binary tree），是指一棵空树或者具有下列性质的[二叉树](https://zh.wikipedia.org/wiki/二叉树)：
-
-1. 若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
-2. 若任意节点的右子树不空，则右子树上所有节点的值均大于或等于它的根节点的值；
-3. 任意节点的左、右子树也分别为二叉查找树；
-
-二叉查找树相比于其他数据结构的优势在于查找、插入的[时间复杂度](https://zh.wikipedia.org/wiki/时间复杂度)较低。为 $O(log^N)$，最坏情况为：O(N)
-
-**详细解释见**： AlgorithmEasyDay03.md
-
-
-
-## 三、平衡二叉树/AVL树
+## 二、平衡二叉树/AVL树
 
 ### （一）平衡性
 
@@ -480,11 +460,11 @@ public static void main(String[] args) {
 
 #### 1.AVL树
 
-AV L树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平衡性呢？那就是**所有子树的左子树和右子树的高度相差不超过1**。弊端是，每次发现因为插入、删除操作破坏了这种严苛的平衡性之后，都需要作出相应的调整以使其恢复平衡，调整较为频繁。
+AV L树是一种具有严苛平衡性的搜索二叉树。即**所有子树的左子树和右子树的高度相差不超过1**。弊端是，每次发现因为插入、删除操作破坏了这种严苛的平衡性之后，都需要作出相应的调整以使其恢复平衡，调整较为频繁。
 
 #### ==2.红黑树==
 
-红黑树是每个节点都带有颜色属性的搜索二叉树，颜色或红色或黑色。在搜索二叉树强制一般要求以外，对于任何有效的红黑树我们增加了如下的额外要求:
+红黑树是每个节点都带有颜色属性的搜索二叉树，颜色为红色或黑色。在搜索二叉树强制一般要求以外，对于任何有效的红黑树我们增加了如下的额外要求:
 
 - 性质1. 节点是红色或黑色。
 - 性质2. 根节点是黑色。
@@ -496,343 +476,9 @@ AV L树是一种具有严苛平衡性的搜索二叉树。什么叫做严苛平�
 
 因为**性质 4 导致了路径不能有两个毗连的红色节点**就足够了。**最短的可能路径都是黑色节点，最长的可能路径有交替的红色和黑色节点**。因为根据性质5所有最长的路径都有相同数目的黑色节点，这就表明了没有路径能多于任何其他路径的两倍长。
 
-**红黑树结构**
+**红黑树结构代码见 Algorithm 项目**
 
-```java
-package com.gjxaiou.advanced.day03;
 
-/**
- * Not implemented by zuochengyun
- * 
- * Red-Black tree implementation. From Introduction to Algorithms 3rd edition.
- * 
- * @author Ignas Lelys
- * @created May 6, 2011
- * 
- */
-public class RedBlackTree extends AbstractSelfBalancingBinarySearchTree {
-
-    protected enum ColorEnum {
-        RED,
-        BLACK
-    };
-
-    protected static final RedBlackNode nilNode = new RedBlackNode(null, null, null, null, ColorEnum.BLACK);
-
-    /**
-     * @see trees.AbstractBinarySearchTree#insert(int)
-     */
-    @Override
-    public Node insert(int element) {
-        Node newNode = super.insert(element);
-        newNode.left = nilNode;
-        newNode.right = nilNode;
-        root.parent = nilNode;
-        insertRBFixup((RedBlackNode) newNode);
-        return newNode;
-    }
-    
-    /**
-     * Slightly modified delete routine for red-black tree.
-     * 
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node delete(Node deleteNode) {
-        Node replaceNode = null; // track node that replaces removedOrMovedNode
-        if (deleteNode != null && deleteNode != nilNode) {
-            Node removedOrMovedNode = deleteNode; // same as deleteNode if it has only one child, and otherwise it replaces deleteNode
-            ColorEnum removedOrMovedNodeColor = ((RedBlackNode)removedOrMovedNode).color;
-        
-            if (deleteNode.left == nilNode) {
-                replaceNode = deleteNode.right;
-                rbTreeTransplant(deleteNode, deleteNode.right);
-            } else if (deleteNode.right == nilNode) {
-                replaceNode = deleteNode.left;
-                rbTreeTransplant(deleteNode, deleteNode.left);
-            } else {
-                removedOrMovedNode = getMinimum(deleteNode.right);
-                removedOrMovedNodeColor = ((RedBlackNode)removedOrMovedNode).color;
-                replaceNode = removedOrMovedNode.right;
-                if (removedOrMovedNode.parent == deleteNode) {
-                    replaceNode.parent = removedOrMovedNode;
-                } else {
-                    rbTreeTransplant(removedOrMovedNode, removedOrMovedNode.right);
-                    removedOrMovedNode.right = deleteNode.right;
-                    removedOrMovedNode.right.parent = removedOrMovedNode;
-                }
-                rbTreeTransplant(deleteNode, removedOrMovedNode);
-                removedOrMovedNode.left = deleteNode.left;
-                removedOrMovedNode.left.parent = removedOrMovedNode;
-                ((RedBlackNode)removedOrMovedNode).color = ((RedBlackNode)deleteNode).color;
-            }
-            
-            size--;
-            if (removedOrMovedNodeColor == ColorEnum.BLACK) {
-                deleteRBFixup((RedBlackNode)replaceNode);
-            }
-        }
-        
-        return replaceNode;
-    }
-    
-    /**
-     * @see trees.AbstractBinarySearchTree#createNode(int, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node)
-     */
-    @Override
-    protected Node createNode(int value, Node parent, Node left, Node right) {
-        return new RedBlackNode(value, parent, left, right, ColorEnum.RED);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node getMinimum(Node node) {
-        while (node.left != nilNode) {
-            node = node.left;
-        }
-        return node;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node getMaximum(Node node) {
-        while (node.right != nilNode) {
-            node = node.right;
-        }
-        return node;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node rotateLeft(Node node) {
-        Node temp = node.right;
-        temp.parent = node.parent;
-        
-        node.right = temp.left;
-        if (node.right != nilNode) {
-            node.right.parent = node;
-        }
-
-        temp.left = node;
-        node.parent = temp;
-
-        // temp took over node's place so now its parent should point to temp
-        if (temp.parent != nilNode) {
-            if (node == temp.parent.left) {
-                temp.parent.left = temp;
-            } else {
-                temp.parent.right = temp;
-            }
-        } else {
-            root = temp;
-        }
-        
-        return temp;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node rotateRight(Node node) {
-        Node temp = node.left;
-        temp.parent = node.parent;
-
-        node.left = temp.right;
-        if (node.left != nilNode) {
-            node.left.parent = node;
-        }
-
-        temp.right = node;
-        node.parent = temp;
-
-        // temp took over node's place so now its parent should point to temp
-        if (temp.parent != nilNode) {
-            if (node == temp.parent.left) {
-                temp.parent.left = temp;
-            } else {
-                temp.parent.right = temp;
-            }
-        } else {
-            root = temp;
-        }
-        
-        return temp;
-    }
-
-    
-    /**
-     * Similar to original transplant() method in BST but uses nilNode instead of null.
-     */
-    private Node rbTreeTransplant(Node nodeToReplace, Node newNode) {
-        if (nodeToReplace.parent == nilNode) {
-            this.root = newNode;
-        } else if (nodeToReplace == nodeToReplace.parent.left) {
-            nodeToReplace.parent.left = newNode;
-        } else {
-            nodeToReplace.parent.right = newNode;
-        }
-        newNode.parent = nodeToReplace.parent;
-        return newNode;
-    }
-    
-    /**
-     * Restores Red-Black tree properties after delete if needed.
-     */
-    private void deleteRBFixup(RedBlackNode x) {
-        while (x != root && isBlack(x)) {
-            
-            if (x == x.parent.left) {
-                RedBlackNode w = (RedBlackNode)x.parent.right;
-                if (isRed(w)) { // case 1 - sibling is red
-                    w.color = ColorEnum.BLACK;
-                    ((RedBlackNode)x.parent).color = ColorEnum.RED;
-                    rotateLeft(x.parent);
-                    w = (RedBlackNode)x.parent.right; // converted to case 2, 3 or 4
-                }
-                // case 2 sibling is black and both of its children are black
-                if (isBlack(w.left) && isBlack(w.right)) {
-                    w.color = ColorEnum.RED;
-                    x = (RedBlackNode)x.parent;
-                } else if (w != nilNode) {
-                    if (isBlack(w.right)) { // case 3 sibling is black and its left child is red and right child is black
-                        ((RedBlackNode)w.left).color = ColorEnum.BLACK;
-                        w.color = ColorEnum.RED;
-                        rotateRight(w);
-                        w = (RedBlackNode)x.parent.right;
-                    }
-                    w.color = ((RedBlackNode)x.parent).color; // case 4 sibling is black and right child is red
-                    ((RedBlackNode)x.parent).color = ColorEnum.BLACK;
-                    ((RedBlackNode)w.right).color = ColorEnum.BLACK;
-                    rotateLeft(x.parent);
-                    x = (RedBlackNode)root;
-                } else {
-                    x.color = ColorEnum.BLACK;
-                    x = (RedBlackNode)x.parent;
-                }
-            } else {
-                RedBlackNode w = (RedBlackNode)x.parent.left;
-                if (isRed(w)) { // case 1 - sibling is red
-                    w.color = ColorEnum.BLACK;
-                    ((RedBlackNode)x.parent).color = ColorEnum.RED;
-                    rotateRight(x.parent);
-                    w = (RedBlackNode)x.parent.left; // converted to case 2, 3 or 4
-                }
-                // case 2 sibling is black and both of its children are black
-                if (isBlack(w.left) && isBlack(w.right)) {
-                    w.color = ColorEnum.RED;
-                    x = (RedBlackNode)x.parent;
-                } else if (w != nilNode) {
-                    if (isBlack(w.left)) { // case 3 sibling is black and its right child is red and left child is black
-                        ((RedBlackNode)w.right).color = ColorEnum.BLACK;
-                        w.color = ColorEnum.RED;
-                        rotateLeft(w);
-                        w = (RedBlackNode)x.parent.left;
-                    }
-                    w.color = ((RedBlackNode)x.parent).color; // case 4 sibling is black and left child is red
-                    ((RedBlackNode)x.parent).color = ColorEnum.BLACK;
-                    ((RedBlackNode)w.left).color = ColorEnum.BLACK;
-                    rotateRight(x.parent);
-                    x = (RedBlackNode)root;
-                } else {
-                    x.color = ColorEnum.BLACK;
-                    x = (RedBlackNode)x.parent;
-                }
-            }
-            
-        }
-    }
-    
-    private boolean isBlack(Node node) {
-        return node != null ? ((RedBlackNode)node).color == ColorEnum.BLACK : false;
-    }
-    
-    private boolean isRed(Node node) {
-        return node != null ? ((RedBlackNode)node).color == ColorEnum.RED : false;
-    }
-
-    /**
-     * Restores Red-Black tree properties after insert if needed. Insert can
-     * break only 2 properties: root is red or if node is red then children must
-     * be black.
-     */
-    private void insertRBFixup(RedBlackNode currentNode) {
-        // current node is always RED, so if its parent is red it breaks
-        // Red-Black property, otherwise no fixup needed and loop can terminate
-        while (currentNode.parent != root && ((RedBlackNode) currentNode.parent).color == ColorEnum.RED) {
-            RedBlackNode parent = (RedBlackNode) currentNode.parent;
-            RedBlackNode grandParent = (RedBlackNode) parent.parent;
-            if (parent == grandParent.left) {
-                RedBlackNode uncle = (RedBlackNode) grandParent.right;
-                // case1 - uncle and parent are both red
-                // re color both of them to black
-                if (((RedBlackNode) uncle).color == ColorEnum.RED) {
-                    parent.color = ColorEnum.BLACK;
-                    uncle.color = ColorEnum.BLACK;
-                    grandParent.color = ColorEnum.RED;
-                    // grandparent was recolored to red, so in next iteration we
-                    // check if it does not break Red-Black property
-                    currentNode = grandParent;
-                } 
-                // case 2/3 uncle is black - then we perform rotations
-                else {
-                    if (currentNode == parent.right) { // case 2, first rotate left
-                        currentNode = parent;
-                        rotateLeft(currentNode);
-                    }
-                    // do not use parent
-                    parent.color = ColorEnum.BLACK; // case 3
-                    grandParent.color = ColorEnum.RED;
-                    rotateRight(grandParent);
-                }
-            } else if (parent == grandParent.right) {
-                RedBlackNode uncle = (RedBlackNode) grandParent.left;
-                // case1 - uncle and parent are both red
-                // re color both of them to black
-                if (((RedBlackNode) uncle).color == ColorEnum.RED) {
-                    parent.color = ColorEnum.BLACK;
-                    uncle.color = ColorEnum.BLACK;
-                    grandParent.color = ColorEnum.RED;
-                    // grandparent was recolored to red, so in next iteration we
-                    // check if it does not break Red-Black property
-                    currentNode = grandParent;
-                }
-                // case 2/3 uncle is black - then we perform rotations
-                else {
-                    if (currentNode == parent.left) { // case 2, first rotate right
-                        currentNode = parent;
-                        rotateRight(currentNode);
-                    }
-                    // do not use parent
-                    parent.color = ColorEnum.BLACK; // case 3
-                    grandParent.color = ColorEnum.RED;
-                    rotateLeft(grandParent);
-                }
-            }
-
-        }
-        // ensure root is black in case it was colored red in fixup
-        ((RedBlackNode) root).color = ColorEnum.BLACK;
-    }
-
-    protected static class RedBlackNode extends Node {
-        public ColorEnum color;
-
-        public RedBlackNode(Integer value, Node parent, Node left, Node right, ColorEnum color) {
-            super(value, parent, left, right);
-            this.color = color;
-        }
-    }
-
-}
-
-```
 
 **Java中红黑树的使用**
 
@@ -869,9 +515,9 @@ public static void main(String[] args) {
 
 `TreeMap`的优势是`key`在其中是有序组织的，因此增加、删除、查找`key`的时间复杂度均为`log(2,N)`。
 
-#### 3.SBT 树
+#### 3.SBT（Size Balanced Tree） 树
 
-它是由中国广东中山纪念中学的陈启峰发明的。陈启峰于2006年底完成论文《Size Balanced Tree》，并在2007年的全国青少年信息学奥林匹克竞赛冬令营中发表。**相比红黑树、AVL树等自平衡二叉查找树，SBT更易于实现**。**据陈启峰在论文中称，SBT是“目前为止速度最快的高级二叉搜索树”**。**SBT能在O(log n)的时间内完成所有二叉搜索树(BST)的相关操作**，而与普通二叉搜索树相比，SBT仅仅加入了简洁的核心操作Maintain。由于SBT赖以保持平衡的是size域而不是其他“无用”的域，它可以很方便地实现动态顺序统计中的select和rank操作。
+**相比红黑树、AVL树等自平衡二叉查找树，SBT更易于实现**。**SBT能在O(log n)的时间内完成所有二叉搜索树(BST)的相关操作**，而与普通二叉搜索树相比，SBT仅仅加入了简洁的核心操作Maintain。由于SBT赖以保持平衡的是size域而不是其他“无用”的域，它可以很方便地实现动态顺序统计中的select和rank操作。
 
 **SBT树的性质**是：对于数中任意结点，以该结点为根节点的子树的结点个数不能比以该结点的叔叔结点为根节点的子树的结点个数大。
 
@@ -883,392 +529,9 @@ public static void main(String[] args) {
 
 > 由于红黑树的实现较为复杂，因此现在工程中大多使用SBT树作为平衡二叉树的实现。
 
+**代码见**：Algorithm 项目
 
 
-原版没有调整的搜索二叉树：不兼顾平衡性
-
-```java
-package com.gjxaiou.advanced.advanced_class_03;
-
-/**
- * Abstract binary search tree implementation. Its basically fully implemented
- * binary search tree, just template method is provided for creating Node (other
- * trees can have slightly different nodes with more info). This way some code
- * from standart binary search tree can be reused for other kinds of binary
- * trees.
- *
- * @author Ignas Lelys
- * @created Jun 29, 2011
- */
-public class AbstractBinarySearchTree {
-
-    /**
-     * Root node where whole tree starts.
-     */
-    public Node root;
-
-    /**
-     * Tree size.
-     */
-    protected int size;
-
-    /**
-     * Because this is abstract class and various trees have different
-     * additional information on different nodes subclasses uses this abstract
-     * method to create nodes (maybe of class {@link Node} or maybe some
-     * different node sub class).
-     *
-     * @param value  Value that node will have.
-     * @param parent Node's parent.
-     * @param left   Node's left child.
-     * @param right  Node's right child.
-     * @return Created node instance.
-     */
-    protected Node createNode(int value, Node parent, Node left, Node right) {
-        return new Node(value, parent, left, right);
-    }
-
-    /**
-     * Finds a node with concrete value. If it is not found then null is
-     * returned.
-     *
-     * @param element Element value.
-     * @return Node with value provided, or null if not found.
-     */
-    public Node search(int element) {
-        Node node = root;
-        while (node != null && node.value != null && node.value != element) {
-            if (element < node.value) {
-                node = node.left;
-            } else {
-                node = node.right;
-            }
-        }
-        return node;
-    }
-
-    /**
-     * Insert new element to tree.
-     *
-     * @param element Element to insert.
-     */
-    public Node insert(int element) {
-        if (root == null) {
-            root = createNode(element, null, null, null);
-            size++;
-            return root;
-        }
-
-        Node insertParentNode = null;
-        Node searchTempNode = root;
-        // 一直找到不能再找了
-        while (searchTempNode != null && searchTempNode.value != null) {
-            insertParentNode = searchTempNode;
-            if (element < searchTempNode.value) {
-                searchTempNode = searchTempNode.left;
-            } else {
-                searchTempNode = searchTempNode.right;
-            }
-        }
-
-        Node newNode = createNode(element, insertParentNode, null, null);
-        if (insertParentNode.value > newNode.value) {
-            insertParentNode.left = newNode;
-        } else {
-            insertParentNode.right = newNode;
-        }
-        size++;
-        return newNode;
-    }
-
-    /**
-     * Removes element if node with such value exists.
-     *
-     * @param element Element value to remove.
-     * @return New node that is in place of deleted node. Or null if element for
-     * delete was not found.
-     */
-    public Node delete(int element) {
-        Node deleteNode = search(element);
-        if (deleteNode != null) {
-            return delete(deleteNode);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Delete logic when node is already found.
-     *
-     * @param deleteNode Node that needs to be deleted.
-     * @return New node that is in place of deleted node. Or null if element for
-     * delete was not found.
-     */
-    protected Node delete(Node deleteNode) {
-        if (deleteNode != null) {
-            Node nodeToReturn = null;
-            if (deleteNode != null) {
-                if (deleteNode.left == null) {
-                    nodeToReturn = transplant(deleteNode, deleteNode.right);
-                } else if (deleteNode.right == null) {
-                    nodeToReturn = transplant(deleteNode, deleteNode.left);
-                    // 如果要删除的节点的左子树和右子树都存在，见图片解析
-                } else {
-                    Node successorNode = getMinimum(deleteNode.right);
-                    if (successorNode.parent != deleteNode) {
-                        transplant(successorNode, successorNode.right);
-                        successorNode.right = deleteNode.right;
-                        successorNode.right.parent = successorNode;
-                    }
-                    transplant(deleteNode, successorNode);
-                    successorNode.left = deleteNode.left;
-                    successorNode.left.parent = successorNode;
-                    nodeToReturn = successorNode;
-                }
-                size--;
-            }
-            return nodeToReturn;
-        }
-        return null;
-    }
-
-    /**
-     * Put one node from tree (newNode) to the place of another (nodeToReplace).
-     *
-     * @param nodeToReplace Node which is replaced by newNode and removed from tree.
-     * @param newNode       New node.
-     * @return New replaced node.
-     */
-    private Node transplant(Node nodeToReplace, Node newNode) {
-        if (nodeToReplace.parent == null) {
-            this.root = newNode;
-        } else if (nodeToReplace == nodeToReplace.parent.left) {
-            nodeToReplace.parent.left = newNode;
-        } else {
-            nodeToReplace.parent.right = newNode;
-        }
-        if (newNode != null) {
-            newNode.parent = nodeToReplace.parent;
-        }
-        return newNode;
-    }
-
-    /**
-     * @param element
-     * @return true if tree contains element.
-     */
-    public boolean contains(int element) {
-        return search(element) != null;
-    }
-
-    /**
-     * @return Minimum element in tree.
-     */
-    public int getMinimum() {
-        return getMinimum(root).value;
-    }
-
-    /**
-     * @return Maximum element in tree.
-     */
-    public int getMaximum() {
-        return getMaximum(root).value;
-    }
-
-    /**
-     * Get next element element who is bigger than provided element.
-     *
-     * @param element Element for whom descendand element is searched
-     * @return Successor value.
-     */
-    // TODO Predecessor
-    public int getSuccessor(int element) {
-        return getSuccessor(search(element)).value;
-    }
-
-    /**
-     * @return Number of elements in the tree.
-     */
-    public int getSize() {
-        return size;
-    }
-
-    /**
-     * Tree traversal with printing element values. In order method.
-     */
-    public void printTreeInOrder() {
-        printTreeInOrder(root);
-    }
-
-    /**
-     * Tree traversal with printing element values. Pre order method.
-     */
-    public void printTreePreOrder() {
-        printTreePreOrder(root);
-    }
-
-    /**
-     * Tree traversal with printing element values. Post order method.
-     */
-    public void printTreePostOrder() {
-        printTreePostOrder(root);
-    }
-
-    /*-------------------PRIVATE HELPER METHODS-------------------*/
-
-    private void printTreeInOrder(Node entry) {
-        if (entry != null) {
-            printTreeInOrder(entry.left);
-            if (entry.value != null) {
-                System.out.println(entry.value);
-            }
-            printTreeInOrder(entry.right);
-        }
-    }
-
-    private void printTreePreOrder(Node entry) {
-        if (entry != null) {
-            if (entry.value != null) {
-                System.out.println(entry.value);
-            }
-            printTreeInOrder(entry.left);
-            printTreeInOrder(entry.right);
-        }
-    }
-
-    private void printTreePostOrder(Node entry) {
-        if (entry != null) {
-            printTreeInOrder(entry.left);
-            printTreeInOrder(entry.right);
-            if (entry.value != null) {
-                System.out.println(entry.value);
-            }
-        }
-    }
-
-    protected Node getMinimum(Node node) {
-        while (node.left != null) {
-            node = node.left;
-        }
-        return node;
-    }
-
-    protected Node getMaximum(Node node) {
-        while (node.right != null) {
-            node = node.right;
-        }
-        return node;
-    }
-
-    protected Node getSuccessor(Node node) {
-        // if there is right branch, then successor is leftmost node of that
-        // subtree
-        if (node.right != null) {
-            return getMinimum(node.right);
-        } else { // otherwise it is a lowest ancestor whose left child is also
-            // ancestor of node
-            Node currentNode = node;
-            Node parentNode = node.parent;
-            while (parentNode != null && currentNode == parentNode.right) {
-                // go up until we find parent that currentNode is not in right
-                // subtree.
-                currentNode = parentNode;
-                parentNode = parentNode.parent;
-            }
-            return parentNode;
-        }
-    }
-
-    // -------------------------------- TREE PRINTING
-    // ------------------------------------
-
-    public void printTree() {
-        printSubtree(root);
-    }
-
-    public void printSubtree(Node node) {
-        if (node.right != null) {
-            printTree(node.right, true, "");
-        }
-        printNodeValue(node);
-        if (node.left != null) {
-            printTree(node.left, false, "");
-        }
-    }
-
-    private void printNodeValue(Node node) {
-        if (node.value == null) {
-            System.out.print("<null>");
-        } else {
-            System.out.print(node.value.toString());
-        }
-        System.out.println();
-    }
-
-    private void printTree(Node node, boolean isRight, String indent) {
-        if (node.right != null) {
-            printTree(node.right, true, indent + (isRight ? "        " : " |      "));
-        }
-        System.out.print(indent);
-        if (isRight) {
-            System.out.print(" /");
-        } else {
-            System.out.print(" \\");
-        }
-        System.out.print("----- ");
-        printNodeValue(node);
-        if (node.left != null) {
-            printTree(node.left, false, indent + (isRight ? " |      " : "        "));
-        }
-    }
-
-    public static class Node {
-        public Node(Integer value, Node parent, Node left, Node right) {
-            super();
-            this.value = value;
-            this.parent = parent;
-            this.left = left;
-            this.right = right;
-        }
-
-        public Integer value;
-        public Node parent;
-        public Node left;
-        public Node right;
-
-        public boolean isLeaf() {
-            return left == null && right == null;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((value == null) ? 0 : value.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            Node other = (Node) obj;
-            if (value == null) {
-                if (other.value != null)
-                    return false;
-            } else if (!value.equals(other.value))
-                return false;
-            return true;
-        }
-
-    }
-}
-
-```
 
 
 
@@ -1336,474 +599,15 @@ public class AbstractBinarySearchTree {
 
 > 红黑树的调整也是类似的，只不过调整方案更多。面试中一般不会让你手写红黑树（若有兴趣可参见文末附录），但我们一定能说清这些查找二叉树的性质，以及调整平衡的基本操作，再就是这些结构的使用。
 
-AVL 树结构
+AVL 树结构代码见：Algorithm 项目
 
-```java
-package com.gjxaiou.advanced.day03;
 
-/**
- * Not implemented by zuochengyun
- * <p>
- * AVL tree implementation.
- * <p>
- * In computer science, an AVL tree is a self-balancing binary search tree, and
- * it was the first such data structure to be invented.[1] In an AVL tree, the
- * heights of the two child subtrees of any node differ by at most one. Lookup,
- * insertion, and deletion all take O(log n) time in both the average and worst
- * cases, where n is the number of nodes in the tree prior to the operation.
- * Insertions and deletions may require the tree to be rebalanced by one or more
- * tree rotations.
- *
- * @author Ignas Lelys
- * @created Jun 28, 2011
- */
-public class AVLTree extends AbstractSelfBalancingBinarySearchTree {
-
-    /**
-     * @see trees.AbstractBinarySearchTree#insert(int)
-     * <p>
-     * AVL tree insert method also balances tree if needed. Additional
-     * height parameter on node is used to track if one subtree is higher
-     * than other by more than one, if so AVL tree rotations is performed
-     * to regain balance of the tree.
-     */
-    @Override
-    public Node insert(int element) {
-        Node newNode = super.insert(element);
-        rebalance((AVLNode) newNode);
-        return newNode;
-    }
-
-    /**
-     * @see trees.AbstractBinarySearchTree#delete(int)
-     */
-    @Override
-    public Node delete(int element) {
-        Node deleteNode = super.search(element);
-        if (deleteNode != null) {
-            Node successorNode = super.delete(deleteNode);
-            if (successorNode != null) {
-                // if replaced from getMinimum(deleteNode.right) then come back there and update 
-                //heights
-                AVLNode minimum = successorNode.right != null ?
-                        (AVLNode) getMinimum(successorNode.right) : (AVLNode) successorNode;
-                recomputeHeight(minimum);
-                rebalance((AVLNode) minimum);
-            } else {
-                recomputeHeight((AVLNode) deleteNode.parent);
-                rebalance((AVLNode) deleteNode.parent);
-            }
-            return successorNode;
-        }
-        return null;
-    }
-
-    /**
-     * @see trees.AbstractBinarySearchTree#createNode(int, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node, trees.AbstractBinarySearchTree.Node)
-     */
-    @Override
-    protected Node createNode(int value, Node parent, Node left, Node right) {
-        return new AVLNode(value, parent, left, right);
-    }
-
-    /**
-     * Go up from inserted node, and update height and balance informations if needed.
-     * If some node balance reaches 2 or -2 that means that subtree must be rebalanced.
-     *
-     * @param node Inserted Node.
-     */
-    // 结点发现左右子树高度不平衡，修改，然后向父走，一级一级判断修改
-    private void rebalance(AVLNode node) {
-        while (node != null) {
-
-            Node parent = node.parent;
-            // 左树和右树的高度：如果左孩子存在左树高度就是左孩子高度，不在则为 -1，右子树同理。
-            int leftHeight = (node.left == null) ? -1 : ((AVLNode) node.left).height;
-            int rightHeight = (node.right == null) ? -1 : ((AVLNode) node.right).height;
-            int nodeBalance = rightHeight - leftHeight;
-            // rebalance (-2 means left subtree outgrow, 2 means right subtree)
-            if (nodeBalance == 2) {
-                if (node.right.right != null) {
-                    node = (AVLNode) avlRotateLeft(node);
-                    break;
-                } else {
-                    node = (AVLNode) doubleRotateRightLeft(node);
-                    break;
-                }
-            } else if (nodeBalance == -2) {
-                if (node.left.left != null) {
-                    node = (AVLNode) avlRotateRight(node);
-                    break;
-                } else {
-                    node = (AVLNode) doubleRotateLeftRight(node);
-                    break;
-                }
-            } else {
-                updateHeight(node);
-            }
-
-            node = (AVLNode) parent;
-        }
-    }
-
-    /**
-     * Rotates to left side.
-     */
-    private Node avlRotateLeft(Node node) {
-        Node temp = super.rotateLeft(node);
-
-        updateHeight((AVLNode) temp.left);
-        updateHeight((AVLNode) temp);
-        return temp;
-    }
-
-    /**
-     * Rotates to right side.
-     */
-    private Node avlRotateRight(Node node) {
-        Node temp = super.rotateRight(node);
-
-        updateHeight((AVLNode) temp.right);
-        updateHeight((AVLNode) temp);
-        return temp;
-    }
-
-    /**
-     * Take right child and rotate it to the right side first and then rotate
-     * node to the left side.
-     */
-    protected Node doubleRotateRightLeft(Node node) {
-        node.right = avlRotateRight(node.right);
-        return avlRotateLeft(node);
-    }
-
-    /**
-     * Take right child and rotate it to the right side first and then rotate
-     * node to the left side.
-     */
-    protected Node doubleRotateLeftRight(Node node) {
-        node.left = avlRotateLeft(node.left);
-        return avlRotateRight(node);
-    }
-
-    /**
-     * Recomputes height information from the node and up for all of parents. It needs to be done
-     * after delete.
-     */
-    private void recomputeHeight(AVLNode node) {
-        while (node != null) {
-            node.height = maxHeight((AVLNode) node.left, (AVLNode) node.right) + 1;
-            node = (AVLNode) node.parent;
-        }
-    }
-
-    /**
-     * Returns higher height of 2 nodes.
-     */
-    private int maxHeight(AVLNode node1, AVLNode node2) {
-        if (node1 != null && node2 != null) {
-            return node1.height > node2.height ? node1.height : node2.height;
-        } else if (node1 == null) {
-            return node2 != null ? node2.height : -1;
-        } else if (node2 == null) {
-            return node1 != null ? node1.height : -1;
-        }
-        return -1;
-    }
-
-    /**
-     * Updates height and balance of the node.
-     *
-     * @param node Node for which height and balance must be updated.
-     */
-    private static final void updateHeight(AVLNode node) {
-        int leftHeight = (node.left == null) ? -1 : ((AVLNode) node.left).height;
-        int rightHeight = (node.right == null) ? -1 : ((AVLNode) node.right).height;
-        node.height = 1 + Math.max(leftHeight, rightHeight);
-    }
-
-    /**
-     * Node of AVL tree has height and balance additional properties. If balance
-     * equals 2 (or -2) that node needs to be re balanced. (Height is height of
-     * the subtree starting with this node, and balance is difference between
-     * left and right nodes heights).
-     *
-     * @author Ignas Lelys
-     * @created Jun 30, 2011
-     */
-    protected static class AVLNode extends Node {
-        public int height;
-
-        public AVLNode(int value, Node parent, Node left, Node right) {
-            super(value, parent, left, right);
-        }
-    }
-
-}
-```
-
-
-
-# AlgorithmMediumDay05
-
-
-
-## 一、判断一棵树是否为完全二叉树
-
-```java
-package nowcoder.advanced.advanced_class_05;
-
-import java.util.LinkedList;
-import java.util.Queue;
-
-public class Code_01_IsBSTAndCBT {
-
-    public static class Node {
-        public int value;
-        public Node left;
-        public Node right;
-
-        public Node(int data) {
-            this.value = data;
-        }
-    }
-
-    public static boolean isBST(Node head) {
-        if (head == null) {
-            return true;
-        }
-        boolean res = true;
-        Node pre = null;
-        Node cur1 = head;
-        Node cur2 = null;
-        while (cur1 != null) {
-            cur2 = cur1.left;
-            if (cur2 != null) {
-                while (cur2.right != null && cur2.right != cur1) {
-                    cur2 = cur2.right;
-                }
-                if (cur2.right == null) {
-                    cur2.right = cur1;
-                    cur1 = cur1.left;
-                    continue;
-                } else {
-                    cur2.right = null;
-                }
-            }
-            if (pre != null && pre.value > cur1.value) {
-                res = false;
-            }
-            pre = cur1;
-            cur1 = cur1.right;
-        }
-        return res;
-    }
-
-    /**
-     * 判断是否为完全二叉树，这里定义空树为完全二叉树
-     *
-     * @param head
-     * @return
-     */
-    public static boolean isCBT(Node head) {
-        if (head == null) {
-            return true;
-        }
-        Queue<Node> queue = new LinkedList<Node>();
-        // 当一个节点左右两个孩子补全的时候，开启判断下面所有结点是否都为叶节点的过程
-        boolean leaf = false;
-        Node left = null;
-        Node right = null;
-        queue.offer(head);
-        while (!queue.isEmpty()) {
-            head = queue.poll();
-            left = head.left;
-            right = head.right;
-            // 当发现某个节点的左右孩子补全的时候，leaf 过程开启，发现接下来的节点左孩子或者右孩子存在，则不是叶节点，返回 false
-            // || 后面表示如果当前结点有右孩子没有左孩子直接返回 false（情况一）
-            if ((leaf && (left != null || right != null)) || (left == null && right != null)) {
-                return false;
-            }
-            if (left != null) {
-                queue.offer(left);
-            }
-            if (right != null) {
-                queue.offer(right);
-                // else 等价于 if(left ==  null || right == null)
-            } else {
-                leaf = true;
-            }
-        }
-        return true;
-    }
-
-    // for test -- print tree
-    public static void printTree(Node head) {
-        System.out.println("Binary Tree:");
-        printInOrder(head, 0, "H", 17);
-        System.out.println();
-    }
-
-    public static void printInOrder(Node head, int height, String to, int len) {
-        if (head == null) {
-            return;
-        }
-        printInOrder(head.right, height + 1, "v", len);
-        String val = to + head.value + to;
-        int lenM = val.length();
-        int lenL = (len - lenM) / 2;
-        int lenR = len - lenM - lenL;
-        val = getSpace(lenL) + val + getSpace(lenR);
-        System.out.println(getSpace(height * len) + val);
-        printInOrder(head.left, height + 1, "^", len);
-    }
-
-    public static String getSpace(int num) {
-        String space = " ";
-        StringBuffer buf = new StringBuffer("");
-        for (int i = 0; i < num; i++) {
-            buf.append(space);
-        }
-        return buf.toString();
-    }
-
-    public static void main(String[] args) {
-        Node head = new Node(4);
-        head.left = new Node(2);
-        head.right = new Node(6);
-        head.left.left = new Node(1);
-        head.left.right = new Node(3);
-        head.right.left = new Node(5);
-
-        printTree(head);
-        System.out.println(isBST(head));
-        System.out.println(isCBT(head));
-
-    }
-}
-```
-
-
-
-### （一）问题变形：求一棵二叉树的最远距离
-
-【注】如果在二叉树中，小明从结点 A 出发，既可以往上走到达它的父结点，又可以往下走到达它的子结点，那么小明从结点 A 走到结点 B 最少要经过的结点个数（包括 A 和 B）叫做 A 到 B 的距离，任意两结点所形成的距离中，最大的叫做树的最大距离。
-
-**高度套路化**：
-
-大前提：如果对于以该树的任意结点作为头结点的子树中，如果我们能够求得所有这些子树的最大距离，那么答案就在其中。
-
-对于该树的任意子树，其最大距离的求解分为以下三种情况：
-
-- 该树的最大距离是左子树的最大距离。
-- 该树的最大距离是右子树的最大距离。
-- 该树的最大距离是从左子树的最深的那个结点经过该树的头结点走到右子树的最深的那个结点。
-
-要从子树收集的信息：
-
-- 子树的最大距离
-- 子树的深度
-
-示例代码：
-
-```java
-package nowcoder.advanced.advanced_class_05;
-
-public class Code_03_MaxDistanceInTree {
-
-    public static class Node {
-        public int value;
-        public Node left;
-        public Node right;
-
-        public Node(int data) {
-            this.value = data;
-        }
-    }
-
-    public static int maxDistance(Node head) {
-        int[] record = new int[1];
-        return posOrder(head, record);
-    }
-
-    // 最大距离，高度
-    public static class ReturnType {
-        public int maxDistance;
-        public int h;
-
-        public ReturnType(int m, int h) {
-            this.maxDistance = m;
-            ;
-            this.h = h;
-        }
-    }
-
-    public static ReturnType process(Node head) {
-        if (head == null) {
-            return new ReturnType(0, 0);
-        }
-        ReturnType leftReturnType = process(head.left);
-        ReturnType rightReturnType = process(head.right);
-
-        // 可能性 3，可能性 1，可能性 2；
-        int includeHeadDistance = leftReturnType.h + 1 + rightReturnType.h;
-        int p1 = leftReturnType.maxDistance;
-        int p2 = rightReturnType.maxDistance;
-        // 最终距离
-        int resultDistance = Math.max(Math.max(p1, p2), includeHeadDistance);
-        // 最大深度，左右最大深度 + 自己
-        int hitself = Math.max(leftReturnType.h, leftReturnType.h) + 1;
-        return new ReturnType(resultDistance, hitself);
-    }
-
-    public static int posOrder(Node head, int[] record) {
-        if (head == null) {
-            record[0] = 0;
-            return 0;
-        }
-        int lMax = posOrder(head.left, record);
-        int maxfromLeft = record[0];
-        int rMax = posOrder(head.right, record);
-        int maxFromRight = record[0];
-        int curNodeMax = maxfromLeft + maxFromRight + 1;
-        record[0] = Math.max(maxfromLeft, maxFromRight) + 1;
-        return Math.max(Math.max(lMax, rMax), curNodeMax);
-    }
-
-    public static void main(String[] args) {
-        Node head1 = new Node(1);
-        head1.left = new Node(2);
-        head1.right = new Node(3);
-        head1.left.left = new Node(4);
-        head1.left.right = new Node(5);
-        head1.right.left = new Node(6);
-        head1.right.right = new Node(7);
-        head1.left.left.left = new Node(8);
-        head1.right.left.right = new Node(9);
-        System.out.println(maxDistance(head1));
-
-        Node head2 = new Node(1);
-        head2.left = new Node(2);
-        head2.right = new Node(3);
-        head2.right.left = new Node(4);
-        head2.right.right = new Node(5);
-        head2.right.left.left = new Node(6);
-        head2.right.right.right = new Node(7);
-        head2.right.left.left.left = new Node(8);
-        head2.right.right.right.right = new Node(9);
-        System.out.println(maxDistance(head2));
-    }
-}
-
-```
-
-> 高度套路化：列出可能性->从子过程收集的信息中整合出本过程要返回的信息->返回
 
 ## 二、舞会最大活跃度
 
-一个公司的上下级关系是一棵多叉树，这个公司要举办晚会，你作为组织者已经摸清了大家的心理：**一个员工的直** **接上级如果到场，这个员工肯定不会来**。每个员工都有一个活跃度的值（值越大，晚会上越活跃），**你可以给某个员工发邀请函以决定谁来**，怎么让舞会的气氛最活跃？返回最大的活跃值。
+【题目】一个公司的上下级关系是一棵多叉树，这个公司要举办晚会，你作为组织者已经摸清了大家的心理：**一个员工的直** **接上级如果到场，这个员工肯定不会来**。每个员工都有一个活跃度的值（值越大，晚会上越活跃），**你可以给某个员工发邀请函以决定谁来**，怎么让舞会的气氛最活跃？返回最大的活跃值。
 
-- 举例1：
+【举个栗子】
 
 
 
@@ -1811,46 +615,39 @@ public class Code_03_MaxDistanceInTree {
 
 
 
-如果邀请A来，那么其直接下属BCD一定不会来，你可以邀请EFGHJKL中的任意几个来，如果都邀请，那么舞会最大活跃度为`A(2)+E(9)+F(11)+G(2)+H(4)+J(7)+K(13)+L(5)`；但如果选择不邀请A来，那么你可以邀请其直接下属BCD中任意几个来，比如邀请B而不邀请CD，那么B的直接下属E一定不回来，但CD的直接下属你可以选择性邀请。
+如果邀请 A 来，那么其直接下属 B、C、D 一定不会来，你可以邀请 E、F、G、H、J、K、L 中的任意几个来，如果都邀请，那么舞会最大活跃度为`A(2)+E(9)+F(11)+G(2)+H(4)+J(7)+K(13)+L(5)`；但如果选择不邀请 A 来，那么你可以邀请其直接下属 B、C、D 中任意几个来，比如邀请 B 而不邀请 C、D，那么 B 的直接下属 E 一定不回来，但 C、D 的直接下属你可以选择性邀请。
 
-- 举例2
+【输入参数表示】
 
 给定一个矩阵来表述这种关系
 matrix =
-{
-1,6
+{1,6
 1,5
-1,4
-}
+1,4}
 这个矩阵的含义是：
-matrix[0] = {1 , 6}，表示0这个员工的直接上级为1,0这个员工自己的活跃度为6
-matrix[1] = {1 , 5}，表示1这个员工的直接上级为1（他自己是这个公司的最大boss）,1这个员工自己的活跃度为5
-matrix[2] = {1 , 4}，表示2这个员工的直接上级为1,2这个员工自己的活跃度为4
-为了让晚会活跃度最大，应该让1不来，0和2来。最后返回活跃度为10
+`matrix[0] = {1 , 6}`，表示 0 这个员工的直接上级为 1 , 0 这个员工自己的活跃度为 6
+`matrix[1] = {1 , 5}`，表示 1 这个员工的直接上级为 1（他自己是这个公司的最大boss）,1 这个员工自己的活跃度为 5
+`matrix[2] = {1 , 4}`，表示 2 这个员工的直接上级为 1 , 2 这个员工自己的活跃度为 4
+为了让晚会活跃度最大，应该让 1 不来，0 和 2 来。最后返回活跃度为 10
 
-
-
-**大前提**：如果你知道每个员工来舞会或不来舞会对舞会活跃值的影响，那么舞会最大活跃值就容易得知了。比如是否邀请A来取决于：B来或不来两种情况中选择对舞会活跃值增益最大的那个+C来或不来两种情况中选择对舞会活跃值增益最大的那个+D来或不来两种情况中选择对舞会活跃值增益最大的那个；同理，对于任意一名员工，是否邀请他来都是用此种决策。
+【前提】如果你知道每个员工来舞会或不来舞会对舞会活跃值的影响，那么舞会最大活跃值就容易得知了。**比如是否邀请 A 来取决于：B 来或不来两种情况中选择对舞会活跃值增益最大的那个 + C 来或不来两种情况中选择对舞会活跃值增益最大的那个 + D 来或不来两种情况中选择对舞会活跃值增益最大的那个**；同理，对于任意一名员工，是否邀请他来都是用此种决策。
 
 
 
 **列出可能性**：来或不来。
 
-![image-20200110184548796](AlgorithmMediumDay03.resource/image-20200110184548796.png)
+![image-20200809100241292](AlgorithmMediumDay03.resource/image-20200809100241292.png)
 
 **子过程要收集的信息**：返回子员工来对舞会活跃值的增益值和不来对舞会的增益值中的较大值。
 
-示例代码：
-
 ```java
-package nowcoder.advanced.advanced_class_05;
+package com.gjxaiou.advanced.day03;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Code_04_MaxHappy {
-    // 比较容易理解的方法
+public class MaxHappy {
+
     public static class Node {
         public int huo;
         public List<Node> nexts;
@@ -1859,12 +656,6 @@ public class Code_04_MaxHappy {
             this.huo = huo;
             nexts = new ArrayList<>();
         }
-    }
-
-    // 主程序
-    public static int getMaxHuo(Node head) {
-        ReturnData data = process(head);
-        return Math.max(data.bu_lai_huo, data.lai_huo);
     }
 
     public static class ReturnData {
@@ -1877,7 +668,14 @@ public class Code_04_MaxHappy {
         }
     }
 
-    // 递归函数
+    /**
+     * 方法一：递归
+     */
+    public static int getMaxHuo(Node head) {
+        ReturnData data = process(head);
+        return Math.max(data.bu_lai_huo, data.lai_huo);
+    }
+
     public static ReturnData process(Node head) {
         // 来的时候默认就是结果包含自己的
         int lai_huo = head.huo;
@@ -1892,9 +690,16 @@ public class Code_04_MaxHappy {
     }
 
 
+    /**
+     * 方法二：动态规划
+     * matrix 第一维代表直接上级，第二维代表活跃值
+     */
     public static int maxHappy(int[][] matrix) {
+        // dp[i][0]表示的是i作为父节点，它不来的时候的最大活跃度；
+        // dp[i][1]表示的是i作为父节点，它来的时候的最大活跃度；
         int[][] dp = new int[matrix.length][2];
         boolean[] visited = new boolean[matrix.length];
+        // 如果某行行数值 = 其上级值，则表示该值为根节点
         int root = 0;
         for (int i = 0; i < matrix.length; i++) {
             if (i == matrix[i][0]) {
@@ -1906,12 +711,16 @@ public class Code_04_MaxHappy {
     }
 
     public static void process(int[][] matrix, int[][] dp, boolean[] visited, int root) {
+        // 标记当前结点已经做过父 也就是它的 dp 数组中两个值都算出来了，可以直接用
         visited[root] = true;
+        // 初始化根节点来的时候的活跃度
         dp[root][1] = matrix[root][1];
         for (int i = 0; i < matrix.length; i++) {
             if (matrix[i][0] == root && !visited[i]) {
                 process(matrix, dp, visited, i);
+                //当root来，则加上root的每个直接下级不来的时候的活跃度
                 dp[root][1] += dp[i][0];
+                //当root不来，则每个直接下级可以来也可以不来，加上较大的活跃度
                 dp[root][0] += Math.max(dp[i][1], dp[i][0]);
             }
         }
@@ -1922,337 +731,9 @@ public class Code_04_MaxHappy {
         System.out.println(maxHappy(matrix));
     }
 }
-
 ```
 
 
-
-## 三、判断一棵树是否为平衡二叉树
-
-- 左树是否平衡，左树的高度
-- 右树是否平衡，右树的高度
-- 左树，右树都平衡，比较高度差
-
-
-
-```java
-package nowcoder.advanced.advanced_class_05;
-
-public class Code_02_IsBalancedTree {
-
-    public static class Node {
-        public int value;
-        public Node left;
-        public Node right;
-
-        public Node(int data) {
-            this.value = data;
-        }
-    }
-
-    public static boolean isBalance(Node head) {
-        boolean[] res = new boolean[1];
-        res[0] = true;
-        getHeight(head, 1, res);
-        return res[0];
-    }
-
-    public static class ReturnType {
-        public int level;
-        public boolean isB;
-
-        public ReturnType(int l, boolean is) {
-            level = l;
-            isB = is;
-        }
-    }
-
-    // process(head, 1)
-
-    public static ReturnType process(Node head, int level) {
-        if (head == null) {
-            return new ReturnType(level, true);
-        }
-        ReturnType leftSubTreeInfo = process(head.left, level + 1);
-        if (!leftSubTreeInfo.isB) {
-            return new ReturnType(level, false);
-        }
-        ReturnType rightSubTreeInfo = process(head.right, level + 1);
-        if (!rightSubTreeInfo.isB) {
-            return new ReturnType(level, false);
-        }
-        if (Math.abs(rightSubTreeInfo.level - leftSubTreeInfo.level) > 1) {
-            return new ReturnType(level, false);
-        }
-        return new ReturnType(Math.max(leftSubTreeInfo.level, rightSubTreeInfo.level), true);
-    }
-
-    public static int getHeight(Node head, int level, boolean[] res) {
-        if (head == null) {
-            return level;
-        }
-        int lH = getHeight(head.left, level + 1, res);
-        if (!res[0]) {
-            return level;
-        }
-        int rH = getHeight(head.right, level + 1, res);
-        if (!res[0]) {
-            return level;
-        }
-        if (Math.abs(lH - rH) > 1) {
-            res[0] = false;
-        }
-        return Math.max(lH, rH);
-    }
-
-    public static void main(String[] args) {
-        Node head = new Node(1);
-        head.left = new Node(2);
-        head.right = new Node(3);
-        head.left.left = new Node(4);
-        head.left.right = new Node(5);
-        head.right.left = new Node(6);
-        head.right.right = new Node(7);
-
-        System.out.println(isBalance(head));
-    }
-}
-
-```
-
-
-
-## 四、数组最大异或和
-
-给定一个数组，求子数组的最大异或和。
-一个数组的异或和为，数组中所有的数异或起来的结果。
-
-```java
-package nowcoder.advanced.advanced_class_05;
-
-public class Code_05_Max_EOR {
-    // 最暴力解法：O(N^3)
-    public static int getMaxE(int[] arr) {
-        int max = Integer.MIN_VALUE;
-        // 分别计算 0 ~ i，1 ~ i。。。i ~ i 的异或和
-        for (int i = 0; i < arr.length; i++) {
-            for (int start = 0; start <= i; start++) {
-                int res = 0;
-                // 针对上面的每一个子数组求异或和
-                for (int k = start; k <= i; k++) {
-                    res ^= arr[k];
-                }
-                max = Math.max(max, res);
-            }
-        }
-        return max;
-    }
-
-
-    // 优化方法：O（N^2）
-    // 异或运算满足交换律与结合律： 若 E1 ^ E2 = E3，则 E1 = E2 ^ E3，E2 = E1 ^ E3；
-    public static int getMaxE2(int[] arr) {
-        int max = Integer.MIN_VALUE;
-        // 准备一个辅助数组，里面放置
-        int[] dp = new int[arr.length];
-        int eor = 0;
-        for (int i = 0; i < arr.length; i++) {
-            // eor 每次都异或新数，最终得到 eor 就是 0 ~ i 的异或和
-            eor ^= arr[i];
-            max = Math.max(max, eor);
-            // 下面计算 start ~ i 的计算结果，例如 2 ~ i 的结果为 0 ~ i 异或结果再异或 0 ~ 2 位置上值
-            for (int start = 1; start <= i; start++) {
-                // curEor 就是 start ~ i 的异或结果
-                int curEor = eor ^ dp[start - 1];
-                max = Math.max(max, curEor);
-            }
-            dp[i] = eor;
-        }
-        return max;
-    }
-
-    // 再次优化：前缀树 O（N^2）
-    public static class Node {
-        // 因为是前缀树，所以只有通向 0 或者 1 的路
-        public Node[] nexts = new Node[2];
-    }
-
-    public static class NumTrie {
-        public Node head = new Node();
-
-        public void add(int num) {
-            Node cur = head;
-            // 因为加入的 int 类型，依次判断每一位的值，然后建立前缀树
-            for (int move = 31; move >= 0; move--) {
-                // 获取的是 int 类型符号位数，并且和 1 相与，如果符号位上为 0 结果为 0，反之如果为 1 则结果为 1；
-                int path = ((num >> move) & 1);
-                // 当前结点走向 path 的路是否为空，如果没有就新建
-                cur.nexts[path] = cur.nexts[path] == null ? new Node() : cur.nexts[path];
-                cur = cur.nexts[path];
-            }
-        }
-
-        // num 为从 0 ~ i 的异或结果
-        public int maxXor(int num) {
-            Node cur = head;
-            int res = 0;
-            for (int move = 31; move >= 0; move--) {
-                // 依次从最高位开始提取每一位上数
-                int path = (num >> move) & 1;
-                // 第一个符号为要选路，因为符号位应该走能保证异或之后值为 0 的路；符号位为 0 则应该选择 0 这条路，返回选择 1 这条路；
-                // 如果不是符号位，因为保证最大，所以要选择能保证异或结果为 1 的路，所以选择的路值和原来值相反。
-                int best = move == 31 ? path : (path ^ 1);
-                // 如果有走向 best 的路则走 best 路，如果没有只能走另一条路
-                best = cur.nexts[best] != null ? best : (best ^ 1);
-                // 设置答案中每一位的值
-                res |= (path ^ best) << move;
-                cur = cur.nexts[best];
-            }
-            return res;
-        }
-
-    }
-
-    public static int maxXorSubarray(int[] arr) {
-        if (arr == null || arr.length == 0) {
-            return 0;
-        }
-        int max = Integer.MIN_VALUE;
-        int eor = 0;
-        NumTrie numTrie = new NumTrie();
-        numTrie.add(0);
-        for (int i = 0; i < arr.length; i++) {
-            // eor 是 0 ~ i 异或结果
-            eor ^= arr[i];
-            max = Math.max(max, numTrie.maxXor(eor));
-            numTrie.add(eor);
-        }
-        return max;
-    }
-
-    // for test
-    public static int comparator(int[] arr) {
-        if (arr == null || arr.length == 0) {
-            return 0;
-        }
-        int max = Integer.MIN_VALUE;
-        for (int i = 0; i < arr.length; i++) {
-            int eor = 0;
-            for (int j = i; j < arr.length; j++) {
-                eor ^= arr[j];
-                max = Math.max(max, eor);
-            }
-        }
-        return max;
-    }
-
-    // for test
-    public static int[] generateRandomArray(int maxSize, int maxValue) {
-        int[] arr = new int[(int) ((maxSize + 1) * Math.random())];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = (int) ((maxValue + 1) * Math.random()) - (int) (maxValue * Math.random());
-        }
-        return arr;
-    }
-
-    // for test
-    public static void printArray(int[] arr) {
-        if (arr == null) {
-            return;
-        }
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i] + " ");
-        }
-        System.out.println();
-    }
-
-    // for test
-    public static void main(String[] args) {
-        int testTime = 500000;
-        int maxSize = 30;
-        int maxValue = 50;
-        boolean succeed = true;
-        for (int i = 0; i < testTime; i++) {
-            int[] arr = generateRandomArray(maxSize, maxValue);
-            int res = maxXorSubarray(arr);
-            int comp = comparator(arr);
-            if (res != comp) {
-                succeed = false;
-                printArray(arr);
-                System.out.println(res);
-                System.out.println(comp);
-                break;
-            }
-        }
-        System.out.println(succeed ? "Nice!" : "Fucking fucked!");
-    }
-}
-
-```
-
-
-
-## 六、完全二叉树结点个数
-
-求一棵完全二叉树的节点个数，要求时间复杂度低于O(N)
-
-
-
-```java
-package nowcoder.advanced.advanced_class_05;
-
-public class Code_06_CompleteTreeNodeNumber {
-
-    public static class Node {
-        public int value;
-        public Node left;
-        public Node right;
-
-        public Node(int data) {
-            this.value = data;
-        }
-    }
-
-    public static int nodeNum(Node head) {
-        if (head == null) {
-            return 0;
-        }
-        return bs(head, 1, mostLeftLevel(head, 1));
-    }
-
-    public static int bs(Node node, int l, int h) {
-        if (l == h) {
-            return 1;
-        }
-        if (mostLeftLevel(node.right, l + 1) == h) {
-            return (1 << (h - l)) + bs(node.right, l + 1, h);
-        } else {
-            return (1 << (h - l - 1)) + bs(node.left, l + 1, h);
-        }
-    }
-
-    public static int mostLeftLevel(Node node, int level) {
-        while (node != null) {
-            level++;
-            node = node.left;
-        }
-        return level - 1;
-    }
-
-    public static void main(String[] args) {
-        Node head = new Node(1);
-        head.left = new Node(2);
-        head.right = new Node(3);
-        head.left.left = new Node(4);
-        head.left.right = new Node(5);
-        head.right.left = new Node(6);
-        System.out.println(nodeNum(head));
-
-    }
-
-}
-
-```
 
 
 
@@ -2268,210 +749,29 @@ public class Code_06_CompleteTreeNodeNumber {
 
 当你向其中添加数据之前，首先会抛硬币，将第一次出现正面朝上时硬币被抛出的次数作为该数据的层数（`level`，**最小为1**），接着将数据和其层数封装成一个`SkipListNode`添加到`SkipList`中。**结构初始化时，其头结点的层数为0，但每次添加数据后都会更新头结点的层数为所添数据中层数最大的**。比如实例化一个`SkipList`后向其中添加一条层数为`3`的数据`7`：
 
-
-
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e97278c2b4?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
+![img](AlgorithmMediumDay03.resource/169045e97278c2b4)
 
 这时如果再添加一条层数为`2`的数据`5`呢？首先游标`curNode`会从`head`的最高层出发往右走，走到数据项为 7 的结点，发现`7>5`，于是又退回来走向下一层：
 
+![img](AlgorithmMediumDay03.resource/169045e9816ae3c1)
 
+接着再尝试往右走，还是发现`7>5`，于是还是准备走向下一层，但此时发现`curNode`所在层数`2`是数据项`5`的最高层，于是先建出数据项`5`的第二层，`curNode`再走向下一层
 
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9816ae3c1?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
-
-接着再尝试往右走，还是发现`7>5`，于是还是准备走向下一层，但此时发现`curNode`所在层数`2`是数据项`5`的最高层，于是先建出数据项`5`的第二层，`curNode`再走向下一层：
-
-
-
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e98dbd9a4d?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
+![img](AlgorithmMediumDay03.resource/169045e98dbd9a4d)
 
 同样的，`curNode`尝试往右走，但发现`7>5`，`curNode`所在层为1，但数据`5`的第一层还没建，于是建出，`curNode`再往下走。当`curNode`走到`null`时，建出数据`5`根部的`null`：
 
-
-
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e992ace6b1?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
+![img](AlgorithmMediumDay03.resource/169045e992ace6b1)
 
 至此层数为 `2` 的数据项`5`的添加操作完毕。
 
 那如果添加一个层数较高的数据项该如何处理呢？以添加层数为 `4`的数据`10`为例：
 
-
-
 ![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9982e49b4?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
+添加操作对应的代码示例：见下面源代码中的 ` public void add(int newValue) `方法
 
 
-添加操作对应的代码示例：
-
-```java
-import java.util.ArrayList;
-
-/**
- * A stored structure.Its add,delete,update,find operation are log(2,N)
- *
- * @author zhenganwen
- */
-public class SkipList {
-    private SkipListNode head;
-    private int maxLevel;
-    private int size;
-    public static final double PROBABILITY = 0.5;
-
-    public SkipList() {
-        this.head = new SkipListNode(Integer.MIN_VALUE);
-        /**
-         * the 0th level of each SkipListNode is null
-         */
-        this.head.nextNodes.add(null);
-        this.maxLevel = 0;
-        this.size = 0;
-    }
-
-    private class SkipListNode {
-        int value;
-        /**
-         * nextNodes represent the all levels of a SkipListNode the element on
-         * one index represent the successor SkipListNode on the indexth level
-         */
-        ArrayList<SkipListNode> nextNodes;
-
-        public SkipListNode(int newValue) {
-            this.value = newValue;
-            this.nextNodes = new ArrayList<SkipListNode>();
-        }
-    }
-
-    /**
-     * put a new data into the structure->log(2,N)
-     *
-     * @param newValue
-     */
-    public void add(int newValue) {
-        if (!contains(newValue)) {
-
-            // generate the level
-            int level = 1;
-            while (Math.random() < PROBABILITY) {
-                level++;
-            }
-            // update max level
-            if (level > maxLevel) {
-                int increment = level - maxLevel;
-                while (increment-- > 0) {
-                    this.head.nextNodes.add(null);
-                }
-                maxLevel = level;
-            }
-            // encapsulate value
-            SkipListNode newNode = new SkipListNode(newValue);
-            // build all the levels of new node
-            SkipListNode cur = findInsertionOfTopLevel(newValue, level);
-            while (level > 0) {
-                if (cur.nextNodes.get(level) != null) {
-                    newNode.nextNodes.add(0, cur.nextNodes.get(level));
-                } else {
-                    newNode.nextNodes.add(0, null);
-                }
-                cur.nextNodes.set(level, newNode);
-                level--;
-                cur = findNextInsertion(cur, newValue, level);
-            }
-            newNode.nextNodes.add(0, null);
-            size++;
-        }
-    }
-
-    /**
-     * find the insertion point of the newNode's top level from head's maxLevel
-     * by going right or down
-     *
-     * @param newValue newNode's value
-     * @param level    newNode's top level
-     * @return
-     */
-    private SkipListNode findInsertionOfTopLevel(int newValue, int level) {
-        int curLevel = this.maxLevel;
-        SkipListNode cur = head;
-        while (curLevel >= level) {
-            if (cur.nextNodes.get(curLevel) != null
-                    && cur.nextNodes.get(curLevel).value < newValue) {
-                // go right
-                cur = cur.nextNodes.get(curLevel);
-            } else {
-                // go down
-                curLevel--;
-            }
-        }
-        return cur;
-    }
-
-    /**
-     * find the next insertion from cur node by going right on the level
-     *
-     * @param cur
-     * @param newValue
-     * @param level
-     * @return
-     */
-    private SkipListNode findNextInsertion(SkipListNode cur, int newValue,
-                                           int level) {
-        while (cur.nextNodes.get(level) != null
-                && cur.nextNodes.get(level).value < newValue) {
-            cur = cur.nextNodes.get(level);
-        }
-        return cur;
-    }
-
-    /**
-     * check whether a value exists->log(2,N)
-     *
-     * @param value
-     * @return
-     */
-    public boolean contains(int value) {
-        if (this.size == 0) {
-            return false;
-        }
-        SkipListNode cur = head;
-        int curLevel = maxLevel;
-        while (curLevel > 0) {
-            if (cur.nextNodes.get(curLevel) != null) {
-                if (cur.nextNodes.get(curLevel).value == value) {
-                    return true;
-                } else if (cur.nextNodes.get(curLevel).value < value) {
-                    cur = cur.nextNodes.get(curLevel);
-                } else {
-                    curLevel--;
-                }
-            } else {
-                curLevel--;
-            }
-        }
-
-        return false;
-    }
-
-    public static void main(String[] args) {
-        SkipList skipList = new SkipList();
-        skipList.add(1);
-        skipList.add(2);
-        skipList.add(3);
-        skipList.add(4);
-        skipList.add(5);
-        //mark a break point here to check the memory structure of skipList
-        System.out.println(skipList);
-    }
-
-}
-
-```
 
 ### （二）查找数据
 
@@ -2481,305 +781,25 @@ public class SkipList {
 
 了解添加数据的过程之后，删除数据其实就是将逻辑倒过来：解除该数据结点的前后引用关系。下图是我在写好上述`add()`方法后，向其中放入`1、2、3、4、5`后形成的结构：
 
-
-
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9a1bc219d?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
+![img](AlgorithmMediumDay03.resource/169045e9a1bc219d)
 
 如果此时删除数据`3`：
 
-
-
-![img](https://user-gold-cdn.xitu.io/2019/2/19/169045e9a1e24f68?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
-
+![img](AlgorithmMediumDay03.resource/169045e9a1e24f68)
 
 首先应该从`head`的最高层出发，通过向右或向下找到数据3的最高层（如图`2->3->5->6->7`），将该层移除整体结构并处理好该层上，其前后结点的关系。同样的逻辑，将数据`3`剩下的层移除。
 
-示例代码：
+示例代码：见下面代码中的 delete(int value) 方法。
 
-```java
-/**
-     * delete skipListNode by the value
-     *
-     * @param value
-     */
-public void delete(int value) {
-    //if exists
-    if (contains(value)) {
-        //find the node and its level
-        SkipListNode deletedNode = head;
-        int deletedLevels = maxLevel;
-        //because exists,so must can find
-        while (deletedLevels > 0) {
-            if (deletedNode.nextNodes.get(deletedLevels) != null) {
-                if (deletedNode.nextNodes.get(deletedLevels).value == value) {
-                    deletedNode = deletedNode.nextNodes.get(deletedLevels);
-                    break;
-                } else if (deletedNode.nextNodes.get(deletedLevels).value < value) {
-                    deletedNode = deletedNode.nextNodes.get(deletedLevels);
-                } else {
-                    deletedLevels--;
-                }
-            } else {
-                deletedLevels--;
-            }
-        }
-        //release the node and adjust the reference
-        while (deletedLevels > 0) {
-            SkipListNode pre = findInsertionOfTopLevel(value, deletedLevels);
-            if (deletedNode.nextNodes.get(deletedLevels) != null) {
-                pre.nextNodes.set(deletedLevels, deletedNode.nextNodes.get(deletedLevels));
-            } else {
-                pre.nextNodes.set(deletedLevels, null);
-            }
-            deletedLevels--;
-        }
 
-        size--;
-    }
-}
-
-public static void main(String[] args) {
-    SkipList skipList = new SkipList();
-    skipList.add(1);
-    skipList.add(2);
-    skipList.add(3);
-    skipList.add(4);
-    skipList.add(5);
-    //mark a break point here to check the memory structure of skipList
-    skipList.delete(3);
-    System.out.println(skipList);
-}
-
-```
 
 ### （四）遍历数据
 
 需要遍历跳表中的数据时，我们可以根据每个数据的层数至少为1的特点（每个结点的第一层引用的是比该结点数据大的结点中数据最小的结点）。
 
-示例代码：
-
-```java
-class SkipListIterator implements Iterator<Integer> {
-    private SkipListNode cur;
-    public SkipListIterator(SkipList skipList) {
-        this.cur = skipList.head;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return cur.nextNodes.get(1) != null;
-    }
-
-    @Override
-    public Integer next() {
-        int value = cur.nextNodes.get(1).value;
-        cur = cur.nextNodes.get(1);
-        return value;
-    }
-}
-
-@Override
-public String toString() {
-    SkipListIterator iterator = new SkipListIterator(this);
-    String res = "[ ";
-    while (iterator.hasNext()) {
-        res += iterator.next()+" ";
-    }
-    res += "]";
-    System.out.println();
-    return res;
-}
-
-public static void main(String[] args) {
-    SkipList skipList = new SkipList();
-    skipList.add(1);
-    skipList.add(2);
-    skipList.add(3);
-    skipList.add(4);
-    skipList.add(5);
-    System.out.println(skipList);
-    skipList.delete(3);
-    System.out.println(skipList);
-}
-```
+完整的代码程序见：SkipList
 
 
-
-完整的代码程序
-
-```java
-package com.gjxaiou.advanced.day03;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-
-/**
- * 跳表
- */
-public class Code_02_SkipList {
-
-    public static class SkipListNode {
-        public Integer value;
-        // 该调表 ArrayList 的长度表示有多少层，nextNodes[0] 表示第一层上 SkipListNode 节点的下一层是什么
-        public ArrayList<SkipListNode> nextNodes;
-
-        public SkipListNode(Integer value) {
-            this.value = value;
-            nextNodes = new ArrayList<SkipListNode>();
-        }
-    }
-
-    public static class SkipListIterator implements Iterator<Integer> {
-        SkipList list;
-        SkipListNode current;
-
-        public SkipListIterator(SkipList list) {
-            this.list = list;
-            this.current = list.getHead();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return current.nextNodes.get(0) != null;
-        }
-
-        @Override
-        public Integer next() {
-            current = current.nextNodes.get(0);
-            return current.value;
-        }
-    }
-
-    public static class SkipList {
-        // head 就是巨小，根据最大的层数决定
-        private SkipListNode head;
-        private int maxLevel;
-        private int size;
-        // 以什么概率出 0，则 1- 概率出 1
-        private static final double PROBABILITY = 0.5;
-
-        public SkipList() {
-            size = 0;
-            maxLevel = 0;
-            head = new SkipListNode(null);
-            head.nextNodes.add(null);
-        }
-
-        public SkipListNode getHead() {
-            return head;
-        }
-
-        public void add(Integer newValue) {
-            if (!contains(newValue)) {
-                size++;
-                int level = 0;
-                while (Math.random() < PROBABILITY) {
-                    level++;
-                }
-                // 如果当前 level 大于之前最大的 maxLevel，则头部一定要增加
-                while (level > maxLevel) {
-                    head.nextNodes.add(null);
-                    maxLevel++;
-                }
-                // 当新加入元素总是从头部 head 的最高层往下移动的
-                SkipListNode newNode = new SkipListNode(newValue);
-                SkipListNode current = head;
-                // 同一层，如果下一个位置数比当前位置数小，则往右移动；如果大了就往下移动
-                // 每次都是从最高层开始往下找
-                int levelAll = maxLevel;
-                do {
-                    current = findNext(newValue, current, levelAll);
-                    if (level >= levelAll) {
-                        newNode.nextNodes.add(0, current.nextNodes.get(level));
-                        current.nextNodes.set(level, newNode);
-                        level--;
-                    }
-                } while (levelAll-- > 0);
-            }
-        }
-
-        public void delete(Integer deleteValue) {
-            if (contains(deleteValue)) {
-                SkipListNode deleteNode = find(deleteValue);
-                size--;
-                int level = maxLevel;
-                SkipListNode current = head;
-                do {
-                    current = findNext(deleteNode.value, current, level);
-                    if (deleteNode.nextNodes.size() > level) {
-                        current.nextNodes.set(level, deleteNode.nextNodes.get(level));
-                    }
-                } while (level-- > 0);
-            }
-        }
-
-        // Returns the skiplist node with greatest value <= e
-        private SkipListNode find(Integer e) {
-            return find(e, head, maxLevel);
-        }
-
-        // Returns the skiplist node with greatest value <= e
-        // Starts at node start and level
-        private SkipListNode find(Integer e, SkipListNode current, int level) {
-            do {
-                current = findNext(e, current, level);
-            } while (level-- > 0);
-            return current;
-        }
-
-        // Returns the node at a given level with highest value less than e
-        private SkipListNode findNext(Integer e, SkipListNode current, int level) {
-            SkipListNode next = current.nextNodes.get(level);
-            while (next != null) {
-                // 拿出 next 值
-                Integer value = next.value;
-                // 如果当前值小于拿出来的值，找到了
-                if (lessThan(e, value)) {
-                    break;
-                }
-                // 如果不小于，则往右走，所以 current 就是在该 level 层中最后一个小于当前数的
-                current = next;
-                next = current.nextNodes.get(level);
-            }
-            return current;
-        }
-
-        public int size() {
-            return size;
-        }
-
-        public boolean contains(Integer value) {
-            SkipListNode node = find(value);
-            return node != null && node.value != null && equalTo(node.value, value);
-        }
-
-        public Iterator<Integer> iterator() {
-            return new SkipListIterator(this);
-        }
-
-        /******************************************************************************
-         * Utility Functions *
-         ******************************************************************************/
-
-        private boolean lessThan(Integer a, Integer b) {
-            return a.compareTo(b) < 0;
-        }
-
-        private boolean equalTo(Integer a, Integer b) {
-            return a.compareTo(b) == 0;
-        }
-
-    }
-
-    public static void main(String[] args) {
-
-    }
-}
-
-```
 
 
 

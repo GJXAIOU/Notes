@@ -201,6 +201,274 @@ public class TrieTree {
 3
 ```
 
+## 七、子数组的最大异或和
+
+数组异或和的定义：把数组中所有的数异或起来得到的值。
+【题目】给定一个数组arr，求子数组的最大异或和。
+
+### （一）暴力解
+
+遍历数组中的每个数，求出以该数结尾所有子数组的异或和。时间复杂度为`O(N^3)`
+
+### （二）优化暴力解
+
+观察暴力解，以 `{1, 2, 3, 4, 1, 2, 0}`为例，当我计算以`4`结尾的所有子数组的异或和时，我会先计算子数组`{4}`的，然后计算`{3,4}`的，然后计算`{2,3,4}`的，也就是说每次都是从头异或到尾，之前的计算的结果并没有为之后的计算过程加速。于是，我想着，当我计算`{3,4}`的时候，将`3^4`的结果临时保存一下，在下次的`{2,3,4}`的计算时复用一下，再保存一下`2^3^4`的结果，在下次的`{1,2,3,4}`的计算又可以复用一下。于是暴力解就被优化成了下面这个样子：
+
+```java
+public static int solution2(int[] arr) {
+    int res = 0;
+    int temp=0;
+    for (int i = 0; i < arr.length; i++) {
+        //以i结尾的最大异或和
+        int maxXorSum = 0;
+        for (int j = i; j >= 0; j--) {
+            temp ^= arr[j];
+            maxXorSum = Math.max(maxXorSum, temp);
+        }
+        //整体的最大异或和
+        res = Math.max(res, maxXorSum);
+    }
+    return res;
+}
+
+public static void main(String[] args) {
+    int[] arr = {1, 2, 3, 4, 1, 2, 0};
+    System.out.println(solution2(arr));//7
+}
+```
+
+这时时间复杂度降为了`O(N^2)`
+
+### （三）最优解
+
+然而使用前缀树结构能够做到时间复杂度`O(N)`。
+
+解题思路：将以`i`结尾的所有子数组的最大异或和的求解限制在`O(1)`。
+
+解题技巧：
+
+1. 对于子数组`0~i`（i是合法下标）和`0~i`之间的下标`k`(k大于等于0，小于等于i)，`k~i`的异或和`xor(k,i)`、`0~i`的异或和`xor(0,i)`、`0~k-1`之间的异或和`xor(0,k-1)`三者之间存在如下关系：`xor(k,i)=xor(0,i) ^ xor(o,k-1)`（`A^B=C -> B=C^A`），因此求`xor(k,i)`的最大值可以转化成求`xor(0,i) ^ xor(o,k-1)`的最大值（**这个思路很重要**，后续步骤就是根据这个来的）。
+
+2. 遍历数组，将以首元素开头，以当前遍历元素结尾的子数组的异或和的32位二进制数放入前缀树结构中（每一位作为一个字符，且字符非0即1）。遍历结束后，所有`0~i`的异或和就存放在前缀树中了。比如：遍历`{1, 2, 3, 4, 1, 2, 0}`形成的前缀树如下：
+
+    ![img](AlgorithmEasyDay07.resource/169045e8cf9fa63d.jpg)
+
+3. 假设遍历数组建立前缀树的过程中，遍历到`4`这个数来了，将`0 100`放入其中，由于之前还遍历过`1,2,3`，所以`xor(0,0)`、`xor(0,1)`、`xor(0,2)`也是在前缀树中的。如果此时要求`xor(k,3)`的最大值（k在下标0和3之间且包括0和3），可以将其转化为求`xor(0,3) ^ xor(0,k-1)`，而我们已知`xor(0,3)=0 100`，所以`xor(0,k-1)`的求解就变成了关键。
+
+    `xor(0,k-1)`的求解：此时游标`cur`从前缀树的根结点走向叶子结点，`cur`沿途经过的二进制位连在一起就是`xor(0,k-1)`，要求每次选择要经过哪个二进制位时，尽可能使之与`xor(0,3)`的异或结果更大：
+
+    
+
+    ![img](AlgorithmEasyDay07.resource/169045e8d42d2e95.jpg)
+
+    
+
+    这个求解过程就是在**贪心**（如果是符号位，那么尽可能让异或结果为0，如果是数值位，那么尽可能让异或结果为1），前缀树里只放着`xor(0,0)、xor(0,1)、xor(0,2)、xor(0,3)`，而`xor(0,k-1)`只能从中取值，这个从根节点一步步试探走到叶子结点的过程就是在贪，哪一条路径对应的`xor`使得`xor ^ xor(0,3)`最大。
+
+    示例代码：
+
+    ```java
+    package com.gjxaiou.advanced.day03;
+    
+    public class MaxEOR {
+    
+        /**
+         * 解法一：最暴力解法：O(N^3)
+         */
+        public static int getMaxE(int[] arr) {
+            int max = Integer.MIN_VALUE;
+            // 分别计算 0 ~ i，1 ~ i。。。i ~ i 的异或和
+            // 以 i 为结尾的
+            for (int i = 0; i < arr.length; i++) {
+                // start 到 i 的最大异或和
+                for (int start = 0; start <= i; start++) {
+                    int res = 0;
+                    // 遍历start---i针对上面的每一个子数组求异或和
+                    for (int k = start; k <= i; k++) {
+                        res ^= arr[k];
+                    }
+                    max = Math.max(max, res);
+                }
+            }
+            return max;
+        }
+    
+    
+        /**
+         * 方法二：优化方法：O（N^2）
+         */
+        // 异或运算满足交换律与结合律： 若 E1 ^ E2 = E3，则 E1 = E2 ^ E3，E2 = E1 ^ E3；
+        public static int getMaxE2(int[] arr) {
+            int max = Integer.MIN_VALUE;
+            // 准备一个辅助数组，里面放置
+            int[] dp = new int[arr.length];
+            int eor = 0;
+            for (int i = 0; i < arr.length; i++) {
+                // eor 每次都异或新数，最终得到 eor 就是 0 ~ i 的异或和
+                eor ^= arr[i];
+                max = Math.max(max, eor);
+                // 下面计算 start ~ i 的计算结果，例如 2 ~ i 的结果为 0 ~ i 异或结果再异或 0 ~ 2 位置上值：整个遍历得到了以i为结尾的最大异或和
+                for (int start = 1; start <= i; start++) {
+                    // curEor 就是 start ~ i 的异或结果，0---i的异或和^0---start的异或和==start-i的异或和
+                    int curEor = eor ^ dp[start - 1];
+                    max = Math.max(max, curEor);
+                }
+                //dp[i]存放着0到i的异或和
+                dp[i] = eor;
+            }
+            return max;
+        }
+    
+        /**
+         * 解法三：前缀树 O（N）
+         */
+        public static class TrieNode {
+            // 因为是前缀树，所以只有通向 0 或者 1 的路
+            public TrieNode[] nexts = new TrieNode[2];
+        }
+    
+        public static class NumTrie {
+            public TrieNode head = new TrieNode();
+    
+            public void add(int num) {
+                TrieNode cur = head;
+                // 因为加入的 int 类型，依次判断每一位的值，然后建立前缀树
+                for (int move = 31; move >= 0; move--) {
+                    // 获取的是 int 类型符号位数，并且和 1 相与，如果符号位上为 0 结果为 0，反之如果为 1 则结果为 1；
+                    int path = (num >> move) & 1;
+                    // 当前结点走向 path 的路是否为空，如果没有就新建
+                    cur.nexts[path] = cur.nexts[path] == null ? new TrieNode() : cur.nexts[path];
+                    cur = cur.nexts[path];
+                }
+            }
+    
+            // num 为从 0 ~ i 的异或结果
+            public int maxXor(int num) {
+                TrieNode cur = head;
+                int res = 0;
+                for (int move = 31; move >= 0; move--) {
+                    // 依次从最高位开始提取每一位上数
+                    int path = (num >> move) & 1;
+                    // 第一个符号为要选路，因为符号位应该走能保证异或之后值为 0 的路；符号位为 0 则应该选择 0 这条路，返回选择 1 这条路；
+                    // 如果不是符号位，因为保证最大，所以要选择能保证异或结果为 1 的路，所以选择的路值和原来值相反。
+                    int best = move == 31 ? path : (path ^ 1);
+                    // 如果有走向 best 的路则走 best 路，如果没有只能走另一条路
+                    best = cur.nexts[best] != null ? best : (best ^ 1);
+                    // 设置答案中每一位的值
+                    res |= (path ^ best) << move;
+                    cur = cur.nexts[best];
+                }
+                return res;
+            }
+    
+        }
+    
+        public static int maxXorSubarray(int[] arr) {
+            if (arr == null || arr.length == 0) {
+                return 0;
+            }
+            int max = Integer.MIN_VALUE;
+            int eor = 0;
+            NumTrie numTrie = new NumTrie();
+            numTrie.add(0);
+            for (int i = 0; i < arr.length; i++) {
+                // eor 是 0 ~ i 异或结果
+                eor ^= arr[i];
+                max = Math.max(max, numTrie.maxXor(eor));
+                numTrie.add(eor);
+            }
+            return max;
+        }
+    }
+    ```
+
+
+
+附：[数组中两个数的最大异或值](https://leetcode-cn.com/problems/maximum-xor-of-two-numbers-in-an-array/)
+
+给定一个非空数组，数组中元素为 a0, a1, a2, … , an-1，其中 0 ≤ ai < 231 。
+
+找到 ai 和aj 最大的异或 (XOR) 运算结果，其中0 ≤ i,  j < n 。
+
+你能在O(n)的时间解决这个问题吗？
+
+示例:
+
+输入: [3, 10, 5, 25, 2, 8]
+
+输出: 28
+
+解释: 最大的结果是 5 ^ 25 = 28.
+
+```java
+package com.gjxaiou.advanced.day03;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2020/8/9 10:56
+ */
+public class MaxEORTwoNum {
+    //前缀树
+    public static class TrieNode {
+        TrieNode[] nexts = new TrieNode[2];
+    }
+
+    public static class Trie {
+        private TrieNode head;
+
+        Trie() {
+            head = new TrieNode();
+        }
+
+        public void insert(int num) {
+            TrieNode cur = head;
+            for (int move = 31; move >= 0; move--) {
+                int path = num >> move & 1;
+                if (cur.nexts[path] == null) {
+                    cur.nexts[path] = new TrieNode();
+                }
+                cur = cur.nexts[path];
+            }
+        }
+
+        public int getMaxXorNum(int value) {
+            TrieNode cur = head;
+            int res = 0;
+            for (int move = 31; move >= 0; move--) {
+                int path = (value >> move) & 1;
+                if (move == 31) {
+                    if (cur.nexts[path] == null) {
+                        path = 1 ^ path;//~path
+                    }
+                } else {
+                    if (cur.nexts[1 ^ path] != null) {
+                        path = 1 ^ path;//~path
+                    }
+                }
+                cur = cur.nexts[path];
+                res = res | ((path ^ path) << move);
+            }
+            return res;
+        }
+    }
+
+    public static int findMaximumXOR(int[] nums) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        Trie tree = new Trie();
+        int result = Integer.MIN_VALUE;
+        for (int i = 0; i < nums.length; i++) {
+            tree.insert(nums[i]);
+        }
+        for (int i = 0; i < nums.length; i++) {
+            result = Math.max(result, tree.getMaxXorNum(nums[i]));
+        }
+        return result;
+    }
+}
+```
+
 
 
 ## 二、贪心

@@ -2455,26 +2455,38 @@ public class Code_03_RegularExpressionMatch {
 
 ```
 
+# 
 
 
-# AlgorithmMediumDay07
 
-[TOC]
+## 最长递增子序列
 
-## 二、最长递增子序列
+【题目】 
 
-【题目】
-给定数组arr，返回arr的最长递增子序列。
+ 给定数组 `arr`，返回 `arr` 的最长递增子序列。
 【举例】
-arr=[2,1,5,3,6,4,8,9,7]，返回的最长递增子序列为[1,3,4,8,9]。
+`arr=[2,1,5,3,6,4,8,9,7]`，返回的最长递增子序列为 `[1,3,4,8,9]`。
 【要求】
-如果arr长度为N，请实现时间复杂度为O(NlogN)的方法。
+ 如果 `arr` 长度为 `N`，请实现时间复杂度为 `O(NlogN)` 的方法。
+
+
+
+**解题步骤**：
+
+第一步：生成长度为N的数组dp，dp[i]表示在以arr[i]这个数结尾的情况下，arr[0...i]中的最大递增子序列长度，其中arr[0]=1
+
+第二步：要计算dp[i]，**如果最长递增子序列以arr[i]结尾，那么在arr[0...i]中所有比arr[i]小的数都可以作为倒数第二个数。在这么多倒数第二个数中，以哪个数结尾的最大递增子序列最大，就选那个数作为倒数第二个数，即dp[i] = max{dp[j] + 1(0 <= j < i，arr[j]<arr[i])}。如果arr[0...i]中所有的数都不比arr[i]小，令dp[i]=1即可。**
 
 ```java
-package nowcoder.advanced.day07;
+package com.gjxaiou.advanced.day07;
 
-public class Code_02_LIS {
-
+public class LIS {
+    /**
+     * 方法一：时间复杂度为 O(N ^2)
+     *
+     * @param arr
+     * @return
+     */
     public static int[] lis1(int[] arr) {
         if (arr == null || arr.length == 0) {
             return null;
@@ -2483,6 +2495,9 @@ public class Code_02_LIS {
         return generateLIS(arr, dp);
     }
 
+    /**
+     * 步骤一：获取 DP 数组， dp[i] 表示以 arr[i] 为结尾的情况下， arr[0..i - 1] 中的最大递增子序列长度
+     */
     public static int[] getdp1(int[] arr) {
         int[] dp = new int[arr.length];
         for (int i = 0; i < arr.length; i++) {
@@ -2496,7 +2511,13 @@ public class Code_02_LIS {
         return dp;
     }
 
+    /**
+     * 根据 dp 数组中最大值，反推出这个序列中包含哪些元素
+     *
+     * @return
+     */
     public static int[] generateLIS(int[] arr, int[] dp) {
+        // 获取 dp 数组中最大值，及其下标
         int len = 0;
         int index = 0;
         for (int i = 0; i < dp.length; i++) {
@@ -2506,6 +2527,7 @@ public class Code_02_LIS {
             }
         }
         int[] lis = new int[len];
+        // 结果数组的最后一位肯定是 index 处元素
         lis[--len] = arr[index];
         for (int i = index; i >= 0; i--) {
             if (arr[i] < arr[index] && dp[i] == dp[index] - 1) {
@@ -2515,6 +2537,7 @@ public class Code_02_LIS {
         }
         return lis;
     }
+
 
     public static int[] lis2(int[] arr) {
         if (arr == null || arr.length == 0) {

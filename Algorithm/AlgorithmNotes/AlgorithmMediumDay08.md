@@ -5,69 +5,70 @@
 ## 一、两个有序数组间相加和的 TOP K 问题
 
 【题目】
-给定两个**有序数组** arr1 和 arr2，再给定一个整数 k，返回分别来自 arr1 和 arr2 的两个数相加和最大的前 k 个，两个数必须分别来自两个数组。
+给定两个**有序数组** `arr1` 和 `arr2`，再给定一个整数 `k`，返回分别来自 `arr1` 和 `arr2` 的两个数相加和最大的前 `k` 个，两个数必须分别来自两个数组。
 【举例】
 `arr1=[1,2,3,4,5]，arr2=[3,5,7,9,11]，k=4。`
 返回数组[16,15,14,14]。
 【要求】
 时间复杂度达到O(klogk)。
 
-【思路】
+【思路】**使用大根堆结构**
 
-使用大根堆结构。假设 arr1 的长度是 M，arr2 的长度是 N。因为是已经排序的数组，arr1 中最后一个数加上 arr2 中最后一个数一定就是最大的相加和。将这个数压入大根堆中。然后从大根堆中弹出一个堆顶，此时这个堆顶一定是 (M-1, N-1) 位置的和，表示获得一个最大相加和。然后，将两个相邻位置的和再放入堆中，即位置 (M-1,N-2) 和 (M-2, N-1)，因为除 (M-1, N-1) 位置的和外，最大的相加和一定在位置(M-1,N-2)和(m-2, N-1)中产生。重新调整大根堆，然后继续弹出，继续将弹出元素的两个相邻位置添加到堆中，直到弹出的元素达到K个。
+假设 arr1 的长度是 M，arr2 的长度是 N。因为是已经排序的数组，arr1 中最后一个数加上 arr2 中最后一个数一定就是最大的相加和。将这个数压入大根堆中。然后从大根堆中弹出一个堆顶，此时这个堆顶一定是 (M-1, N-1) 位置的和，表示获得一个最大相加和。然后，将两个相邻位置的和再放入堆中，即位置 (M-1,N-2) 和 (M-2, N-1)，因为除 (M-1, N-1) 位置的和外，最大的相加和一定在位置(M-1,N-2)和(m-2, N-1)中产生。重新调整大根堆，然后继续弹出，继续将弹出元素的两个相邻位置添加到堆中，直到弹出的元素达到K个。
 
 ```java
-package nowcoder.advanced.advanced_class_08;
+package com.gjxaiou.advanced.day08;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class Code_01_TopKSumCrossTwoArrays {
+public class TopKSumCrossTwoArrays {
 
     public static class HeapNode {
         public int row;
-        public int col;
+        public int column;
         public int value;
 
         public HeapNode(int row, int col, int value) {
             this.row = row;
-            this.col = col;
+            this.column = col;
             this.value = value;
         }
     }
 
-    public static int[] topKSum(int[] a1, int[] a2, int topK) {
-        if (a1 == null || a2 == null || topK < 1) {
+    public static int[] topKSum(int[] arr1, int[] arr2, int topK) {
+        if (arr1 == null || arr2 == null || topK < 1) {
             return null;
         }
-        topK = Math.min(topK, a1.length * a2.length);
+        topK = Math.min(topK, arr1.length * arr2.length);
+
         HeapNode[] heap = new HeapNode[topK + 1];
         int heapSize = 0;
-        int headR = a1.length - 1;
-        int headC = a2.length - 1;
+        int headRight = arr1.length - 1;
+        int headColumn = arr2.length - 1;
         int uR = -1;
         int uC = -1;
         int lR = -1;
         int lC = -1;
-        heapInsert(heap, heapSize++, headR, headC, a1[headR] + a2[headC]);
+        heapInsert(heap, heapSize++, headRight, headColumn, arr1[headRight] + arr2[headColumn]);
         HashSet<String> positionSet = new HashSet<String>();
         int[] res = new int[topK];
         int resIndex = 0;
         while (resIndex != topK) {
             HeapNode head = popHead(heap, heapSize--);
             res[resIndex++] = head.value;
-            headR = head.row;
-            headC = head.col;
-            uR = headR - 1;
-            uC = headC;
-            if (headR != 0 && !isContains(uR, uC, positionSet)) {
-                heapInsert(heap, heapSize++, uR, uC, a1[uR] + a2[uC]);
+            headRight = head.row;
+            headColumn = head.column;
+            uR = headRight - 1;
+            uC = headColumn;
+            if (headRight != 0 && !isContains(uR, uC, positionSet)) {
+                heapInsert(heap, heapSize++, uR, uC, arr1[uR] + arr2[uC]);
                 addPositionToSet(uR, uC, positionSet);
             }
-            lR = headR;
-            lC = headC - 1;
-            if (headC != 0 && !isContains(lR, lC, positionSet)) {
-                heapInsert(heap, heapSize++, lR, lC, a1[lR] + a2[lC]);
+            lR = headRight;
+            lC = headColumn - 1;
+            if (headColumn != 0 && !isContains(lR, lC, positionSet)) {
+                heapInsert(heap, heapSize++, lR, lC, arr1[lR] + arr2[lC]);
                 addPositionToSet(lR, lC, positionSet);
             }
         }
@@ -133,7 +134,8 @@ public class Code_01_TopKSumCrossTwoArrays {
         set.add(String.valueOf(row + "_" + col));
     }
 
-    // For test, this method is inefficient but absolutely right
+
+    ////////////////// 测试程序 //////////////////////////
     public static int[] topKSumTest(int[] arr1, int[] arr2, int topK) {
         int[] all = new int[arr1.length * arr2.length];
         int index = 0;
@@ -196,11 +198,8 @@ public class Code_01_TopKSumCrossTwoArrays {
         System.out.println(end - start + " ms");
 
         System.out.println(isEqual(res, absolutelyRight));
-
     }
-
 }
-
 ```
 
 程序运行结果：
@@ -213,22 +212,18 @@ true
 
 
 
-
-
 ## 二、子数组的最大累加和问题
 
 【题目】
-给定一个数组arr，返回子数组的最大累加和。
-例如，arr=[1,-2,3,5,-2,6,-1]，所有的子数组中，[3,5,-2,6]可以累加出最大的和12，所以返回12。
+给定一个数组 `arr`，返回子数组的最大累加和。
+例如，`arr=[1,-2,3,5,-2,6,-1]`，所有的子数组中，`[3,5,-2,6]` 可以累加出最大的和 `12`，所以返回 `12`。
 【要求】
-如果arr长度为N，要求时间复杂度为O(N)，额外空间复杂度为O(1)。
-
-
+如果 `arr` 长度为 `N`，要求时间复杂度为 O(N)，额外空间复杂度为O(1)。
 
 ```java
-package nowcoder.advanced.advanced_class_08;
+package com.gjxaiou.advanced.day08;
 
-public class Code_02_MaxSubMatrixSum {
+public class MaxSubMatrixSum {
 
     public static int maxSum(int[][] m) {
         if (m == null || m.length == 0 || m[0].length == 0) {
@@ -255,10 +250,8 @@ public class Code_02_MaxSubMatrixSum {
     public static void main(String[] args) {
         int[][] matrix = {{-90, 48, 78}, {64, -40, 64}, {-81, -7, 66}};
         System.out.println(maxSum(matrix));
-
     }
 }
-
 ```
 
 程序运行结果：
@@ -271,7 +264,7 @@ public class Code_02_MaxSubMatrixSum {
 
 
 
-## 三、边界都是1的最大正方形大小
+## 三、边界都是 1 的最大正方形大小
 
 【题目】
 给定一个NN的矩阵matrix，在这个矩阵中，只有0和1两种值，返回边框全是1的最大正方形的边长长度。
@@ -399,8 +392,6 @@ N=3，可以三次都跨1个台阶；也可以先跨2个台阶，再跨1个台�
 N=6，第1年1头成熟母牛记为a；第2年a生了新的小母牛，记为b，总牛数为2；第3年a生了新的小母牛，记为c，总牛数为3；第4年a生了新的小母牛，记为d，总牛数为4。第5年b成熟了，a和b分别生了新的小母牛，总牛数为6；第6年c也成熟了，a、b和c分别生了新的小母牛，总牛数为9，返回9。
 【要求】
 对以上所有的问题，请实现时间复杂度O(logN)的解法。
-
-
 
 ```java
 package nowcoder.advanced.advanced_class_08;
@@ -601,99 +592,6 @@ public class Code_04_FibonacciProblem {
 
 
 
-
-## 五、找到字符串的最长无重复字符子串
-
-【题目】
-给定一个字符串str，返回str的最长无重复字符子串的长度。
-【举例】
-str="abcd"，返回4
-str="aabcb"，最长无重复字符子串为"abc"，返回3。
-【要求】
-如果str的长度为N，请实现时间复杂度为O(N)的方法。
-
-
-
-```java
-package nowcoder.advanced.advanced_class_08;
-
-public class Code_05_LongestNoRepeatSubstring {
-
-    public static int maxUnique(String str) {
-        if (str == null || str.equals("")) {
-            return 0;
-        }
-        char[] chas = str.toCharArray();
-        int[] map = new int[256];
-        for (int i = 0; i < 256; i++) {
-            map[i] = -1;
-        }
-        int len = 0;
-        int pre = -1;
-        int cur = 0;
-        for (int i = 0; i != chas.length; i++) {
-            pre = Math.max(pre, map[chas[i]]);
-            cur = i - pre;
-            len = Math.max(len, cur);
-            map[chas[i]] = i;
-        }
-        return len;
-    }
-
-    // for test
-    public static String getRandomString(int len) {
-        char[] str = new char[len];
-        int base = 'a';
-        int range = 'z' - 'a' + 1;
-        for (int i = 0; i != len; i++) {
-            str[i] = (char) ((int) (Math.random() * range) + base);
-        }
-        return String.valueOf(str);
-    }
-
-    // for test
-    public static String maxUniqueString(String str) {
-        if (str == null || str.equals("")) {
-            return str;
-        }
-        char[] chas = str.toCharArray();
-        int[] map = new int[256];
-        for (int i = 0; i < 256; i++) {
-            map[i] = -1;
-        }
-        int len = -1;
-        int pre = -1;
-        int cur = 0;
-        int end = -1;
-        for (int i = 0; i != chas.length; i++) {
-            pre = Math.max(pre, map[chas[i]]);
-            cur = i - pre;
-            if (cur > len) {
-                len = cur;
-                end = i;
-            }
-            map[chas[i]] = i;
-        }
-        return str.substring(end - len + 1, end + 1);
-    }
-
-    public static void main(String[] args) {
-        String str = getRandomString(20);
-        System.out.println(str);
-        System.out.println(maxUnique(str));
-        System.out.println(maxUniqueString(str));
-    }
-}
-
-```
-
-程序运行结果：
-
-```java
-bltpirbrifkownqrttwu
-9
-brifkownq
-```
 
 
 

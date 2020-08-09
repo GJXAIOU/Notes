@@ -997,10 +997,18 @@ true
   
 
 ## 七、判断是否是搜索二叉树或者完全二叉树
-### （一）搜索二叉树 BST
-【**搜索二叉树 BST 概念**】
 
-==对于二叉树的任意一棵子树，其左子树上的**所有**结点的值小于该子树的根节点的值，而其右子树上的**所有**结点的值大于该子树的根结点的值，并且整棵树上任意两个结点的值不同（重复的结点的值可以通过 List 的形式进行存放）。==
+### （一）搜索二叉树 （BST：Binary Search Tree）
+**二叉查找树**也称为**二叉搜索树**、**有序二叉树**（ordered binary tree）或**排序二叉树**（sorted binary tree），是指一棵空树或者具有下列性质的二叉树：
+
+1. 若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
+2. 若任意节点的右子树不空，则右子树上所有节点的值均大于或等于它的根节点的值；
+3. 任意节点的左、右子树也分别为二叉查找树；
+4. 并且整棵树上任意两个结点的值不同（重复的结点的值可以通过 List 的形式进行存放）。
+
+二叉查找树相比于其他数据结构的优势在于查找、插入的[时间复杂度较低。为 $O(log^N)$，最坏情况为：O(N)
+
+
 
 【**解答方案**】 **根据二叉树的中序遍历看是否递增**
 根据定义，==搜索二叉树的**中序遍历**打印将是一个升序序列==。因此我们可以利用二叉树的中序遍历的非递归方式，比较中序遍历时相邻两个结点的大小，只要有一个结点的值小于其后继结点的那就不是搜索二叉树。
@@ -1169,7 +1177,352 @@ true
 true
 ```
 
+
+
+### （一）问题变形：求一棵二叉树的最远距离
+
+【注】如果在二叉树中，小明从结点 A 出发，既可以往上走到达它的父结点，又可以往下走到达它的子结点，那么小明从结点 A 走到结点 B 最少要经过的结点个数（包括 A 和 B）叫做 A 到 B 的距离，任意两结点所形成的距离中，最大的叫做树的最大距离。
+
+**高度套路化**：
+
+大前提：如果对于以该树的任意结点作为头结点的子树中，如果我们能够求得所有这些子树的最大距离，那么答案就在其中。
+
+对于该树的任意子树，其最大距离的求解分为以下三种情况：
+
+- 该树的最大距离是左子树的最大距离。
+- 该树的最大距离是右子树的最大距离。
+- 该树的最大距离是从左子树的最深的那个结点经过该树的头结点走到右子树的最深的那个结点。
+
+要从子树收集的信息：
+
+- 子树的最大距离
+- 子树的深度
+
+示例代码：
+
+```java
+package nowcoder.advanced.advanced_class_05;
+
+public class Code_03_MaxDistanceInTree {
+
+    public static class Node {
+        public int value;
+        public Node left;
+        public Node right;
+
+        public Node(int data) {
+            this.value = data;
+        }
+    }
+
+    public static int maxDistance(Node head) {
+        int[] record = new int[1];
+        return posOrder(head, record);
+    }
+
+    // 最大距离，高度
+    public static class ReturnType {
+        public int maxDistance;
+        public int h;
+
+        public ReturnType(int m, int h) {
+            this.maxDistance = m;
+            ;
+            this.h = h;
+        }
+    }
+
+    public static ReturnType process(Node head) {
+        if (head == null) {
+            return new ReturnType(0, 0);
+        }
+        ReturnType leftReturnType = process(head.left);
+        ReturnType rightReturnType = process(head.right);
+
+        // 可能性 3，可能性 1，可能性 2；
+        int includeHeadDistance = leftReturnType.h + 1 + rightReturnType.h;
+        int p1 = leftReturnType.maxDistance;
+        int p2 = rightReturnType.maxDistance;
+        // 最终距离
+        int resultDistance = Math.max(Math.max(p1, p2), includeHeadDistance);
+        // 最大深度，左右最大深度 + 自己
+        int hitself = Math.max(leftReturnType.h, leftReturnType.h) + 1;
+        return new ReturnType(resultDistance, hitself);
+    }
+
+    public static int posOrder(Node head, int[] record) {
+        if (head == null) {
+            record[0] = 0;
+            return 0;
+        }
+        int lMax = posOrder(head.left, record);
+        int maxfromLeft = record[0];
+        int rMax = posOrder(head.right, record);
+        int maxFromRight = record[0];
+        int curNodeMax = maxfromLeft + maxFromRight + 1;
+        record[0] = Math.max(maxfromLeft, maxFromRight) + 1;
+        return Math.max(Math.max(lMax, rMax), curNodeMax);
+    }
+
+    public static void main(String[] args) {
+        Node head1 = new Node(1);
+        head1.left = new Node(2);
+        head1.right = new Node(3);
+        head1.left.left = new Node(4);
+        head1.left.right = new Node(5);
+        head1.right.left = new Node(6);
+        head1.right.right = new Node(7);
+        head1.left.left.left = new Node(8);
+        head1.right.left.right = new Node(9);
+        System.out.println(maxDistance(head1));
+
+        Node head2 = new Node(1);
+        head2.left = new Node(2);
+        head2.right = new Node(3);
+        head2.right.left = new Node(4);
+        head2.right.right = new Node(5);
+        head2.right.left.left = new Node(6);
+        head2.right.right.right = new Node(7);
+        head2.right.left.left.left = new Node(8);
+        head2.right.right.right.right = new Node(9);
+        System.out.println(maxDistance(head2));
+    }
+}
+
+```
+
+> 高度套路化：列出可能性->从子过程收集的信息中整合出本过程要返回的信息->返回
+
+
+
+### （二）最大搜索二叉子树
+
+【**题目**】
+
+给定一棵二叉树的头节点 head，所有结点的值都是不一样的，请返回最大搜索二叉子树的大小（即含有结点最多的搜索二叉树）
+
+【总结】
+
+==求一棵树的最大XXXXX，转换为求以每个结点为根节点树的最大XXXX，最终答案一定在其中。== 即这类题一般都有一个**大前提**：**假设对于以树中的任意结点为头结点的子树，我们都能求得其最大搜索二叉子树的结点个数，那么答案一定就在其中**。
+
+这种题目的解题过程分为三步:
+
+- **列出所有可能性**；
+- **列出结点需要的信息，并整合信息(成一个结构体)**；
+- **改递归 ，先假设左和右都给我信息(黑盒)，然后怎么利用左边和右边的信息组出来我该返回的信息，最后`basecase`(边界)填什么**；
+
+
+
+**步骤一：可能性**
+
+而对于以任意结点为头结点的子树，其最大搜索二叉子树的求解分为三种情况（**列出可能性**）：
+
+- 整棵树的最大搜索二叉子树存在于左子树中。这要求其左子树中存在最大搜索二叉子树，而其右子树不存在。
+- 整棵树的最大搜索二叉子树存在于右子树中。这要求其右子树中存在最大搜索二叉子树，而其左子树不存在。
+- 最整棵二叉树的最大搜索二叉子树就是其本身。这需要其左子树就是一棵搜索二叉子树（左树头结点为 `node.left`）且左子树的最大值结点比头结点小、其右子树就是一棵搜索二叉子树（右结点的头结点为 `node.right`）且右子树的最小值结点比头结点大。
+
+**步骤二：**要想区分这三种情况，我们需要收集的信息：
+
+左边搜索二叉树大小、右边搜索二叉树大小、左边搜索二叉树头部、右边搜索二叉树头部、左树最大值，右树最小值，==但是求得每个结点之后进行递归，要创建结点唯一要搜索的结构，所有要化简==
+
+- 子树中是否存在最大搜索二叉树，如果存在则记录搜索二叉树的大小；
+- 子树的头结点，搜索二叉树头结点；
+- 子树的最大值结点
+- 子树的最小值结点
+
+**步骤三**：因此我们就可以开始我们的高度套路了：
+
+1. 将要从子树收集的信息封装成一个`ReturnData`，代表处理完这一棵子树要向上级返回的信息。
+2. 假设我利用子过程收集到了子树的信息，接下来根据子树的信息和分析问题时列出的情况加工出当前这棵树要为上级提供的所有信息，并返回给上级（**整合信息**）。
+3. 确定`base case`，子过程到子树为空时，停。
+
+根据上面高度套路的分析，可以写出解决这类问题高度相似的代码：
+
+```java
+package com.gjxaiou.advanced.day04;
+
+public class BiggestSubBSTInTree {
+
+    // 树节点的结构
+    public static class Node {
+        public int value;
+        public Node left;
+        public Node right;
+
+        public Node(int data) {
+            this.value = data;
+        }
+    }
+
+    // 对于递归函数返回的结构类型
+    public static class ReturnType {
+        // 左右搜索二叉子树节点数的最大值
+        public int size;
+        // 左右搜索二叉子树节点数较大的子树的头结点
+        public Node head;
+        // 右树的最小值
+        public int min;
+        // 左树的最大值
+        public int max;
+
+        public ReturnType(int size, Node head, int min, int max) {
+            this.size = size;
+            this.head = head;
+            this.min = min;
+            this.max = max;
+        }
+    }
+
+    /**
+     * 方式一：使用后续遍
+     */
+    public static Node biggestSubBST1(Node head) {
+        return process(head).head;
+    }
+
+    // 采用后序遍历的方式进行递归，因为需要左右的信息来构造头部的信息
+    public static ReturnType process(Node head) {
+        if (head == null) {
+            // 返回最大值，比较谁小的时候不会影响比较结果
+            return new ReturnType(0, null, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        }
+
+        // 分别将左右孩子传入之后返回左树和右树的信息
+        Node left = head.left;
+        ReturnType leftSubTressInfo = process(left);
+
+        Node right = head.right;
+        ReturnType rightSubTressInfo = process(right);
+
+        // 可能性 3
+        int includeItSelf = 0;
+        // 如果左树上最大搜索二叉子树的头部是该节点的左孩子，右树上最大搜索二叉子树的头部是该节点的右孩子，同时左树上最大值值小于该结点，右树上值大于该节点
+        if (leftSubTressInfo.head == left
+                && rightSubTressInfo.head == right
+                && head.value > leftSubTressInfo.max
+                && head.value < rightSubTressInfo.min
+        ) {
+            includeItSelf = leftSubTressInfo.size + 1 + rightSubTressInfo.size;
+        }
+        // 可能性 1
+        int p1 = leftSubTressInfo.size;
+        // 可能性 2
+        int p2 = rightSubTressInfo.size;
+        // 该节点返回的最大值是三种可能性中最大值
+        int maxSize = Math.max(Math.max(p1, p2), includeItSelf);
+        // 返回值头部 P1 大说明来自左子树最大搜索二叉树头部，P2 大则说明......
+        Node maxHead = p1 > p2 ? leftSubTressInfo.head : rightSubTressInfo.head;
+        if (maxSize == includeItSelf) {
+            maxHead = head;
+        }
+
+        return new ReturnType(maxSize,
+                maxHead,
+                Math.min(Math.min(leftSubTressInfo.min, rightSubTressInfo.min), head.value),
+                Math.max(Math.max(leftSubTressInfo.max, rightSubTressInfo.max), head.value));
+    }
+
+
+    /*
+     优化方式：将三个值以数组形式存放，
+     */
+    public static Node biggestSubBST(Node head) {
+        // 0->size, 1->min, 2->max
+        int[] record = new int[3];
+        return posOrder(head, record);
+    }
+
+    public static Node posOrder(Node head, int[] record) {
+        if (head == null) {
+            record[0] = 0;
+            record[1] = Integer.MAX_VALUE;
+            record[2] = Integer.MIN_VALUE;
+            return null;
+        }
+        int value = head.value;
+        Node left = head.left;
+        Node right = head.right;
+        Node lBST = posOrder(left, record);
+        int lSize = record[0];
+        int lMin = record[1];
+        int lMax = record[2];
+        Node rBST = posOrder(right, record);
+        int rSize = record[0];
+        int rMin = record[1];
+        int rMax = record[2];
+        record[1] = Math.min(rMin, Math.min(lMin, value)); // lmin, value, rmin -> min
+        record[2] = Math.max(lMax, Math.max(rMax, value)); // lmax, value, rmax -> max
+        if (left == lBST && right == rBST && lMax < value && value < rMin) {
+            record[0] = lSize + rSize + 1;
+            return head;
+        }
+        record[0] = Math.max(lSize, rSize);
+        return lSize > rSize ? lBST : rBST;
+    }
+
+
+    // for test -- print tree
+    public static void printTree(Node head) {
+        System.out.println("Binary Tree:");
+        printInOrder(head, 0, "H", 17);
+        System.out.println();
+    }
+
+    public static void printInOrder(Node head, int height, String to, int len) {
+        if (head == null) {
+            return;
+        }
+        printInOrder(head.right, height + 1, "v", len);
+        String val = to + head.value + to;
+        int lenM = val.length();
+        int lenL = (len - lenM) / 2;
+        int lenR = len - lenM - lenL;
+        val = getSpace(lenL) + val + getSpace(lenR);
+        System.out.println(getSpace(height * len) + val);
+        printInOrder(head.left, height + 1, "^", len);
+    }
+
+    public static String getSpace(int num) {
+        String space = " ";
+        StringBuffer buf = new StringBuffer("");
+        for (int i = 0; i < num; i++) {
+            buf.append(space);
+        }
+        return buf.toString();
+    }
+
+    public static void main(String[] args) {
+
+        Node head = new Node(6);
+        head.left = new Node(1);
+        head.left.left = new Node(0);
+        head.left.right = new Node(3);
+        head.right = new Node(12);
+        head.right.left = new Node(10);
+        head.right.left.left = new Node(4);
+        head.right.left.left.left = new Node(2);
+        head.right.left.left.right = new Node(5);
+        head.right.left.right = new Node(14);
+        head.right.left.right.left = new Node(11);
+        head.right.left.right.right = new Node(15);
+        head.right.right = new Node(13);
+        head.right.right.left = new Node(20);
+        head.right.right.right = new Node(16);
+
+        printTree(head);
+        Node bst = biggestSubBST(head);
+        Node node = biggestSubBST1(head);
+        printTree(bst);
+        System.out.println("=====================================");
+        printTree(node);
+    }
+}
+```
+
+
+
 ## 八、已知一棵完全二叉树，求其节点的个数
+
 要求：时间复杂度低于 O(N)，N 为这棵树的节点个数
 
 ### （一）获取完全二叉树的高度

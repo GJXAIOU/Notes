@@ -601,7 +601,97 @@ public class AllLessNumSubArray {
 }
 ```
 
+## 五、找到字符串的最长无重复字符子串
 
+【题目】
+给定一个字符串str，返回str的最长无重复字符子串的长度。
+【举例】
+str="abcd"，返回4
+str="aabcb"，最长无重复字符子串为"abc"，返回3。
+【要求】
+如果str的长度为N，请实现时间复杂度为O(N)的方法。方法：滑动窗口
+
+【解答】建立一个256位大小的整型数组 freq ，用来建立字符和其出现位置之间的映射。
+
+维护一个滑动窗口，窗口内的都是没有重复的字符，去尽可能的扩大窗口的大小，窗口不停的向右滑动。
+
+*   如果当前遍历到的字符从未出现过，那么直接扩大右边界；
+*   如果当前遍历到的字符出现过，则缩小窗口（左边索引向右移动），然后继续观察当前遍历到的字符；
+*   重复前两步，直到左边索引无法再移动；
+*   维护一个结果res，每次用出现过的窗口大小来更新结果 res，最后返回 res 获取结果。
+
+![LeetCode3](../../../../Yu%2520Writer%2520Libraries/LeetCode/LeetCodeNotes/String/Medium/3%2520.%2520%25E6%2597%25A0%25E9%2587%258D%25E5%25A4%258D%25E5%25AD%2597%25E7%25AC%25A6%25E7%259A%2584%25E6%259C%2580%25E9%2595%25BF%25E5%25AD%2590%25E4%25B8%25B2.resource/LeetCode3.gif)
+
+​	
+
+```java
+package string.medium;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 使用滑动窗口
+ *
+ * @author GJXAIOU
+ * @create 2019-09-01-19:11
+ */
+public class LeetCode3 {
+    public int lengthOfLongestSubstring(String s) {
+        int[] freq = new int[256];
+        int left = 0;
+        int right = -1;
+        int res = 0;
+
+        // 在每次循环里逐渐改变窗口, 维护freq, 并记录当前窗口中是否找到了一个新的最优值
+        while (left < s.length()) {
+            if ((right + 1) < s.length() && (freq[s.charAt(right + 1)] == 0)) {
+                right++;
+                freq[s.charAt(right)]++;
+            } else {
+                // 如果 right 已经到头或者 right 位置已经有元素了
+                freq[s.charAt(left)]--;
+                left++;
+            }
+            res = res > (right - left + 1) ? res : (right - left + 1);
+        }
+        return res;
+    }
+}
+```
+
+
+
+### 方法优化
+
+如果有重复，left 直接跳到重复位置  + 1 开始，不用慢慢+1；
+
+- 定义一个 map 数据结构存储 (k, v)，其中 key 值为字符，value 值为字符位置 +1，加 1 表示从字符位置后一个才开始不重复；
+- 我们定义不重复子串的开始位置为 start，结束位置为 end；
+- 随着 end 不断遍历向后，会遇到与 [start, end] 区间内字符相同的情况，**此时将字符作为 key 值，获取其 value 值**，并更新 start，此时 [start, end] 区间内不存在重复字符
+- 无论是否更新 start，都会更新其 map 数据结构和结果 ans。
+- 时间复杂度：O(n)
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int length = s.length(), ans = 0;
+        Map<Character, Integer> map = new HashMap<>();
+        for (int end = 0, start = 0; end < length; end++) {
+            char alpha = s.charAt(end);
+            if (map.containsKey(alpha)) {
+                start = map.get(alpha) > start ? map.get(alpha) : start;
+            }
+            ans = ans > end - start + 1 ? ans : end - start + 1;
+            map.put(s.charAt(end), end + 1);
+        }
+        return ans;
+    }
+}
+
+```
+
+![LeetCode3动画](../../../../Yu%2520Writer%2520Libraries/LeetCode/LeetCodeNotes/String/Medium/3%2520.%2520%25E6%2597%25A0%25E9%2587%258D%25E5%25A4%258D%25E5%25AD%2597%25E7%25AC%25A6%25E7%259A%2584%25E6%259C%2580%25E9%2595%25BF%25E5%25AD%2590%25E4%25B8%25B2.resource/LeetCode3%25E5%258A%25A8%25E7%2594%25BB.gif)
 
 ## 五、单调栈
 
