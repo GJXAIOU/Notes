@@ -2157,7 +2157,7 @@ Circular List: 4 -> 4
 
 示例代码：
 
-```
+```java
 public static boolean match(char[] s, int i, char[] e, int j) {
     if (j == e.length) {
         return i == s.length;
@@ -2195,7 +2195,6 @@ public static void main(String[] args) {
     System.out.println(isMatch("abbbbc","a.bbc"));//F
     System.out.println(isMatch("abbbbc","a.bbbc"));//T
 }
-复制代码
 ```
 
 ### 动态规划

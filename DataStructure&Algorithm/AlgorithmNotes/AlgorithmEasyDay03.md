@@ -1093,7 +1093,6 @@ public class PrintCommonPart {
     }
 
     
-    
     // 输出输入的两个链表元素
     public static void printLinkedList(Node node) {
         System.out.print("Linked List: ");
@@ -1121,7 +1120,6 @@ public class PrintCommonPart {
         printCommonPart(node1, node2);
     }
 }
-
 ```
 程序运行结果：
 ```java
@@ -1141,7 +1139,8 @@ Common Part: 2 5
 - 然后再遍历链表，并且同时从栈中取出元素，两个进行逐个比较，如果有不相等的就不是；
 
 **方法二：**额外空间复杂度为 O（N），需要栈空间为链表长度的一半；
-- 将链表遍历一遍，但是这次使用快慢指针，快指针一次走两步，慢指针一次走一步，这样快指针走到头，慢指针正好走到链表中间；然后将链表后半部分放入**栈**中；
+
+- 将链表遍历一遍，但是这次使用快慢指针，快指针一次走两步，慢指针一次走一步，这样快指针走到头，慢指针正好走到链表中间；然后**将链表后半部分放入栈中**；
 - 遍历链表前半部分，同时从栈中取出元素，两者进行逐个比较，如果不相等就不是；
 
 ==**进阶**： 如果链表长度为N，时间复杂度达到O(N)，额外空间复杂度达到O(1)。==
@@ -1219,6 +1218,9 @@ public class IsPalindromeList {
         if (head == null || head.next == null) {
             return true;
         }
+        
+       	// 使用这种方式寻找中间节点
+        
         // slowPointer 是慢指针，fastPointer 是快指针
         Node slowPointer = head;
         Node fastPointer = head;
@@ -1227,6 +1229,8 @@ public class IsPalindromeList {
             slowPointer = slowPointer.next;
             fastPointer = fastPointer.next.next;
         }
+        
+        
         // 快指针指向右半部分第一个节点
         fastPointer = slowPointer.next;
         // 中间节点指向 null
