@@ -8,33 +8,31 @@
 
 ### (一) Lambda 表达式
 
-在编程语言中，Lambda 是用于表示匿名函数（anonymous functions）或者闭包（closures) 的运算符。
+在编程语言中，**Lambda 是用于表示匿名函数（anonymous functions）或者闭包（closures) 的运算符**。
 
 **为何需要Lambda表达式**
 
--  在 Java 中，我们无法将函数作为参数传递给一个方法，也无法声明返回一个函数的方法。**只能传递或者返回数据。**
+-  在 Java 中，我们无法将函数作为参数传递给一个方法，也无法声明返回一个函数的方法。只能传递或者返回数据。
 
--  在JavaScript（面向对象和函数式语言）中，函数参数是一个函数，返回值是另一个函数的情况是非常常见的；JavaScript是一门非常典型的函数式语⾔。
+-  在JavaScript（面向对象和函数式语言）中，函数参数是一个函数，返回值是另一个函数的情况是常见的；JavaScript 是一门非常典型的函数式语⾔。
 
 #### Lambda 表达式概要和作用
 
-Java Lambda 表达式是一种匿名函数；它是没有声明的方法，即没有访问修饰符、返回值声明和名字。
+- Java Lambda 表达式是一种匿名函数；它是没有声明的方法，即没有访问修饰符、返回值声明和名字。
 
-**作用**：
-
-- 传递行为，而不仅仅是值
-- 提升抽象层次
-- API 重用性更好
-- 更加灵活
+- Lambda 表达式为 Java 添加了缺失的**函数式编程**特性，使我们能将函数当做一等公民看待。
+- 在将函数作为一等公民的语⾔言中（如 python、JavaScript），Lambda 表达式的类型是函数。**但在 Java 中，Lambda 表达式是对象**，他们必须依附于一类特别的对象类型——函数式接口(functional interface) 
+- Lambda 表达式主要用于传递行为，而不仅仅是值。从而提升抽象层次，使得 API 重用性更好。
 
 #### Lambda 基本语法
 
-`(argument) -> {body}`
-比如说
-•	`(arg1, arg2...) -> { body }`   // 省略类型声明
-•	`(type1 arg1, type2 arg2...) -> { body }`   // 补充上完整的类型声明
-
-
+```java
+// 概述结构
+(argument) -> {body}
+// 示例结构
+(arg1, arg2...) -> { body }   // 省略类型声明
+(type1 arg1, type2 arg2...) -> { body }  // 补充上完整的类型声明
+```
 
 #### Lambda 结构
 
@@ -49,9 +47,9 @@ Java Lambda 表达式是一种匿名函数；它是没有声明的方法，即�
 - 如果 Lambda 表达式的主体只有一条语句，花括号 `{}` 可省略。匿名函数的返回类型与该主体表达式一致。
 - 如果 Lambda 表达式的主体包含一条以上语句，则表达式必须包含在花括号 `{}` 中（形成代码块）。匿名函数的返回类型与代码块的返回类型一致，若没有返回则为空。
 
-#### 1.引言
+#### 代码示例
 
-从匿名内部类到 Lambda
+- 从匿名内部类到 Lambda
 
 ```java
 package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
@@ -105,11 +103,7 @@ public class SwingTest {
 // }
 ```
 
-
-
-#### 2.Lambda 表达式使用
-
-测试在集合中的使用
+- 测试在集合遍历中的使用
 
 ```java
 package com.gjxaiou.jdk8;
@@ -137,7 +131,7 @@ public class CollectionTest {
 
         // 方式三：使用 Consumer 函数式接口
         // forEach() 是 Iterable 接口的默认实现方法，则其实现类就继承了该方法，List 是 Iterable 的一个实现类
-        // Consumer 函数式接口中的 JavaDoc 文档说明：接收另一个参数并且不返回结果值，可能会修改入参值。
+     // Consumer 函数式接口中的 JavaDoc 文档说明：接收另一个参数并且不返回结果值，可能会修改入参值。
         list.forEach(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) {
@@ -158,16 +152,12 @@ public class CollectionTest {
 }
 ```
 
-#### 3.Lambda 表达式作用
-
-•	Lambda 表达式为 Java 添加了缺失的**函数式编程**特性，使我们能将函数当做一等公民看待。
-•	在将函数作为一等公民的语⾔言中（如 python、JavaScript），Lambda 表达式的类型是函数。**但在 Java 中，Lambda 表达式是对象**，他们必须依附于一类特别的对象类型——函数式接口(functional interface)
-
-注：为什么 Lambda 表达式是对象
+- 验证 Lambda 表达式是对象方式一
 
 ```java
 package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
 
+// 首先提供一个函数式接口
 @FunctionalInterface
 interface MyInterface {
     void test();
@@ -177,8 +167,8 @@ interface MyInterface {
     String toString();
 }
 
-public class Test2 {
 
+public class Test2 {
     public void myTest(MyInterface myInterface) {
         myInterface.test();
         System.out.println("-----------------");
@@ -215,19 +205,15 @@ public class Test2 {
  */
 ```
 
-
-
-另一个验证方式：
+- 验证 Lambda 表达式是对象方式二：
 
 ```java
 package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-
 
 /**
  * 定义两个函数式接口
@@ -241,6 +227,7 @@ interface TheInterface {
 interface TheInterface2 {
     void myMethod2();
 }
+
 
 public class Test3 {
     public static void main(String[] args) {
@@ -258,12 +245,14 @@ public class Test3 {
 
         /**
          * 示例二：创建线程方式，这里使用 Lambda 形式来实现 Runnable 接口的形式。
+         * Runnable 接口也是一个函数式接口
          */
         new Thread(() -> System.out.println("hello world")).start();
 
         /**
          * 示例三：列表遍历修改
          */
+        
         // 需求一：遍历列表然后将元素全部大写然后输出
         List<String> list = Arrays.asList("hello", "world", "hello world");
         // forEach 中接受一个 Consumer 接口，该接口接受一个参数并且不返回值。
@@ -277,12 +266,11 @@ public class Test3 {
 
         // 需求二的语句简化：使用 stream 流的形式的两种写法
         list.stream().map(item -> item.toUpperCase()).forEach(item -> System.out.println(item));
-        // map() 本身接收的是一个函数式接口 Function 的参数，该函数式接口的抽象方法为接收一个参数然后返回一个值，除了使用上面的 Lambda
-        // 表达式之外还可以使用下面的方法引用。
+        // map() 本身接收的是一个函数式接口 Function 的参数，该函数式接口的抽象方法为接收一个参数然后返回一个值，除了使用上面的 Lambda 表达式之外还可以使用下面的方法引用。
         list.stream().map(String::toUpperCase).forEach(item -> System.out.println(item));
 
-        // 方法引用，Function 函数式接口
-        // 因为 toUpperCase() 方法是一个实例方法，因此使用的时候肯定是有一个 String 对象来调用该方法。对于像 String::toUpperCase 这种
+        // 方法引用：Function 函数式接口
+        // 因为 toUpperCase() 方法是一个实例方法，因此使用的时候肯定是由一个 String 对象来调用该方法。对于像 String::toUpperCase 这种
         // 类::实例方法 形式的方法引用，则该实例方法的第一个输入参数一定就是调用该方法的对象，这里就是 String 对象，正好对应 Lambda 表达式中的第一个参数（对应上面
         // Lambda 表达式写法就是 item，也就是 Function 的 String 类型来源）。
         Function<String, String> function = String::toUpperCase;
@@ -311,7 +299,7 @@ public class Test3 {
  */
 ```
 
-Lambda 表达式另一种常用方式：
+- Lambda 表达式在排序中使用 
 
 ```java
 package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
@@ -341,6 +329,7 @@ public class StringComparator {
 
         /**
          * 方式二：Lambda 表达式
+         * sort(list 列表，Comparator 函数式接口)，该接口接收两个参数，返回一个参数
          */
         Collections.sort(names, (o1, o2) -> {
             return o2.compareTo(o1);
@@ -362,7 +351,7 @@ public class StringComparator {
 
 ### (二) 函数式接口：FunctionalInterface
 
-接口里面尤其只有一个实例方法的时候可以在接口上面使用 `@FunctionInterface` 来标注这个接口，当然该接口中可以拥有默认实现方法和静态方法。
+接口里面有且只有一个实例方法的时候可以在接口上面使用 `@FunctionInterface` 注解来标注这个接口，当然该接口中**可以拥有默认实现方法和静态方法**。
 
 ```java
 @FunctionalInterface
@@ -377,8 +366,6 @@ public interface Demo {
 }
 ```
 
-
-
 从 FunctionalInterface 接口的 JavaDoc 文档中可以看出：
 
 ```markdown
@@ -387,20 +374,20 @@ Note that instances of functional interfaces can be created with  lambda express
 
 **函数式接口的实例可以通过 Lambda 表达式、方法引用或者构造方法引用来创建**。例如在 `Runnable` 接口上面有 `@FunctionInterface` 标识，表示该接口是函数式接口，因此可以使用 Lambda 表达式方式来创建。
 
-#### 1.函数式接口定义
+#### 函数式接口定义
 
 - 如果一个接口只有一个**抽象方法**，那么该接口就是一个函数式接口。
 
 - 如果我们在某个接口上声明了 `@FunctionalInterface` 注解，那么编译器就会按照函数式接口的定义来要求该接口。即如果不满足下面两个条件就是报错。
 
-    - 【必须为接口】该元素是一个接口类型并且不是一个注解类型、枚举类型、 class 类型。
+    - 该元素是一个接口类型并且不是一个注解类型、枚举类型、 class 类型。
     - 该注解类型满足函数式接口的要求（即只能有一个抽象的成员方法）。
 
 - 如果某个接口只有一个抽象方法，但是我们没有给该接口声明 `@FunctionalInterface` 注解，那么编译器依然会将该接口看作是函数式接口。
 
-- 函数式接口中可以有：抽象方法（有且只有一个）、默认方法、静态方法、重写 Object 类的方法。
+- **函数式接口中可以有：抽象方法（有且只有一个）、默认方法、静态方法、重写 Object 类的方法**。
 
-- 如果一个接口中声明了一个抽象方法（该方法重写了 Object 类中的一个 public 方法），则该接口的抽象方法的个数不会加一。
+- 如果一个接口中声明了一个抽象方法（该方法重写了 Object 类中的一个 public 方法），则该接口的抽象方法的个数不会加一（即该抽象方法不算进抽象方法判断条件中的个数）。
 
     ```java
     @FunctionalInterface
@@ -419,7 +406,6 @@ Note that instances of functional interfaces can be created with  lambda express
     ```java
     package com.gjxaiou.jdk8;
     
-    
     @FunctionalInterface
     interface MyInterface {
         void test();
@@ -428,8 +414,8 @@ Note that instances of functional interfaces can be created with  lambda express
         String toString();
     }
     
-    public class Test2 {
     
+    public class Test2 {
         public void myTest(MyInterface myInterface) {
             myInterface.test();
             System.out.println("-----------------");
@@ -447,74 +433,91 @@ Note that instances of functional interfaces can be created with  lambda express
             });
     
             // 调用方式二：Lambda 表达式
-            // 因为函数式接口中只有唯一的抽象方法，所以 sout 解释对该方法的实现，() 表示没有参数，但是 () 得有。
+            // 因为函数式接口中只有唯一的抽象方法，所以 sout 即是对该方法的实现，() 表示没有参数，但是 () 得有。
             test2.myTest(() -> {
                 System.out.println("this is myTest by Lambda 表达式");
             });
-            
         }
     }
     ```
-
+    
     输出结果：
 
     ```java
-    this is myTest by 匿名内部�?
+this is myTest by 匿名内部�?
     -----------------
     this is myTest by Lambda 表达�?
     -----------------
     ```
 
+#### 函数式接口：Function
 
+```java
+package java.util.function;
 
-#### 2.函数式接口：Function
+import java.util.Objects;
+
+/**
+ * Represents a function that accepts one argument and produces a result.
+ *
+ * <p>This is a <a href="package-summary.html">functional interface</a>
+ * whose functional method is {@link #apply(Object)}.
+ *
+ * @param <T> the type of the input to the function
+ * @param <R> the type of the result of the function
+ *
+ * @since 1.8
+ */
+@FunctionalInterface
+public interface Function<T, R> {
+
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param t the function argument
+     * @return the function result
+     */
+    R apply(T t);
+}
+```
 
 Function 函数式接口代表一个函数，该函数**接收一个参数并且返回一个结果**。
 
 ```java
-// 需求二的语句简化：使用 stream 流的形式的两种写法
-list.stream().map(item -> item.toUpperCase()).forEach(item -> System.out.println(item));
-// map() 本身接收的是一个函数式接口 Function 的参数，该函数式接口的抽象方法为接收一个参数然后返回一个值，除了使用上面的 Lambda
-// 表达式之外还可以使用下面的方法引用。
-list.stream().map(String::toUpperCase).forEach(item -> System.out.println(item));
+public class Test3 {
+    public static void main(String[] args) {      
 
-// 方法引用，Function 函数式接口
-// 因为 toUpperCase() 方法是一个实例方法，因此使用的时候肯定是有一个 String 对象来调用该方法。对于像 String::toUpperCase 这种
-// 类::实例方法 形式的方法引用，则该实例方法的第一个输入参数一定就是调用该方法的对象，这里就是 String 对象，正好对应 Lambda 表达式中的第一个参数（对应上面
-// Lambda 表达式写法就是 item，也就是 Function 的 String 类型来源）。
-Function<String, String> function = String::toUpperCase;
-System.out.println(function.getClass().getInterfaces()[0]);
+        // 需求：遍历 list1 得到值然后添加到目标集合 list2 中，然后打印
+        List<String> list = Arrays.asList("hello", "world", "hello world");
+        List<String> list2 = new ArrayList<>();
+
+        /*
+		 * stream 的形式的两种写法
+		*/
+        // map() 本身接收的是一个函数式接口 Function 的参数，该函数式接口的抽象方法为接收一个参数然后返回一个值
+        list.stream().map(item -> item.toUpperCase()).forEach(item -> System.out.println(item));
+
+        // 除了使用上面的 Lambda 表达式之外还可以使用下面的方法引用。
+        list.stream().map(String::toUpperCase).forEach(item -> System.out.println(item));
+
+        // 方法引用，Function 函数式接口
+        // 因为 toUpperCase() 方法是一个实例方法，因此使用的时候肯定是有一个 String 对象来调用该方法。对于像 String::toUpperCase 这种
+        // 类::实例方法 形式的方法引用，则该实例方法的第一个输入参数一定就是调用该方法的对象，这里就是 String 对象，正好对应 Lambda 表达式中的第一个参数（对应上面
+        // Lambda 表达式写法就是 item，也就是 Function 的 String 类型来源）。
+        Function<String, String> function = String::toUpperCase;
+        System.out.println(function.getClass().getInterfaces()[0]);
+    }
+}
 ```
 
 **高阶函数**：如果一个函数接收一个函数作为参数，或者返回一个函数作为返回值，那么该函数就叫做高阶函数。
 
 ```java
-package com.gjxaiou.jdk8;
+package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
 
 import java.util.function.Function;
 
 public class FunctionTest {
-    public static void main(String[] args) {
-        FunctionTest test = new FunctionTest();
-
-        // 将一个行为：value -> {return 2 * value;} 作为参数进行传递（对应的就是 apply()），该行为中输入参数为 value，输出为： 2 * value
-        System.out.println(test.compute(1, value -> {
-            return 2 * value;
-        }));
-        System.out.println(test.compute(2, value -> 5 + value));
-
-        System.out.println(test.convert(5, value -> value + "hello world"));
-
-        System.out.println(test.method1(2));
-
-        /**
-         * 行为是调用的时候才确定的，当然可以先定义好 Lambda 表达式然后传递
-         */
-        Function<Integer, Integer> function = value -> value * 2;
-
-        System.out.println(test.compute(4, function));
-    }
-
 
     // 接收一个 Function 类型的参数，该函数式接口中有唯一的抽象方法： R apply(T t);
     public int compute(int a, Function<Integer, Integer> function) {
@@ -534,8 +537,31 @@ public class FunctionTest {
     public int method1(int a) {
         return 2 * a;
     }
+
     public int method2(int a) {
         return 5 + a;
+    }
+
+
+    public static void main(String[] args) {
+        FunctionTest test = new FunctionTest();
+
+        // 将一个行为：value -> {return 2 * value;} 作为参数进行传递（对应的就是 apply()），该行为中输入参数为 value，输出为： 2 * value
+        System.out.println(test.compute(1, value -> {
+            return 2 * value;
+        }));
+        System.out.println(test.compute(2, value -> 5 + value));
+
+        System.out.println(test.convert(5, value -> value + "hello world"));
+
+        System.out.println(test.method1(2));
+
+        /**
+         * 行为是调用的时候才确定的，当然可以先定义好 Lambda 表达式然后传递
+         */
+        Function<Integer, Integer> function = value -> value * 2;
+
+        System.out.println(test.compute(4, function));
     }
 }
 ```
