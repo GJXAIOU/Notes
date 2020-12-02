@@ -16,7 +16,7 @@ https://spring.io/projects/spring-cloud#overflow
 https://start.spring.io/actuator/info
 <img src="imgs/版本.png">
 
-<img src="imgs/Cloud升级.png">
+
 
  微服务应该包括：
 
@@ -34,4 +34,4 @@ https://start.spring.io/actuator/info
 
 现在替换技术
 
-![image-20201116102309972](1-%E7%89%88%E6%9C%AC%E4%BB%8B%E7%BB%8D.resource/image-20201116102309972.png)
+![image-20201116102309972](FrameDay01_版本介绍.resource/image-20201116102309972.png)

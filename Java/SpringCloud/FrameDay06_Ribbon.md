@@ -26,7 +26,7 @@ https://github.com/Netflix/ribbon
 2. 实现
 负载均衡+RestTemplate 调用
 
-<img src="imgs/Ribbon.png">
+<img src="FrameDay06_Ribbon.resource/Ribbon.png">
 
 * Ribbon工作时有两步
     1. 第一步先选择 EurekaServer，优先选择统一区域负载较少的 server
@@ -36,7 +36,7 @@ https://github.com/Netflix/ribbon
 不需要
 cloud-consumer-order80 模块下的 spring-cloud-starter-netflix-eureka-client 依赖已经引入了 Ribbon-Balance的依赖
 
-![image-20201130113626757](6-Ribbon.resource/image-20201130113626757.png)
+![image-20201130113626757](FrameDay06_Ribbon.resource/image-20201130113626757.png)
 
 # RestTemplate 使用
 - getForObject 返回json
@@ -83,7 +83,7 @@ cloud-consumer-order80 模块下的 spring-cloud-starter-netflix-eureka-client �
 # Ribbon 自带的负载均衡
 ### 核心接口组件 IRule
 
-![image-20201130140332208](6-Ribbon.resource/image-20201130140332208.png)
+![image-20201130140332208](FrameDay06_Ribbon.resource/image-20201130140332208.png)
 
 ###### IRule默认自带的负载规则
 - RoundRobinRule   轮询

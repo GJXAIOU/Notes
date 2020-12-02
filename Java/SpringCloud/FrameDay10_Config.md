@@ -1,4 +1,7 @@
+P74
+
 # 概述
+
 1. 分布式系统面临的配置问题
 每建一个微服务都需要一次配置，例如10个微服务访问相同的数据库，如果数据库名更改了，要改十次。
 2. 是什么
@@ -68,6 +71,7 @@ cloud-config-client3355
 ```
 3. yml
 ```yml
+
 ```
 4. 主启动
 # 客户端动态刷新
@@ -77,6 +81,7 @@ cloud-config-client3355
   2. 修改yml暴露端口
   3. @RefreshScope业务类controller修饰
   4. 刷新
+
     ```
     curl -X POST "http://localhost:3355/actuator/refresh"
     ```

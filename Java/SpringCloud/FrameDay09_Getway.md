@@ -8,9 +8,9 @@
 
 ### （一）项目结构
 
-<img src="9-Getway.resource/image-20201201201042036.png" alt="image-20201201201042036" style="zoom: 80%;" />
+<img src="FrameDay09_Getway.resource/image-20201201201042036.png" alt="image-20201201201042036" style="zoom: 80%;" />
 
-<img src="9-Getway.resource/image-20201201201026600.png" alt="image-20201201201026600" style="zoom:50%;" />
+<img src="FrameDay09_Getway.resource/image-20201201201026600.png" alt="image-20201201201026600" style="zoom:50%;" />
 
 ### （二）特性
 
@@ -46,7 +46,7 @@
     这些是使用特定工厂构造的 Spring FrameworkGatewayFilter 实例。在这里，您可以在发送下游请求之前或之后修改请求和响应。
 
 ### （五）工作流程
-<img src="9-Getway.resource/gateway工作流程.png" style="zoom:80%;" >
+<img src="FrameDay09_Getway.resource/gateway工作流程.png" style="zoom:80%;" >
 
 Clients make requests to Spring Cloud Gateway. If the Gateway Handler Mapping determines that a request matches a route, it is sent to the Gateway Web Handler. This handler runs the request through a filter chain that is specific to the request. The reason the filters are divided by the dotted（遍布的） line is that filters can run logic both before and after the proxy request is sent. All “pre” filter logic is executed. Then the proxy request is made. After the proxy request is made, the “post” filter logic is run.
 
@@ -202,7 +202,7 @@ spring:
 
 常见的断言规则在 9527 模块启动的时候在控制台上进行了输出（如下图），所有的配置选项[看官网文档](https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.2.RELEASE/reference/html/#the-between-route-predicate-factory)。
 
-![image-20201201181533857](9-Getway.resource/image-20201201181533857.png)
+![image-20201201181533857](FrameDay09_Getway.resource/image-20201201181533857.png)
 
 「测试工具说明」直接在命令行 cmd 中使用 Curl，如 `curl http://localhost:9527/payment/get/1` 本质上就是一个 get 请求。
 

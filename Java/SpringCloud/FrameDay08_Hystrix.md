@@ -370,62 +370,80 @@ public class PaymentService {
 
 - 和业务代码在一起
 
-###### 解决
-1. 第一个问题controller
-   
-    解决方案：整个类上标注：`@DefaultProperties(defaultFallback = "paymentGlobalFallback")`指定全局默认 fallback 方法。如果配置了 fallbackMethod 就用指定了，否则针对 @HystrixCommand 标注的方法对应全局默认 fallback 方法
-    
+#### 解决方案
+- 针对第一个问题
+
+    解决方案：整个类上标注：`@DefaultProperties(defaultFallback = "paymentGlobalFallback")`指定全局默认 fallback 方法。如果配置了 fallbackMethod 就用自己指定的，否则针对所有 `@HystrixCommand` 标注的方法对应全局默认 fallback 方法
+
     ```java
+    package com.gjxaiou.springcloud.controller;
+    
+    import com.gjxaiou.springcloud.service.PaymentHystrixService;
+    import com.netflix.hystrix.contrib.javanica.annotation.DefaultProperties;
+    import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+    import lombok.extern.slf4j.Slf4j;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.RestController;
+    
+    import javax.annotation.Resource;
+    
+    /**
+     * @Author GJXAIOU
+     * @Date 2020/11/30 20:48
+     */
     @RestController
     @Slf4j
-    // 1. 添加注解，标注全局服务降级方法
-    @DefaultProperties(defaultFallback = "paymentGlobalFallBack")
-    public class OrderController {
-    @Resource
-        private PaymentHystrixService service;
+    // 如果配置了 fallbackMethod 就用指定了，否则针对 @HystrixCommand 标注的方法对应全局默认 fallback 方法
+    @DefaultProperties(defaultFallback = "paymentGlobalFallback")
+    public class OrderHystrixController {
+        @Resource
+        PaymentHystrixService paymentHystrixService;
     
-        // 3. 写 @HystrixCommand单不指定具体方法 
-        @GetMapping("/ok/{id}")
+        @GetMapping("/consumer/payment/hystrix/ok/{id}")
+        String paymentInfoOK(@PathVariable("id") Integer id) {
+            String result = paymentHystrixService.paymentInfoOK(id);
+            log.info("feign-hystrix-order80=> paymentInfoOK");
+            return result;
+        }
+    
+    
+        @GetMapping("/consumer/payment/hystrix/timeout/{id}")
+    //    @HystrixCommand(fallbackMethod = "paymentInfoTimeoutFallback", commandProperties = {
+    //            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value =
+    //                    "1500")
+    //    })
         @HystrixCommand
-        public String paymentInfo_OK(@PathVariable Integer id) {
-            int a = 10/0;
-        return service.paymentInfo_OK(id);
+        String paymentInfoTimeout(@PathVariable("id") Integer id) {
+            String result = paymentHystrixService.paymentInfoTimeout(id);
+            log.info("调用 feign-hystrix-order80=> paymentInfoTimeout");
+            return result;
         }
     
-        public String paymentInfo_TimeoutHandler(Integer id){
-        return "80异常，降级处理";
+        String paymentInfoTimeoutFallback(@PathVariable("id") Integer id) {
+            log.info("调用 feign-hystrix-order80=> paymentInfoTimeoutFallback");
+            return "消费者 80，对方 8001 系统繁忙，请等待一段时间再试或者检查自身是否出错";
         }
     
-        // 2. 定义全局服务降级方法
-        // 下面是全局 fallback
-        public String paymentGlobalFallBack(){
-            return "80：获取异常，调用方法为全局fallback";
+        // 设置全局 fallback
+        public String paymentGlobalFallback() {
+            return "80 全局性的fallback";
+        }
     }
-    }
-    
     ```
-    
-2. 第二个问题
+
+- 第二个问题：和业务代码进行解耦
 
     实现功能：客户端调用服务端的时候，服务端宕机或者关闭了。
 
-    因为 controller 层调用 service 层，所以新建一个类实现service 接口，对所有方法进行重写统一进行处理。不在需要在 Controller 层处理。
+    因为 controller 层调用 service 层，所以新建一个实现类实现 service 接口，对所有方法进行重写统一进行处理。**不在需要在 Controller 层处理**。
 
-    1. 找到注解 @FeignClient 对应的接口
+    - 步骤一：针对需要进行服务降级的接口提供一个实现类，提供降级处理过程
 
-    2. 再写一个类实现该接口，对降级方法进行处理
-       
         ```java
         package com.gjxaiou.springcloud.service;
+        import org.springframework.stereotype.Component;
         
-        ```
-    
-    import org.springframework.stereotype.Component;
-        
-        /**
-         * @Author GJXAIOU
-         * @Date 2020/11/30 22:13
-         */
         @Component
         public class PaymentFallbackService implements PaymentHystrixService{
             @Override
@@ -438,36 +456,38 @@ public class PaymentService {
                 return "PaymentFallbackService => paymentInfoTimeout => Fallback";
             }
         }
-        
         ```
-    
-    
-    ​    
-    ​    
-        然后在原来的 service 类中使用 `fallback = PaymentFallBackService.class` 表示上面的类是 该类的 fallback 类。
-        
+
+    - 步骤二：针对需要降级的接口使用 `@FeignClient` 指定上述的降级处理类
+
         ```java
-        @Component
-        @FeignClient(value = "CLOUD-PROVIDER-HYSTRIX-PAYMENT",fallback = PaymentFallBackService.class)
-        public interface PaymentHystrixService {}
+        package com.gjxaiou.springcloud.service;
         
         @Component
-        public class PaymentFallBackService implements PaymentHystrixService {}
-    ```
-    
-3. 测试在 8001 内加异常，或使 8001 宕机 ，返回异常处理
-    
+        @FeignClient(value = "CLOUD-PROVIDER-HYSTRIX-PAYMENT", fallback = PaymentFallbackService.class)
+        
+        public interface PaymentHystrixService {
+            // 这里直接复制服务提供者 8001 controller 中接口即可
+            @GetMapping("/payment/hystrix/ok/{id}")
+            String paymentInfoOK(@PathVariable("id") Integer id);
+        
+            @GetMapping("/payment/hystrix/timeout/{id}")
+            String paymentInfoTimeout(@PathVariable("id") Integer id);
+        }
+        ```
+
+    - 步骤三：测试在 8001 内加异常，或使 8001 宕机 ，返回异常处理
+
         首先访问：`http://localhost/consumer/payment/hystrix/ok/1` 正常访问，然后关闭 8001
-    
+
         再次访问上面的连接返回：`PaymentFallbackService => paymentInfoOK => Fallback`即调用了降级的方法。
-# 服务熔断
-### 简介
-类比保险丝，达到最大访问后直接拒绝访问，拉闸限电，然后调用服务降级。当检测==到该节点微服务调用正常后，恢复调用链路。==
-当失败的调用达到一定阈值，缺省是5s内20次调用失败，就会启动熔断机制。熔断机制的注解是：`@HystrixCommand`
 
-#### 熔断机制概述
+## 四、服务熔断
+类比保险丝，达到最大访问后直接拒绝访问，拉闸限电，然后调用服务降级。当检测==到该节点微服务调用正常后，恢复调用链路==。即当失败的调用达到一定阈值，缺省是5s内20次调用失败，就会启动熔断机制。熔断机制的注解是：`@HystrixCommand`。具体介绍见[博客](https://martinfowler.com/bliki/CircuitBreaker.html)。
 
-熔断机制是应对雪崩效应的一种微服务链路保护机制。当扇出链路的某个微服务出错不可用或者响应时间太长时候，会进行服务的降级，进而熔断该结点微服务的调用，快速返回错误的响应信息。
+### （一）熔断机制概述
+
+**熔断机制是应对雪崩效应的一种微服务链路保护机制**。当扇出链路的某个微服务出错不可用或者响应时间太长时候，会进行服务的降级，进而熔断该结点微服务的调用，快速返回错误的响应信息。
 
 **当检测到该结点微服务调用响应正常后，恢复调用链路**。
 
@@ -475,8 +495,6 @@ public class PaymentService {
 - 无论如何降级的流程一定会先调用正常的方法再调用 fallback 方法
 - 加入单位时间内调用失败次数过多，也就是降级次数过多（缺省是 5s 内 20 次调用失败）就会触发熔断。
 - 熔断之后会跳过正常方法直接调用 fallback 方法。
-
-
 
 **熔断的过程**：见：https://github.com/Netflix/Hystrix/wiki/How-it-Works
 
@@ -488,158 +506,176 @@ The precise way that the circuit opening and closing occurs is as follows:
 - While it is open, it short-circuits all requests made against that circuit-breaker.
 - After some amount of time (HystrixCommandProperties.circuitBreakerSleepWindowInMilliseconds()), the next single request is let through (this is the HALF-OPEN state). If the request fails, the circuit-breaker returns to the OPEN state for the duration of the sleep window. If the request succeeds, the circuit-breaker transitions to CLOSED and the logic in 1. takes over again.
 
-### 是什么
-https://martinfowler.com/bliki/CircuitBreaker.html
-### 实践：这里仅仅是 8001 进行自测，没有通过 80 进行调用
+### （二）8001 熔断实践
 
-### cloud-provider-hystrix-payment8001
+这里仅仅是 8001 进行自测，没有通过 80 进行调用，以下修改均针对 `hystrix-8001`。
 
-1. PaymentService
-```java
+- 在 Service 层进行服务熔断处理，同时服务熔断的方法也需要指定 Fallback 方法。
 
-    /**
-     * 服务熔断
-     */
-    // Hystrix 的全部属性在类：HystrixCommandProperties 中
-    @HystrixCommand(fallbackMethod = "paymentCircuitBreakerHandler", commandProperties = {
-            // 是否开启断路器
-            @HystrixProperty(name = "circuitBreaker.enabled",value = "true"),
-            // 请求次数
-            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "10"),
-            // 时间窗口期：经过多长时间后恢复一次尝试
-            @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds",value = "10000"),
-            // 失败率阈值
-            @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage",value = "60"),
-    })
-    public String paymentCircuitBreaker(@PathVariable("id") Integer id) {
-        if (id < 0) {
-            throw new RuntimeException("id 不能为负数");
+    ```java
+    package com.gjxaiou.springcloud.service;
+    
+    @Service
+    public class PaymentService {
+        /**
+         * 服务熔断
+         */
+        // Hystrix 的全部属性在类：HystrixCommandProperties 中
+      @HystrixCommand(fallbackMethod = "paymentCircuitBreakerHandler", commandProperties={
+          // 是否开启断路器
+          @HystrixProperty(name = "circuitBreaker.enabled", value = "true"),
+          // 请求次数
+          @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "10"),
+          // 时间窗口期：经过多长时间后恢复一次尝试
+          @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "10000"),
+          // 失败率阈值
+          @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "60"),
+        })
+        public String paymentCircuitBreaker(@PathVariable("id") Integer id) {
+            if (id < 0) {
+                throw new RuntimeException("id 不能为负数");
+            }
+            String simpleUUID = IdUtil.simpleUUID();
+    
+            return Thread.currentThread().getName() + " 调用成功，流水号为：" + simpleUUID;
         }
-        String simpleUUID = IdUtil.simpleUUID();
-
-        return Thread.currentThread().getName() + " 调用成功，流水号为：" + simpleUUID;
+    
+        // 提供对应的服务降级 fallback 方法
+        public String paymentCircuitBreakerHandler(@PathVariable("id") Integer id) {
+            return "id 不能为负数，请稍后再试，This is fallback method.";
+        }
     }
+    ```
 
-    // 对应的服务降级 fallback 方法
-    public String paymentCircuitBreakerHandler(@PathVariable("id") Integer id) {
-        return "id 不能为负数，请稍后再试，This is fallback method.";
-    }
-```
-2. controller
-```java
-  /**
-     * 服务熔断
-     */
+- controller 提供一个访问方法，这里就是直接调用 service 进行处理。
+
+    ```java
+    /**
+         * 服务熔断
+         */
     @GetMapping("/payment/circuit/{id}")
     public String paymentCircuitBreaker(@PathVariable("id") Integer id) {
         String result = paymentService.paymentCircuitBreaker(id);
         log.info("result: " + result);
         return result;
     }
-```
-3. 结果
+    ```
 
-  启动 7001 和 8001 
+- 测试
 
-  `http://localhost:8001payment/circuit/1` 返回结果为：`hystrix-PaymentService-1 调用成功，流水号为：de734206603641b1948d3d6182c9b9f4`
+      首先启动 7001 和 8001，访问   `http://localhost:8001payment/circuit/1`  返回结果为：`hystrix-PaymentService-1 调用成功，流水号为：de734206603641b1948d3d6182c9b9f4`。访问  `http://localhost:8001payment/circuit/-1` 返回结果为：`id 不能为负数，请稍后再试，This is fallback method.`
+        
+      **一直多次输入id为负数，达到失败率后即使输入 id 为正数也进入错误页面，等一会才可以返回正确结果。**
 
-  `http://localhost:8001payment/circuit/-1` 返回结果为：`id 不能为负数，请稍后再试，This is fallback method.`
+### （三）总结
 
-  一直多次输入id为负数，达到失败率后即使输入id为正数也进入错误页面，等一会才可以返回正确结果。
-# 总结
+完整的服务熔断流程见 [Github](https://github.com/Netflix/Hystrix/wiki/How-it-Works)。
 
-工作流程：https://github.com/Netflix/Hystrix/wiki/How-it-Works
+![image-20201202094454178](FrameDay08_Hystrix.resource/image-20201202094454178.png)
 
-### 熔断类型
-1. 熔断打开
-请求不再进行调用当前服务，内部设有时钟一般为 MTTR，当打开时长达时钟则进入半熔断状态
-2. 熔断关闭
-熔断关闭不会对服务进行熔断
-3. 熔断半开
-根据规则调用当前服务，符合规则恢复正常，关闭熔断
-### 什么时候打开
-设计三个参数：时间窗，请求总阈值，错误百分比阈值
-1. 快照时间窗：默认为最近的10s
-2. 请求总数阈值：必须满足请求总阈值才有资格熔断。默认为20。意味着在10s内，如果命令调用次数不足20次，即使所有请求都超时或其他原因失败断路器都不会打开
-3. 错误百分比阈值：在快照时间窗内请求总数超过阈值，且错误次数占总请求次数的比值大于阈值，断路器将会打开
+#### 1.熔断状态类型
+- 熔断打开
+    请求不再进行调用当前服务，内部设有时钟一般为 MTTR，当打开时长达时钟则进入半熔断状态
+
+- 熔断关闭
+    熔断关闭不会对服务进行熔断
+
+- 熔断半开
+    根据规则调用当前服务，符合规则恢复正常，关闭熔断
+
+#### 2.熔断打开时机
+涉及三个参数：时间窗，请求总阈值，错误百分比阈值
+- 快照时间窗：默认为最近的10s
+
+- 请求总数阈值：必须满足请求总阈值才有资格熔断。默认为20。意味着在10s内，如果命令调用次数不足20次，即使所有请求都超时或其他原因失败断路器都不会打开
+
+- 错误百分比阈值：在快照时间窗内请求总数超过阈值，且错误次数占总请求次数的比值大于阈值，断路器将会打开
 
 
 
 
 
-# web界面图形化展示Dashboard
+## 五、图形化展示Dashboard
 
-### 搭建
-1. 建 moudle
-cloud-consumer-hystrix-dashboard9001
-2. pom
-```xml
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
-</dependency>
-```
-3. yml
-只需要配置端口号就行
-4. 启动类
-加注解@EnableHystrixDashboard
-5. 测试
-`http://localhost:9001/hystrix`有页面即为成功
+### 搭建模块：cloud-consumer-hystrix-dashboard9001
+- 步骤一：Pom 中新增 dashboard 依赖
 
-这里要监控 80、8001/8002，受监控的模块依赖中必须有：
+    ```xml
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+    </dependency>
+    ```
 
-```xml
-<!--监控-->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
-```
+- 步骤二： application.yml 配置如下
 
-### 使用
+    ```yaml
+    server:
+      port: 9001
+    
+    # 如果页面一直为 Loading，则开启这个选项
+    hystrix:
+      dashboard:
+        proxy-stream-allow-list: "*"
+    
+    # 注册进入 Eureka
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://eureka7001.com:7001/eureka
+    ```
 
-###### 注意
-1. 注意：依赖于actuator，要监控哪个接口，哪个接口必须有这个依赖
-2. 8001业务模块需要添加bean(在主类中增加以下方法)
-```java
-    @Bean
-    public ServletRegistrationBean getServlet(){
-        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
-        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
-        registrationBean.setLoadOnStartup(1);
-        registrationBean.addUrlMappings("/hystrix.stream");
-        registrationBean.setName("HystrixMetricsStreamServlet");
-        return registrationBean;
-    }
-```
-或者在 8001 的 yaml 配置文件中配置如下：
+- 步骤三：启动类上加上 `@EnableHystrixDashboard` 注解。
 
-```yml
-management:
-  endpoints:
-    web:
-      exposure:
-        include: hystrix.stream
-```
+- 项目测试
+    启动模块之后，访问`http://localhost:9001/hystrix`有页面即为成功。
 
-测试过程：
+### 监控服务
 
-首先需要启动一个或者多个 Eureka，同时这里因为是 9001 监控 8001，所以两者均需要启动。
+- 步骤一：这里要监控 80、8001/8002，受监控的模块依赖中必须有：
 
-然后在监控页面：`localhost:9001/hystrix` 中配置监控服务为：`http://localhost:8001/hystrix.stream` ，delay 可以配置为 2000，Title 随便配置，然后点击 「monitor Stream」。
+    ```xml
+    <!--监控-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    ```
 
-###### 使用
+- 步骤二：在受监控模块的主类中增加如下方法或者在 yaml 文件中进行将配置开启受监控，这里以 8001 为例。
 
-<img src="imgs/dashboard.png">
+    - 受监控模块的主类中进行硬编码
 
-1. 分别通过上面两个路径：`http://localhost:8001payment/circuit/1` 和 `http://localhost:8001payment/circuit/- 1` 访问 8001 的。通过页面就可以看到访问的变化
+        ```java
+        @Bean
+        public ServletRegistrationBean getServlet(){
+            HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+            ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
+            registrationBean.setLoadOnStartup(1);
+            registrationBean.addUrlMappings("/hystrix.stream");
+            registrationBean.setName("HystrixMetricsStreamServlet");
+            return registrationBean;
+        }
+        ```
 
-    ![image-20201201143838930](8-Hystrix.resource/image-20201201143838930.png)
+    - 在受监控模块的 yaml 中增加如下配置
 
-2. 页面状态
-    1. 七色
-        对应不同状态
-    2. 一圈
-        对应访问量
-    3. 一线
-        访问趋势
+        ```yaml
+        management:
+          endpoints:
+            web:
+              exposure:
+                include: hystrix.stre
+        ```
+
+- 测试过程：
+
+    首先需要启动一个或者多个 Eureka，同时这里因为是 9001 监控 8001，所以两者均需要启动。
+
+    然后在监控页面：`localhost:9001/hystrix` 中配置监控服务为：`http://localhost:8001/hystrix.stream` ，delay 可以配置为 2000，Title 随便配置，然后点击 「monitor Stream」。
+
+    ![image-20201202101331852](FrameDay08_Hystrix.resource/image-20201202101331852.png)
+
+分别通过上面两个路径：`http://localhost:8001payment/circuit/1` 和 `http://localhost:8001payment/circuit/- 1` 访问 8001 的。通过页面就可以看到访问的变化
+
+![image-20201201143838930](FrameDay08_Hystrix.resource/image-20201201143838930.png)

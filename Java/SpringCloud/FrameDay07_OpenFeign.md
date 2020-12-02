@@ -14,14 +14,14 @@ Feign 是声明性 Web 服务**客户端**。它使编写 Web 服务客户端更
 * Feign集成了Ribbon
 利用Ribbon维护了Payment的服务列表信息，并且实现了轮询实现客户端的负载均衡。而与Ribbon不同的是，==feign只需要定义服务绑定接口且以声明式的方法==，优雅而简单的实现服务调用。
 * Feign与OpenFeign区别
-![image-20201130161550127](7-OpenFeign.resource/image-20201130161550127.png)
+![image-20201130161550127](FrameDay07_OpenFeign.resource/image-20201130161550127.png)
 
 ### 官网
 https://cloud.spring.io/spring-cloud-openfeign/2.2.x/reference/html/
 
 **整体的逻辑结构修改**
 
-<img src="7-OpenFeign.resource/image-20201130161842384.png" alt="image-20201130161842384" style="zoom:50%;" />
+<img src="FrameDay07_OpenFeign.resource/image-20201130161842384.png" alt="image-20201130161842384" style="zoom:50%;" />
 
 用在消费端。
 
@@ -126,7 +126,7 @@ public class OrderFeignController {
     可以访问
 
 2. 通过80 访问：`http://localhost/consumer/payment/feign/timeout`
-  超时异常
+    超时异常
 
 3. OpenFeign 客户端默认等待时间 1s，但是这里服务端等待时间是 3s，导致客户端无法等待从而直接报错。
 
