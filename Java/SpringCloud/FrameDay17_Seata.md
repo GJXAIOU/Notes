@@ -1,9 +1,20 @@
+# Seata 处理分布式事务
+
 # 简介
+
 ### 解决问题
 1. 分布式前Java服务与数据库1->1
 2. 分布式后 1->1,1>多,多->多
 保证多个服务之间的数据一致性
+
+单体应用被拆分为微服务应用，原来的多个模块被拆分为多个独立的应用，分别对应使用多个独立的数据源。
+
+业务操作需要调用多个服务来完成，此时每个服务内部的数据一致性由本地事务来保证，但是全局的数据一致性无法保证。
+
+
+
 ### 是什么
+
 Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。
 ### 官网
 http://seata.io/zh-cn/
@@ -12,7 +23,7 @@ http://seata.io/zh-cn/
 
 ###### 一ID+三组件
 1. id
-全局唯一的事务ID
+全局唯一的事务ID=》XID
 2. 3组件
     1. TC - 事务协调者
     维护全局和分支事务的状态，驱动全局事务提交或回滚。
@@ -35,15 +46,20 @@ https://github.com/seata/seata/releases
 修改数据库账号密码端口
 找到 register.conf
 将 registry 与 config 里的 type均改为nacos
-同时修改两者下面的 nacos信息
+同时修改两者下面的 nacos信息为：`serverAddr = "localhost:8848"`
 3. 创建数据库 seata
 
 4. 数据库加载文件
     查看RANDME.MD server 对应网址即可
     1. https://github.com/seata/seata/tree/develop/script/client下db中的mysql
 
+先启动 nacos，然后启动 Seata。
+
+
+
 # 实验
-### 数据库
+
+### 数据库准备
 1. 创建数据库
     1. create database seata_order;订单
     2. create database seata_storage;库存
@@ -54,16 +70,36 @@ https://github.com/seata/seata/releases
     3. seata_account下建 t_account
 3. 建表sql
 ```sql
+use seata_order;
 create table t_order(
     id bigint(11) not null auto_increment primary key,
     user_id bigint(11) default null comment '用户id',
     product_id bigint(11) default null comment '产品id',
     count  int(11) default null comment '数量',
-    money decimal(11,0) default null comment '余额',
-    status int(1) default null comment '订单状态'
-)
+    money decimal(11,0) default null comment '金额',
+    status int(1) default null comment '订单状态：0 表示创建中， 1 表示已完结'
+)ENGINE = INNODB AUTO_INCREMENT = 7 default charset = utf8;
+
+
+use seata_storage;
+create table t_storage(
+    id bigint(11) not null auto_increment primary key,
+    product_id bigint(11) default null  comment '产品id',
+    total int(11) default null comment  '总库存',
+    used int(11) default null comment '已用库存',
+    residue int(11) default null comment '剩余库存'
+)ENGINE = INNODB AUTO_INCREMENT = 2 default charset =utf8;
 ```
 ### 建模块
+
+三个微服务：订单、库存、账户
+
+用户下单时， 会在订单服务中创建一个订单、然后将通过远程调用库存服务来扣减下单商品的库存
+
+在通过远程调用账户服务来扣减用户账户里面的余额。
+
+最后在订单服务中修改订单状态为已完成。
+
 ###### seata-order-service2001
 1. pom
 ```xml
