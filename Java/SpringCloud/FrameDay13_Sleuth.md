@@ -35,29 +35,44 @@ java -jar zipkin-server-2.12.9-exec.jar
 # 使用
 
 ### 改变最原始的模块80与8001
-1. 依赖
+
+cloud-provider-payment8001
+
+cloud-consumer-order80
+
+- 在80 和 8001 添加依赖
+
 ```xml
+<!-- 包含了sleuth zipkin 数据链路追踪-->
 <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-zipkin</artifactId>
 </dependency>
 ```
-2. yml
+2. 80 和8001 的 yml 增加如下配置
 ```yml
+# 服务名称
 spring:
+  application:
+    name: cloud-payment-service
   zipkin:
-    # 放到 zipkin上
+    # 放到 zipkin 上，监控的数据放入 9411
     base-url: http://localhost:9411
   sleuth:
     sampler:
-      # 采样率介于0-1之间，1表示全部采集
+      # 采样率介于 0-1 之间，1 表示全部采集
       probability: 1
 ```
 3. controller 80
 ```java
+   /**
+     * 测试调用链路追踪
+     * @return
+     */
     @GetMapping("/consumer/payment/zipkin")
     public String paymentZipkin(){
-        String result = restTemplate.getForObject(PAYMENT_URL+"/payment/zipkin",String.class);
+        String result = restTemplate.getForObject("http://localhost:8001"+"/payment/zipkin",
+                String.class);
         return result;
     }
 ```
@@ -69,6 +84,12 @@ spring:
     }
 ```
 5. 测试
-依次打开7001,8001,80
-访问80
-访问http://localhost:9411/可以查看到访问的链路
+  依次打开7001,8001,80
+
+  首先通过：`http://eureka7001.com:7001/` 查看服务是否已经注入
+
+  通过：`http://localhost:8001/payment/zipkin`进行自测
+
+  通过：`http://localhost/consumer/payment/zipkin` 从 80 端访问测试。
+
+  最后访问http://localhost:9411/可以查看到访问的链路

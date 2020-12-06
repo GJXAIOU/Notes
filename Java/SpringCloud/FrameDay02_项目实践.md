@@ -156,7 +156,7 @@ dependencyManagement 只是声明依赖，并不实现引入，**因此子项目
 
 ## 二、项目结构
 
-![image-20201116113310677](2-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.resource/image-20201116113310677.png)
+![image-20201116113310677](FrameDay02_项目实践.resource/image-20201116113310677.png)
 
 
 

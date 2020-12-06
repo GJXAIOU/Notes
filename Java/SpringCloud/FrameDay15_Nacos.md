@@ -1,88 +1,134 @@
 # Nacos 服务注册和配置中心
 
+[TOC]
+
+
+
 ## 一、概述
 
-### 什么是 Nacos
-Dynamic Naming and Configuration Service 动态命名和配置服务
+### （一）概念
+Dynamic Naming and Configuration Service：动态命名和配置服务
 Nacos = Eureka+Config+Bus 注册中心与配置中心的组合
 
 一个更易于构建云原生应用的动态服务发现、配置管理和服务管理平台。
 
-### 能干什么
-1. 替代Eureka做注册中心
-2. 替代Config做配置中心
-### 下载
-https://github.com/alibaba/nacos
+==Nacos 自带 Ribbon 实现负载均衡，Nacos 支持 AP 与 CP 的切换==
 
-![image-20201204150130302](FrameDay15_Nacos.resource/image-20201204150130302.png)
+主要作用：
 
-### 官网
-https://nacos.io/en-us/
-### 安装
-1. 本案例采用 1.1.4
-2. https://github.com/alibaba/nacos/releases/tag/1.1.4          tar.gz是linux，zip是windows
-3. 解压 cmd 进入 bin目录下
-4. 执行 `startup.cmd` 启动程序
-5. 进入 http://localhost:8848/nacos
-6. 默认账号密码都是 nacos
-# 作为服务注册中心
-### 服务提供者模块
-1. cloud-ali-provider-payment9001
-2. 父 pom
-```xml
-<dependencyManagement>
-    <dependencies>
-          <!--spring cloud 阿里巴巴-->
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2.1.0.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-    </dependencies>
-</dependencyManagement>
-```
-3. 子 pom
-```xml
-<dependency>
-    <groupId>com.alibaba.cloud</groupId>
-    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-</dependency>
-```
-4. yml
-```yml
-server:
-  port: 9001
+- 替代 Eureka 做注册中心
 
-spring:
-  application:
-    name: nacos-payment-provider
-  cloud:
-    nacos:
-      discovery:
-        server-addr: localhost:8848 #配置Nacos地址
+- 替代 Config 做配置中心
 
-# 暴露端口，用于监控
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-```
-5. 启动 Nacos 和 9001 
+[GitHub 开源网址](https://github.com/alibaba/nacos)、[官网](https://nacos.io)
 
-  测试 http://localhost:9001/payment/nacos/1
-  进入nocas 控制面板=》「服务管理」=》「服务列表」查看 9001 服务是否注入成功。
+| 服务注册与发现框架 | CAP 模型 | 控制台管理 | 社区活跃度 |
+| ------------------ | -------- | ---------- | ---------- |
+| Eureka             | AP       | 支持       | 低         |
+| Zookeeper          | CP       | 不支持     | 中         |
+| Consul             | CP       | 支持       | 高         |
+| Nacos              | AP       | 支持       | 高         |
 
-6. 参照9001新建9002
-## 消费者模块 83
+### （二）基本安装
+[下载链接](https://github.com/alibaba/nacos/releases/tag/1.1.4)
 
-==Nacos自带Ribbon实现负载均衡，Nacos支持AP与CP的切换==
-1. 新建消费者模块
-2. pom 
-同 9001 一样
-3. yml
+- 步骤一：解压 cmd 进入 bin目录下然后执行 `startup.cmd` 启动程序。
+
+- 步骤二：进入 http://localhost:8848/nacos，默认账号密码都是 nacos 验证是否启动成功。
+
+
+
+## 二、作为服务注册中心
+
+### 服务提供者模块：cloud-alibaba-provider-payment9001
+- 步骤一：首先在 父 pom 即 SpringCloud2020 的 pom.xml 中引入下列依赖
+
+    ```xml
+    <dependencyManagement>
+        <dependencies>
+              <!--spring cloud 阿里巴巴-->
+                <dependency>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                    <version>2.1.0.RELEASE</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+        </dependencies>
+    </dependencyManagement>
+    ```
+
+- 步骤二：子 pom 中要引入 Nacos 依赖
+
+    ```xml
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+    ```
+
+- 步骤三：配置 yaml 文件
+
+    ```yaml
+    server:
+      port: 9001
+    
+    spring:
+      application:
+        name: nacos-payment-provider
+      cloud:
+        nacos:
+          discovery:
+            server-addr: localhost:8848 #配置Nacos地址
+    
+    # 暴露端口，用于监控
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: '*'
+    ```
+
+- 步骤四：主启动类
+
+    ```java
+    @SpringBootApplication
+    @EnableDiscoveryClient
+    ```
+
+- 步骤五：业务类：Controller
+
+    ```java
+    package com.gjxaiou.springcloud.controller;
+    
+    @RestController
+    public class PaymentController {
+    
+        @Value("${server.port}")
+        private String serverPort;
+    
+        @GetMapping(value = "/payment/nacos/{id}")
+        public String getPayment(@PathVariable("id") Integer id) {
+            return "nacos registry, serverPort: " + serverPort + " id: " + id;
+        }
+    }
+    ```
+
+- 测试
+
+    启动 Nacos 和 9001，然后 测试 http://localhost:9001/payment/nacos/1
+    进入nocas 控制面板=》「服务管理」=》「服务列表」查看 9001 服务是否注入成功。
+
+参照 9001 新建 9002 用于测试
+
+
+
+### 消费者模块：cloud-alibaba-consumer-nacos-order83
+
+- 步骤一：pom 依赖同 9001
+
+- 步骤二：yaml 文件配置如下：
+
 ```yml
 server:
   port: 83
@@ -209,7 +255,7 @@ public class ConfigClientController {
 }
 ```
 6. 配置 dataid
-    
+   
     配置规则见：[官方文档](https://nacos.io/zh-cn/docs/quick-start-spring-cloud.html)
     
     `${prefix}-${spring.profile.active}.${file-extension}`
@@ -231,9 +277,9 @@ public class ConfigClientController {
     * 配置 yaml 文件
      <img src="imgs/nacos-config1.png">
      ![image-20201204190628173](FrameDay15_Nacos.resource/image-20201204190628173.png)
-     
+    
      ![image-20201204190806997](FrameDay15_Nacos.resource/image-20201204190806997.png)
-     
+    
     * 启动 3377 测试访问http://localhost:3377/config/info看是否得到配置信息
     
     * 更改nacos中内容查看3377中是否变化
@@ -380,8 +426,8 @@ https://blog.csdn.net/dc282614966/article/details/81098074
 
 
 3. 安装Nginx
-  https://blog.csdn.net/t8116189520/article/details/81909574
-  命令： cd /usr/local/nginx/sbin
+    https://blog.csdn.net/t8116189520/article/details/81909574
+    命令： cd /usr/local/nginx/sbin
 
 启动，关闭，重启，命令：
 
@@ -391,14 +437,38 @@ https://blog.csdn.net/dc282614966/article/details/81098074
 
 ./nginx -s reload 重启
 5. 配置nginx
-https://www.cnblogs.com/linchenguang/p/12827582.html
-6. 注意
-  1. 关闭防火墙
-  2. 打开mysql服务
-  3. 有错误要去nacos的log文件夹内查询
-  4. 不要将安装包在windows下载后直接拖到linux
-7. 测试
-将idea对应端口换成 nginx 地址即可：192.168.150.66:1111
+    https://www.cnblogs.com/linchenguang/p/12827582.html
+
+  直接修改 ngix.conf
+
+![image-20201205091413280](FrameDay15_Nacos.resource/image-20201205091413280.png)
+
+启动：./nginx -c /usr/local/nginx/conf/nginx.conf
+
+测试：
+
+- 分别启动 Nacos：`./startup.sh -p 3333`  和  `./startup.sh -p 4444`  和 `./startup.sh -p 5555`
+- 启动 Nginx：见上
+
+`http://192.168.111.144:1111/nacos/#/login`
+
+
+
+
+
+5. 注意
+  6. 关闭防火墙
+  7. 打开mysql服务
+  8. 有错误要去nacos的log文件夹内查询
+  9. 不要将安装包在windows下载后直接拖到linux
+10. 测试
+    将 9002 中的 server-addr ：idea对应端口换成 nginx 地址即可：192.168.150.66:1111
+
+![image-20201205092330668](FrameDay15_Nacos.resource/image-20201205092330668.png)
+
+本质上 Nginx 和 MySQL 也应该集群化。
+
+
 
 ### Docker 配置过程
 
