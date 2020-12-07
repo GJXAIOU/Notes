@@ -145,8 +145,8 @@ management:
 
     ![image-20201205101107897](FrameDay16_Sentinel.resource/image-20201205101107897.png)
 
-4. <img src="imgs/postman1.png">
-    <img src="imgs/postman2.png">
+4. <img src="FrameDay16_Sentinel.resource/postman1.png">
+    <img src="FrameDay16_Sentinel.resource/postman2.png">
 
     1. 先访问testB
     2. save到新建collection里
@@ -161,14 +161,14 @@ management:
 
 图片含义：最终的 QPS 阈值应该达到 10 ，但是刚开始是 10/3 = 3 个，5 秒钟之后要达到 10 的阈值。
 
-<img src="imgs/sentinel2.png">
+<img src="FrameDay16_Sentinel.resource/sentinel2.png">
 
 1. 初始QPS = QPS 阈值/3 开始
 2. 阈值从初始QPS主键增加到 QPS
 3. 访问 testB 观察随时间变化错误的数量变化
 ###### 排队等待
-<img src="imgs/排队等待1.png">
-<img src="imgs/排队等待2.png">
+<img src="FrameDay16_Sentinel.resource/排队等待1.png">
+<img src="FrameDay16_Sentinel.resource/排队等待2.png">
 
 为 testB 设置打印当前时间
 可以观察到一秒一个挨个执行
@@ -303,7 +303,7 @@ public String testE() {
 
 > 即正常情况才仍然像上面一样， 当 p1 访问超过 1 秒 1 个的阈值之后马上限流，但是当 p1 参数为某个特殊值的之后，限流的阈值可以不一样。
 
-<img src="imgs/特殊参数项.png">
+<img src="FrameDay16_Sentinel.resource/特殊参数项.png">
 
 1. 当参数为特定值的时候拥有不同的阈值
 2. 即使其他参数项熔断，特定参数项也不会熔断
@@ -333,7 +333,7 @@ public String testE() {
 5. 入口 QPS：当单台机器上所有入口流量的 QPS 达到阈值即触发系统保护。
 
 ###### 怎么做
-<img src="imgs/系统规则.png">
+<img src="FrameDay16_Sentinel.resource/系统规则.png">
 
 ==简而言之就是对整个系统添加限流，不推荐使用==
 
@@ -679,7 +679,7 @@ public class CircleBreakerController {
 3. 结果 
 ==没有在sentinel中配置服务降级只会报出异常界面，而fallback不需要配置sentinel==
 4. 再测试
-<img src="imgs/block降级.png">
+<img src="FrameDay16_Sentinel.resource/block降级.png">
 **配置异常数为 2 ，单独点 1 次 爆异常界面，连续两次爆blockhandler的方法**
 
 ###### 配置fallback+blockHanlder
@@ -789,7 +789,7 @@ spring:
             rule-type: flow #流控规则
 ```
 4. nocos 8848 中新增业务规则配置
-  <img src="imgs/sentinel持久化.png">
+    <img src="FrameDay16_Sentinel.resource/sentinel持久化.png">
 
   写入 Nacos 时候，下面的注释一定要删掉。
 
