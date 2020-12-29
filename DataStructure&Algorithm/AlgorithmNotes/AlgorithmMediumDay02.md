@@ -442,7 +442,7 @@ public class SlidingWindowMaxArray {
         int[] resList = new int[arr.length - w + 1];
         int index = 0;
         for (int i = 0; i < arr.length; i++) {
-            // 更新双端队列，如果双端队列不为空，并且尾结点(存的是下标)对应数组中的值是否小于等于当前值
+           // 更新双端队列，如果双端队列不为空，并且尾结点(存的是下标)对应数组中的值是否小于等于当前值
             while (!maxList.isEmpty() && arr[maxList.peekLast()] <= arr[i]) {
                 maxList.pollLast();
             }
@@ -603,13 +603,11 @@ public class AllLessNumSubArray {
 
 ## 五、找到字符串的最长无重复字符子串
 
-【题目】
-给定一个字符串str，返回str的最长无重复字符子串的长度。
+【题目】：给定一个字符串 str，返回 str 的最长无重复字符子串的长度。
 【举例】
-str="abcd"，返回4
-str="aabcb"，最长无重复字符子串为"abc"，返回3。
-【要求】
-如果str的长度为N，请实现时间复杂度为O(N)的方法。方法：滑动窗口
+str="abcd"，返回 4
+str="aabcb"，最长无重复字符子串为 "abc"，返回 3。
+【要求】：如果 str 的长度为N ，请实现时间复杂度为 O(N) 的方法。方法：滑动窗口
 
 【解答】建立一个256位大小的整型数组 freq ，用来建立字符和其出现位置之间的映射。
 
@@ -620,9 +618,7 @@ str="aabcb"，最长无重复字符子串为"abc"，返回3。
 *   重复前两步，直到左边索引无法再移动；
 *   维护一个结果res，每次用出现过的窗口大小来更新结果 res，最后返回 res 获取结果。
 
-![LeetCode3](../../../../Yu%2520Writer%2520Libraries/LeetCode/LeetCodeNotes/String/Medium/3%2520.%2520%25E6%2597%25A0%25E9%2587%258D%25E5%25A4%258D%25E5%25AD%2597%25E7%25AC%25A6%25E7%259A%2584%25E6%259C%2580%25E9%2595%25BF%25E5%25AD%2590%25E4%25B8%25B2.resource/LeetCode3.gif)
-
-​	
+![LeetCode3](AlgorithmMediumDay02.resource/LeetCode3.gif)
 
 ```java
 package string.medium;
@@ -691,7 +687,7 @@ class Solution {
 
 ```
 
-![LeetCode3动画](../../../../Yu%2520Writer%2520Libraries/LeetCode/LeetCodeNotes/String/Medium/3%2520.%2520%25E6%2597%25A0%25E9%2587%258D%25E5%25A4%258D%25E5%25AD%2597%25E7%25AC%25A6%25E7%259A%2584%25E6%259C%2580%25E9%2595%25BF%25E5%25AD%2590%25E4%25B8%25B2.resource/LeetCode3%25E5%258A%25A8%25E7%2594%25BB.gif)
+![LeetCode3动画](AlgorithmMediumDay02.resource/LeetCode3动画.gif)
 
 ## 五、单调栈
 
