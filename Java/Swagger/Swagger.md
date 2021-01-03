@@ -188,26 +188,58 @@ public class SwaggerConfig {
 
 
 
-> ### 配置扫描接口
+## 四、配置扫描接口
+
+默认扫描接口的结果是包括两个接口，一个是 basic-error-controller 接口（默认的 error 界面），另一个是 hello-controller 接口。
+
+![Swagger UI - localhost](Swagger.resource/Swagger UI - localhost.png)
 
 1、构建Docket时通过select()方法配置怎么扫描接口。
 
-```
-@Bean
-public Docket docket() {
-   return new Docket(DocumentationType.SWAGGER_2)
-      .apiInfo(apiInfo())
-      .select()// 通过.select()方法，去配置扫描接口,RequestHandlerSelectors配置如何扫描接口
-      .apis(RequestHandlerSelectors.basePackage("com.kuang.swagger.controller"))
-      .build();
+通过 select() 可以指定扫描的接口范围，下面就是仅仅扫描指定包下面的接口。
+
+```java
+package com.gjxaiou.swagger2020.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.VendorExtension;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.ArrayList;
+
+/**
+ * @Author GJXAIOU
+ * @Date 2021/1/1 15:55
+ */
+// 标识为配置类
+@Configuration
+// 开启 Swagger2
+@EnableSwagger2
+public class SwaggerConfig {
+    @Bean
+    public Docket docket2() {
+        // 联系人信息
+        Contact contact = new Contact("联系人名字", "www.gjxaiou.com", "联系人邮箱");
+        return new Docket(DocumentationType.SWAGGER_2).apiInfo(// 省略里面信息
+            // 通过.select()方法，去配置扫描接口,RequestHandlerSelectors配置如何扫                描接口 
+      ). select(). apis (RequestHandlerSelectors. basePackage ("com.gjxaiou.swagger2020.controller")).build();
+    }
 }
 ```
 
 2、重启项目测试，由于我们配置根据包的路径扫描接口，所以我们只能看到一个类
 
-3、除了通过包路径配置扫描接口外，还可以通过配置其他方式扫描接口，这里注释一下所有的配置方式：
+![image-20210104001744397](Swagger.resource/image-20210104001744397.png)
 
-```
+3、除了通过包路径配置扫描接口外，还可以通过配置其他方式扫描接口，这里注释一下所有的配置方式：通过 RequestHandlerSelectors 源码中的方法可以看到所有。
+
+```java
 any() // 扫描所有，项目中的所有接口都会被扫描到
 none() // 不扫描接口
 // 通过方法上的注解扫描，如withMethodAnnotation(GetMapping.class)只扫描get请求
@@ -249,7 +281,7 @@ ant(final String antPattern) // 通过ant()控制
 
 1、通过enable()方法配置是否启用swagger，如果是false，swagger将不能在浏览器中访问了
 
-```
+```java
 @Bean
 public Docket docket() {
    return new Docket(DocumentationType.SWAGGER_2)
@@ -265,7 +297,7 @@ public Docket docket() {
 
 2、如何动态配置当项目处于test、dev环境时显示swagger，处于prod时不显示？
 
-```
+```java
 @Bean
 public Docket docket(Environment environment) {
    // 设置要显示swagger的环境
@@ -286,6 +318,8 @@ public Docket docket(Environment environment) {
 ```
 
 3、可以在项目中增加一个dev的配置文件查看效果！
+
+首先新建配置文件：`application-dev.properties`，然后文件中加上 `spring.profiles.active=true`则表示激活了该环境。其他环境配置一样。
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/uJDAUKrGC7IExpkhknhzRFQicsic8yibm9Zf87yQGBYZKyqCsjP79C67S0NgdOmrQWJ7tkpPsdkrWQeQiaIZia7VD8w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
