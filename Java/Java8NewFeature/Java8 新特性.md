@@ -29,7 +29,7 @@
 ```java
 // 概述结构
 (argument) -> {body}
-// 示例结构
+// 两种主要的示例结构
 (arg1, arg2...) -> { body }   // 省略类型声明
 (type1 arg1, type2 arg2...) -> { body }  // 补充上完整的类型声明
 ```
@@ -1050,7 +1050,7 @@ public class BinaryOperatorTest {
 
 为了解决：NPE：NullPointerException
 
-根据该接口的 JavaDoc：是一个容器对象，可能包括或者不包括一个非空值（即里面可能为对象或者为空），通过 `isPresent()`判断是否存在，通过 `get()`获取。
+根据该接口的 JavaDoc：是一个容器对象，可能包括或者不包括一个非空值（即里面可能为对象或者为空），可以通过 `isPresent()`判断是否存在，通过 `get()`获取。
 
 **注意**：因为 Optional 并没有实现 Serializable 接口，所以不要将 Optional 作为方法参数传递或者在类中定义 Optional 类型的成员变量，**通常 Optional 只作为方法的返回值来避免 NPE**。
 
