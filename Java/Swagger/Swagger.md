@@ -190,6 +190,8 @@ public class SwaggerConfig {
 
 ## 四、配置扫描接口
 
+swagger-ui 的界面在 swagger 包下面的 webjar 下面。
+
 默认扫描接口的结果是包括两个接口，一个是 basic-error-controller 接口（默认的 error 界面），另一个是 hello-controller 接口。
 
 ![Swagger UI - localhost](Swagger.resource/Swagger UI - localhost.png)
@@ -277,6 +279,10 @@ ant(final String antPattern) // 通过ant()控制
 
 ###  
 
+
+
+
+
 > ### 配置Swagger开关
 
 1、通过enable()方法配置是否启用swagger，如果是false，swagger将不能在浏览器中访问了
@@ -329,6 +335,8 @@ public Docket docket(Environment environment) {
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/uJDAUKrGC7IExpkhknhzRFQicsic8yibm9Z7k4Y8iaVnHtPd78o82ff8hItej9Cyf0wvbG8u8KgXic7gVh77NoZw4RQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
+还是看 Docket 中的属性，这里是 groupName 属性。
+
 1、如果没有配置分组，默认是default。通过groupName()方法即可配置分组：
 
 ```
@@ -363,21 +371,23 @@ public Docket docket3(){
 
 
 
-> ### 实体配置
+> ### 实体类配置
+>
+> 即 Model 部分
 
 1、新建一个实体类
 
 ```
-@ApiModel("用户实体")
+@ApiModel("用户实体类的文档注释")
 public class User {
-   @ApiModelProperty("用户名")
+   @ApiModelProperty("用户名：字段属性注释")
    public String username;
    @ApiModelProperty("密码")
    public String password;
 }
 ```
 
-2、只要这个实体在**请求接口**的返回值上（即使是泛型），都能映射到实体项中：
+2、只要这个实体在**请求接口**的返回值上（即使是泛型），都能映射到实体项中，即都能扫描到 swagger 中：
 
 ```
 @RequestMapping("/getUser")
@@ -392,9 +402,13 @@ public User getUser(){
 
 注：并不是因为@ApiModel这个注解让实体显示在这里了，而是只要出现在接口方法的返回值上的实体都会显示在这里，而@ApiModel和@ApiModelProperty这两个注解只是为实体添加注释的。
 
-@ApiModel为类添加注释
+@ApiModel为类添加注释，等价于 @Api
 
 @ApiModelProperty为类属性添加注释
+
+@ApiOperation()：为方法添加注释
+
+@ApiParam()：为方法中属性添加注释
 
 
 
@@ -491,7 +505,3 @@ Swagger是个优秀的工具，现在国内已经有很多的中小型互联网�
 狂神讲解的配套视频地址：https://www.bilibili.com/video/BV1Y441197Lw
 
 
-
-视频同步更新，这次一定！
-
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/uJDAUKrGC7KaCZTnzpTQ4y0unN9icJaRPdGy06vUfzQgzpibBctoiaZbTiaVibavlK6Ww0OIavHmSBf5luzDibthmgBA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
