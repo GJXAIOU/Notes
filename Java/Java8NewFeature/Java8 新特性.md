@@ -16,7 +16,7 @@
 
 -  在JavaScript（面向对象和函数式语言）中，函数参数是一个函数，返回值是另一个函数的情况是常见的；JavaScript 是一门非常典型的函数式语⾔。
 
-#### Lambda 表达式概要和作用
+#### 1.Lambda 表达式概要和作用
 
 - Java Lambda 表达式是一种匿名函数；它是没有声明的方法，即没有访问修饰符、返回值声明和名字。
 
@@ -24,7 +24,7 @@
 - 在将函数作为一等公民的语⾔言中（如 python、JavaScript），Lambda 表达式的类型是函数。**但在 Java 中，Lambda 表达式是对象**，他们必须依附于一类特别的对象类型——函数式接口(functional interface) 
 - Lambda 表达式主要用于传递行为，而不仅仅是值。从而提升抽象层次，使得 API 重用性更好。
 
-#### Lambda 基本语法
+#### 2.Lambda 基本语法
 
 ```java
 // 概述结构
@@ -34,7 +34,7 @@
 (type1 arg1, type2 arg2...) -> { body }  // 补充上完整的类型声明
 ```
 
-#### Lambda 结构
+#### 3.Lambda 结构
 
 - 一个 Lambda 表达式可以有零个或多个参数
 - 参数的类型既可以明确声明，也可以根据上下文来推断。例如：`(int a)` 与 `(a)` 效果相同。
@@ -47,163 +47,162 @@
 - 如果 Lambda 表达式的主体只有一条语句，花括号 `{}` 可省略。匿名函数的返回类型与该主体表达式一致。
 - 如果 Lambda 表达式的主体包含一条以上语句，则表达式必须包含在花括号 `{}` 中（形成代码块）。匿名函数的返回类型与代码块的返回类型一致，若没有返回则为空。
 
-#### 代码示例
+#### 4.测试代码
 
 - 从匿名内部类到 Lambda
 
-```java
-package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
+  ```java
+  package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
+  
+  import javax.swing.*;
+  import java.awt.event.ActionEvent;
+  import java.awt.event.ActionListener;
+  
+  /**
+   * 功能需求： 对一个按钮 button 注册一个事件监听器，该监听器的作用是当按钮发生某个动作则监听器的特定方法会被调用
+   */
+  public class SwingTest {
+  
+      public static void main(String[] args) {
+          JFrame jframe = new JFrame("My JFrame");
+          JButton jButton = new JButton("My JButton");
+  
+          /**
+           * 实现方式一：原始方式：使用匿名内部类
+           */
+          jButton.addActionListener(new ActionListener() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                  System.out.println("Button Pressed!");
+                  System.out.println("hello world");
+                  System.out.println("executed");
+              }
+          });
+  
+          /**
+           * 实现方式二：Lambda 表达式
+           */
+          // 这里 ActionEvent 如果不写，Java 编译可以进行类型推断进行推断处理。
+          jButton.addActionListener((ActionEvent event) -> {
+              System.out.println("Button Pressed!");
+              System.out.println("hello world");
+              System.out.println("executed");
+          });
+  
+          // 将按钮 button 添加到 frame
+          jframe.add(jButton);
+          jframe.pack();
+          jframe.setVisible(true);
+          jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      }
+  }
+  
+  // ActionListener 接口源码
+  // public interface ActionListener extends EventListener {
+  //    public void actionPerformed(ActionEvent e);
+  // }
+  ```
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+- 在集合遍历中的使用 Lambda
 
-/**
- * 功能需求： 对一个按钮 button 注册一个事件监听器，该监听器的作用是当按钮发生某个动作则监听器的特定方法会被调用
- */
-public class SwingTest {
+  ```java
+  package com.gjxaiou.jdk8;
+  
+  import java.util.Arrays;
+  import java.util.List;
+  import java.util.function.Consumer;
+  
+  public class CollectionTest {
+  
+      public static void main(String[] args) {
+          List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
+  
+          // 方式一：遍历集合方式
+          for (int i = 0; i < list.size(); ++i) {
+              System.out.println(list.get(i));
+          }
+          System.out.println("----------");
+  
+          // 方式二：增强 for 循环
+          for (Integer i : list) {
+              System.out.println(i);
+          }
+          System.out.println("----------");
+  
+          // 方式三：使用 Consumer 函数式接口
+          // forEach() 是 Iterable 接口的默认实现方法，则其实现类就继承了该方法，List 是 Iterable 的一个实现类
+       // Consumer 函数式接口中的 JavaDoc 文档说明：接收另一个参数并且不返回结果值，可能会修改入参值。
+          list.forEach(new Consumer<Integer>() {
+              @Override
+              public void accept(Integer integer) {
+                  System.out.println(integer);
+              }
+          });
+          System.out.println("----------");
+  
+          // 方式三改为使用 Lambda 表达式
+          list.forEach(integer -> {
+              System.out.println(integer);
+          });
+          System.out.println("----------");
+          
+          // 方式四：使用方法引用（method reference），因为函数式接口的实例可以通过 Lambda 表达式、方法引用、构造方法引用来创建。
+          list.forEach(System.out::println);
+      }
+  }
+  ```
 
-    public static void main(String[] args) {
-        JFrame jframe = new JFrame("My JFrame");
-        JButton jButton = new JButton("My JButton");
+- 验证 Lambda 表达式是对象
 
-        /**
-         * 实现方式一：原始方式：使用匿名内部类
-         */
-        jButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Button Pressed!");
-                System.out.println("hello world");
-                System.out.println("executed");
-            }
-        });
-
-        /**
-         * 实现方式二：Lambda 表达式
-         */
-        // 这里 ActionEvent 如果不写，Java 编译可以进行类型推断进行推断处理。
-        jButton.addActionListener((ActionEvent event) -> {
-            System.out.println("Button Pressed!");
-            System.out.println("hello world");
-            System.out.println("executed");
-        });
-
-        // 将按钮 button 添加到 frame
-        jframe.add(jButton);
-        jframe.pack();
-        jframe.setVisible(true);
-        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-}
-
-// ActionListener 接口源码
-// public interface ActionListener extends EventListener {
-//    public void actionPerformed(ActionEvent e);
-// }
-```
-
-- 测试在集合遍历中的使用
-
-```java
-package com.gjxaiou.jdk8;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-
-public class CollectionTest {
-
-    public static void main(String[] args) {
-        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
-
-        // 方式一：遍历集合方式
-        for (int i = 0; i < list.size(); ++i) {
-            System.out.println(list.get(i));
-        }
-        System.out.println("----------");
-
-        // 方式二：增强 for 循环
-        for (Integer i : list) {
-            System.out.println(i);
-        }
-        System.out.println("----------");
-
-        // 方式三：使用 Consumer 函数式接口
-        // forEach() 是 Iterable 接口的默认实现方法，则其实现类就继承了该方法，List 是 Iterable 的一个实现类
-     // Consumer 函数式接口中的 JavaDoc 文档说明：接收另一个参数并且不返回结果值，可能会修改入参值。
-        list.forEach(new Consumer<Integer>() {
-            @Override
-            public void accept(Integer integer) {
-                System.out.println(integer);
-            }
-        });
-        System.out.println("----------");
-
-        // 方式三改为使用 Lambda 表达式
-        list.forEach(integer -> {
-            System.out.println(integer);
-        });
-        System.out.println("----------");
-        
-        // 方式四：使用方法引用（method reference），因为函数式接口的实例可以通过 Lambda 表达式、方法引用、构造方法引用来创建。
-        list.forEach(System.out::println);
-    }
-}
-```
-
-- 验证 Lambda 表达式是对象方式一
-
-```java
-package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
-
-// 首先提供一个函数式接口
-@FunctionalInterface
-interface MyInterface {
-    void test();
-
-    // 重写 Object 类中的方法，则该接口中仍然只有上面一个抽象方法，则仍然可以标注 @FunctionalInterface
-    @Override
-    String toString();
-}
-
-
-public class Test2 {
-    public void myTest(MyInterface myInterface) {
-        myInterface.test();
-        System.out.println("-----------------");
-    }
-
-    public static void main(String[] args) {
-        Test2 test2 = new Test2();
-
-        // 调用方式：Lambda 表达式
-        test2.myTest(() -> {
-            System.out.println("this is myTest by Lambda 表达式");
-        });
-
-        // 上面等价于下面的，就是  MyInterface 的一个实现。
-        // 后面的 Lambda 表达式赋值给了前面的对象引用 myInterface
-        MyInterface myInterface = () -> {
-            System.out.println("hello");
-        };
-
-        // 该 Lambda 表达式的类型
-        System.out.println(myInterface.getClass());
-        // 该 Lambda 表达式的父类型
-        System.out.println("父类" + myInterface.getClass().getSuperclass());
-        // 该 Lambda 表达式实现的接口
-        System.out.println("实现以下接口：" + myInterface.getClass().getInterfaces()[0]);
-    }
-}
-/** output:
- * this is myTest by Lambda 表达式
- * -----------------
- * class com.gjxaiou.jdk8.lambdaAndFunctionInterface.Test2$$Lambda$2/764977973
- * 父类class java.lang.Object
- * 实现以下接口：interface com.gjxaiou.jdk8.lambdaAndFunctionInterface.MyInterface
- */
-```
+  ```java
+  package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
+  
+  // 首先提供一个函数式接口
+  @FunctionalInterface
+  interface MyInterface {
+      void test();
+  
+      // 重写 Object 类中的方法，则该接口中仍然只有上面一个抽象方法，则仍然可以标注 @FunctionalInterface
+      @Override
+      String toString();
+  }
+  
+  public class Test2 {
+      public void myTest(MyInterface myInterface) {
+          myInterface.test();
+          System.out.println("-----------------");
+      }
+  
+      public static void main(String[] args) {
+          Test2 test2 = new Test2();
+  
+          // 调用方式：Lambda 表达式
+          test2.myTest(() -> {
+              System.out.println("this is myTest by Lambda 表达式");
+          });
+  
+          // 上面等价于下面的，就是  MyInterface 的一个实现。
+          // 后面的 Lambda 表达式赋值给了前面的对象引用 myInterface
+          MyInterface myInterface = () -> {
+              System.out.println("hello");
+          };
+  
+          // 该 Lambda 表达式的类型
+          System.out.println(myInterface.getClass());
+          // 该 Lambda 表达式的父类型
+          System.out.println("父类" + myInterface.getClass().getSuperclass());
+          // 该 Lambda 表达式实现的接口
+          System.out.println("实现以下接口：" + myInterface.getClass().getInterfaces()[0]);
+      }
+  }
+  /** output:
+   * this is myTest by Lambda 表达式
+   * -----------------
+   * class com.gjxaiou.jdk8.lambdaAndFunctionInterface.Test2$$Lambda$2/764977973
+   * 父类class java.lang.Object
+   * 实现以下接口：interface com.gjxaiou.jdk8.lambdaAndFunctionInterface.MyInterface
+   */
+  ```
 
 - 验证 Lambda 表达式是对象方式二：
 
@@ -301,53 +300,53 @@ public class Test3 {
 
 - Lambda 表达式在排序中使用 
 
-```java
-package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-public class StringComparator {
-
-    public static void main(String[] args) {
-        List<String> names = Arrays.asList("zhangsan", "lisi", "wangwu", "zhaoliu");
-
-        /**
-         * 倒序排序方式一：匿名内部类
-         */
-        // Comparator 也是函数式接口，
-        Collections.sort(names, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o2.compareTo(o1);
-            }
-        });
-        System.out.println(names);
-
-
-        /**
-         * 方式二：Lambda 表达式
-         * sort(list 列表，Comparator 函数式接口)，该接口接收两个参数，返回一个参数
-         */
-        Collections.sort(names, (o1, o2) -> {
-            return o2.compareTo(o1);
-        });
-
-        // 方式二的简化版本
-        Collections.sort(names, (o1, o2) -> o2.compareTo(o1));
-
-        // 方式二的简化版本
-        Collections.sort(names, Comparator.reverseOrder());
-        System.out.println(names);
-    }
-}
-/** output:
- * [zhaoliu, zhangsan, wangwu, lisi]
- * [zhaoliu, zhangsan, wangwu, lisi]
- */
-```
+  ```java
+  package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
+  
+  import java.util.Arrays;
+  import java.util.Collections;
+  import java.util.Comparator;
+  import java.util.List;
+  
+  public class StringComparator {
+  
+      public static void main(String[] args) {
+          List<String> names = Arrays.asList("zhangsan", "lisi", "wangwu", "zhaoliu");
+  
+          /**
+           * 倒序排序方式一：匿名内部类
+           */
+          // Comparator 也是函数式接口，
+          Collections.sort(names, new Comparator<String>() {
+              @Override
+              public int compare(String o1, String o2) {
+                  return o2.compareTo(o1);
+              }
+          });
+          System.out.println(names);
+  
+  
+          /**
+           * 方式二：Lambda 表达式
+           * sort(list 列表，Comparator 函数式接口)，该接口接收两个参数，返回一个参数
+           */
+          Collections.sort(names, (o1, o2) -> {
+              return o2.compareTo(o1);
+          });
+  
+          // 方式二的简化版本
+          Collections.sort(names, (o1, o2) -> o2.compareTo(o1));
+  
+          // 方式二的简化版本
+          Collections.sort(names, Comparator.reverseOrder());
+          System.out.println(names);
+      }
+  }
+  /** output:
+   * [zhaoliu, zhangsan, wangwu, lisi]
+   * [zhaoliu, zhangsan, wangwu, lisi]
+   */
+  ```
 
 ### (二) 函数式接口：FunctionalInterface
 
@@ -1758,8 +1757,6 @@ Stream 流操作的分类：惰性求值 和 及早求值
 
     `count()` 本身就是一个及早求值。
 
-
-
 - Collection 提供了新的 `stream()` 方法
 - **流不存储值，通过管道的方式获取值，值还是存储在数据提供方**。
 - 本质是函数式的，对流的操作会生成一个结果，但并不会修改底层的数据源，集合可以作为流的底层数据源
@@ -1784,15 +1781,15 @@ import java.util.stream.Stream;
 public class StreamTest1 {
 
     public static void main(String[] args) {
-        // 方式一：
+        // 方式一：直接创建元素填充
         Stream stream1 = Stream.of("hello", "world", "hello world");
 
-        // 方式二：
+        // 方式二：主要针对数组
         String[] myArray = new String[]{"hello", "world", "hello world"};
         Stream stream2 = Stream.of(myArray);
         Stream stream3 = Arrays.stream(myArray);
 
-        // 方式三：
+        // 方式三：主要针对 List
         List<String> list = Arrays.asList(myArray);
         Stream stream4 = list.stream();
     }
