@@ -1764,7 +1764,7 @@ Stream 流操作的分类：惰性求值 和 及早求值
 
 
 
-#### 常见的测试 Demo
+**常见的测试 Demo**
 
 1.Stream 流的三种创建方式
 
@@ -1836,116 +1836,115 @@ public class StreamTest2 {
     }        
 ```
 
-### 对 Stream 接口中的 Collection 方法分析
+-  Collection 方法分析
 
-对流中的元素执行一个可变的汇聚操作（看 JavaDoc 文档中的分析，可以分解为三个步骤，分别对应下面三个函数式接口）
+  对流中的元素执行一个可变的汇聚操作（看 JavaDoc 文档中的分析，可以分解为三个步骤，分别对应下面三个函数式接口）
 
-```java
-<R> R collect(Supplier<R> supplier,
-              BiConsumer<R, ? super T> accumulator,
-              BiConsumer<R, R> combiner);
-```
+  ```java
+  <R> R collect(Supplier<R> supplier,
+                BiConsumer<R, ? super T> accumulator,
+                BiConsumer<R, R> combiner);
+  
+  <R, A> R collect(Collector<? super T, A, R> collector);
+  ```
 
-测试方法：
+  测试方法：
 
-```java
-package com.gjxaiou.jdk8.stream;
+  ```java
+  package com.gjxaiou.jdk8.stream;
+  
+  import java.util.*;
+  import java.util.stream.Collectors;
+  import java.util.stream.Stream;
+  
+  public class StreamTest4 {
+  
+      public static void main(String[] args) {
+          Stream<String> stream = Stream.of("hello", "world", "helloWorld");
+  
+          // 将流转换为字符串数组
+          String[] stringArray = stream.toArray(length -> new String[length]);
+          // 使用方法引用改造上面的 Lambda 表达式写法
+          // String[] stringArray = stream.toArray(String[]::new);
+          Arrays.asList(stringArray).forEach(System.out::println);
+  
+          /**
+           * 将流转换为一个 List
+           */
+          Stream<String> stream2 = Stream.of("hello", "world", "helloWorld");
+          // collect() 是一个终止方法
+          List<String> list = stream2.collect(Collectors.toList());
+          // 上面一行等价于下面这个，本质是 Collectors.toList() 就是对下面代码的封装
+          List<String> list1 = stream2.collect(
+                  () -> new ArrayList(), // 不接受参数，返回一个结果，也是最终结果
+                  (theList, item) -> theList.add(item),// 两个参数，进行遍历然后加入集合
+                  (theList1, theList2) -> theList1.addAll(theList2)
+          );// 将每次遍历形成的 List2 加入最终返回的 List2 中
+          // 使用方法引用简化上面代码
+          List<String> list2 = stream2.collect(LinkedList::new, LinkedList::add, LinkedList::addAll);
+  
+          list.forEach(System.out::println);
+  
+          // 流转换为集合的方式二
+          Stream<String> stream3 = Stream.of("hello", "world", "helloWorld");
+          // 可以自定义返回 List 的类型
+          List<String> list3 = stream3.collect(Collectors.toCollection(ArrayList::new));
+          list3.forEach(System.out::println);
+  
+          // 自定义转换为 Set 类型
+          Stream<String> stream4 = Stream.of("hello", "world", "helloWorld");
+          Set<String> set = stream4.collect(Collectors.toCollection(TreeSet::new));
+          System.out.println(set.getClass());
+  
+          set.forEach(System.out::println);
+  
+          // 转换为 String 对象
+          Stream<String> stream5 = Stream.of("hello", "world", "helloWorld");
+          String str = stream5.collect(Collectors.joining()).toString();
+          System.out.println(str);
+      }
+  }
+  ```
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+- flatMap 方法
 
-public class StreamTest4 {
+  例如一个集合中有三个元素，每个元素都是一个 List，如果使用原始的 map 进行映射的时候，得到的还是还是元素，每个元素都是一个 List，其中值是原始元素的逐个映射。但是 flatMap 将原始集合中的所有小元素逐个映射的结构放在一个 List 中。进行扁平化。
 
-    public static void main(String[] args) {
-        Stream<String> stream = Stream.of("hello", "world", "helloWorld");
-
-        // 将流转换为字符串数组
-        String[] stringArray = stream.toArray(length -> new String[length]);
-        // 使用方法引用改造上面的 Lambda 表达式写法
-        // String[] stringArray = stream.toArray(String[]::new);
-        Arrays.asList(stringArray).forEach(System.out::println);
-
-        /**
-         * 将流转换为一个 List
-         */
-        Stream<String> stream2 = Stream.of("hello", "world", "helloWorld");
-        // collect() 是一个终止方法
-        List<String> list = stream2.collect(Collectors.toList());
-        // 上面一行等价于下面这个，本质是 Collectors.toList() 就是对下面代码的封装
-        List<String> list1 = stream2.collect(() -> new ArrayList(), // 不接受参数，返回一个结果，也是最终结果
-                (theList, item) -> theList.add(item),// 两个参数，进行遍历然后加入集合
-                (theList1, theList2) -> theList1.addAll(theList2));// 将每次遍历形成的 List2 加入最终返回的 List2 中
-        // 使用方法引用简化上面代码
-        List<String> list2 = stream2.collect(LinkedList::new, LinkedList::add, LinkedList::addAll);
-
-        list.forEach(System.out::println);
-
-        // 流转换为集合的方式二
-        Stream<String> stream3 = Stream.of("hello", "world", "helloWorld");
-        // 可以自定义返回 List 的类型
-        List<String> list3 = stream3.collect(Collectors.toCollection(ArrayList::new));
-        list3.forEach(System.out::println);
-
-        // 自定义转换为 Set 类型
-        Stream<String> stream4 = Stream.of("hello", "world", "helloWorld");
-        Set<String> set = stream4.collect(Collectors.toCollection(TreeSet::new));
-        System.out.println(set.getClass());
-
-        set.forEach(System.out::println);
-
-        // 转换为 String 对象
-        Stream<String> stream5 = Stream.of("hello", "world", "helloWorld");
-        String str = stream5.collect(Collectors.joining()).toString();
-        System.out.println(str);
-    }
-}
-```
-
-
-
-#### flatMap
-
-例如一个集合中有三个元素，每个元素都是一个 List，如果使用原始的 map 进行映射的时候，得到的还是还是元素，每个元素都是一个 List，其中值是原始元素的逐个映射。但是 flatMap 将原始集合中的所有小元素逐个映射的结构放在一个 List 中。进行扁平化。
-
-```java
-package com.gjxaiou.jdk8.stream;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-public class StreamTest5 {
-    public static void main(String[] args) {
-        List<String> list = Arrays.asList("hello", "world", "helloworld", "test");
-        // 将集合中每个元素转换为大写然后输出
-        list.stream().map(String::toUpperCase).collect(Collectors.toList()).forEach(System.out::println);
-
-        System.out.println("----------");
-
-        List<Integer> list2 = Arrays.asList(1, 2, 3, 4, 5);
-        list2.stream().map(item -> item * item).collect(Collectors.toList()).forEach(System.out::println);
-
-        System.out.println("----------");
-
-        // flatMap：平整化的 Map
-        Stream<List<Integer>> stream = Stream.of(Arrays.asList(1),
-                Arrays.asList(2, 3), Arrays.asList(4, 5, 6));
-
-        // theList -> theList.stream() 将每个 List 都转换为 Stream，然后通过 flatMap 将所有 Stream 打平
-        stream.flatMap(theList -> theList.stream()).map(item -> item * item).forEach(System.out::println);
-    }
-}
-```
-
-
+  ```java
+  package com.gjxaiou.jdk8.stream;
+  
+  import java.util.Arrays;
+  import java.util.List;
+  import java.util.stream.Collectors;
+  import java.util.stream.Stream;
+  
+  public class StreamTest5 {
+      public static void main(String[] args) {
+          List<String> list = Arrays.asList("hello", "world", "helloworld", "test");
+          // 将集合中每个元素转换为大写然后输出
+          list.stream().map(String::toUpperCase).collect(Collectors.toList()).forEach(System.out::println);
+  
+          System.out.println("----------");
+  
+          List<Integer> list2 = Arrays.asList(1, 2, 3, 4, 5);
+          list2.stream().map(item -> item * item).collect(Collectors.toList()).forEach(System.out::println);
+  
+          System.out.println("----------");
+  
+          // flatMap：平整化的 Map
+          Stream<List<Integer>> stream = Stream.of(Arrays.asList(1),
+                  Arrays.asList(2, 3), Arrays.asList(4, 5, 6));
+  
+          // theList -> theList.stream() 将每个 List 都转换为 Stream，然后通过 flatMap 将所有 Stream 打平
+          stream.flatMap(theList -> theList.stream()).map(item -> item * item).forEach(System.out::println);
+      }
+  }
+  ```
 
 - `generate()`、`iterate()`方法以及需要注意的知识点
 
     ```java
     package com.gjxaiou.jdk8.stream;
-    
     
     import java.util.IntSummaryStatistics;
     import java.util.UUID;
@@ -1993,10 +1992,10 @@ public class StreamTest5 {
         }
     }
     ```
-
     
 
-    知识点：中间操作和终止操作的测试
+    
+-  知识点：中间操作和终止操作的测试
 
     ```java
     package com.gjxaiou.jdk8.stream;
@@ -2035,37 +2034,36 @@ public class StreamTest5 {
     }
     ```
 
-    - `distinct()` 方法
+- `distinct()` 方法
 
-        ```java
-        package com.gjxaiou.jdk8.stream;
-        
-        import java.util.stream.IntStream;
-        
-        public class StreamTest8 {
-        
-            public static void main(String[] args) {
-                // 运行这行，输出 0 1 但是程序一直无法执行完成，因为 iterate() 迭代输出导致 distinct() 一直无法结束
-                IntStream.iterate(0, i -> (i + 1) % 2).distinct().limit(6).forEach(System.out::println);
-                // 正确的使用方式
-                IntStream.iterate(0, i -> (i + 1) % 2).limit(6).distinct().forEach(System.out::println);
-            }
+    ```java
+    package com.gjxaiou.jdk8.stream;
+    
+    import java.util.stream.IntStream;
+    
+    public class StreamTest8 {
+    
+        public static void main(String[] args) {
+            // 运行这行，输出 0 1 但是程序一直无法执行完成，因为 iterate() 迭代输出导致 distinct() 一直无法结束
+            IntStream.iterate(0, i -> (i + 1) % 2).distinct().limit(6).forEach(System.out::println);
+            // 正确的使用方式
+            IntStream.iterate(0, i -> (i + 1) % 2).limit(6).distinct().forEach(System.out::println);
         }
-        
-        ```
+    }
+    ```
+    
 
-        
-
+    
     #### 内部迭代和外部迭代
-
+    
     - 外部迭代：例如 for 循环
-
+    
     - 内部迭代：Stream 流
-
+    
         内部迭代方式不一定是按照方法调用的顺序进行执行，内部会进行优化。所有的中间指令可以看做是在一个容器中，然后针对流中每一个元素进行应用。如果看成 for 循环则最终仅仅遍历了一遍。
-
+    
     <img src="Java8%20%E6%96%B0%E7%89%B9%E6%80%A7.resource/image-20201028152857282-1604234304841.png" alt="image-20201028152857282" style="zoom:50%;" />
-
+    
     
 
 集合关注的是数据和数据存储本身。
@@ -2169,8 +2167,7 @@ public class StreamTest11 {
         result.forEach(item -> Arrays.asList(item).forEach(System.out::println));
 
         List<String> result2 =
-                list.stream().map(item -> item.split(" ")).flatMap(Arrays::stream).distinct().
-                        collect(Collectors.toList());
+                list.stream().map(item -> item.split(" ")). flatMap(Arrays::stream). 	  distinct().collect(Collectors.toList());
 
         result2.forEach(System.out::println);
     }
