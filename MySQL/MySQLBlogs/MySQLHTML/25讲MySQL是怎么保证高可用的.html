@@ -1,0 +1,508 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                25讲MySQL是怎么保证高可用的
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/70/25/709a17b02b35211e1293f7f122538625.jpg">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>在上一篇文章中，我和你介绍了binlog的基本内容，在一个主备关系中，每个备库接收主库的binlog并执行。</p><p>正常情况下，只要主库执行更新生成的所有binlog，都可以传到备库并被正确地执行，备库就能达到跟主库一致的状态，这就是最终一致性。</p><p>但是，MySQL要提供高可用能力，只有最终一致性是不够的。为什么这么说呢？今天我就着重和你分析一下。</p><p>这里，我再放一次上一篇文章中讲到的双M结构的主备切换流程图。</p><p><img src="https://static001.geekbang.org/resource/image/89/cc/89290bbcf454ff9a3dc5de42a85a69cc.png" alt=""></p><center><span class="reference">图 1 MySQL主备切换流程--双M结构</span></center><h1>主备延迟</h1><p>主备切换可能是一个主动运维动作，比如软件升级、主库所在机器按计划下线等，也可能是被动操作，比如主库所在机器掉电。</p><p>接下来，我们先一起看看主动切换的场景。</p><p>在介绍主动切换流程的详细步骤之前，我要先跟你说明一个概念，即“同步延迟”。与数据同步有关的时间点主要包括以下三个：</p><ol>
+<li>
+<p>主库A执行完成一个事务，写入binlog，我们把这个时刻记为T1;</p>
+</li>
+<li>
+<p>之后传给备库B，我们把备库B接收完这个binlog的时刻记为T2;</p>
+</li>
+<li>
+<p>备库B执行完成这个事务，我们把这个时刻记为T3。</p>
+</li>
+</ol><p>所谓主备延迟，就是同一个事务，在备库执行完成的时间和主库执行完成的时间之间的差值，也就是T3-T1。</p><p>你可以在备库上执行show slave status命令，它的返回结果里面会显示seconds_behind_master，用于表示当前备库延迟了多少秒。</p><!-- [[[read_end]]] --><p>seconds_behind_master的计算方法是这样的：</p><ol>
+<li>
+<p>每个事务的binlog 里面都有一个时间字段，用于记录主库上写入的时间；</p>
+</li>
+<li>
+<p>备库取出当前正在执行的事务的时间字段的值，计算它与当前系统时间的差值，得到seconds_behind_master。</p>
+</li>
+</ol><p>可以看到，其实seconds_behind_master这个参数计算的就是T3-T1。所以，我们可以用seconds_behind_master来作为主备延迟的值，这个值的时间精度是秒。</p><p>你可能会问，如果主备库机器的系统时间设置不一致，会不会导致主备延迟的值不准？</p><p>其实不会的。因为，备库连接到主库的时候，会通过执行SELECT UNIX_TIMESTAMP()函数来获得当前主库的系统时间。如果这时候发现主库的系统时间与自己不一致，备库在执行seconds_behind_master计算的时候会自动扣掉这个差值。</p><p>需要说明的是，在网络正常的时候，日志从主库传给备库所需的时间是很短的，即T2-T1的值是非常小的。也就是说，网络正常情况下，主备延迟的主要来源是备库接收完binlog和执行完这个事务之间的时间差。</p><p>所以说，主备延迟最直接的表现是，备库消费中转日志（relay log）的速度，比主库生产binlog的速度要慢。接下来，我就和你一起分析下，这可能是由哪些原因导致的。</p><h1>主备延迟的来源</h1><p><strong>首先，有些部署条件下，备库所在机器的性能要比主库所在的机器性能差。</strong></p><p>一般情况下，有人这么部署时的想法是，反正备库没有请求，所以可以用差一点儿的机器。或者，他们会把20个主库放在4台机器上，而把备库集中在一台机器上。</p><p>其实我们都知道，更新请求对IOPS的压力，在主库和备库上是无差别的。所以，做这种部署时，一般都会将备库设置为“非双1”的模式。</p><p>但实际上，更新过程中也会触发大量的读操作。所以，当备库主机上的多个备库都在争抢资源的时候，就可能会导致主备延迟了。</p><p>当然，这种部署现在比较少了。因为主备可能发生切换，备库随时可能变成主库，所以主备库选用相同规格的机器，并且做对称部署，是现在比较常见的情况。</p><p>追问1：但是，做了对称部署以后，还可能会有延迟。这是为什么呢？</p><p>这就是<strong>第二种常见的可能了，即备库的压力大</strong>。一般的想法是，主库既然提供了写能力，那么备库可以提供一些读能力。或者一些运营后台需要的分析语句，不能影响正常业务，所以只能在备库上跑。</p><p>我真就见过不少这样的情况。由于主库直接影响业务，大家使用起来会比较克制，反而忽视了备库的压力控制。结果就是，备库上的查询耗费了大量的CPU资源，影响了同步速度，造成主备延迟。</p><p>这种情况，我们一般可以这么处理：</p><ol>
+<li>
+<p>一主多从。除了备库外，可以多接几个从库，让这些从库来分担读的压力。</p>
+</li>
+<li>
+<p>通过binlog输出到外部系统，比如Hadoop这类系统，让外部系统提供统计类查询的能力。</p>
+</li>
+</ol><p>其中，一主多从的方式大都会被采用。因为作为数据库系统，还必须保证有定期全量备份的能力。而从库，就很适合用来做备份。</p><blockquote>
+<p>备注：这里需要说明一下，从库和备库在概念上其实差不多。在我们这个专栏里，为了方便描述，我把会在HA过程中被选成新主库的，称为备库，其他的称为从库。</p>
+</blockquote><p>追问2：采用了一主多从，保证备库的压力不会超过主库，还有什么情况可能导致主备延迟吗？</p><p><strong>这就是第三种可能了，即大事务。</strong></p><p>大事务这种情况很好理解。因为主库上必须等事务执行完成才会写入binlog，再传给备库。所以，如果一个主库上的语句执行10分钟，那这个事务很可能就会导致从库延迟10分钟。</p><p>不知道你所在公司的DBA有没有跟你这么说过：不要<strong>一次性地用delete语句删除太多数据</strong>。其实，这就是一个典型的大事务场景。</p><p>比如，一些归档类的数据，平时没有注意删除历史数据，等到空间快满了，业务开发人员要一次性地删掉大量历史数据。同时，又因为要避免在高峰期操作会影响业务（至少有这个意识还是很不错的），所以会在晚上执行这些大量数据的删除操作。</p><p>结果，负责的DBA同学半夜就会收到延迟报警。然后，DBA团队就要求你后续再删除数据的时候，要控制每个事务删除的数据量，分成多次删除。</p><p><strong>另一种典型的大事务场景，就是大表DDL。</strong>这个场景，我在前面的文章中介绍过。处理方案就是，计划内的DDL，建议使用gh-ost方案（这里，你可以再回顾下第13篇文章<a href="https://time.geekbang.org/column/article/72388">《为什么表数据删掉一半，表文件大小不变？》</a>中的相关内容）。</p><p>追问3：如果主库上也不做大事务了，还有什么原因会导致主备延迟吗？</p><p>造成主备延迟还有一个大方向的原因，就是<strong>备库的并行复制能力</strong>。这个话题，我会留在下一篇文章再和你详细介绍。</p><p>其实还是有不少其他情况会导致主备延迟，如果你还碰到过其他场景，欢迎你在评论区给我留言，我来和你一起分析、讨论。</p><p>由于主备延迟的存在，所以在主备切换的时候，就相应的有不同的策略。</p><h1>可靠性优先策略</h1><p>在图1的双M结构下，从状态1到状态2切换的详细过程是这样的：</p><ol>
+<li>
+<p>判断备库B现在的seconds_behind_master，如果小于某个值（比如5秒）继续下一步，否则持续重试这一步；</p>
+</li>
+<li>
+<p>把主库A改成只读状态，即把readonly设置为true；</p>
+</li>
+<li>
+<p>判断备库B的seconds_behind_master的值，直到这个值变成0为止；</p>
+</li>
+<li>
+<p>把备库B改成可读写状态，也就是把readonly 设置为false；</p>
+</li>
+<li>
+<p>把业务请求切到备库B。</p>
+</li>
+</ol><p>这个切换流程，一般是由专门的HA系统来完成的，我们暂时称之为可靠性优先流程。</p><p><img src="https://static001.geekbang.org/resource/image/54/4a/54f4c7c31e6f0f807c2ab77f78c8844a.png" alt=""></p><center><span class="reference">图2 MySQL可靠性优先主备切换流程</span></center><p>备注：图中的SBM，是seconds_behind_master参数的简写。</p><p>可以看到，这个切换流程中是有不可用时间的。因为在步骤2之后，主库A和备库B都处于readonly状态，也就是说这时系统处于不可写状态，直到步骤5完成后才能恢复。</p><p>在这个不可用状态中，比较耗费时间的是步骤3，可能需要耗费好几秒的时间。这也是为什么需要在步骤1先做判断，确保seconds_behind_master的值足够小。</p><p>试想如果一开始主备延迟就长达30分钟，而不先做判断直接切换的话，系统的不可用时间就会长达30分钟，这种情况一般业务都是不可接受的。</p><p>当然，系统的不可用时间，是由这个数据可靠性优先的策略决定的。你也可以选择可用性优先的策略，来把这个不可用时间几乎降为0。</p><h1>可用性优先策略</h1><p>如果我强行把步骤4、5调整到最开始执行，也就是说不等主备数据同步，直接把连接切到备库B，并且让备库B可以读写，那么系统几乎就没有不可用时间了。</p><p>我们把这个切换流程，暂时称作可用性优先流程。这个切换流程的代价，就是可能出现数据不一致的情况。</p><p>接下来，我就和你分享一个可用性优先流程产生数据不一致的例子。假设有一个表 t：</p><pre><code>mysql&gt; CREATE TABLE `t` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `c` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+insert into t(c) values(1),(2),(3);
+</code></pre><p>这个表定义了一个自增主键id，初始化数据后，主库和备库上都是3行数据。接下来，业务人员要继续在表t上执行两条插入语句的命令，依次是：</p><pre><code>insert into t(c) values(4);
+insert into t(c) values(5);
+</code></pre><p>假设，现在主库上其他的数据表有大量的更新，导致主备延迟达到5秒。在插入一条c=4的语句后，发起了主备切换。</p><p>图3是<strong>可用性优先策略，且binlog_format=mixed</strong>时的切换流程和数据结果。</p><p><img src="https://static001.geekbang.org/resource/image/37/3a/3786bd6ad37faa34aca25bf1a1d8af3a.png" alt=""></p><center><span class="reference">图3 可用性优先策略，且binlog_format=mixed</span></center><p>现在，我们一起分析下这个切换流程：</p><ol>
+<li>
+<p>步骤2中，主库A执行完insert语句，插入了一行数据（4,4），之后开始进行主备切换。</p>
+</li>
+<li>
+<p>步骤3中，由于主备之间有5秒的延迟，所以备库B还没来得及应用“插入c=4”这个中转日志，就开始接收客户端“插入 c=5”的命令。</p>
+</li>
+<li>
+<p>步骤4中，备库B插入了一行数据（4,5），并且把这个binlog发给主库A。</p>
+</li>
+<li>
+<p>步骤5中，备库B执行“插入c=4”这个中转日志，插入了一行数据（5,4）。而直接在备库B执行的“插入c=5”这个语句，传到主库A，就插入了一行新数据（5,5）。</p>
+</li>
+</ol><p>最后的结果就是，主库A和备库B上出现了两行不一致的数据。可以看到，这个数据不一致，是由可用性优先流程导致的。</p><p>那么，如果我还是用<strong>可用性优先策略，但设置binlog_format=row</strong>，情况又会怎样呢？</p><p>因为row格式在记录binlog的时候，会记录新插入的行的所有字段值，所以最后只会有一行不一致。而且，两边的主备同步的应用线程会报错duplicate key error并停止。也就是说，这种情况下，备库B的(5,4)和主库A的(5,5)这两行数据，都不会被对方执行。</p><p>图4中我画出了详细过程，你可以自己再分析一下。</p><p><img src="https://static001.geekbang.org/resource/image/b8/43/b8d2229b2b40dd087fd3b111d1bdda43.png" alt=""></p><center><span class="reference">图4 可用性优先策略，且binlog_format=row</span></center><p>从上面的分析中，你可以看到一些结论：</p><ol>
+<li>
+<p>使用row格式的binlog时，数据不一致的问题更容易被发现。而使用mixed或者statement格式的binlog时，数据很可能悄悄地就不一致了。如果你过了很久才发现数据不一致的问题，很可能这时的数据不一致已经不可查，或者连带造成了更多的数据逻辑不一致。</p>
+</li>
+<li>
+<p>主备切换的可用性优先策略会导致数据不一致。因此，大多数情况下，我都建议你使用可靠性优先策略。毕竟对数据服务来说的话，数据的可靠性一般还是要优于可用性的。</p>
+</li>
+</ol><p>但事无绝对，<strong>有没有哪种情况数据的可用性优先级更高呢？</strong></p><p>答案是，有的。</p><p>我曾经碰到过这样的一个场景：</p><ul>
+<li>有一个库的作用是记录操作日志。这时候，如果数据不一致可以通过binlog来修补，而这个短暂的不一致也不会引发业务问题。</li>
+<li>同时，业务系统依赖于这个日志写入逻辑，如果这个库不可写，会导致线上的业务操作无法执行。</li>
+</ul><p>这时候，你可能就需要选择先强行切换，事后再补数据的策略。</p><p>当然，事后复盘的时候，我们想到了一个改进措施就是，让业务逻辑不要依赖于这类日志的写入。也就是说，日志写入这个逻辑模块应该可以降级，比如写到本地文件，或者写到另外一个临时库里面。</p><p>这样的话，这种场景就又可以使用可靠性优先策略了。</p><p>接下来我们再看看，<strong>按照可靠性优先的思路，异常切换会是什么效果？</strong></p><p>假设，主库A和备库B间的主备延迟是30分钟，这时候主库A掉电了，HA系统要切换B作为主库。我们在主动切换的时候，可以等到主备延迟小于5秒的时候再启动切换，但这时候已经别无选择了。</p><p><img src="https://static001.geekbang.org/resource/image/55/8b/553b7fc2d0dce3ec78bb595e1806eb8b.png" alt=""></p><center><span class="reference">图5 可靠性优先策略，主库不可用</span></center><p>采用可靠性优先策略的话，你就必须得等到备库B的seconds_behind_master=0之后，才能切换。但现在的情况比刚刚更严重，并不是系统只读、不可写的问题了，而是系统处于完全不可用的状态。因为，主库A掉电后，我们的连接还没有切到备库B。</p><p>你可能会问，那能不能直接切换到备库B，但是保持B只读呢？</p><p>这样也不行。</p><p>因为，这段时间内，中转日志还没有应用完成，如果直接发起主备切换，客户端查询看不到之前执行完成的事务，会认为有“数据丢失”。</p><p>虽然随着中转日志的继续应用，这些数据会恢复回来，但是对于一些业务来说，查询到“暂时丢失数据的状态”也是不能被接受的。</p><p>聊到这里你就知道了，在满足数据可靠性的前提下，MySQL高可用系统的可用性，是依赖于主备延迟的。延迟的时间越小，在主库故障的时候，服务恢复需要的时间就越短，可用性就越高。</p><h1>小结</h1><p>今天这篇文章，我先和你介绍了MySQL高可用系统的基础，就是主备切换逻辑。紧接着，我又和你讨论了几种会导致主备延迟的情况，以及相应的改进方向。</p><p>然后，由于主备延迟的存在，切换策略就有不同的选择。所以，我又和你一起分析了可靠性优先和可用性优先策略的区别。</p><p>在实际的应用中，我更建议使用可靠性优先的策略。毕竟保证数据准确，应该是数据库服务的底线。在这个基础上，通过减少主备延迟，提升系统的可用性。</p><p>最后，我给你留下一个思考题吧。</p><p>一般现在的数据库运维系统都有备库延迟监控，其实就是在备库上执行 show slave status，采集seconds_behind_master的值。</p><p>假设，现在你看到你维护的一个备库，它的延迟监控的图像类似图6，是一个45°斜向上的线段，你觉得可能是什么原因导致呢？你又会怎么去确认这个原因呢？</p><p><img src="https://static001.geekbang.org/resource/image/cf/71/cf5ea52aa3b26ef56c567125197fa171.png" alt=""></p><center><span class="reference">图6 备库延迟</span></center><p>你可以把你的分析写在评论区，我会在下一篇文章的末尾跟你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><h1>上期问题时间</h1><p>上期我留给你的问题是，什么情况下双M结构会出现循环复制。</p><p>一种场景是，在一个主库更新事务后，用命令set global server_id=x修改了server_id。等日志再传回来的时候，发现server_id跟自己的server_id不同，就只能执行了。</p><p>另一种场景是，有三个节点的时候，如图7所示，trx1是在节点 B执行的，因此binlog上的server_id就是B，binlog传给节点 A，然后A和A’搭建了双M结构，就会出现循环复制。</p><p><img src="https://static001.geekbang.org/resource/image/f9/71/f968192ce2f436c939dd702b8f409771.png" alt=""></p><center><span class="reference">图7 三节点循环复制</span></center><p>这种三节点复制的场景，做数据库迁移的时候会出现。</p><p>如果出现了循环复制，可以在A或者A’上，执行如下命令：</p><pre><code>stop slave；
+CHANGE MASTER TO IGNORE_SERVER_IDS=(server_id_of_B);
+start slave;
+</code></pre><p>这样这个节点收到日志后就不会再执行。过一段时间后，再执行下面的命令把这个值改回来。</p><pre><code>stop slave；
+CHANGE MASTER TO IGNORE_SERVER_IDS=();
+start slave;
+</code></pre><p>评论区留言点赞板：</p><blockquote>
+<p>@一大只、@HuaMax 同学提到了第一个复现方法；</p>
+</blockquote><blockquote>
+<p>@Jonh同学提到了IGNORE_SERVER_IDS这个解决方法；</p>
+</blockquote><blockquote>
+<p>@React 提到，如果主备设置不同的步长，备库是不是可以设置为可读写。我的建议是，只要这个节点设计内就不会有业务直接在上面执行更新，就建议设置为readonly。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/09/77/09c1073f99cf71d2fb162a716b5fa577.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f8/70/f3a33a14.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">某、人</span>
+                            </div>
+                            <div class="bd">遇到过下面几种造成主从延迟的情况:<br>1.主库DML语句并发大,从库qps高<br>2.从库服务器配置差或者一台服务器上几台从库(资源竞争激烈,特别是io)<br>3.主库和从库的参数配置不一样<br>4.大事务(DDL,我觉得DDL也相当于一个大事务)<br>5.从库上在进行备份操作<br>6.表上无主键的情况(主库利用索引更改数据,备库回放只能用全表扫描,这种情况可以调整slave_rows_search_algorithms参数适当优化下)<br>7.设置的是延迟备库<br>8.备库空间不足的情况下<br><br>这期的问题：<br>看这曲线,应该是从库正在应用一个大事务,或者一个大表上无主键的情况(有该表的更新)<br>应该是T3随着时间的增长在增长,而T1这个时间点是没变的,造成的现象就是<br>随着时间的增长,second_behind_master也是有规律的增长 <br></div>
+                            <span class="time">2019-01-10 21:46</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">分析的点很准确</p>
+                                <p class="reply-time">2019-01-11 01:18</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/4f/78/c3d8ecb0.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">undifined</span>
+                            </div>
+                            <div class="bd">问题答案：<br>1. 备库在执行复杂查询，导致资源被占用<br>2. 备库正在执行一个大事务<br>3. DML 语句执行<br><br>老师我的理解对吗 <br></div>
+                            <span class="time">2019-01-09 20:52</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1不太准确，明天我会提到哈<br><br>23对的</p>
+                                <p class="reply-time">2019-01-09 22:05</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/1e/47/f01225df.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">7号</span>
+                            </div>
+                            <div class="bd">老师，生产环境有一张表需要清理，该表大小140G。要保留最近一个月的数据，又不能按时间直接用detele删（全表扫描），本来想通过清空分区表删，但是分区表又是哈希的。。有没好的办法呢？ <br></div>
+                            <span class="time">2019-01-09 19:42</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">估计下一个月占多少比例，如果比较小就建新表，把数据导过去吧<br>如果一个月占比高的话，只能一点点删了。<br><br>时间字段有索引的话，每个分区按时间过滤出来删除</p>
+                                <p class="reply-time">2019-01-09 22:07</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/5c/c5/1231d633.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">梁中华</span>
+                            </div>
+                            <div class="bd">我有一个比较极端一点的HA问题，假设主库的binlog刚写成功还未来得及把binlog同步到从库，主库就掉电了，这时候从库的数据会不完整吗？<br>第二个问题，原主库重启加入集群后，那条没有传出去的binlog会如何处理？ <br></div>
+                            <span class="time">2019-01-09 10:43</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1.可能会丢<br>2. 要看重启之后的拓扑结构了，如果还有节点是这个库的从库，还是会拿走的</p>
+                                <p class="reply-time">2019-01-09 12:49</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/16/97/9e342700.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username"> JJ</span>
+                            </div>
+                            <div class="bd">请问老师，主库断电了，怎么把binlog传给从库同步数据，怎么使的SBM为0主从切换呢？ <br></div>
+                            <span class="time">2019-01-09 09:10</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">等应用完就认为是SBM=0<br><br>如果不能接受主库有来不及传的，就使用semi-sync</p>
+                                <p class="reply-time">2019-01-09 10:39</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/87/60/fe8a31ea.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">via</span>
+                            </div>
+                            <div class="bd">通过 binlog 输出到外部系统，比如 Hadoop 这类...<br><br>文中这个具体是可采用什么工具呢？<br>  <br></div>
+                            <span class="time">2019-01-09 08:53</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">canal 可以了解下</p>
+                                <p class="reply-time">2019-01-10 19:19</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJAibnPX9jW8kqLcIfibjic8GbkQkEUYyFKJkc39hZhibVlNrqwTjdLozkqibI2IwACd5YzofYickNxFnZg/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Sinyo</span>
+                            </div>
+                            <div class="bd">老师，在 binlog row模式下，insert 到表中一条记录，这条记录中某个字段不填，该字段在表中有设置默认值，利用canal解析binlog出来，这个不填的字段会不存在；难道 binlog 只记录有插入的字段数据，表字段的默认数据就不会记录么？mysql版本5.7.22 canal版本1.0.3 <br></div>
+                            <span class="time">2019-01-09 00:37</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">不会啊<br>insert记录的时候肯定都记录的<br>你的默认值是什么？</p>
+                                <p class="reply-time">2019-01-10 19:16</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJJeibN69icI9iapx9h2MtUX3zb2iaggw32w4GAmbUDibPp3ia5MPSznxGZeiadXibBbx6Y13iacDbTDBwKyibA/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">qq悟空</span>
+                            </div>
+                            <div class="bd">老师文章末尾思考题部分，有点困惑求解答。<br>循环复制我之前理解是B-&gt;A-&gt;A&#39;-&gt;B这样的拓扑结构。<br>而双M结构理解是A-&gt;A&#39;-&gt;A，此时A是A&#39;的主库和从库，B只能是A的从库。那么trx1在从库B上的更新就不会传给A。<br>文中是一种假设吗？还是我理解偏差了 ~<br><br>--------正文--------<br>trx1 是在节点 B 执行的，因此 binlog 上的 server_id 就是 B，binlog 传给节点 A，然后A 和 A’搭建了双 M 结构，就会出现循环复制。 <br></div>
+                            <span class="time">2019-01-12 16:32</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">这个说的是迁移过程，<br>也就是说，一开始A是B的从库，后来迁移过程中，停止了A和B的主备关系，让A和A&#39;互为主备</p>
+                                <p class="reply-time">2019-01-12 19:37</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/99/f4/a06982f7.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">崔伟协</span>
+                            </div>
+                            <div class="bd">发生主从切换的时候，主有的最新数据没同步到从，会出现这种情况吗，出现了会怎么样 <br></div>
+                            <span class="time">2019-01-11 14:25</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">异常切换有可能的<br><br>要根据你的处理策略了，如果不能丢，有几个可选的<br>1.不切换（等这个库自己恢复起来）<br>2. 使用semi-sync策略<br>3. 启动后业务做数据对账（这个一般用得少，成本高）<br></p>
+                                <p class="reply-time">2019-01-11 15:06</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/d8/d6/47da34bf.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">任鹏斌</span>
+                            </div>
+                            <div class="bd">老师好发现我们系统中一条sql写法比较独特<br>SELECT<br>    IF(ha.curricula_type = &#39;02&#39;<br>            AND ((cla.model_code IN (&#39;CM05004&#39; , &#39;CM05001&#39;)<br>            AND cla.is_vip_video = 1)<br>            OR cla.model_code = &#39;CM05008&#39;),<br>        &#39;1&#39;,<br>        &#39;0&#39;) AS &#39;isUK&#39;<br>FROM<br>    h_curricula ha,<br>    h_class cla<br>WHERE<br>    ha.`code` = &#39;2&#39; <br>	AND cla.`code` =&#39;2&#39; <br>使用查询分析器后所有列都无信息显示，只在Extra列显示，<br>Impossible WHERE noticed after reading const tables，不知道如何分析其执行计划。<br>如果code列均为两个表的主键类型是varchar，想知道这种情况下是否会产生笛卡尔积？ <br></div>
+                            <span class="time">2019-01-11 09:24</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">Impossible WHERE noticed after reading const tables<br><br>这个语句是不是执行结果是空？</p>
+                                <p class="reply-time">2019-01-11 11:47</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/2b/d3/7c42e06c.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">康磊</span>
+                            </div>
+                            <div class="bd">老师你好，现在一般采用读写分离，读的是从库，那么主从如果出现延迟的话，读库就读的不是最新数据，对这种问题有什么好建议吗？ <br></div>
+                            <span class="time">2019-01-11 09:00</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">第28篇专门讲这个问题，敬请期待</p>
+                                <p class="reply-time">2019-01-11 11:11</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/8a/a8/cf86fe53.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">cyberty</span>
+                            </div>
+                            <div class="bd">请问老师，如果备库连接主库之后，主库的系统时间修改了，备库同步的时候是否会自动修正？ <br></div>
+                            <span class="time">2019-01-10 13:19</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">好问题，不会</p>
+                                <p class="reply-time">2019-01-10 23:33</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/19/cb/70a2b47e.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">风萧雨瑟</span>
+                            </div>
+                            <div class="bd">老师问一下集群在开启并行复制的情况下：<br>主库参数：binlog_group_commit_sync_delay=1000；binlog_group_commit_sync_no_delay_count=10<br>从库：slave_parallel_type=LOGICAL_CLOCK；slave_parallel_workers=8<br>MySQL：社区版5.7.20<br>在从库上查看slave status的时Seconds_Behind_Master总是显示落后10-15，在有大量更新的情况下数据会一直增大，通过binlog来看的话Read_Master_Log_Pos 和Exec_Master_Log_Pos相差总是在1000+，甚至变大的更大。但将slave_parallel_type更改回默认值DATABASE时，Read_Master_Log_Pos 和Exec_Master_Log_Pos相差很小，甚至可以相同。<br>在不同的集群上开启并行复制都会出现相同的情况，但将slave_parallel_type更改回默认值DATABASE时都要比LOGICAL_CLOCK延迟情况要好。<br>更换5.7.24版本的情况下有同样的问题。<br>如果有两台从库，机器配置相同其它参数一样。一台设置成slave_parallel_type=DATABASE。而另一台设置成LOGICAL_CLOCK，不管是线上的表现还是通过sysbench压测来看，设置成LOGICAL_CLOCK的从库延迟确实要比DATABASE大一些。<br>这个情况从哪里排查一下？谢谢。<br> <br></div>
+                            <span class="time">2019-01-10 11:09</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">先看看26篇，然后再下面留下你的理解和新的疑问哈</p>
+                                <p class="reply-time">2019-01-10 23:32</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/23/98/bd96932f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">xm</span>
+                            </div>
+                            <div class="bd">一般主从延时多少算是合理的？是秒级别吗？ <br></div>
+                            <span class="time">2019-01-10 11:09</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">一般大于1就不好 ^_^</p>
+                                <p class="reply-time">2019-01-10 23:30</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f4/61/cfdd9e55.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Chris</span>
+                            </div>
+                            <div class="bd">老师，咨询个问题，现在遇到一个问题，mysql数据库总是crash，重新启动服务又正常，然后运行一段时间又会crash，报错如下InnoDB: Assertion failure in thread 6792 in file fil0fil.cc line 5805<br>InnoDB: Failing assertion: err == DB_SUCCESS<br>InnoDB: We intentionally generate a memory trap.<br>InnoDB: Submit a detailed bug report to http:&#47;&#47;bugs.mysql.com.<br>InnoDB: If you get repeated assertion failures or crashes, even<br>InnoDB: immediately after the mysqld startup, there may be<br>InnoDB: corruption in the InnoDB tablespace. Please refer to<br>InnoDB: http:&#47;&#47;dev.mysql.com&#47;doc&#47;refman&#47;5.7&#47;en&#47;forcing-innodb-recovery.html<br>InnoDB: about forcing recovery.<br>08:52:33 UTC - mysqld got exception 0x80000003 ;<br>This could be because you hit a bug. It is also possible that this binary<br>or one of the libraries it was linked against is corrupt, improperly built,<br>or misconfigured. This error can also be caused by malfunctioning hardware.<br>Attempting to collect some information that could help diagnose the problem.<br>As this is a crash and something is definitely wrong, the information<br>collection process might fail.<br><br>key_buffer_size=8388608<br>read_buffer_size=131072<br>max_used_connections=60<br>max_threads=151<br>thread_count=45<br>connection_count=45<br>It is possible that mysqld could use up to <br>key_buffer_size + (read_buffer_size + sort_buffer_size)*max_threads = 68010 K  bytes of memory<br>Hope that&#39;s ok; if not, decrease some variables in the equation.<br><br>Thread pointer: 0x0<br>Attempting backtrace. You can use the following information to find out<br>where mysqld died. If you see no messages after this, something went<br>terribly wrong...<br>13f9b9812    mysqld.exe!my_sigabrt_handler()[my_thr_init.c:449]<br>13fd5e349    mysqld.exe!raise()[winsig.c:587]<br>13fd5d240    mysqld.exe!abort()[abort.c:82]<br>13fab9b08    mysqld.exe!ut_dbg_assertion_failed()[ut0dbg.cc:67]<br>13fae06da    mysqld.exe!fil_aio_wait()[fil0fil.cc:5807]<br>13fa7eb84    mysqld.exe!io_handler_thread()<br>The manual page at http:&#47;&#47;dev.mysql.com&#47;doc&#47;mysql&#47;en&#47;crashing. <br></div>
+                            <span class="time">2019-01-10 11:08</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">看着好像是磁盘问题了，你这个是5.7的哪个小版本？<br>还有，尽量不要用windows系统哦</p>
+                                <p class="reply-time">2019-01-11 01:18</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/23/98/bd96932f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">xm</span>
+                            </div>
+                            <div class="bd">老师好，如果是主库的qps上来了，主库写请求太多这种造成的延迟的话是不是从主库上下手好点？这种是做热数据隔离主库拆分？ <br></div>
+                            <span class="time">2019-01-10 11:06</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">就是要看还有没有救，如果各种方法都没救了，就只能主库分库了<br><br></p>
+                                <p class="reply-time">2019-01-11 01:15</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">考拉出山</span>
+                            </div>
+                            <div class="bd">你好，想问几个不明了的与平时遇到的问题：<br>CREATE TABLE `t_my_user` (<br>  `id` bigint(20) NOT NULL,<br>  `type` int(11) NOT NULL,<br>  `groupType` int(11) NOT NULL,<br>  PRIMARY KEY (`id`),<br>  UNIQUE KEY `unique-type` (`type`) USING BTREE<br>) ENGINE=InnoDB DEFAULT CHARSET=utf8;<br>INSERT INTO t_my_user(`id`, `type`, `groupType`) VALUES (1, 1, 1),(2, 2, 2),(3, 3, 3);<br><br>RC事务隔离级别<br>(session-A)begin;<br>(session-B)begin;<br>(session-A)update t_my_user set type = 4 where type =2;<br>(session-B) delete from t_my_user where groupType = 6;<br>结果是session-B 处于fetching rows  LOCK WAIT 等待session-A;<br>问题1：mysql delete是会扫描记录加锁然后过滤适配记录再释放X锁吗？是一次性全表先加X锁，还是一边逐行扫描加锁，然后过滤，释放？为什么扫描过滤不先加S锁，发现满足条件再变为X锁呢。<br>问题2：session-B换成(delete from t_my_user where groupType = 6;) 则不会阻塞，除非命中记录，update不需要加锁过滤？<br><br>(session-A)begin;<br>select * from t_my_user where type = 2 lock in SHARE mode;<br>update t_my_user set type = 4 where type =2;<br>结果是顺利执行；<br>问题3：第一步获取了S锁，第二部获取了X锁，这个过程是怎么样的呢？ S锁升级为X锁？还是先释放S锁，再获取X锁，难道不用提交事务也可以释放锁吗？<br><br>(session-A)begin;<br>(session-B)begin;<br>(session-C)begin;<br>(session-A)INSERT INTO t_my_user(`id`, `type`, `groupType`) VALUES (4, 4, 4);<br>(session-B)INSERT INTO t_my_user(`id`, `type`, `groupType`) VALUES (5, 4, 4);<br>(session-C)INSERT INTO t_my_user(`id`, `type`, `groupType`) VALUES (6, 4, 4);<br>结果是：session-A 执行  session-B&#47;session-C Lock Mode S  Lock Wait X ,等待session-A；<br>官方文档有如下解释“If a duplicate-key error occurs, a shared lock on the duplicate index record is set.”；<br>为什么要添加S锁呢？没有找到相关解释。网上有解释说是插入语句会先在唯一索引上添加S锁进行唯一性检查，再变为X锁？ 还是只有在“duplicate-key error occurs”才会尝试添加S锁<br> <br></div>
+                            <span class="time">2019-01-10 10:44</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. 因为groupType没有索引，所以全表扫描，并在primary key上加上所有next-key lock，所以会在锁id=2这一行，被锁住；<br>2. 是不是打错了？delete from t_my_user where type = 6; 能通过，是因为这个语句锁的是 type这个索引上(2, suprenum)，这个没有锁冲突<br>3. 这样的情况下两个锁都还在，都在事务提交的时候释放。是在“duplicate-key error occurs”才会尝试添加S锁。</p>
+                                <p class="reply-time">2019-01-10 23:30</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/9a/0a/6c74e932.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">光</span>
+                            </div>
+                            <div class="bd">老师请教个问题我们公司现在用得阿里云mysql  ，昨天下午开始了延迟，排查发现有大事务更新操作。<br>现在怎么解决这个大事务呢。<br>1、如果我主库上删除这个表或者从库上删除这个表会有什么结果。<br>2、比如我主库上三个表1、2、3，只同步了1，没同步完时候删除了2、3表，这时候会有什么错误。<br>3、Waiting for Slave Workers to free pending events 这个是代表什么意思<br>4、mysql tables in use 1, locked 1<br>     6045 lock struct(s), heap size 549072, 159972 row lock(s), undo log entries 159972<br>      MySQL thread id 3, OS thread handle 47532738873088, query id 165269 Executing event<br>这个是锁表了把。能简单解释下呢。我查资料不是很明白。<br>5、这个事务是不是只能等。或者是重建主从。<br> <br></div>
+                            <span class="time">2019-01-10 10:28</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. 主库上删除，对延迟没有任何影响的，还是得等从库同步完成之后，再执行“删表”这个动作；<br>   备库的话，如果这个语句已经在执行了，你执行的drop table是会被堵住的，所以对延迟也无益；<br>2. 说的是主库删除还是备库删除？<br>3. 表示从库上的工作线程的等待队列太多了<br>4. 不是锁表，就是锁了太多行了；<br>5. 如果你真的可以重建表的话，操作上可以这样。 <br>    a) 备库上stop slave<br>    b) 备库上 set sql_log_bin=off; truncate table t;<br>    c）备库上跳过这个事务（方法后面文章会说）<br></p>
+                                <p class="reply-time">2019-01-10 19:58</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/f2/63/1f495e51.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">nero</span>
+                            </div>
+                            <div class="bd">老师请教下：备库连接到主库的时候，会通过执行 SELECT UNIX_TIMESTAMP() 函数来获得当前主库的系统时间。这个时间也不是很准确吧，没有网络延时吗<br> <br></div>
+                            <span class="time">2019-01-10 10:22</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">单位是秒，应该还好啦^_^</p>
+                                <p class="reply-time">2019-01-10 19:51</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/79/b7/989824f7.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">春困秋乏夏打盹</span>
+                            </div>
+                            <div class="bd">(Master_Log_file, Read_Master_Log_Pos): Coordinates in the master binary log indicating how far the slave I&#47;O thread has read events from that log.	<br>(Relay_Master_Log_File, Exec_Master_Log_Pos): Coordinates in the master binary log indicating how far the slave SQL thread has executed events received from that log.<br>(Relay_Log_File, Relay_Log_Pos): Coordinates in the slave relay log indicating how far the slave SQL thread has executed the relay log. These correspond to the preceding coordinates, but are<br>expressed in slave relay log coordinates rather than master binary log coordinates.	<br>清楚了 <br></div>
+                            <span class="time">2019-01-10 09:49</span>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

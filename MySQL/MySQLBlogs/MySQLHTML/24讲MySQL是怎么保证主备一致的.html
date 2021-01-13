@@ -1,0 +1,531 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                24讲MySQL是怎么保证主备一致的
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/4b/9a/4b14443b3291b2afa40124ae0b8ed29a.jpg">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>在前面的文章中，我不止一次地和你提到了binlog，大家知道binlog可以用来归档，也可以用来做主备同步，但它的内容是什么样的呢？为什么备库执行了binlog就可以跟主库保持一致了呢？今天我就正式地和你介绍一下它。</p><p>毫不夸张地说，MySQL能够成为现下最流行的开源数据库，binlog功不可没。</p><p>在最开始，MySQL是以容易学习和方便的高可用架构，被开发人员青睐的。而它的几乎所有的高可用架构，都直接依赖于binlog。虽然这些高可用架构已经呈现出越来越复杂的趋势，但都是从最基本的一主一备演化过来的。</p><p>今天这篇文章我主要为你介绍主备的基本原理。理解了背后的设计原理，你也可以从业务开发的角度，来借鉴这些设计思想。</p><h1>MySQL主备的基本原理</h1><p>如图1所示就是基本的主备切换流程。</p><p><img src="https://static001.geekbang.org/resource/image/fd/10/fd75a2b37ae6ca709b7f16fe060c2c10.png" alt=""></p><center><span class="reference">图 1 MySQL主备切换流程</span></center><p>在状态1中，客户端的读写都直接访问节点A，而节点B是A的备库，只是将A的更新都同步过来，到本地执行。这样可以保持节点B和A的数据是相同的。</p><p>当需要切换的时候，就切成状态2。这时候客户端读写访问的都是节点B，而节点A是B的备库。</p><p>在状态1中，虽然节点B没有被直接访问，但是我依然建议你把节点B（也就是备库）设置成只读（readonly）模式。这样做，有以下几个考虑：</p><!-- [[[read_end]]] --><ol>
+<li>
+<p>有时候一些运营类的查询语句会被放到备库上去查，设置为只读可以防止误操作；</p>
+</li>
+<li>
+<p>防止切换逻辑有bug，比如切换过程中出现双写，造成主备不一致；</p>
+</li>
+<li>
+<p>可以用readonly状态，来判断节点的角色。</p>
+</li>
+</ol><p>你可能会问，我把备库设置成只读了，还怎么跟主库保持同步更新呢？</p><p>这个问题，你不用担心。因为readonly设置对超级(super)权限用户是无效的，而用于同步更新的线程，就拥有超级权限。</p><p>接下来，我们再看看<strong>节点A到B这条线的内部流程是什么样的</strong>。图2中画出的就是一个update语句在节点A执行，然后同步到节点B的完整流程图。</p><p><img src="https://static001.geekbang.org/resource/image/a6/a3/a66c154c1bc51e071dd2cc8c1d6ca6a3.png" alt=""></p><center><span class="reference">图2 主备流程图</span></center><p>图2中，包含了我在上一篇文章中讲到的binlog和redo log的写入机制相关的内容，可以看到：主库接收到客户端的更新请求后，执行内部事务的更新逻辑，同时写binlog。</p><p>备库B跟主库A之间维持了一个长连接。主库A内部有一个线程，专门用于服务备库B的这个长连接。一个事务日志同步的完整过程是这样的：</p><ol>
+<li>
+<p>在备库B上通过change master命令，设置主库A的IP、端口、用户名、密码，以及要从哪个位置开始请求binlog，这个位置包含文件名和日志偏移量。</p>
+</li>
+<li>
+<p>在备库B上执行start slave命令，这时候备库会启动两个线程，就是图中的io_thread和sql_thread。其中io_thread负责与主库建立连接。</p>
+</li>
+<li>
+<p>主库A校验完用户名、密码后，开始按照备库B传过来的位置，从本地读取binlog，发给B。</p>
+</li>
+<li>
+<p>备库B拿到binlog后，写到本地文件，称为中转日志（relay log）。</p>
+</li>
+<li>
+<p>sql_thread读取中转日志，解析出日志里的命令，并执行。</p>
+</li>
+</ol><p>这里需要说明，后来由于多线程复制方案的引入，sql_thread演化成为了多个线程，跟我们今天要介绍的原理没有直接关系，暂且不展开。</p><p>分析完了这个长连接的逻辑，我们再来看一个问题：binlog里面到底是什么内容，为什么备库拿过去可以直接执行。</p><h1>binlog的三种格式对比</h1><p>我在<a href="https://time.geekbang.org/column/article/73161">第15篇答疑文章</a>中，和你提到过binlog有两种格式，一种是statement，一种是row。可能你在其他资料上还会看到有第三种格式，叫作mixed，其实它就是前两种格式的混合。</p><p>为了便于描述binlog的这三种格式间的区别，我创建了一个表，并初始化几行数据。</p><pre><code>mysql&gt; CREATE TABLE `t` (
+  `id` int(11) NOT NULL,
+  `a` int(11) DEFAULT NULL,
+  `t_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `a` (`a`),
+  KEY `t_modified`(`t_modified`)
+) ENGINE=InnoDB;
+
+insert into t values(1,1,'2018-11-13');
+insert into t values(2,2,'2018-11-12');
+insert into t values(3,3,'2018-11-11');
+insert into t values(4,4,'2018-11-10');
+insert into t values(5,5,'2018-11-09');
+</code></pre><p>如果要在表中删除一行数据的话，我们来看看这个delete语句的binlog是怎么记录的。</p><p>注意，下面这个语句包含注释，如果你用MySQL客户端来做这个实验的话，要记得加-c参数，否则客户端会自动去掉注释。</p><pre><code>mysql&gt; delete from t /*comment*/  where a&gt;=4 and t_modified&lt;='2018-11-10' limit 1;
+</code></pre><p>当binlog_format=statement时，binlog里面记录的就是SQL语句的原文。你可以用</p><pre><code>mysql&gt; show binlog events in 'master.000001';
+</code></pre><p>命令看binlog中的内容。</p><p><img src="https://static001.geekbang.org/resource/image/b9/31/b9818f73cd7d38a96ddcb75350b52931.png" alt=""></p><center><span class="reference">图3 statement格式binlog 示例</span></center><p>现在，我们来看一下图3的输出结果。</p><ul>
+<li>第一行SET @@SESSION.GTID_NEXT='ANONYMOUS’你可以先忽略，后面文章我们会在介绍主备切换的时候再提到；</li>
+<li>第二行是一个BEGIN，跟第四行的commit对应，表示中间是一个事务；</li>
+<li>第三行就是真实执行的语句了。可以看到，在真实执行的delete命令之前，还有一个“use ‘test’”命令。这条命令不是我们主动执行的，而是MySQL根据当前要操作的表所在的数据库，自行添加的。这样做可以保证日志传到备库去执行的时候，不论当前的工作线程在哪个库里，都能够正确地更新到test库的表t。<br>
+use 'test’命令之后的delete 语句，就是我们输入的SQL原文了。可以看到，binlog“忠实”地记录了SQL命令，甚至连注释也一并记录了。</li>
+<li>最后一行是一个COMMIT。你可以看到里面写着xid=61。你还记得这个XID是做什么用的吗？如果记忆模糊了，可以再回顾一下<a href="https://time.geekbang.org/column/article/73161">第15篇文章</a>中的相关内容。</li>
+</ul><p>为了说明statement 和 row格式的区别，我们来看一下这条delete命令的执行效果图：</p><p><img src="https://static001.geekbang.org/resource/image/96/2b/96c2be9c0fcbff66883118526b26652b.png" alt=""></p><center><span class="reference">图4 delete执行warnings</span></center><p>可以看到，运行这条delete命令产生了一个warning，原因是当前binlog设置的是statement格式，并且语句中有limit，所以这个命令可能是unsafe的。</p><p>为什么这么说呢？这是因为delete 带limit，很可能会出现主备数据不一致的情况。比如上面这个例子：</p><ol>
+<li>
+<p>如果delete语句使用的是索引a，那么会根据索引a找到第一个满足条件的行，也就是说删除的是a=4这一行；</p>
+</li>
+<li>
+<p>但如果使用的是索引t_modified，那么删除的就是 t_modified='2018-11-09’也就是a=5这一行。</p>
+</li>
+</ol><p>由于statement格式下，记录到binlog里的是语句原文，因此可能会出现这样一种情况：在主库执行这条SQL语句的时候，用的是索引a；而在备库执行这条SQL语句的时候，却使用了索引t_modified。因此，MySQL认为这样写是有风险的。</p><p>那么，如果我把binlog的格式改为binlog_format=‘row’， 是不是就没有这个问题了呢？我们先来看看这时候binog中的内容吧。</p><p><img src="https://static001.geekbang.org/resource/image/d6/26/d67a38db154afff610ae3bb64e266826.png" alt=""></p><center><span class="reference">图5 row格式binlog 示例</span></center><p>可以看到，与statement格式的binlog相比，前后的BEGIN和COMMIT是一样的。但是，row格式的binlog里没有了SQL语句的原文，而是替换成了两个event：Table_map和Delete_rows。</p><ol>
+<li>
+<p>Table_map event，用于说明接下来要操作的表是test库的表t;</p>
+</li>
+<li>
+<p>Delete_rows event，用于定义删除的行为。</p>
+</li>
+</ol><p>其实，我们通过图5是看不到详细信息的，还需要借助mysqlbinlog工具，用下面这个命令解析和查看binlog中的内容。因为图5中的信息显示，这个事务的binlog是从8900这个位置开始的，所以可以用start-position参数来指定从这个位置的日志开始解析。</p><pre><code>mysqlbinlog  -vv data/master.000001 --start-position=8900;
+</code></pre><p><img src="https://static001.geekbang.org/resource/image/c3/c2/c342cf480d23b05d30a294b114cebfc2.png" alt=""></p><center><span class="reference">图6 row格式binlog 示例的详细信息</span></center><p>从这个图中，我们可以看到以下几个信息：</p><ul>
+<li>server id 1，表示这个事务是在server_id=1的这个库上执行的。</li>
+<li>每个event都有CRC32的值，这是因为我把参数binlog_checksum设置成了CRC32。</li>
+<li>Table_map event跟在图5中看到的相同，显示了接下来要打开的表，map到数字226。现在我们这条SQL语句只操作了一张表，如果要操作多张表呢？每个表都有一个对应的Table_map event、都会map到一个单独的数字，用于区分对不同表的操作。</li>
+<li>我们在mysqlbinlog的命令中，使用了-vv参数是为了把内容都解析出来，所以从结果里面可以看到各个字段的值（比如，@1=4、 @2=4这些值）。</li>
+<li>binlog_row_image的默认配置是FULL，因此Delete_event里面，包含了删掉的行的所有字段的值。如果把binlog_row_image设置为MINIMAL，则只会记录必要的信息，在这个例子里，就是只会记录id=4这个信息。</li>
+<li>最后的Xid event，用于表示事务被正确地提交了。</li>
+</ul><p>你可以看到，当binlog_format使用row格式的时候，binlog里面记录了真实删除行的主键id，这样binlog传到备库去的时候，就肯定会删除id=4的行，不会有主备删除不同行的问题。</p><h1>为什么会有mixed格式的binlog？</h1><p>基于上面的信息，我们来讨论一个问题：<strong>为什么会有mixed这种binlog格式的存在场景？</strong>推论过程是这样的：</p><ul>
+<li>因为有些statement格式的binlog可能会导致主备不一致，所以要使用row格式。</li>
+<li>但row格式的缺点是，很占空间。比如你用一个delete语句删掉10万行数据，用statement的话就是一个SQL语句被记录到binlog中，占用几十个字节的空间。但如果用row格式的binlog，就要把这10万条记录都写到binlog中。这样做，不仅会占用更大的空间，同时写binlog也要耗费IO资源，影响执行速度。</li>
+<li>所以，MySQL就取了个折中方案，也就是有了mixed格式的binlog。mixed格式的意思是，MySQL自己会判断这条SQL语句是否可能引起主备不一致，如果有可能，就用row格式，否则就用statement格式。</li>
+</ul><p>也就是说，mixed格式可以利用statment格式的优点，同时又避免了数据不一致的风险。</p><p>因此，如果你的线上MySQL设置的binlog格式是statement的话，那基本上就可以认为这是一个不合理的设置。你至少应该把binlog的格式设置为mixed。</p><p>比如我们这个例子，设置为mixed后，就会记录为row格式；而如果执行的语句去掉limit 1，就会记录为statement格式。</p><p>当然我要说的是，现在越来越多的场景要求把MySQL的binlog格式设置成row。这么做的理由有很多，我来给你举一个可以直接看出来的好处：<strong>恢复数据</strong>。</p><p>接下来，我们就分别从delete、insert和update这三种SQL语句的角度，来看看数据恢复的问题。</p><p>通过图6你可以看出来，即使我执行的是delete语句，row格式的binlog也会把被删掉的行的整行信息保存起来。所以，如果你在执行完一条delete语句以后，发现删错数据了，可以直接把binlog中记录的delete语句转成insert，把被错删的数据插入回去就可以恢复了。</p><p>如果你是执行错了insert语句呢？那就更直接了。row格式下，insert语句的binlog里会记录所有的字段信息，这些信息可以用来精确定位刚刚被插入的那一行。这时，你直接把insert语句转成delete语句，删除掉这被误插入的一行数据就可以了。</p><p>如果执行的是update语句的话，binlog里面会记录修改前整行的数据和修改后的整行数据。所以，如果你误执行了update语句的话，只需要把这个event前后的两行信息对调一下，再去数据库里面执行，就能恢复这个更新操作了。</p><p>其实，由delete、insert或者update语句导致的数据操作错误，需要恢复到操作之前状态的情况，也时有发生。MariaDB的<a href="https://mariadb.com/kb/en/library/flashback/">Flashback</a>工具就是基于上面介绍的原理来回滚数据的。</p><p>虽然mixed格式的binlog现在已经用得不多了，但这里我还是要再借用一下mixed格式来说明一个问题，来看一下这条SQL语句：</p><pre><code>mysql&gt; insert into t values(10,10, now());
+</code></pre><p>如果我们把binlog格式设置为mixed，你觉得MySQL会把它记录为row格式还是statement格式呢？</p><p>先不要着急说结果，我们一起来看一下这条语句执行的效果。</p><p><img src="https://static001.geekbang.org/resource/image/01/ef/0150301698979255a6f27711c35e9eef.png" alt=""></p><center><span class="reference">图7 mixed格式和now()</span></center><p>可以看到，MySQL用的居然是statement格式。你一定会奇怪，如果这个binlog过了1分钟才传给备库的话，那主备的数据不就不一致了吗？</p><p>接下来，我们再用mysqlbinlog工具来看看：</p><p><img src="https://static001.geekbang.org/resource/image/1a/41/1ad3a4c4b9a71955edba5195757dd041.png" alt=""></p><center><span class="reference">图8 TIMESTAMP 命令</span></center><p>从图中的结果可以看到，原来binlog在记录event的时候，多记了一条命令：SET TIMESTAMP=1546103491。它用 SET TIMESTAMP命令约定了接下来的now()函数的返回时间。</p><p>因此，不论这个binlog是1分钟之后被备库执行，还是3天后用来恢复这个库的备份，这个insert语句插入的行，值都是固定的。也就是说，通过这条SET TIMESTAMP命令，MySQL就确保了主备数据的一致性。</p><p>我之前看过有人在重放binlog数据的时候，是这么做的：用mysqlbinlog解析出日志，然后把里面的statement语句直接拷贝出来执行。</p><p>你现在知道了，这个方法是有风险的。因为有些语句的执行结果是依赖于上下文命令的，直接执行的结果很可能是错误的。</p><p>所以，用binlog来恢复数据的标准做法是，用 mysqlbinlog工具解析出来，然后把解析结果整个发给MySQL执行。类似下面的命令：</p><pre><code>mysqlbinlog master.000001  --start-position=2738 --stop-position=2973 | mysql -h127.0.0.1 -P13000 -u$user -p$pwd;
+</code></pre><p>这个命令的意思是，将 master.000001 文件里面从第2738字节到第2973字节中间这段内容解析出来，放到MySQL去执行。</p><h1>循环复制问题</h1><p>通过上面对MySQL中binlog基本内容的理解，你现在可以知道，binlog的特性确保了在备库执行相同的binlog，可以得到与主库相同的状态。</p><p>因此，我们可以认为正常情况下主备的数据是一致的。也就是说，图1中A、B两个节点的内容是一致的。其实，图1中我画的是M-S结构，但实际生产上使用比较多的是双M结构，也就是图9所示的主备切换流程。</p><p><img src="https://static001.geekbang.org/resource/image/20/56/20ad4e163115198dc6cf372d5116c956.png" alt=""></p><center><span class="reference">图 9 MySQL主备切换流程--双M结构</span></center><p>对比图9和图1，你可以发现，双M结构和M-S结构，其实区别只是多了一条线，即：节点A和B之间总是互为主备关系。这样在切换的时候就不用再修改主备关系。</p><p>但是，双M结构还有一个问题需要解决。</p><p>业务逻辑在节点A上更新了一条语句，然后再把生成的binlog 发给节点B，节点B执行完这条更新语句后也会生成binlog。（我建议你把参数log_slave_updates设置为on，表示备库执行relay log后生成binlog）。</p><p>那么，如果节点A同时是节点B的备库，相当于又把节点B新生成的binlog拿过来执行了一次，然后节点A和B间，会不断地循环执行这个更新语句，也就是循环复制了。这个要怎么解决呢？</p><p>从上面的图6中可以看到，MySQL在binlog中记录了这个命令第一次执行时所在实例的server id。因此，我们可以用下面的逻辑，来解决两个节点间的循环复制的问题：</p><ol>
+<li>
+<p>规定两个库的server id必须不同，如果相同，则它们之间不能设定为主备关系；</p>
+</li>
+<li>
+<p>一个备库接到binlog并在重放的过程中，生成与原binlog的server id相同的新的binlog；</p>
+</li>
+<li>
+<p>每个库在收到从自己的主库发过来的日志后，先判断server id，如果跟自己的相同，表示这个日志是自己生成的，就直接丢弃这个日志。</p>
+</li>
+</ol><p>按照这个逻辑，如果我们设置了双M结构，日志的执行流就会变成这样：</p><ol>
+<li>
+<p>从节点A更新的事务，binlog里面记的都是A的server id；</p>
+</li>
+<li>
+<p>传到节点B执行一次以后，节点B生成的binlog 的server id也是A的server id；</p>
+</li>
+<li>
+<p>再传回给节点A，A判断到这个server id与自己的相同，就不会再处理这个日志。所以，死循环在这里就断掉了。</p>
+</li>
+</ol><h1>小结</h1><p>今天这篇文章，我给你介绍了MySQL binlog的格式和一些基本机制，是后面我要介绍的读写分离等系列文章的背景知识，希望你可以认真消化理解。</p><p>binlog在MySQL的各种高可用方案上扮演了重要角色。今天介绍的可以说是所有MySQL高可用方案的基础。在这之上演化出了诸如多节点、半同步、MySQL group replication等相对复杂的方案。</p><p>我也跟你介绍了MySQL不同格式binlog的优缺点，和设计者的思考。希望你在做系统开发时候，也能借鉴这些设计思想。</p><p>最后，我给你留下一个思考题吧。</p><p>说到循环复制问题的时候，我们说MySQL通过判断server id的方式，断掉死循环。但是，这个机制其实并不完备，在某些场景下，还是有可能出现死循环。</p><p>你能构造出一个这样的场景吗？又应该怎么解决呢？</p><p>你可以把你的设计和分析写在评论区，我会在下一篇文章跟你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><h1>上期问题时间</h1><p>上期我留给你的问题是，你在什么时候会把线上生产库设置成“非双1”。我目前知道的场景，有以下这些：</p><ol>
+<li>
+<p>业务高峰期。一般如果有预知的高峰期，DBA会有预案，把主库设置成“非双1”。</p>
+</li>
+<li>
+<p>备库延迟，为了让备库尽快赶上主库。@永恒记忆和@Second Sight提到了这个场景。</p>
+</li>
+<li>
+<p>用备份恢复主库的副本，应用binlog的过程，这个跟上一种场景类似。</p>
+</li>
+<li>
+<p>批量导入数据的时候。</p>
+</li>
+</ol><p>一般情况下，把生产库改成“非双1”配置，是设置innodb_flush_logs_at_trx_commit=2、sync_binlog=1000。</p><p>评论区留言点赞板：</p><blockquote>
+<p>@way 同学提到了一个有趣的现象，由于从库设置了 binlog_group_commit_sync_delay和binlog_group_commit_sync_no_delay_count导致一直延迟的情况。我们在主库设置这两个参数，是为了减少binlog的写盘压力。备库这么设置，尤其在“快要追上”的时候，就反而会受这两个参数的拖累。一般追主备就用“非双1”（追上记得改回来）。</p>
+</blockquote><blockquote>
+<p>@一大只 同学验证了在sync_binlog=0的情况下，设置sync_delay和sync_no_delay_count的现象，点赞这种发现边界的意识和手动验证的好习惯。是这样的：sync_delay和sync_no_delay_count的逻辑先走，因此该等还是会等。等到满足了这两个条件之一，就进入sync_binlog阶段。这时候如果判断sync_binlog=0，就直接跳过，还是不调fsync。</p>
+</blockquote><blockquote>
+<p>@锅子 同学提到，设置sync_binlog=0的时候，还是可以看到binlog文件马上做了修改。这个是对的，我们说“写到了page cache”，就是文件系统的page cache。而你用ls命令看到的就是文件系统返回的结果。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/09/77/09c1073f99cf71d2fb162a716b5fa577.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/84/49/abb7bfe3.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">观弈道人</span>
+                            </div>
+                            <div class="bd">老师你好，问个备份问题，假如周日23点做了备份，周二20点需要恢复数据，那么在用binlog恢复时，如何恰好定位到周日23点的binlog,谢谢。 <br></div>
+                            <span class="time">2019-01-07 07:44</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">Mysqlbinlog有个参数—stop-datetime </p>
+                                <p class="reply-time">2019-01-07 09:55</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/41/27/3ff1a1d6.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">hua168</span>
+                            </div>
+                            <div class="bd">大神，我前些天去面试，面试官问了一题:<br>mysql做主从，一段时间后发现从库在高峰期会发生一两条条数据丢失（不记得是查询行空白还是查询不到了），主从正常，怎么判断？<br>1.我问他是不是所以从库都是一样，他说不一样<br>2.我说低峰期重做新的从库观察，查看日志有没有报错？他好像不满意这个答案。<br><br> 二、他还问主库挂了怎么办？<br>1.  mysql主从+keepalived&#47;heartbeat<br>     有脑裂，还是有前面丢数据问题<br>2. 用MMM或HMA之类<br>3.用ZK之类<br><br>三、写的压力大怎么办？<br>我回答，分库，分表<br><br>感觉整天他都不怎么满意，果然没让我复试了，我郁闷呀，我就面试运维的，问数据这么详细。<br>大神，能说下我哪里有问题吗？现在我都想不明白 <br></div>
+                            <span class="time">2019-01-08 05:49</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">运维现在要求也挺高的<br><br>第一个问题其实我也没看懂，“高峰期丢数据”是指主备延迟查不到数据，还是真的丢了，得先问清楚下<br><br>不过你回答的第二点不太好，低峰期重做这个大家都知道要这么做，而且只是修复动作，没办法用来定位原因，面试官是要问你分析问题的方法（方向错误）<br>重搭从库错误日志里面什么都没有的（这个比较可惜，暴露了对字节不够了解，一般不了解的方法在面试的时候是不如不说的）<br><br>第二个问题三点都是你回答的吗？那还算回答得可以的，但是不能只讲名词，要找个你熟悉细节的方案展开一下<br><br>三方向也是对的<br><br>我估计就是第一个问题减分比较厉害</p>
+                                <p class="reply-time">2019-01-08 11:24</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">堕落天使</span>
+                            </div>
+                            <div class="bd">老师，您好，问一个关于change buffer的问题。<br>对于insert语句来说，change buffer的优化主要在非唯一的二级索引上，因为主键是唯一索引，插入必须要判断是否存在。<br>那么对于update语句呢？如下（假设c有非唯一索引，id是主键，d没有索引）：<br>update t set d=2 where c=10;<br>原先以为：从索引c取出id之后，不会回表，也不会把修改行的数据读入内存，而是直接在change buffer中记录一下。但看了今天得内容之后又迷糊了，因为如果不把修改行的数据读入内存，它又怎么把旧数据写入binlog中呢？<br>所以我想问的就是，上面的sql语句会不会把修改行的内容也读进内存？如果读进内存，那读进内存的这一步难道就为了写binlog吗？如果不读进内存，那binlog中的旧数据又是怎么来的呢？还有delete语句也同理。 <br></div>
+                            <span class="time">2019-01-07 20:53</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">修改的行要读入内存呀<br><br>写binlog只需要主键索引上的值<br><br>你这个语句的话，如果字段c d上都有索引，那么c用不上chsnge buffer,<br>D可能可以同上</p>
+                                <p class="reply-time">2019-01-07 22:06</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/NhbRicjvf8v3K6D3v1FtOicxOciaPZQsCjCmuGCqea4vJeRVaLicKLpAcFQlcTgLvczBWY7SYDkeOtibxXj1PGl7Nug/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">柚子</span>
+                            </div>
+                            <div class="bd">大佬您好，文中说现在越来越多的使用row方式的binlog，那么只能选择接受写入慢和占用空间大的弊端么？ <br></div>
+                            <span class="time">2019-01-07 14:50</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是的，当然还有minimal可选，会好些</p>
+                                <p class="reply-time">2019-01-07 16:34</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/11/18/8cee35f9.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">HuaMax</span>
+                            </div>
+                            <div class="bd">课后题。如果在同步的过程中修改了server id，那用原server id 生成的log被两个M认为都不是自己的而被循环执行，不知这种情况会不会发生 <br></div>
+                            <span class="time">2019-01-07 14:06</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是的，会</p>
+                                <p class="reply-time">2019-01-07 22:00</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/45/64/2b09a36b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">风二中</span>
+                            </div>
+                            <div class="bd">在主库执行这条 SQL 语句的时候，用的是索引 a；而在备库执行这条 SQL 语句的时候，却使用了索引 t_modified<br>老师，您好，这里索引选择不一样，是因为前面提到的mysql 会选错索引吗？这种情况应该发生比较少吧，这里应该都会选择索引a吧，还是说这里只是一个事例，还有更复杂的情况 <br></div>
+                            <span class="time">2019-01-12 13:59</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">对，只是一个举例的</p>
+                                <p class="reply-time">2019-01-12 15:19</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/2au3iaQvydOVeVY1vlSVeGia7SvrpWFVibdxdjKiafof3RhzFO9e8sxKIBxKXJQibRNpOWMiaSyzWDGJMZTHRae3u84Q/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">秋一匹</span>
+                            </div>
+                            <div class="bd">老师，您好。我这慢了一步。。。学习晚了点。我这之前碰到了个问题，有一段时间主从复制延迟比较厉害，达到5s左右吧，一般都是1～2秒吧。首先排除不是网络原因。想问下还有哪些因素会影响主从复制呢？ <br></div>
+                            <span class="time">2019-01-10 13:51</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">还是要给一下更具体的信息<br>比如主库的tps<br>备库的跟复制相关的配置等信息</p>
+                                <p class="reply-time">2019-01-10 23:34</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/b8/36/542c96bf.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Mr.Strive.Z.H.L</span>
+                            </div>
+                            <div class="bd">老师你好：<br>有一个疑惑，多条语句同时在commit阶段过程中，如果发生写入binlog和写入redolog的顺序不一致的情况。主从备份的时候，从库是不是会导致数据不一致呀？ <br></div>
+                            <span class="time">2019-01-10 10:03</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/08/96/231fdd9e.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">未知</span>
+                            </div>
+                            <div class="bd">老师在讲row模式的数据恢复时，感觉insert，update，delete的数据格式和undo  log的差不多。之前文章一直说redo和binlog，老师抽空也讲下undo和回滚段的知识。 <br></div>
+                            <span class="time">2019-01-10 09:00</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">Undo前面大致有说过了，你要了解undo的什么内容呢</p>
+                                <p class="reply-time">2019-01-10 10:24</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/9a/0a/6c74e932.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">光</span>
+                            </div>
+                            <div class="bd">林老师今天遇到个问题就是主从同步延迟，查到主从状态中出现：Slave_SQL_Running_State: Waiting for Slave Workers to free pending events。不知道这个是否会引起延迟。查了些资料说得都不是很明白。老师是否可以简短解答下。以及这种延迟如何避免。 <br></div>
+                            <span class="time">2019-01-09 19:42</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">这个的意思是， 现在工作线程里面等待的队列太多，都已经超过上限了，要等工作线程消化掉一些事务再分<br><br>简单说，就是备库的应用日志的队列太慢了。。</p>
+                                <p class="reply-time">2019-01-10 19:30</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/5c/c5/1231d633.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">梁中华</span>
+                            </div>
+                            <div class="bd">我有一个比较极端一点的HA问题，假设主库的binlog刚写成功还未来得及把binlog同步到从库，主库就掉电了，这时候从库的数据会不完整吗？<br>第二个问题，原主库重启加入集群后，那条没有传出去的binlog会如何处理？ <br></div>
+                            <span class="time">2019-01-09 10:42</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/33/46/315a862e.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">不迷失</span>
+                            </div>
+                            <div class="bd">请教一下，生产环境能不能使用正常使用表连接？要注意哪些地方？DBA总是说不建议用，还催促我将使用了表连接的地方改造，但也说不出个所以然。目前在两个百万级数据的表中有用到内连接，并没有觉得有什么问题 <br></div>
+                            <span class="time">2019-01-08 20:46</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">索引使用正确，不要出现全表扫描，其实OK的</p>
+                                <p class="reply-time">2019-01-08 21:17</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/41/27/3ff1a1d6.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">hua168</span>
+                            </div>
+                            <div class="bd">这样，我是想增加一些经验，怕后面试又遇到，想问一下大神分析思路，这种问题没经验回答。<br>我就差点回答用阿里云的DRDS了<br><br>现在开源的mysql中间件生存环境中用什么比较多呀？mycat还是网易的cetus？<br><br>海量存储阿里云有OSS，有没有对应的开源软件呀？用于生存环境的，没有接触过，想问下，搞下实验后再去找工作。 <br></div>
+                            <span class="time">2019-01-08 20:41</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">中间件作为练手这些都可以的<br><br>你搜“开源分布式存储系统”</p>
+                                <p class="reply-time">2019-01-08 21:19</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/cb/0a/6a9e6602.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">React</span>
+                            </div>
+                            <div class="bd">老师好，文章前面说主从最好从机设置readonly.那么在双主的情况(互为主备)下，设置不同的自增值是否就可以不用设置只读了？且此时复制是否可以跳过主键冲突，因为自增值不同？ <br></div>
+                            <span class="time">2019-01-08 20:25</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">如果自增值严格控制了，也没必要设置跳过主键冲突了对吧（反正不冲突）<br><br>除非你的业务就是设计好支持多点写入，否则还是把不写入的都设置上readonly吧</p>
+                                <p class="reply-time">2019-01-08 22:28</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/09/98/b11c372b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">鸠翱</span>
+                            </div>
+                            <div class="bd">也就是说 statement格式是不能用来恢复数据的是嘛…… <br></div>
+                            <span class="time">2019-01-08 20:14</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">不能用在使用flashback机制恢复</p>
+                                <p class="reply-time">2019-01-08 22:26</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/41/27/3ff1a1d6.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">hua168</span>
+                            </div>
+                            <div class="bd">面试官说的是mysql做一主多从，读写分离，运行一段时间后，发现从库在业务高峰期不规律性出现从库丢失数据，而所有从库丢失的数据情况都不一样，在一个从库查询某条记录是空的（不记得是空白还是直接查不到，真的没数据了，并不是延迟了，主从没停，就是没写进从库），在另一个从库却能查到，有的在这个从库查到了，另一个从库查不到，因为运行了几个月客户反馈才发现此问题，不确定所有从库中哪个从库数据是没有丢失的，和主库一致，怎么办？<br>我回答:<br>1.在业务低峰期，锁库，重新做主从，但是如果一天不能同步完的话，白天主库还要解锁。不会搞了……<br>又不像mongoDB那样不用记录pos值<br>2.减少主库io压力试下，比如分库分表<br>3.查看日志之类……<br><br>二、mysql主库高可用<br>mysql主从+keepalived&#47;heatbeat<br>HMA&#47;MMM<br>ZK<br>是我看配置视频，老师简单讲了一下，我在网上搜的<br><br>三、主库写压力过大<br>只能通过分库，分表<br>也是我看linux运维培训视频老师说的 <br></div>
+                            <span class="time">2019-01-08 17:12</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">其实要是我回答，我也只能说以主库为准按顺序重做，都过了这么久了还能咋样<br></p>
+                                <p class="reply-time">2019-01-08 20:16</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/b1/bc/5ce1f4e2.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">null</span>
+                            </div>
+                            <div class="bd">老师，我请教一个问题。现在我有一张表里面存储的有用户id和用户头像，用户头像存的二进制。我批量查询用户头像，比如我查500个用户id的头像，我将500个用户id分成十等份，每份50个id，然后开启线程池用10个线程并行查询。现在的问题是先提交查询的那个线程查询时间可能只用了一两秒，后面提交的那几个线程查询时间依次增加，最久的大概需要五六秒。我们数据库用的Oracle，虽然不是mysql，但是我感觉Oracle不至于10个线程的并发都扛不住还需要排队处理啊，想请教一下老师出现这种情况是什么原因导致的呢 <br></div>
+                            <span class="time">2019-01-08 16:45</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">我觉得你要先查一下为啥第一个查询要用1-2秒，这个请求看起来应该挺快呀</p>
+                                <p class="reply-time">2019-01-08 20:19</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/57/6e/dd0eee5f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">夜空中最亮的星（华仔）</span>
+                            </div>
+                            <div class="bd">这节课完全学懂了，开心 <br></div>
+                            <span class="time">2019-01-08 16:41</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content"></p>
+                                <p class="reply-time">2019-01-10 19:14</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/57/6e/dd0eee5f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">夜空中最亮的星（华仔）</span>
+                            </div>
+                            <div class="bd">级联复制，3个数据库，首尾相连，应会出现死循环 <br></div>
+                            <span class="time">2019-01-08 16:40</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">不会哦，1给2，2给3，3给1，1就放弃了<br><br>不过引入第三个节点的思路是对的哈</p>
+                                <p class="reply-time">2019-01-08 20:08</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eqyfwpUx3JgSX2IediaP7AUtYPVBjhy17OibD6e7owwBK0uF2rABzQYKSgiaCgFYibWrZ9b5ib55InmDpw/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">ccstorm</span>
+                            </div>
+                            <div class="bd">老师，您好！请教一个课题之外的问题，请问mysql小版本需要更新么。我现在项目用的5.6，请问需要升级到5.7么，如果升级的话需要注意什么，谢谢老师！ <br></div>
+                            <span class="time">2019-01-08 15:52</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">够用就不动</p>
+                                <p class="reply-time">2019-01-08 20:10</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -59,7 +59,7 @@
 
 - 方式一：首先创建一个 maven 工程；（jar），然后导入 spring boot 相关的依赖（maven.xml）
 
-```xml
+    ```xml
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -71,11 +71,9 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
-```
+    ```
 
 - 方式二：File -> New Project -> Spring initializr (选择jdk版本) -> next -> 填写信息（注意修改最后的 package，同时 Artifact 不能有大写字母 ），然后默认 maven 会自动导入相关的依赖。
-
-
 
 ### （二）在主程序中启动Spring Boot应用
 
@@ -102,13 +100,13 @@ public class HelloWorldMainApplication {
 ```java
 package com.gjxaiou.controller;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@Controller
+@RestController
 public class HelloController {
-    @ResponseBody
+
     @RequestMapping("/hello")
     public String hello(){
         return "hello world";
@@ -118,15 +116,17 @@ public class HelloController {
 
 ### （四）运行主程序测试
 
-只要直接执行上面的主程序，就可以直接在浏览器中访问：`localhost:8080/hello`，结果图如下：
-
-![image-20191223163759281](FrameDay06_1%20SpringBoot%E5%85%A5%E9%97%A8.resource/image-20191223163759281.png)
+只要直接执行上面的主程序，就可以直接在浏览器中访问：`localhost:8080/hello`，页面返回 `hello world` 字符串。
 
 ### （五）简化部署（直接将项目打成 jar，然后在命令行运行即可）
 
 **打成 Jar 包**
 
-不在需要将项目导出为 war 包然后部署到服务器中，只需要在 maven 中导入下面插件，然后使用右边的 `maven Project -> lifecycle -> pageage(右击:run 项目名[package])` 命令就可以直接将项目打成可执行的 jar 包，默认的 jar 包位置在 项目的 target 文件夹下面；可以直接进入该文件夹，然后在文件路径框输入 cmd;
+不在需要将项目导出为 war 包然后部署到服务器中，只需要在 maven 中导入下面插件。
+
+方式一：使用右边的 `maven Project -> lifecycle -> pageage(右击:run 项目名[package])` 命令就可以直接将项目打成可执行的 jar 包，默认的 jar 包位置在 项目的 target 文件夹下面；
+
+方式二：在 `pom.xml` 文件同路径下使用 `mvn package` 即可。
 
 ```xml
  <!-- 这个插件，可以将应用打包成一个可执行的jar包；-->
@@ -140,7 +140,7 @@ public class HelloController {
 </build>
 ```
 
-**运行 Jar 包**：将这个应用打成 jar 包之后，直接使用 java -jar 的命令进行执行；`java -jar Jar包位置和名称`
+**运行 Jar 包**：将这个应用打成 jar 包之后，在 Jar 包同路径直接使用 java -jar 的命令进行执行；`java -jar Jar包位置和名称`
 
 ## 五、Hello World 原理探究
 
@@ -203,7 +203,7 @@ public class HelloController {
 | `spring-boot-starter-amqp`     | Starter for using Spring AMQP and Rabbit MQ                  | [Pom](https://github.com/spring-projects/spring-boot/tree/v2.2.1.RELEASE/spring-boot-project/spring-boot-starters/spring-boot-starter-amqp/pom.xml) |
 | `spring-boot-starter-aop`      | Starter for aspect-oriented programming with Spring AOP and AspectJ | [Pom](https://github.com/spring-projects/spring-boot/tree/v2.2.1.RELEASE/spring-boot-project/spring-boot-starters/spring-boot-starter-aop/pom.xml) |
 
-### （二）主程序类，主入口类
+### （二）主程序入口类
 
 ```java
 /**
@@ -249,7 +249,7 @@ public @interface SpringBootApplication {
 
     - 标注在某个类上，表示这是一个 SpringBoot 的配置类；
 
-      其本质上是 spring 定义的注解（点击内容见下），其中 `@Configuration`：即使用该注解来标注配置类；（为了简化 spring 通常将配置文件替换为配置类来使用，然后使用上述的标识来标识为配置类）。
+      其本质上是 spring 定义的注解（点击内容见下），其中 `@Configuration`：即表示使用该注解来标注配置类；（为了简化 spring 通常将配置文件替换为配置类来使用，然后使用上述的标识来标识为配置类）。
 
     ```java
     @Target({ElementType.TYPE})

@@ -1,0 +1,405 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                06讲全局锁和表锁：给表加个字段怎么有这么多阻碍
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/89/a9/8914f9b46c87424964efcc0755af3da9.png">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>今天我要跟你聊聊MySQL的锁。数据库锁设计的初衷是处理并发问题。作为多用户共享的资源，当出现并发访问的时候，数据库需要合理地控制资源的访问规则。而锁就是用来实现这些访问规则的重要数据结构。</p><p><strong>根据加锁的范围，MySQL里面的锁大致可以分成全局锁、表级锁和行锁三类</strong>。今天这篇文章，我会和你分享全局锁和表级锁。而关于行锁的内容，我会留着在下一篇文章中再和你详细介绍。</p><p>这里需要说明的是，锁的设计比较复杂，这两篇文章不会涉及锁的具体实现细节，主要介绍的是碰到锁时的现象和其背后的原理。</p><h1>全局锁</h1><p>顾名思义，全局锁就是对整个数据库实例加锁。MySQL提供了一个加全局读锁的方法，命令是 Flush tables with read lock (FTWRL)。当你需要让整个库处于只读状态的时候，可以使用这个命令，之后其他线程的以下语句会被阻塞：数据更新语句（数据的增删改）、数据定义语句（包括建表、修改表结构等）和更新类事务的提交语句。</p><p><strong>全局锁的典型使用场景是，做全库逻辑备份。</strong>也就是把整库每个表都select出来存成文本。</p><p>以前有一种做法，是通过FTWRL确保不会有其他线程对数据库做更新，然后对整个库做备份。注意，在备份过程中整个库完全处于只读状态。</p><!-- [[[read_end]]] --><p>但是让整库都只读，听上去就很危险：</p><ul>
+<li>如果你在主库上备份，那么在备份期间都不能执行更新，业务基本上就得停摆；</li>
+<li>如果你在从库上备份，那么备份期间从库不能执行主库同步过来的binlog，会导致主从延迟。</li>
+</ul><p>看来加全局锁不太好。但是细想一下，备份为什么要加锁呢？我们来看一下不加锁会有什么问题。</p><p>假设你现在要维护“极客时间”的购买系统，关注的是用户账户余额表和用户课程表。</p><p>现在发起一个逻辑备份。假设备份期间，有一个用户，他购买了一门课程，业务逻辑里就要扣掉他的余额，然后往已购课程里面加上一门课。</p><p>如果时间顺序上是先备份账户余额表(u_account)，然后用户购买，然后备份用户课程表(u_course)，会怎么样呢？你可以看一下这个图：</p><p><img src="https://static001.geekbang.org/resource/image/cb/cd/cbfd4a0bbb1210792064bcea4e49b0cd.png" alt=""></p><center><span class="reference">图1 业务和备份状态图</span></center><p>可以看到，这个备份结果里，用户A的数据状态是“账户余额没扣，但是用户课程表里面已经多了一门课”。如果后面用这个备份来恢复数据的话，用户A就发现，自己赚了。</p><p>作为用户可别觉得这样可真好啊，你可以试想一下：如果备份表的顺序反过来，先备份用户课程表再备份账户余额表，又可能会出现什么结果？</p><p>也就是说，不加锁的话，备份系统备份的得到的库不是一个逻辑时间点，这个视图是逻辑不一致的。</p><p>说到视图你肯定想起来了，我们在前面讲事务隔离的时候，其实是有一个方法能够拿到一致性视图的，对吧？</p><p>是的，就是在可重复读隔离级别下开启一个事务。</p><blockquote>
+<p>备注：如果你对事务隔离级别的概念不是很清晰的话，可以再回顾一下第3篇文章<a href="https://time.geekbang.org/column/article/68963">《事务隔离：为什么你改了我还看不见？》</a>中的相关内容。</p>
+</blockquote><p>官方自带的逻辑备份工具是mysqldump。当mysqldump使用参数–single-transaction的时候，导数据之前就会启动一个事务，来确保拿到一致性视图。而由于MVCC的支持，这个过程中数据是可以正常更新的。</p><p>你一定在疑惑，有了这个功能，为什么还需要FTWRL呢？<strong>一致性读是好，但前提是引擎要支持这个隔离级别。</strong>比如，对于MyISAM这种不支持事务的引擎，如果备份过程中有更新，总是只能取到最新的数据，那么就破坏了备份的一致性。这时，我们就需要使用FTWRL命令了。</p><p>所以，<strong>single-transaction方法只适用于所有的表使用事务引擎的库。</strong>如果有的表使用了不支持事务的引擎，那么备份就只能通过FTWRL方法。这往往是DBA要求业务开发人员使用InnoDB替代MyISAM的原因之一。</p><p>你也许会问，<strong>既然要全库只读，为什么不使用set global readonly=true的方式呢</strong>？确实readonly方式也可以让全库进入只读状态，但我还是会建议你用FTWRL方式，主要有两个原因：</p><ul>
+<li>一是，在有些系统中，readonly的值会被用来做其他逻辑，比如用来判断一个库是主库还是备库。因此，修改global变量的方式影响面更大，我不建议你使用。</li>
+<li>二是，在异常处理机制上有差异。如果执行FTWRL命令之后由于客户端发生异常断开，那么MySQL会自动释放这个全局锁，整个库回到可以正常更新的状态。而将整个库设置为readonly之后，如果客户端发生异常，则数据库就会一直保持readonly状态，这样会导致整个库长时间处于不可写状态，风险较高。</li>
+</ul><p>业务的更新不只是增删改数据（DML)，还有可能是加字段等修改表结构的操作（DDL）。不论是哪种方法，一个库被全局锁上以后，你要对里面任何一个表做加字段操作，都是会被锁住的。</p><p>但是，即使没有被全局锁住，加字段也不是就能一帆风顺的，因为你还会碰到接下来我们要介绍的表级锁。</p><h1>表级锁</h1><p>MySQL里面表级别的锁有两种：一种是表锁，一种是元数据锁（meta data lock，MDL)。</p><p><strong>表锁的语法是 lock tables … read/write。</strong>与FTWRL类似，可以用unlock tables主动释放锁，也可以在客户端断开的时候自动释放。需要注意，lock tables语法除了会限制别的线程的读写外，也限定了本线程接下来的操作对象。</p><p>举个例子, 如果在某个线程A中执行lock tables t1 read, t2 write; 这个语句，则其他线程写t1、读写t2的语句都会被阻塞。同时，线程A在执行unlock tables之前，也只能执行读t1、读写t2的操作。连写t1都不允许，自然也不能访问其他表。</p><p>在还没有出现更细粒度的锁的时候，表锁是最常用的处理并发的方式。而对于InnoDB这种支持行锁的引擎，一般不使用lock tables命令来控制并发，毕竟锁住整个表的影响面还是太大。</p><p><strong>另一类表级的锁是MDL（metadata lock)。</strong>MDL不需要显式使用，在访问一个表的时候会被自动加上。MDL的作用是，保证读写的正确性。你可以想象一下，如果一个查询正在遍历一个表中的数据，而执行期间另一个线程对这个表结构做变更，删了一列，那么查询线程拿到的结果跟表结构对不上，肯定是不行的。</p><p>因此，在MySQL 5.5版本中引入了MDL，当对一个表做增删改查操作的时候，加MDL读锁；当要对表做结构变更操作的时候，加MDL写锁。</p><ul>
+<li>
+<p>读锁之间不互斥，因此你可以有多个线程同时对一张表增删改查。</p>
+</li>
+<li>
+<p>读写锁之间、写锁之间是互斥的，用来保证变更表结构操作的安全性。因此，如果有两个线程要同时给一个表加字段，其中一个要等另一个执行完才能开始执行。</p>
+</li>
+</ul><p>虽然MDL锁是系统默认会加的，但却是你不能忽略的一个机制。比如下面这个例子，我经常看到有人掉到这个坑里：给一个小表加个字段，导致整个库挂了。</p><p>你肯定知道，给一个表加字段，或者修改字段，或者加索引，需要扫描全表的数据。在对大表操作的时候，你肯定会特别小心，以免对线上服务造成影响。而实际上，即使是小表，操作不慎也会出问题。我们来看一下下面的操作序列，假设表t是一个小表。</p><blockquote>
+<p>备注：这里的实验环境是MySQL 5.6。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/7c/ce/7cf6a3bf90d72d1f0fc156ececdfb0ce.jpg" alt=""></p><p>我们可以看到session A先启动，这时候会对表t加一个MDL读锁。由于session B需要的也是MDL读锁，因此可以正常执行。</p><p>之后session C会被blocked，是因为session A的MDL读锁还没有释放，而session C需要MDL写锁，因此只能被阻塞。</p><p>如果只有session C自己被阻塞还没什么关系，但是之后所有要在表t上新申请MDL读锁的请求也会被session C阻塞。前面我们说了，所有对表的增删改查操作都需要先申请MDL读锁，就都被锁住，等于这个表现在完全不可读写了。</p><p>如果某个表上的查询语句频繁，而且客户端有重试机制，也就是说超时后会再起一个新session再请求的话，这个库的线程很快就会爆满。</p><p>你现在应该知道了，事务中的MDL锁，在语句执行开始时申请，但是语句结束后并不会马上释放，而会等到整个事务提交后再释放。</p><p>基于上面的分析，我们来讨论一个问题，<strong>如何安全地给小表加字段？</strong></p><p>首先我们要解决长事务，事务不提交，就会一直占着MDL锁。在MySQL的information_schema 库的 innodb_trx 表中，你可以查到当前执行中的事务。如果你要做DDL变更的表刚好有长事务在执行，要考虑先暂停DDL，或者kill掉这个长事务。</p><p>但考虑一下这个场景。如果你要变更的表是一个热点表，虽然数据量不大，但是上面的请求很频繁，而你不得不加个字段，你该怎么做呢？</p><p>这时候kill可能未必管用，因为新的请求马上就来了。比较理想的机制是，在alter table语句里面设定等待时间，如果在这个指定的等待时间里面能够拿到MDL写锁最好，拿不到也不要阻塞后面的业务语句，先放弃。之后开发人员或者DBA再通过重试命令重复这个过程。</p><p>MariaDB已经合并了AliSQL的这个功能，所以这两个开源分支目前都支持DDL NOWAIT/WAIT n这个语法。</p><pre><code>ALTER TABLE tbl_name NOWAIT add column ...
+ALTER TABLE tbl_name WAIT N add column ... 
+</code></pre><h1>小结</h1><p>今天，我跟你介绍了MySQL的全局锁和表级锁。</p><p>全局锁主要用在逻辑备份过程中。对于全部是InnoDB引擎的库，我建议你选择使用–single-transaction参数，对应用会更友好。</p><p>表锁一般是在数据库引擎不支持行锁的时候才会被用到的。如果你发现你的应用程序里有lock tables这样的语句，你需要追查一下，比较可能的情况是：</p><ul>
+<li>要么是你的系统现在还在用MyISAM这类不支持事务的引擎，那要安排升级换引擎；</li>
+<li>要么是你的引擎升级了，但是代码还没升级。我见过这样的情况，最后业务开发就是把lock tables 和 unlock tables 改成 begin 和 commit，问题就解决了。</li>
+</ul><p>MDL会直到事务提交才释放，在做表结构变更的时候，你一定要小心不要导致锁住线上查询和更新。</p><p>最后，我给你留一个问题吧。备份一般都会在备库上执行，你在用–single-transaction方法做逻辑备份的过程中，如果主库上的一个小表做了一个DDL，比如给一个表上加了一列。这时候，从备库上会看到什么现象呢？</p><p>你可以把你的思考和观点写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><p>说明：这篇文章没有介绍到物理备份，物理备份会有一篇单独的文章。</p><h1>上期问题时间</h1><p>上期的问题是关于对联合主键索引和InnoDB索引组织表的理解。</p><p>我直接贴@老杨同志 的回复略作修改如下（我修改的部分用<span class="orange">橙色</span>标出）：</p><p>表记录<br>
+–a--|–b--|–c--|–d--<br>
+1 2 3 d<br>
+1 3 2 d<br>
+1 4 3 d<br>
+2 1 3 d<br>
+2 2 2 d<br>
+2 3 4 d<br>
+主键 a，b的聚簇索引组织顺序相当于 order by a,b ，也就是先按a排序，再按b排序，c无序。</p><p>索引 ca 的组织是先按c排序，再按a排序，同时记录主键<br>
+–c--|–a--|–主键部分<span class="orange">b</span>-- <span class="orange">（注意，这里不是ab，而是只有b）</span><br>
+2 1 3<br>
+2 2 2<br>
+3 1 2<br>
+3 1 4<br>
+3 2 1<br>
+4 2 3<br>
+<span class="orange">这个跟索引c的数据是一模一样的。</span></p><p>索引 cb 的组织是先按c排序，在按b排序，同时记录主键<br>
+–c--|–b--|–主键部分<span class="orange">a</span>-- <span class="orange">（同上）</span><br>
+2 2 2<br>
+2 3 1<br>
+3 1 2<br>
+3 2 1<br>
+3 4 1<br>
+4 3 2</p><p>所以，结论是ca可以去掉，cb需要保留。</p><p>评论区留言点赞：</p><blockquote>
+<p>@浪里白条 帮大家总结了复习要点；<br>
+@约书亚 的问题里提到了MRR优化；<br>
+@HwangZHen 留言言简意赅。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/ce/d9/ce7f4e35916ed1aa49206a53a0547bd9.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/7d/da/780f149e.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">echo＿陈</span>
+                            </div>
+                            <div class="bd">mysql 5.6不是支持online ddl了吗？也就是对表操作增加字段等功能，实际上不会阻塞读写？ <br></div>
+                            <span class="time">2018-11-26 09:38</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">Online DDL的过程是这样的：<br>1. 拿MDL写锁<br>2. 降级成MDL读锁<br>3. 真正做DDL<br>4. 升级成MDL写锁<br>5. 释放MDL锁<br><br>1、2、4、5如果没有锁冲突，执行时间非常短。第3步占用了DDL绝大部分时间，这期间这个表可以正常读写数据，是因此称为“online ”<br><br>我们文中的例子，是在第一步就堵住了</p>
+                                <p class="reply-time">2018-11-26 09:53</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/df/e7/e3c450c2.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">lionetes</span>
+                            </div>
+                            <div class="bd">FTWRL 前有读写的话 ,FTWRL 都会等待 读写执行完毕后才执行<br>FTWRL 执行的时候要刷脏页的数据到磁盘,因为要保持数据的一致性 ，理解的执行FTWRL时候是 所有事务 都提交完毕的时候<br><br>mysqldump + -single-transaction 也是保证事务的一致性,但他只针对 有支持事务 引擎,比如 innodb<br>所以 还是强烈建议大家在创建实例,表时候需要innodb 引擎 为好<br>全库只读  readonly = true 还有个情况在 slave 上 如果用户有超级权限的话  readonly 是失效的<br><br>表级别 锁 ：一个直接就是表锁 lock table 建议不要使用, 影响太大，另个就是 MDL 元数据锁<br><br>MDL 是并发情况下维护数据的一致性,在表上有事务的时候,不可以对元数据经行写入操作,并且这个是在server层面实现的<br>当你做 dml 时候增加的 MDL 读锁, update table set id=Y where id=X; 并且由于隔离级别的原因 读锁之间不冲突<br><br>当你DDL 时候 增加对表的写锁, 同时操作两个alter table 操作 这个要出现等待情况。<br><br>但是 如果是  dml 与ddl 之间的交互 就更容易出现不可读写情况,这个情况容易session 爆满,session是占用内存的,也会导致内存升高<br>MDL 释放的情况就是 事务提交.<br><br>主库上的一个小表做了一个 DDL, 同步给slave ,由于这个时候有了先前的 single-transaction,所以slave 就会出现 该表的 锁等待, 并且slave 出现延迟 <br></div>
+                            <span class="time">2018-11-26 16:45</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">分析得很好。<br>尤其readonly 对 super 权限无效这句。<br></p>
+                                <p class="reply-time">2018-11-26 18:25</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">miche</span>
+                            </div>
+                            <div class="bd">1. 上面的那个因为mdl锁把整个库搞挂的例子里，如果用pt工具来操作，会出现同样的情况吗？<br>2. 那个例子里显示select语句前加了begin，是不是select的时候不加begin，就不会出现同样的情况呢？<br>3. online ddl 的copy方式和inplace方式，也都是需要 拿MDL写锁、降成读锁、做DDL、升成写锁、释放MDL锁吗？<br><br> <br></div>
+                            <span class="time">2018-11-28 10:49</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. Pt的过程也是有操作表结构的，所以会类似<br><br>2. 对，没有begin的话，这样select执行完成以后，MDL就自动释放了哦<br><br>3. 是，是否online都是第三步（结合置顶评论看哈）的区别，另外四步还是有的</p>
+                                <p class="reply-time">2018-11-28 12:41</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/ab/e1/f6b921fa.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">壹笙漂泊</span>
+                            </div>
+                            <div class="bd">总结：<br>根据加锁范围：MySQL里面的锁可以分为：全局锁、表级锁、行级锁<br><br>一、全局锁：<br>对整个数据库实例加锁。<br>MySQL提供加全局读锁的方法：Flush tables with read lock(FTWRL)<br>这个命令可以使整个库处于只读状态。使用该命令之后，数据更新语句、数据定义语句和更新类事务的提交语句等操作都会被阻塞。<br>使用场景：全库逻辑备份。<br>风险：<br>1.如果在主库备份，在备份期间不能更新，业务停摆<br>2.如果在从库备份，备份期间不能执行主库同步的binlog，导致主从延迟<br>官方自带的逻辑备份工具mysqldump，当mysqldump使用参数--single-transaction的时候，会启动一个事务，确保拿到一致性视图。而由于MVCC的支持，这个过程中数据是可以正常更新的。<br><br>一致性读是好，但是前提是引擎要支持这个隔离级别。<br>如果要全库只读，为什么不使用set global readonly=true的方式？<br>1.在有些系统中，readonly的值会被用来做其他逻辑，比如判断主备库。所以修改global变量的方式影响太大。<br>2.在异常处理机制上有差异。如果执行FTWRL命令之后由于客户端发生异常断开，那么MySQL会自动释放这个全局锁，整个库回到可以正常更新的状态。而将整个库设置为readonly之后，如果客户端发生异常，则数据库就会一直保持readonly状态，这样会导致整个库长时间处于不可写状态，风险较高。<br>二、表级锁<br>MySQL里面表级锁有两种，一种是表锁，一种是元数据所(meta data lock,MDL)<br>表锁的语法是:lock tables ... read&#47;write<br>可以用unlock tables主动释放锁，也可以在客户端断开的时候自动释放。lock tables语法除了会限制别的线程的读写外，也限定了本线程接下来的操作对象。<br>对于InnoDB这种支持行锁的引擎，一般不使用lock tables命令来控制并发，毕竟锁住整个表的影响面还是太大。<br>MDL：不需要显式使用，在访问一个表的时候会被自动加上。<br>MDL的作用：保证读写的正确性。<br>在对一个表做增删改查操作的时候，加MDL读锁；当要对表做结构变更操作的时候，加MDL写锁。<br>读锁之间不互斥。读写锁之间，写锁之间是互斥的，用来保证变更表结构操作的安全性。<br>MDL 会直到事务提交才会释放，在做表结构变更的时候，一定要小心不要导致锁住线上查询和更新。<br> <br></div>
+                            <span class="time">2018-11-26 11:27</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">早啊今天</p>
+                                <p class="reply-time">2018-11-26 11:43</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/5d/01/9cd84003.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">栋能</span>
+                            </div>
+                            <div class="bd">没搞懂c的索引树为什么和ca是一样的. c索引树中c有序，(a,b)随意序的呀？这能代表c与ca索引树一致吗？ <br></div>
+                            <span class="time">2018-11-26 22:03</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/61/57/6f3c81dd.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">阿建</span>
+                            </div>
+                            <div class="bd">没明白为什么ca索引建出来的模型和c建出来的一样？ <br></div>
+                            <span class="time">2018-11-26 00:36</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/de/8d/99536c5b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Aurora</span>
+                            </div>
+                            <div class="bd">如果mysqldump 备份的是整个schema，某个小表t1只是该schema上其中有一张表<br>情况1：<br>master上对小表t1的DDL传输到slave去应用的时刻，mysqldump已经备份完了t1表的数据，此时slave 同步正常，不会有问题。<br><br>情况2：<br>master上对小表t1的DDL传输到slave去应用的时刻，mysqldump正在备份t1表的数据,此时会发生MDL 锁，从库上t1表的所有操作都会Hang 住。<br><br>情况3：<br>master 上对小表t1的DDL传输到slave去应用的时刻，mysqldump 还没对t1表进行备份，该DDL会在slave的t1表应用成功，但是当导出到t1表的时候会报“ERROR 1412 (HY000): Table definition has changed, please retry transaction” 错误，导致导出失败！<br> <br></div>
+                            <span class="time">2018-11-26 18:38</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/34/5c/6b4757a0.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">倪大人</span>
+                            </div>
+                            <div class="bd">思考题：<br>由于先用–single-transaction做备份，所以备份线程会启动一个事务获取MDL读锁，文中也说了“MDL 会直到事务提交才释放”，所以要一直等到备份完成主库来的DDL才会在从库执行生效，且备份的数据里并不会有新增的这个列。<br><br>再补充下，由于主库来的DDL会等待MDL写锁，所以会导致之后从库上的读写请求都阻塞，相当与文中sessionC和sessionD。 <br></div>
+                            <span class="time">2018-11-26 11:20</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/48/bd/6c7d4230.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Tony Du</span>
+                            </div>
+                            <div class="bd">基于文中的例子MDL（metadata lock)，自己做了一个实验（稍微有一些小改动在session D上），<br>session A: begin; select * from t limit 1; 最先启动sessionA<br>session B: begin; select * from t limit 1; 紧接着启动sessionB<br>session C: alter table t add f int; 然后再是启动sessionC<br>session D: begin; select * from t limit 1; 最后是启动sessionD<br>如文中例子，session A和B正常启动，然后session C被block，之后session D也被block。当把 session A 和 session B 都commit掉后，发现session C依然是block的（被 session D阻塞），只有当把 session D 也commit掉后，session C才执行下去。同样的实验，重复了三遍，结果也是一样。<br>从现象上看，session D会先拿到MDL读锁，当session D commit掉后，然后再是session C获得MDL写锁。请问老师，这里对于MDL锁的获取顺序（也就是说 是session C先获取MDL写锁还是session D先获取MDL读锁）有什么原则？是随机的还是有什么讲究？<br><br>另外，在一开始的获取MDL锁的阶段，session A（MDL读锁，正常执行）-&gt; session B (MDL读锁，正常执行) -&gt; session C (MDL写锁，被block) -&gt; session D (MDL读锁，被MDL写锁 block) 。是不是说加MDL锁是看时间先后顺序的，一旦出现过需要获取MDL写锁（即使被block），后续再需要获取MDL读锁，则发现之前已经有获取MDL写锁（即使被block），需要获取读锁的session都会被block。感觉上像进入一个锁的”队列“，根据时间先后顺序。请问老师，这里可以更细节和深入的说明下吗？<br><br> 作者回复<br>你这个例子里面，sessionD 被C堵住后是不能输入命令的，之后是什么动作之后，sessionD才能输入commit语句呢<br><br>我的回复：<br>session D被C堵住后，会卡在select * from t limit 1这句。然后当我把A和B都commit掉，session D就会执行select * from t limit 1这句，此时，session C依旧会被堵着。然后把session D commit掉，session C才能执行。实验的时候，我是把sql语句都写在MySQL workbench里的，通过workbench连服务器的，session D的commit语句是写在workbench里执行的。我的问题是，为什么是session D先获取的MDL读锁，而不是session C先获取MDL写锁，对于MDL锁的获取顺序有什么原则？是随机的还是有什么讲究？ <br></div>
+                            <span class="time">2018-11-27 19:14</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">你用MySQL 客户端试试，我跑出来是文中的顺序哈。给我一下你的MySQL 版本号和workbench版本号</p>
+                                <p class="reply-time">2018-11-27 19:45</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKJDeCB8VNAIh7m5btiaBD3gkJYjDUJ8eFrAoyhR1FWUS0dB1YC9uszFGpARThMNRX3F4D7DaOwXYA/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">forina</span>
+                            </div>
+                            <div class="bd">老师 我想咨询一个问题 ，我有一个大表t 几百万条数据，a是主键(int类型)，另外有一个索引（b,c,d），查询语句 select a from t where b=‘ZC1093’ and c=‘2018-07-31’ and d=‘AG011’ limit 1000,10 执行过程使用了索引只用了0.014s,查询语句 select a from t where b=‘ZC1093’ and c=‘2018-07-31’ and d=‘AG011’  order by a limit 1000,10 执行过程也用了(b,c,d)这个索引 却用了34s 完成，两条查询语句结果也都是一样的 我很疑惑索引 (b,c,d)和(b,c,d,a)不应该是等效的吗 为什么一个快一个慢？ <br></div>
+                            <span class="time">2018-11-27 09:27</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">在《”order by 是怎么工作的”》 这篇会提到这个问题哈</p>
+                                <p class="reply-time">2018-11-27 10:41</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/e2/1e/ea3a0366.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Jeremy</span>
+                            </div>
+                            <div class="bd">对于思考题，索引ca里面，当a相同时，为什么b一定按照升序排列？ <br></div>
+                            <span class="time">2018-11-26 19:59</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/48/bd/6c7d4230.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Tony Du</span>
+                            </div>
+                            <div class="bd">基于文中的例子MDL（metadata lock)，自己做了一个实验（稍微有一些小改动在session D上），<br>session A:  begin; select * from t limit 1;   最先启动sessionA<br>session B:  begin; select * from t limit 1;   紧接着启动sessionB<br>session C:  alter table t add f int;            然后再是启动sessionC<br>session D:  begin; select * from t limit 1;   最后是启动sessionD<br>如文中例子，session A和B正常启动，然后session C被block，之后session D也被block。当把 session A 和 session B 都commit掉后，发现session C依然是block的（被 session D阻塞），只有当把 session D 也commit掉后，session C才执行下去。同样的实验，重复了三遍，结果也是一样。<br>从现象上看，session D会先拿到MDL读锁，当session D commit掉后，然后再是session C获得MDL写锁。请问老师，这里对于MDL锁的获取顺序（也就是说 是session C先获取MDL写锁还是session D先获取MDL读锁）有什么原则？是随机的还是有什么讲究？<br><br>另外，在一开始的获取MDL锁的阶段，session A（MDL读锁，正常执行）-&gt; session B (MDL读锁，正常执行) -&gt; session C (MDL写锁，被block) -&gt; session D (MDL读锁，被MDL写锁 block) 。是不是说加MDL锁是看时间先后顺序的，一旦出现过需要获取MDL写锁（即使被block），后续再需要获取MDL读锁，则发现之前已经有获取MDL写锁（即使被block），需要获取读锁的session都会被block。感觉上像进入一个锁的”队列“，根据时间先后顺序。请问老师，这里可以更细节和深入的说明下吗？ <br></div>
+                            <span class="time">2018-11-27 13:07</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">你这个例子里面，sessionD 被C堵住后是不能输入命令的，之后是什么动作之后，sessionD才能输入commit语句呢<br><br></p>
+                                <p class="reply-time">2018-11-27 13:43</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">keepmoving</span>
+                            </div>
+                            <div class="bd">请教，我们在一个mysql 5.7版本的分区大表上增加了一个字段，是在线更新表结构，原本以为会很快，结果足足等了4个多小时。按您的说法系统能正常的做交易。之前上网查原因，一种说法是mysql的表结构加字段，通过创建临时表，copy数据到临时表，再用有新增字段的临时表替换原表的方式来处理。<br>1、请问以上说法是对的么？<br>2、如果像您说的表数据更新和查询都会加mdl锁，那就应该不能处理新增交易啊？<br>3、现在mysql新增字段不支持设置超时时间吧？<br><br>谢谢<br> <br></div>
+                            <span class="time">2018-11-26 21:46</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/2a/a5/e80c3a39.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">　</span>
+                            </div>
+                            <div class="bd">表级锁的例子中：<br>lock tables t1 read, t2 write<br>说到“线程A不能读取T2”<br>查了一下MySQL Reference：<br>WRITE lock:<br>The session that holds the lock can read and write the table.<br>Only the session that holds the lock can access the table. No other session can access it until the lock is released.<br>Lock requests for the table by other sessions block while the WRITE lock is held.<br>也就是说表级别write锁，对于本线程是可读可写的，<br>文章中说的线程A不能读取T2，我这里不太理解 <br></div>
+                            <span class="time">2018-11-26 10:42</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是的，文中写错了。我刚刚修改上去了。抱歉。谢谢提醒</p>
+                                <p class="reply-time">2018-11-26 11:47</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Nick</span>
+                            </div>
+                            <div class="bd">FTWRL是怎么实现全局读锁的？<br>在5.7.23环境下做了测试<br>场景一<br>第一步执行事物A: begin;update t set name＝&#39;x&#39; where id＝1; 不提交<br>第二步执行sql B: update t set name＝&#39;x&#39; where id＝1;被阻塞，锁等待<br>第三步执行 sql C : flush tables with read lock; 被阻塞，状态为waiting for global read lock<br><br>场景二<br>第一步执行事物A: begin;update t set name＝&#39;x&#39; where id＝1; 不提交<br>第二步执行sql C : flush tables with read lock; <br>顺利执行完。<br><br>场景二说明FTWRL不被行x锁和 共享mdl锁阻塞，那场景一中，什么阻塞了FTWRL呢？<br>FTWRL包含三个动作，<br>1 上全局读锁 ;<br>2 关闭表 ;<br>3上全局commit锁;<br>请林老师解惑 <br></div>
+                            <span class="time">2018-11-29 12:43</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/48/bd/6c7d4230.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Tony Du</span>
+                            </div>
+                            <div class="bd">基于文中的例子MDL（metadata lock)，自己做了一个实验（稍微有一些小改动在session D上），<br>session A: begin; select * from t limit 1; 最先启动sessionA<br>session B: begin; select * from t limit 1; 紧接着启动sessionB<br>session C: alter table t add f int; 然后再是启动sessionC<br>session D: begin; select * from t limit 1; 最后是启动sessionD<br>如文中例子，session A和B正常启动，然后session C被block，之后session D也被block。当把 session A 和 session B 都commit掉后，发现session C依然是block的（被 session D阻塞），只有当把 session D 也commit掉后，session C才执行下去。同样的实验，重复了三遍，结果也是一样。<br>从现象上看，session D会先拿到MDL读锁，当session D commit掉后，然后再是session C获得MDL写锁。请问老师，这里对于MDL锁的获取顺序（也就是说 是session C先获取MDL写锁还是session D先获取MDL读锁）有什么原则？是随机的还是有什么讲究？<br><br>另外，在一开始的获取MDL锁的阶段，session A（MDL读锁，正常执行）-&gt; session B (MDL读锁，正常执行) -&gt; session C (MDL写锁，被block) -&gt; session D (MDL读锁，被MDL写锁 block) 。是不是说加MDL锁是看时间先后顺序的，一旦出现过需要获取MDL写锁（即使被block），后续再需要获取MDL读锁，则发现之前已经有获取MDL写锁（即使被block），需要获取读锁的session都会被block。感觉上像进入一个锁的”队列“，根据时间先后顺序。请问老师，这里可以更细节和深入的说明下吗？<br><br> 作者回复<br>你这个例子里面，sessionD 被C堵住后是不能输入命令的，之后是什么动作之后，sessionD才能输入commit语句呢<br><br>我的回复：<br>session D被C堵住后，会卡在select * from t limit 1这句。然后当我把A和B都commit掉，session D就会执行select * from t limit 1这句，此时，session C依旧会被堵着。然后把session D commit掉，session C才能执行。实验的时候，我是把sql语句都写在MySQL workbench里的，通过workbench连服务器的，session D的commit语句是写在workbench里执行的。我的问题是，为什么是session D先获取的MDL读锁，而不是session C先获取MDL写锁，对于MDL锁的获取顺序有什么原则？是随机的还是有什么讲究？<br><br> 作者回复<br>你用MySQL 客户端试试，我跑出来是文中的顺序哈。给我一下你的MySQL 版本号和workbench版本号<br><br>我的回复<br>用MySQL客户端试过了（通过命令行），结果和我上面实验的结果是一样的。还是session D先获取的MDL读锁，而不是session C先获取MDL写锁。<br>MySQL版本：Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper<br>Workbench版本：<br>MySQL Workbench 6.3<br>Version 6.3.8 build 1228 CE (64 bits) Community<br><br>这里留言回复不太方便，能否留一个邮箱或者微信号，交流起来比较方便。谢谢。 <br></div>
+                            <span class="time">2018-11-28 09:53</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/d5/95/aae1eb2a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">core dumped</span>
+                            </div>
+                            <div class="bd">思考题:要看ddl语句传到备库后是在mysqldump命令中select数据之前还是之后，如果是之前这个ddl能执行成功，但是mysqldump后面select数据就会报错，如果是之后就会等待在导出数据完成后会跳到select开始之前保存的save point点，这时ddl会继续执行下去。不知是否正确，望大神指导。 <br></div>
+                            <span class="time">2018-11-26 12:31</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/de/1c/60ff644d.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Fatal Error</span>
+                            </div>
+                            <div class="bd">上一节的问题，ca 索引的数据和 c 索引一样，是因为c索引查到数据时，回表后返回的数据在主键索引已经排好，所以不需要 ca 索引做排序。做个记录，一开始没理解，刚刚想了一下理解了。 <br></div>
+                            <span class="time">2018-12-12 17:01</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/10/c5/5940aadc.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Lingance</span>
+                            </div>
+                            <div class="bd">–single-transaction 是一致性读，在开始备份前开启事务并将隔离级别设置为可重复读。所以备份期间主库上后发起的DDL在备库上不可见。 <br></div>
+                            <span class="time">2018-11-26 08:46</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/3c/2d/3d31b684.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">D不发音</span>
+                            </div>
+                            <div class="bd">我查阅了下MySQL的doc，说道<br>To acquire table locks within the current session, use the LOCK TABLES statement, which acquires metadata locks<br>来源：https:&#47;&#47;dev.mysql.com&#47;doc&#47;refman&#47;8.0&#47;en&#47;lock-tables.html#table-lock-acquisition<br>就是LOCK TABLES拿到的也是mdl，而不是表锁？<br>然后我看到mdl的doc，说道<br>The exclusive lock request for x by Client 3 has higher priority than the write lock request by Client 2, so Client 3 acquires its lock on x, then also on x_new and x_old, performs the renaming, and releases its locks.<br>来源：https:&#47;&#47;dev.mysql.com&#47;doc&#47;refman&#47;8.0&#47;en&#47;metadata-locking.html<br>意思就是除了读锁和写锁还存在exclusive lock？然后这个锁比写锁的优先高。<br>感觉极客时间评论应该支持markdown，现在的感觉就是给移动端做的，不关心PC端富文本编辑的需求。<br> <br></div>
+                            <span class="time">2018-12-13 23:23</span>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

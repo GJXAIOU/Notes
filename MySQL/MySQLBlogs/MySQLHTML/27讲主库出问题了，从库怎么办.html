@@ -1,0 +1,500 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                27讲主库出问题了，从库怎么办
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/28/73/28a49c9237925fe1d95edc612dd13673.jpg">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>在前面的第<a href="https://time.geekbang.org/column/article/76446">24</a>、<a href="https://time.geekbang.org/column/article/76795">25</a>和<a href="https://time.geekbang.org/column/article/77083">26</a>篇文章中，我和你介绍了MySQL主备复制的基础结构，但这些都是一主一备的结构。</p><p>大多数的互联网应用场景都是读多写少，因此你负责的业务，在发展过程中很可能先会遇到读性能的问题。而在数据库层解决读性能问题，就要涉及到接下来两篇文章要讨论的架构：一主多从。</p><p>今天这篇文章，我们就先聊聊一主多从的切换正确性。然后，我们在下一篇文章中再聊聊解决一主多从的查询逻辑正确性的方法。</p><p>如图1所示，就是一个基本的一主多从结构。</p><p><img src="https://static001.geekbang.org/resource/image/aa/79/aadb3b956d1ffc13ac46515a7d619e79.png" alt=""></p><center><span class="reference">图1 一主多从基本结构</span></center><p>图中，虚线箭头表示的是主备关系，也就是A和A’互为主备， 从库B、C、D指向的是主库A。一主多从的设置，一般用于读写分离，主库负责所有的写入和一部分读，其他的读请求则由从库分担。</p><p>今天我们要讨论的就是，在一主多从架构下，主库故障后的主备切换问题。</p><p>如图2所示，就是主库发生故障，主备切换后的结果。</p><p><img src="https://static001.geekbang.org/resource/image/00/53/0014f97423bd75235a9187f492fb2453.png" alt=""></p><center><span class="reference">图2 一主多从基本结构--主备切换</span></center><p>相比于一主一备的切换流程，一主多从结构在切换完成后，A’会成为新的主库，从库B、C、D也要改接到A’。正是由于多了从库B、C、D重新指向的这个过程，所以主备切换的复杂性也相应增加了。</p><p>接下来，我们再一起看看一个切换系统会怎么完成一主多从的主备切换过程。</p><!-- [[[read_end]]] --><h1>基于位点的主备切换</h1><p>这里，我们需要先来回顾一个知识点。</p><p>当我们把节点B设置成节点A’的从库的时候，需要执行一条change master命令：</p><pre><code>CHANGE MASTER TO 
+MASTER_HOST=$host_name 
+MASTER_PORT=$port 
+MASTER_USER=$user_name 
+MASTER_PASSWORD=$password 
+MASTER_LOG_FILE=$master_log_name 
+MASTER_LOG_POS=$master_log_pos  
+</code></pre><p>这条命令有这么6个参数：</p><ul>
+<li>MASTER_HOST、MASTER_PORT、MASTER_USER和MASTER_PASSWORD四个参数，分别代表了主库A’的IP、端口、用户名和密码。</li>
+<li>最后两个参数MASTER_LOG_FILE和MASTER_LOG_POS表示，要从主库的master_log_name文件的master_log_pos这个位置的日志继续同步。而这个位置就是我们所说的同步位点，也就是主库对应的文件名和日志偏移量。</li>
+</ul><p>那么，这里就有一个问题了，节点B要设置成A’的从库，就要执行change master命令，就不可避免地要设置位点的这两个参数，但是这两个参数到底应该怎么设置呢？</p><p>原来节点B是A的从库，本地记录的也是A的位点。但是相同的日志，A的位点和A’的位点是不同的。因此，从库B要切换的时候，就需要先经过“找同步位点”这个逻辑。</p><p>这个位点很难精确取到，只能取一个大概位置。为什么这么说呢？</p><p>我来和你分析一下看看这个位点一般是怎么获取到的，你就清楚其中不精确的原因了。</p><p>考虑到切换过程中不能丢数据，所以我们找位点的时候，总是要找一个“稍微往前”的，然后再通过判断跳过那些在从库B上已经执行过的事务。</p><p>一种取同步位点的方法是这样的：</p><ol>
+<li>
+<p>等待新主库A’把中转日志（relay log）全部同步完成；</p>
+</li>
+<li>
+<p>在A’上执行show master status命令，得到当前A’上最新的File 和 Position；</p>
+</li>
+<li>
+<p>取原主库A故障的时刻T；</p>
+</li>
+<li>
+<p>用mysqlbinlog工具解析A’的File，得到T时刻的位点。</p>
+</li>
+</ol><pre><code>mysqlbinlog File --stop-datetime=T --start-datetime=T
+</code></pre><p><img src="https://static001.geekbang.org/resource/image/34/dd/3471dfe4aebcccfaec0523a08cdd0ddd.png" alt=""></p><center><span class="reference">图3 mysqlbinlog 部分输出结果</span></center><p>图中，end_log_pos后面的值“123”，表示的就是A’这个实例，在T时刻写入新的binlog的位置。然后，我们就可以把123这个值作为$master_log_pos ，用在节点B的change master命令里。</p><p>当然这个值并不精确。为什么呢？</p><p>你可以设想有这么一种情况，假设在T这个时刻，主库A已经执行完成了一个insert 语句插入了一行数据R，并且已经将binlog传给了A’和B，然后在传完的瞬间主库A的主机就掉电了。</p><p>那么，这时候系统的状态是这样的：</p><ol>
+<li>
+<p>在从库B上，由于同步了binlog， R这一行已经存在；</p>
+</li>
+<li>
+<p>在新主库A’上， R这一行也已经存在，日志是写在123这个位置之后的；</p>
+</li>
+<li>
+<p>我们在从库B上执行change master命令，指向A’的File文件的123位置，就会把插入R这一行数据的binlog又同步到从库B去执行。</p>
+</li>
+</ol><p>这时候，从库B的同步线程就会报告 Duplicate entry ‘id_of_R’ for key ‘PRIMARY’ 错误，提示出现了主键冲突，然后停止同步。</p><p>所以，<strong>通常情况下，我们在切换任务的时候，要先主动跳过这些错误，有两种常用的方法。</strong></p><p><strong>一种做法是</strong>，主动跳过一个事务。跳过命令的写法是：</p><pre><code>set global sql_slave_skip_counter=1;
+start slave;
+</code></pre><p>因为切换过程中，可能会不止重复执行一个事务，所以我们需要在从库B刚开始接到新主库A’时，持续观察，每次碰到这些错误就停下来，执行一次跳过命令，直到不再出现停下来的情况，以此来跳过可能涉及的所有事务。</p><p><strong>另外一种方式是，</strong>通过设置slave_skip_errors参数，直接设置跳过指定的错误。</p><p>在执行主备切换时，有这么两类错误，是经常会遇到的：</p><ul>
+<li>1062错误是插入数据时唯一键冲突；</li>
+<li>1032错误是删除数据时找不到行。</li>
+</ul><p>因此，我们可以把slave_skip_errors 设置为 “1032,1062”，这样中间碰到这两个错误时就直接跳过。</p><p>这里需要注意的是，这种直接跳过指定错误的方法，针对的是主备切换时，由于找不到精确的同步位点，所以只能采用这种方法来创建从库和新主库的主备关系。</p><p>这个背景是，我们很清楚在主备切换过程中，直接跳过1032和1062这两类错误是无损的，所以才可以这么设置slave_skip_errors参数。等到主备间的同步关系建立完成，并稳定执行一段时间之后，我们还需要把这个参数设置为空，以免之后真的出现了主从数据不一致，也跳过了。</p><h1>GTID</h1><p>通过sql_slave_skip_counter跳过事务和通过slave_skip_errors忽略错误的方法，虽然都最终可以建立从库B和新主库A’的主备关系，但这两种操作都很复杂，而且容易出错。所以，MySQL 5.6版本引入了GTID，彻底解决了这个困难。</p><p>那么，GTID到底是什么意思，又是如何解决找同步位点这个问题呢？现在，我就和你简单介绍一下。</p><p>GTID的全称是Global Transaction Identifier，也就是全局事务ID，是一个事务在提交的时候生成的，是这个事务的唯一标识。它由两部分组成，格式是：</p><pre><code>GTID=server_uuid:gno
+</code></pre><p>其中：</p><ul>
+<li>server_uuid是一个实例第一次启动时自动生成的，是一个全局唯一的值；</li>
+<li>gno是一个整数，初始值是1，每次提交事务的时候分配给这个事务，并加1。</li>
+</ul><p>这里我需要和你说明一下，在MySQL的官方文档里，GTID格式是这么定义的：</p><pre><code>GTID=source_id:transaction_id
+</code></pre><p>这里的source_id就是server_uuid；而后面的这个transaction_id，我觉得容易造成误导，所以我改成了gno。为什么说使用transaction_id容易造成误解呢？</p><p>因为，在MySQL里面我们说transaction_id就是指事务id，事务id是在事务执行过程中分配的，如果这个事务回滚了，事务id也会递增，而gno是在事务提交的时候才会分配。</p><p>从效果上看，GTID往往是连续的，因此我们用gno来表示更容易理解。</p><p>GTID模式的启动也很简单，我们只需要在启动一个MySQL实例的时候，加上参数gtid_mode=on和enforce_gtid_consistency=on就可以了。</p><p>在GTID模式下，每个事务都会跟一个GTID一一对应。这个GTID有两种生成方式，而使用哪种方式取决于session变量gtid_next的值。</p><ol>
+<li>
+<p>如果gtid_next=automatic，代表使用默认值。这时，MySQL就会把server_uuid:gno分配给这个事务。<br>
+a.  记录binlog的时候，先记录一行 SET @@SESSION.GTID_NEXT=‘server_uuid:gno’;<br>
+b.  把这个GTID加入本实例的GTID集合。</p>
+</li>
+<li>
+<p>如果gtid_next是一个指定的GTID的值，比如通过set gtid_next='current_gtid’指定为current_gtid，那么就有两种可能：<br>
+a.  如果current_gtid已经存在于实例的GTID集合中，接下来执行的这个事务会直接被系统忽略；<br>
+b.  如果current_gtid没有存在于实例的GTID集合中，就将这个current_gtid分配给接下来要执行的事务，也就是说系统不需要给这个事务生成新的GTID，因此gno也不用加1。</p>
+</li>
+</ol><p>注意，一个current_gtid只能给一个事务使用。这个事务提交后，如果要执行下一个事务，就要执行set 命令，把gtid_next设置成另外一个gtid或者automatic。</p><p>这样，每个MySQL实例都维护了一个GTID集合，用来对应“这个实例执行过的所有事务”。</p><p>这样看上去不太容易理解，接下来我就用一个简单的例子，来和你说明GTID的基本用法。</p><p>我们在实例X中创建一个表t。</p><pre><code>CREATE TABLE `t` (
+  `id` int(11) NOT NULL,
+  `c` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+insert into t values(1,1);
+</code></pre><p><img src="https://static001.geekbang.org/resource/image/28/c2/28a5cab0079fb12fd5abecd92b3324c2.png" alt=""></p><center><span class="reference">图4 初始化数据的binlog</span></center><p>可以看到，事务的BEGIN之前有一条SET @@SESSION.GTID_NEXT命令。这时，如果实例X有从库，那么将CREATE TABLE和insert语句的binlog同步过去执行的话，执行事务之前就会先执行这两个SET命令， 这样被加入从库的GTID集合的，就是图中的这两个GTID。</p><p>假设，现在这个实例X是另外一个实例Y的从库，并且此时在实例Y上执行了下面这条插入语句：</p><pre><code>insert into t values(1,1);
+</code></pre><p>并且，这条语句在实例Y上的GTID是 “aaaaaaaa-cccc-dddd-eeee-ffffffffffff:10”。</p><p>那么，实例X作为Y的从库，就要同步这个事务过来执行，显然会出现主键冲突，导致实例X的同步线程停止。这时，我们应该怎么处理呢？</p><p>处理方法就是，你可以执行下面的这个语句序列：</p><pre><code>set gtid_next='aaaaaaaa-cccc-dddd-eeee-ffffffffffff:10';
+begin;
+commit;
+set gtid_next=automatic;
+start slave;
+</code></pre><p>其中，前三条语句的作用，是通过提交一个空事务，把这个GTID加到实例X的GTID集合中。如图5所示，就是执行完这个空事务之后的show master status的结果。</p><p><img src="https://static001.geekbang.org/resource/image/c8/57/c8d3299ece7d583a3ecd1557851ed157.png" alt=""></p><center><span class="reference">图5 show master status结果</span></center><p>可以看到实例X的Executed_Gtid_set里面，已经加入了这个GTID。</p><p>这样，我再执行start slave命令让同步线程执行起来的时候，虽然实例X上还是会继续执行实例Y传过来的事务，但是由于“aaaaaaaa-cccc-dddd-eeee-ffffffffffff:10”已经存在于实例X的GTID集合中了，所以实例X就会直接跳过这个事务，也就不会再出现主键冲突的错误。</p><p>在上面的这个语句序列中，start slave命令之前还有一句set gtid_next=automatic。这句话的作用是“恢复GTID的默认分配行为”，也就是说如果之后有新的事务再执行，就还是按照原来的分配方式，继续分配gno=3。</p><h1>基于GTID的主备切换</h1><p>现在，我们已经理解GTID的概念，再一起来看看基于GTID的主备复制的用法。</p><p>在GTID模式下，备库B要设置为新主库A’的从库的语法如下：</p><pre><code>CHANGE MASTER TO 
+MASTER_HOST=$host_name 
+MASTER_PORT=$port 
+MASTER_USER=$user_name 
+MASTER_PASSWORD=$password 
+master_auto_position=1 
+</code></pre><p>其中，master_auto_position=1就表示这个主备关系使用的是GTID协议。可以看到，前面让我们头疼不已的MASTER_LOG_FILE和MASTER_LOG_POS参数，已经不需要指定了。</p><p>我们把现在这个时刻，实例A’的GTID集合记为set_a，实例B的GTID集合记为set_b。接下来，我们就看看现在的主备切换逻辑。</p><p>我们在实例B上执行start slave命令，取binlog的逻辑是这样的：</p><ol>
+<li>
+<p>实例B指定主库A’，基于主备协议建立连接。</p>
+</li>
+<li>
+<p>实例B把set_b发给主库A’。</p>
+</li>
+<li>
+<p>实例A’算出set_a与set_b的差集，也就是所有存在于set_a，但是不存在于set_b的GITD的集合，判断A’本地是否包含了这个差集需要的所有binlog事务。<br>
+a.  如果不包含，表示A’已经把实例B需要的binlog给删掉了，直接返回错误；<br>
+b.  如果确认全部包含，A’从自己的binlog文件里面，找出第一个不在set_b的事务，发给B；</p>
+</li>
+<li>
+<p>之后就从这个事务开始，往后读文件，按顺序取binlog发给B去执行。</p>
+</li>
+</ol><p>其实，这个逻辑里面包含了一个设计思想：在基于GTID的主备关系里，系统认为只要建立主备关系，就必须保证主库发给备库的日志是完整的。因此，如果实例B需要的日志已经不存在，A’就拒绝把日志发给B。</p><p>这跟基于位点的主备协议不同。基于位点的协议，是由备库决定的，备库指定哪个位点，主库就发哪个位点，不做日志的完整性判断。</p><p>基于上面的介绍，我们再来看看引入GTID后，一主多从的切换场景下，主备切换是如何实现的。</p><p>由于不需要找位点了，所以从库B、C、D只需要分别执行change master命令指向实例A’即可。</p><p>其实，严谨地说，主备切换不是不需要找位点了，而是找位点这个工作，在实例A’内部就已经自动完成了。但由于这个工作是自动的，所以对HA系统的开发人员来说，非常友好。</p><p>之后这个系统就由新主库A’写入，主库A’的自己生成的binlog中的GTID集合格式是：server_uuid_of_A’:1-M。</p><p>如果之前从库B的GTID集合格式是 server_uuid_of_A:1-N， 那么切换之后GTID集合的格式就变成了server_uuid_of_A:1-N, server_uuid_of_A’:1-M。</p><p>当然，主库A’之前也是A的备库，因此主库A’和从库B的GTID集合是一样的。这就达到了我们预期。</p><h1>GTID和在线DDL</h1><p>接下来，我再举个例子帮你理解GTID。</p><p>之前在第22篇文章<a href="https://time.geekbang.org/column/article/75746">《MySQL有哪些“饮鸩止渴”提高性能的方法？》</a>中，我和你提到业务高峰期的慢查询性能问题时，分析到如果是由于索引缺失引起的性能问题，我们可以通过在线加索引来解决。但是，考虑到要避免新增索引对主库性能造成的影响，我们可以先在备库加索引，然后再切换。</p><p>当时我说，在双M结构下，备库执行的DDL语句也会传给主库，为了避免传回后对主库造成影响，要通过set sql_log_bin=off关掉binlog。</p><p>评论区有位同学提出了一个问题：这样操作的话，数据库里面是加了索引，但是binlog并没有记录下这一个更新，是不是会导致数据和日志不一致？</p><p>这个问题提得非常好。当时，我在留言的回复中就引用了GTID来说明。今天，我再和你展开说明一下。</p><p>假设，这两个互为主备关系的库还是实例X和实例Y，且当前主库是X，并且都打开了GTID模式。这时的主备切换流程可以变成下面这样：</p><ul>
+<li>
+<p>在实例X上执行stop slave。</p>
+</li>
+<li>
+<p>在实例Y上执行DDL语句。注意，这里并不需要关闭binlog。</p>
+</li>
+<li>
+<p>执行完成后，查出这个DDL语句对应的GTID，并记为 server_uuid_of_Y:gno。</p>
+</li>
+<li>
+<p>到实例X上执行以下语句序列：</p>
+</li>
+</ul><pre><code>set GTID_NEXT=&quot;server_uuid_of_Y:gno&quot;;
+begin;
+commit;
+set gtid_next=automatic;
+start slave;
+</code></pre><p>这样做的目的在于，既可以让实例Y的更新有binlog记录，同时也可以确保不会在实例X上执行这条更新。</p><ul>
+<li>接下来，执行完主备切换，然后照着上述流程再执行一遍即可。</li>
+</ul><h1>小结</h1><p>在今天这篇文章中，我先和你介绍了一主多从的主备切换流程。在这个过程中，从库找新主库的位点是一个痛点。由此，我们引出了MySQL 5.6版本引入的GTID模式，介绍了GTID的基本概念和用法。</p><p>可以看到，在GTID模式下，一主多从切换就非常方便了。</p><p>因此，如果你使用的MySQL版本支持GTID的话，我都建议你尽量使用GTID模式来做一主多从的切换。</p><p>在下一篇文章中，我们还能看到GTID模式在读写分离场景的应用。</p><p>最后，又到了我们的思考题时间。</p><p>你在GTID模式下设置主从关系的时候，从库执行start slave命令后，主库发现需要的binlog已经被删除掉了，导致主备创建不成功。这种情况下，你觉得可以怎么处理呢？</p><p>你可以把你的方法写在留言区，我会在下一篇文章的末尾和你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><h1>上期问题时间</h1><p>上一篇文章最后，我给你留的问题是，如果主库都是单线程压力模式，在从库追主库的过程中，binlog-transaction-dependency-tracking 应该选用什么参数？</p><p>这个问题的答案是，应该将这个参数设置为WRITESET。</p><p>由于主库是单线程压力模式，所以每个事务的commit_id都不同，那么设置为COMMIT_ORDER模式的话，从库也只能单线程执行。</p><p>同样地，由于WRITESET_SESSION模式要求在备库应用日志的时候，同一个线程的日志必须与主库上执行的先后顺序相同，也会导致主库单线程压力模式下退化成单线程复制。</p><p>所以，应该将binlog-transaction-dependency-tracking 设置为WRITESET。</p><p><strong>评论区留言点赞板：</strong></p><blockquote>
+<p>@慧鑫coming 问了一个好问题，对同一行作更新的几个事务，如果commit_id相同，是不是在备库并行执行的时候会导致数据不一致？这个问题的答案是更新同一行的事务是不可能同时进入commit状态的。<br>
+@老杨同志 对这个问题给出了更详细的回答，大家可以去看一下。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/09/77/09c1073f99cf71d2fb162a716b5fa577.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f8/70/f3a33a14.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">某、人</span>
+                            </div>
+                            <div class="bd">1.如果业务允许主从不一致的情况那么可以在主上先show global variables like &#39;gtid_purged&#39;;然后在从上执行set global gtid_purged =&#39; &#39;.指定从库从哪个gtid开始同步,binlog缺失那一部分,数据在从库上会丢失,就会造成主从不一致<br>2.需要主从数据一致的话,最好还是通过重新搭建从库来做。<br>3.如果有其它的从库保留有全量的binlog的话，可以把从库指定为保留了全量binlog的从库为主库(级联复制)<br>4.如果binlog有备份的情况,可以先在从库上应用缺失的binlog,然后在start slave<br> <br></div>
+                            <span class="time">2019-01-15 17:21</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">非常好</p>
+                                <p class="reply-time">2019-01-15 19:34</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/b8/36/542c96bf.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Mr.Strive.Z.H.L</span>
+                            </div>
+                            <div class="bd">老师您好：<br>在实际工作中，主从备份似乎是mysql用的最多的高可用方案。<br>但是个人认为主从备份这个方案的问题实在太多了：<br>1. binlog数据传输前，主库宕机，导致提交了的事务数据丢失。<br>2. 一主多从，即使采用半同步，也只能保证binlog至少在两台机器上，没有一个机制能够选出拥有最完整binlog的从库作为新的主库。<br>3. 主从切换涉及到 人为操作，而不是全自动化的。即使在使用GTID的情况下，也会有binlog被删除，需要重新做从库的情况。<br>4. 互为主备，如果互为主备的两个实例全部宕机，mysql直接不可用。<br><br>mysql应该有更强大更完备的高可用方案（类似于zab协议或者raft协议这种），而在实际环境下，为什么主从备份用得最多呢？<br> <br></div>
+                            <span class="time">2019-01-18 10:43</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">3 这个应该是可以做到自动化的。<br>4 这个概率比较小，其实即使是别的三节点的方案，也架不住挂两个实例，所以这个不是MySQL主备的锅。<br><br>前面两点提得很对哈。<br>其实MySQL到现在，还是提供了很多方案可选的。很多是业务权衡的结果。<br><br>比如说，异步复制，在主库异常掉电的时候可能会丢数据。<br>这个大家知道以后，有一些就改成semi-sync了，但是还是有一些就留着异步复制的模式，因为semi-sync有性能影响（一开始35%，现在好点15%左右，看具体环境），而可能这些业务认为丢一两行，可以从应用层日志去补。 就保留了异步复制模式。<br><br>最后，为什么主从备份用得最多，我觉得有历史原因。多年前MySQL刚要开始火的时候，大家发现这个主备模式好方便，就都用了。<br>而基于其他协议的方案，都是后来出现的，并且还是陆陆续续出点bug。<br>涉及到线上服务，大家使用新方案的热情总是局限在测试环境的多。<br><br>semi-sync也是近几年才开始稳定并被一些公司开始作为默认配置。<br><br>新技术的推广，在数据库上，确实比其他领域更需要谨慎些，也算是业务决定的吧^_^<br>好问题<br>以上仅一家之言哈<br><br></p>
+                                <p class="reply-time">2019-01-18 11:54</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJJeibN69icI9iapx9h2MtUX3zb2iaggw32w4GAmbUDibPp3ia5MPSznxGZeiadXibBbx6Y13iacDbTDBwKyibA/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">悟空</span>
+                            </div>
+                            <div class="bd">看过上篇后想到一个问题:<br>级联复制A-&gt;B-&gt;C结构下, 从库C的Seconds_Behind_Master的时间计算问题.<br>假定当前主库A仅有一个DDL要进行变更,耗时1分钟.那么从库C的SBM值最大应该是多少时间?<br>是1分钟, 2分钟, 还是3分钟呢 ?<br>带着疑问看了一下测试从库C的binlog文件中的时间戳,得出结论应该是3分钟.<br><br>打破之前认知 ♀ . 请老师解惑 , 谢谢 !  <br></div>
+                            <span class="time">2019-01-14 16:06</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是的，因为算的是：当前执行时间，跟*日志时间*的差距<br><br>而这个日志时间，是在A上执行出来的。<br><br>好问题，很好的验证过程。</p>
+                                <p class="reply-time">2019-01-14 17:15</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/71/97/09bc55dc.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">张永志</span>
+                            </div>
+                            <div class="bd">今天问题回答：<br>GTID主从同步设置时，主库A发现需同步的GTID日志有删掉的，那么A就会报错。<br>解决办法：<br>从库B在启动同步前需要设置 gtid_purged，指定GTID同步的起点，使用备份搭建从库时需要这样设置。<br><br>如果在从库上执行了单独的操作，导致主库上缺少GTID，那么可以在主库上模拟一个与从库B上GTID一样的空事务，这样主从同步就不会报错了。<br> <br></div>
+                            <span class="time">2019-01-14 16:49</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">你已经理解GTID的机制啦</p>
+                                <p class="reply-time">2019-01-15 03:47</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/b8/36/542c96bf.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Mr.Strive.Z.H.L</span>
+                            </div>
+                            <div class="bd">老师您好：<br>之前讲过 互为主备 的场景下，会出现循环复制的问题，今天这节讲了GTID。<br>如果使用GTID，那么 循环复制 的问题自然而然就解决了呀？？！！ <br></div>
+                            <span class="time">2019-01-18 10:33</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">哈哈，you got it</p>
+                                <p class="reply-time">2019-01-18 11:42</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/79/b7/989824f7.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">春困秋乏夏打盹</span>
+                            </div>
+                            <div class="bd">回答undifined的第二个问题<br>A-A&#39;-B这样的级联结构<br>A (binlog：A:1-M)<br>A&#39;(binlog:   A:1-M,B:1-N) ,A&#39;上面的操作记为B:1-N<br>B (binlog:   A:1-M,B:1-N,C:1-X) B上面的操作记为C:1-X<br>---A,B,C分别为A-A&#39;-B的uuid <br></div>
+                            <span class="time">2019-01-16 16:46</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">对的<br>总之就是，一个主备关系里，备库的GTID集合应该包含主库的GTID集合。</p>
+                                <p class="reply-time">2019-01-16 17:51</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83er6NXib2NGaTAAEe2KCcibH2FiafOOD73kQdcuAMGrnRib5CDWXum0SWDOM9NnWicbUsDpghmxEmJtpk9w/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">tchz</span>
+                            </div>
+                            <div class="bd">1.purge gtid，2.重做备库数据 <br></div>
+                            <span class="time">2019-01-15 13:14</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">2 是ok的<br><br>purge gtid是啥</p>
+                                <p class="reply-time">2019-01-15 19:27</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTIKVicSvNf6OFvv4m3ibfsYCIUxic41kODPa9cuGUJjPcBtryLBDljalIVUiaJKlkGEJtOMZ03XSFlx1w/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">fuyu</span>
+                            </div>
+                            <div class="bd">seta 和 setb 里的集合大小不会很大？ <br></div>
+                            <span class="time">2019-01-15 12:55</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">大没关系呀，是分段的，比如 server_uuid_of_a:1-1000000，就一个段</p>
+                                <p class="reply-time">2019-01-15 19:26</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/31/fe/30a17a9d.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Leo</span>
+                            </div>
+                            <div class="bd">老师你好，PingCAP的大牛说分布式数据库的一个难点是时间同步。此话怎讲？mysql主从架构下时间不同步会有哪些问题？ <br></div>
+                            <span class="time">2019-01-15 09:14</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">今晚发布的第28篇会提到哈</p>
+                                <p class="reply-time">2019-01-15 10:11</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/7c/16/38c07a04.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">_CountingStars</span>
+                            </div>
+                            <div class="bd">老师我有一个问题 如果数据库已经有完成了很多事务 实例 A’的 GTID集合和 实例 B的 GTID集合 是不是很大，这个GTID是从binglog里一点一点的解析出来所有的事务的吗？这样是不是会很慢 ？在所有binlog里定位某个GTID是不是效率也很低 <br></div>
+                            <span class="time">2019-01-15 08:25</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">好问题，<br>在binlog文件开头，有一个Previous_gtids, 用于记录 “生成这个binlog的时候，实例的Executed_gtid_set”, 所以启动的时候只需要解析最后一个文件；<br><br>同样的，由于有这个Previous_gtids，可以快速地定位GTID在哪个文件里。</p>
+                                <p class="reply-time">2019-01-15 10:09</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/4b/e4/0219e7c8.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">小超</span>
+                            </div>
+                            <div class="bd">老师，问个上一篇的问题，从库不是只根据binlog来做相应的操作么，这个并行复制策略根据事务相同commit_id判断好理解，但是根据同时进入redo log prepare 和 commit 来判断这个怎么理解？事务提交的时候，其他事务的redo log处于prepare的状态事务的某个标识也会记录到每一个事务的binlog中么？ <br></div>
+                            <span class="time">2019-01-14 22:28</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f6/d1/dcafd7cf.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">PengfeiWang</span>
+                            </div>
+                            <div class="bd">老师，您好： 文中对于sql_slave_skip_counter=1的理解似乎有偏差，官方文档中的解释是：<br>When you use SET GLOBAL sql_slave_skip_counter to skip events and the result is in the middle of a group, the slave continues to skip events until it reaches the end of the group. Execution then starts with the next event group.<br>按照官方文档的解释，命令sql_slave_skip_counter=1 应该是跳过一个事务中的1个event，除非这个事务是有单个event组成的，才会跳过一个事务。<br>  <br></div>
+                            <span class="time">2019-01-14 16:06</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">你这个是好问题，<br><br>确实只是跳过一个event，不过文档中说了呀<br>“the slave continues to skip events until it reaches the end of the group. ”， <br>所以效果上等效于跳过一个事务哦</p>
+                                <p class="reply-time">2019-01-14 18:31</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f6/d1/dcafd7cf.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">PengfeiWang</span>
+                            </div>
+                            <div class="bd">老师，你好：在生产环境（基于位点的主备切换）中，经常会遇到这样的场景：备库由于硬件或其他原因异常宕机，恢复后重启备库，执行start slave命令，总会遇到1062主键重复的报错，一直解释不清楚为什么？ <br></div>
+                            <span class="time">2019-01-14 15:50</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">看一下这个语句的结果, 会受这几个参数的影响哈<br>select * from information_schema.GLOBAL_VARIABLES where VARIABLE_NAME in (&#39;master_info_repository&#39;,&#39;relay_log_info_repository&#39;,&#39;sync_master_info&#39;,&#39;sync_relay_log_info&#39;, &#39;sync_binlog&#39;, &#39;innodb_flush_log_at_trx_commit&#39;);<br></p>
+                                <p class="reply-time">2019-01-14 17:09</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/16/31/ae8adf82.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">路过</span>
+                            </div>
+                            <div class="bd">老师，请教：<br>show slave status\G的输出中，包含如下：<br>Executed_Gtid_Set: 572ece6c-e3ed-11e8-92c4-005056a509d8:1-1136659,<br>ecb34895-e3eb-11e8-80e9-005056a55d62:1-1015<br>是不是表示当前slave曾经和两个master同步过？ <br></div>
+                            <span class="time">2019-01-14 15:42</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">一个是它自己吧？<br>select @@server_uuid 看看</p>
+                                <p class="reply-time">2019-01-14 16:59</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/4f/78/c3d8ecb0.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">undifined</span>
+                            </div>
+                            <div class="bd">老师 有几个问题：<br>1. 会不会出现主库切换后，B 中已经执行过的事务，而 A&#39;由于网络延迟还没有收到，此时已经对 B 执行切换主库，这时候，B 中有该 GTID，但是 A&#39;中没有，这种情况会怎么处理<br>2. 如果 A 是主库，A&#39; 备库，B 是 A&#39;的从库，此时 B 的 GTID 集合应该是 server_uuid_of_A&#39;:1-N，此时 A&#39;宕机，B 改为监听 A，这时候A 和 B 的 GTID 集合没有交集，会不会发生 A 将所有的binlog 重新发给B<br>3. 思考题我的理解是从主库中 dump 出相关的数据，在备库中执行后再次执行 start slave；评论中说到从其他从库获取，但是如果只有一主一从，有 binlog 丢失，是不是只要 dump 文件恢复这一个办法 <br></div>
+                            <span class="time">2019-01-14 12:45</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. 这个也是异步复制导致的，只有semi-sync能解了。。<br>2. 不是哦，如果“ A 是主库，A&#39; 备库，B 是 A&#39;的从库”，那所有A的更新也都会通过A&#39;传给B，所以B的GTID集合正常就是包含了A和A&#39;的<br>3. “如果只有一主一从，有 binlog 丢失”，是的，就只有备库重做了</p>
+                                <p class="reply-time">2019-01-16 10:29</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/93/8a/abb7bfe3.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">亮</span>
+                            </div>
+                            <div class="bd">老师您好，假如a宕机了，需要把从切换到a&#39;，这时候业务已经有感知了吧？怎么能让业务尽量没有感知呢？谢谢老师 <br></div>
+                            <span class="time">2019-01-14 10:13</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">这种情况下，不可能业务完全无感知，<br><br>但是如果业务代码有“重连并重试”的逻辑，并且切换足够快，就可以对业务无影响，前提是要解决主备延迟问题，就是25、26两篇提到的</p>
+                                <p class="reply-time">2019-01-14 11:25</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/06/f2/1f511b7f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">大坤</span>
+                            </div>
+                            <div class="bd">今天问题回答，由于GTID具有全局唯一性，那么其它正常的gtid已经被复制到了其他从库上了，只需要切换gtid到其他从库，等待同步完毕后在切换回主库即可 <br></div>
+                            <span class="time">2019-01-14 08:16</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">这个想法很不错 </p>
+                                <p class="reply-time">2019-01-14 10:23</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/da/ec/779c1a78.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">往事随风，顺其自然</span>
+                            </div>
+                            <div class="bd">执行事务之前生成GTID，系统怎么知道下次要生成事物，是预生成留在那？ <br></div>
+                            <span class="time">2019-01-14 08:09</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">提交事务的时候才生成GTID</p>
+                                <p class="reply-time">2019-01-14 10:22</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,8 +1,8 @@
----
-style: summer
----
-
 # SSM框架原理,作用及使用方法
+
+[TOC]
+
+
 
 ## 一、框架原理
 
@@ -10,14 +10,14 @@ style: summer
 
 SSM 框架是 spring MVC ，spring 和 mybatis 框架的整合，是标准的 MVC 模式，将整个系统划分为表现层，controller层，service 层，DAO 层四层；
 
-- 使用spring MVC负责**请求的转发和视图管理**
-- spring实现业务对象管理
-- mybatis作为数据对象的持久化引擎
+- 使用 spring MVC 负责**请求的转发和视图管理**
+- spring 实现业务对象管理
+- Mybatis 作为数据对象的持久化引擎
 
 ### （二）实现原理
 
 - **spring MVC**
-  - DNS 负责域名的解析, 比如访问`www.baidu.com` 先通过DNS获取相应的服务器IP和端口；
+  - DNS 负责域名的解析, 比如访问`www.baidu.com` 先通过 DNS 获取相应的服务器 IP 和端口；
   - 请求消息到达端口以后由**Tomcat 主动去询问**自己占用的端口是否由请求发来；
   - 如果有请求 Tomcat **交给对应的项目**处理；
   - 客户端发送请求到 DispacherServlet（前端控制器即分发器），这里可以设置拦截器，对请求进行过滤处理；

@@ -1,0 +1,429 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                05讲深入浅出索引（下）
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/b1/9a/b19cb8fb9c5f7b565a89ab4c49811f9a.jpg">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>在上一篇文章中，我和你介绍了InnoDB索引的数据结构模型，今天我们再继续聊聊跟MySQL索引有关的概念。</p><p>在开始这篇文章之前，我们先来看一下这个问题：</p><p>在下面这个表T中，如果我执行 select * from T where k between 3 and 5，需要执行几次树的搜索操作，会扫描多少行？</p><p>下面是这个表的初始化语句。</p><pre><code>mysql&gt; create table T (
+ID int primary key,
+k int NOT NULL DEFAULT 0, 
+s varchar(16) NOT NULL DEFAULT '',
+index k(k))
+engine=InnoDB;
+
+insert into T values(100,1, 'aa'),(200,2,'bb'),(300,3,'cc'),(500,5,'ee'),(600,6,'ff'),(700,7,'gg');
+</code></pre><p><img src="https://static001.geekbang.org/resource/image/dc/8d/dcda101051f28502bd5c4402b292e38d.png" alt=""></p><center><span class="reference">图1 InnoDB的索引组织结构</span></center><p>现在，我们一起来看看这条SQL查询语句的执行流程：</p><ol>
+<li>
+<p>在k索引树上找到k=3的记录，取得 ID = 300；</p>
+</li>
+<li>
+<p>再到ID索引树查到ID=300对应的R3；</p>
+</li>
+<li>
+<p>在k索引树取下一个值k=5，取得ID=500；</p>
+</li>
+<li>
+<p>再回到ID索引树查到ID=500对应的R4；</p>
+</li>
+<li>
+<p>在k索引树取下一个值k=6，不满足条件，循环结束。</p>
+</li>
+</ol><p>在这个过程中，<strong>回到主键索引树搜索的过程，我们称为回表</strong>。可以看到，这个查询过程读了k索引树的3条记录（步骤1、3和5），回表了两次（步骤2和4）。</p><p>在这个例子中，由于查询结果所需要的数据只在主键索引上有，所以不得不回表。那么，有没有可能经过索引优化，避免回表过程呢？</p><h1>覆盖索引</h1><p>如果执行的语句是select ID from T where k between 3 and 5，这时只需要查ID的值，而ID的值已经在k索引树上了，因此可以直接提供查询结果，不需要回表。也就是说，在这个查询里面，索引k已经“覆盖了”我们的查询需求，我们称为覆盖索引。</p><!-- [[[read_end]]] --><p><strong>由于覆盖索引可以减少树的搜索次数，显著提升查询性能，所以使用覆盖索引是一个常用的性能优化手段。</strong></p><p>需要注意的是，在引擎内部使用覆盖索引在索引k上其实读了三个记录，R3~R5（对应的索引k上的记录项），但是对于MySQL的Server层来说，它就是找引擎拿到了两条记录，因此MySQL认为扫描行数是2。</p><blockquote>
+<p>备注：关于如何查看扫描行数的问题，我将会在第16文章《如何正确地显示随机消息？》中，和你详细讨论。</p>
+</blockquote><p>基于上面覆盖索引的说明，我们来讨论一个问题：<strong>在一个市民信息表上，是否有必要将身份证号和名字建立联合索引？</strong></p><p>假设这个市民表的定义是这样的：</p><pre><code>CREATE TABLE `tuser` (
+  `id` int(11) NOT NULL,
+  `id_card` varchar(32) DEFAULT NULL,
+  `name` varchar(32) DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  `ismale` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_card` (`id_card`),
+  KEY `name_age` (`name`,`age`)
+) ENGINE=InnoDB
+</code></pre><p>我们知道，身份证号是市民的唯一标识。也就是说，如果有根据身份证号查询市民信息的需求，我们只要在身份证号字段上建立索引就够了。而再建立一个（身份证号、姓名）的联合索引，是不是浪费空间？</p><p>如果现在有一个高频请求，要根据市民的身份证号查询他的姓名，这个联合索引就有意义了。它可以在这个高频请求上用到覆盖索引，不再需要回表查整行记录，减少语句的执行时间。</p><p>当然，索引字段的维护总是有代价的。因此，在建立冗余索引来支持覆盖索引时就需要权衡考虑了。这正是业务DBA，或者称为业务数据架构师的工作。</p><h1>最左前缀原则</h1><p>看到这里你一定有一个疑问，如果为每一种查询都设计一个索引，索引是不是太多了。如果我现在要按照市民的身份证号去查他的家庭地址呢？虽然这个查询需求在业务中出现的概率不高，但总不能让它走全表扫描吧？反过来说，单独为一个不频繁的请求创建一个（身份证号，地址）的索引又感觉有点浪费。应该怎么做呢？</p><p>这里，我先和你说结论吧。<strong>B+树这种索引结构，可以利用索引的“最左前缀”，来定位记录。</strong></p><p>为了直观地说明这个概念，我们用（name，age）这个联合索引来分析。</p><p><img src="https://static001.geekbang.org/resource/image/89/70/89f74c631110cfbc83298ef27dcd6370.jpg" alt=""></p><center><span class="reference">图2 （name，age）索引示意图</span></center><p>可以看到，索引项是按照索引定义里面出现的字段顺序排序的。</p><p>当你的逻辑需求是查到所有名字是“张三”的人时，可以快速定位到ID4，然后向后遍历得到所有需要的结果。</p><p>如果你要查的是所有名字第一个字是“张”的人，你的SQL语句的条件是"where name like ‘张%’"。这时，你也能够用上这个索引，查找到第一个符合条件的记录是ID3，然后向后遍历，直到不满足条件为止。</p><p>可以看到，不只是索引的全部定义，只要满足最左前缀，就可以利用索引来加速检索。这个最左前缀可以是联合索引的最左N个字段，也可以是字符串索引的最左M个字符。</p><p>基于上面对最左前缀索引的说明，我们来讨论一个问题：<strong>在建立联合索引的时候，如何安排索引内的字段顺序。</strong></p><p>这里我们的评估标准是，索引的复用能力。因为可以支持最左前缀，所以当已经有了(a,b)这个联合索引后，一般就不需要单独在a上建立索引了。因此，<strong>第一原则是，如果通过调整顺序，可以少维护一个索引，那么这个顺序往往就是需要优先考虑采用的。</strong></p><p>所以现在你知道了，这段开头的问题里，我们要为高频请求创建(身份证号，姓名）这个联合索引，并用这个索引支持“根据身份证号查询地址”的需求。</p><p>那么，如果既有联合查询，又有基于a、b各自的查询呢？查询条件里面只有b的语句，是无法使用(a,b)这个联合索引的，这时候你不得不维护另外一个索引，也就是说你需要同时维护(a,b)、(b) 这两个索引。</p><p>这时候，我们要<strong>考虑的原则就是空间</strong>了。比如上面这个市民表的情况，name字段是比age字段大的 ，那我就建议你创建一个（name,age)的联合索引和一个(age)的单字段索引。</p><h1>索引下推</h1><p>上一段我们说到满足最左前缀原则的时候，最左前缀可以用于在索引中定位记录。这时，你可能要问，那些不符合最左前缀的部分，会怎么样呢？</p><p>我们还是以市民表的联合索引（name, age）为例。如果现在有一个需求：检索出表中“名字第一个字是张，而且年龄是10岁的所有男孩”。那么，SQL语句是这么写的：</p><pre><code>mysql&gt; select * from tuser where name like '张%' and age=10 and ismale=1;
+</code></pre><p>你已经知道了前缀索引规则，所以这个语句在搜索索引树的时候，只能用 “张”，找到第一个满足条件的记录ID3。当然，这还不错，总比全表扫描要好。</p><p>然后呢？</p><p>当然是判断其他条件是否满足。</p><p>在MySQL 5.6之前，只能从ID3开始一个个回表。到主键索引上找出数据行，再对比字段值。</p><p>而MySQL 5.6 引入的索引下推优化（index condition pushdown)， 可以在索引遍历过程中，对索引中包含的字段先做判断，直接过滤掉不满足条件的记录，减少回表次数。</p><p>图3和图4，是这两个过程的执行流程图。</p><p><img src="https://static001.geekbang.org/resource/image/b3/ac/b32aa8b1f75611e0759e52f5915539ac.jpg" alt=""></p><center><span class="reference">图3 无索引下推执行流程</span></center><p><img src="https://static001.geekbang.org/resource/image/76/1b/76e385f3df5a694cc4238c7b65acfe1b.jpg" alt=""></p><center><span class="reference">图4 索引下推执行流程</span></center><p>在图3和4这两个图里面，每一个虚线箭头表示回表一次。</p><p>图3中，在(name,age)索引里面我特意去掉了age的值，这个过程InnoDB并不会去看age的值，只是按顺序把“name第一个字是’张’”的记录一条条取出来回表。因此，需要回表4次。</p><p>图4跟图3的区别是，InnoDB在(name,age)索引内部就判断了age是否等于10，对于不等于10的记录，直接判断并跳过。在我们的这个例子中，只需要对ID4、ID5这两条记录回表取数据判断，就只需要回表2次。</p><h1>小结</h1><p>今天这篇文章，我和你继续讨论了数据库索引的概念，包括了覆盖索引、前缀索引、索引下推。你可以看到，在满足语句需求的情况下， 尽量少地访问资源是数据库设计的重要原则之一。我们在使用数据库的时候，尤其是在设计表结构时，也要以减少资源消耗作为目标。</p><p>接下来我给你留下一个问题吧。</p><p>实际上主键索引也是可以使用多个字段的。DBA小吕在入职新公司的时候，就发现自己接手维护的库里面，有这么一个表，表结构定义类似这样的：</p><pre><code>CREATE TABLE `geek` (
+  `a` int(11) NOT NULL,
+  `b` int(11) NOT NULL,
+  `c` int(11) NOT NULL,
+  `d` int(11) NOT NULL,
+  PRIMARY KEY (`a`,`b`),
+  KEY `c` (`c`),
+  KEY `ca` (`c`,`a`),
+  KEY `cb` (`c`,`b`)
+) ENGINE=InnoDB;
+</code></pre><p>公司的同事告诉他说，由于历史原因，这个表需要a、b做联合主键，这个小吕理解了。</p><p>但是，学过本章内容的小吕又纳闷了，既然主键包含了a、b这两个字段，那意味着单独在字段c上创建一个索引，就已经包含了三个字段了呀，为什么要创建“ca”“cb”这两个索引？</p><p>同事告诉他，是因为他们的业务里面有这样的两种语句：</p><pre><code>select * from geek where c=N order by a limit 1;
+select * from geek where c=N order by b limit 1;
+</code></pre><p>我给你的问题是，这位同事的解释对吗，为了这两个查询模式，这两个索引是否都是必须的？为什么呢？</p><p>你可以把你的思考和观点写在留言区里，我会在下一篇文章的末尾和你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><h1>上期问题时间</h1><p>上期的问题是，通过两个alter 语句重建索引k，以及通过两个alter语句重建主键索引是否合理。</p><p>在评论区，有同学问到为什么要重建索引。我们文章里面有提到，索引可能因为删除，或者页分裂等原因，导致数据页有空洞，重建索引的过程会创建一个新的索引，把数据按顺序插入，这样页面的利用率最高，也就是索引更紧凑、更省空间。</p><p>这道题目，我给你的“参考答案”是：</p><p>重建索引k的做法是合理的，可以达到省空间的目的。但是，重建主键的过程不合理。不论是删除主键还是创建主键，都会将整个表重建。所以连着执行这两个语句的话，第一个语句就白做了。这两个语句，你可以用这个语句代替 ： alter table T engine=InnoDB。在专栏的第12篇文章《为什么表数据删掉一半，表文件大小不变？》中，我会和你分析这条语句的执行流程。</p><p>评论区留言中， @壹笙漂泊 做了很详细的笔记，@高枕 帮同学解答了问题，@约书亚 提了一个很不错的面试问题。在这里，我要和你们道一声感谢。</p><p>PS：如果你在面试中，曾有过被MySQL相关问题难住的经历，也可以把这个问题发到评论区，我们一起来讨论。如果解答这个问题，需要的篇幅会很长的话，我可以放到答疑文章展开。</p><p><img src="https://static001.geekbang.org/resource/image/ce/d9/ce7f4e35916ed1aa49206a53a0547bd9.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/64/05/6989dce6.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">我来也</span>
+                            </div>
+                            <div class="bd">老师的每一篇都会讲到平常工作用遇到的事情. 这个专栏真的很值.<br>今天这个 alter table T engine=InnoDB 让我想到了我们线上的一个表, 记录日志用的, 会定期删除过早之前的数据. 最后这个表实际内容的大小才10G, 而他的索引却有30G. 在阿里云控制面板上看,就是占了40G空间. 这可花的是真金白银啊.<br>后来了解到是 InnoDB 这种引擎导致的,虽然删除了表的部分记录,但是它的索引还在, 并未释放.<br>只能是重新建表才能重建索引.<br>如果当时看到了这个专栏,把这个语句拿来用,就可以省下不少钱了. <br></div>
+                            <span class="time">2018-11-24 09:34</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">确实例子都是血泪史，有些是我的血泪、有些是帮助人擦眼泪<br><br>也鼓励大家把平时碰到的问题提出来，大家一起未雨绸缪</p>
+                                <p class="reply-time">2018-11-24 14:55</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/f8/ba/14e05601.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">约书亚</span>
+                            </div>
+                            <div class="bd">疑问：<br>1. 有些资料提到，在不影响排序结果的情况下，在取出主键后，回表之前，会在对所有获取到的主键排序，请问是否存在这种情况？<br>2. 索引下推那个例子，感觉5.6之前的机制很匪夷所思：感觉判断&#39;张%&#39;之后再“看age的值”是顺理成章的事。难道联合索引的底层实现结构在这期间发生了变化？ <br></div>
+                            <span class="time">2018-11-23 09:01</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. 有的， Multi-Range Read (MRR) 由于不论是否使用这个策略，SQL语句写法不变，就没有在正文中提<br><br>2. 不是，是接口能力发生了变化，以前只能传“搜索关键字” 。<br><br>如果你用过5.1 甚至5.0， 在从现在的观点看，你会发现很多“匪夷所思”。还有：并行复制官方5.6才引入、MDL 5.5 才有、Innodb 自增主键持久化、多源复制、online DDL ... <br><br>只能说，持续进化，幸甚至哉</p>
+                                <p class="reply-time">2018-11-23 10:37</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/36/d2/c7357723.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">发条橙子 。</span>
+                            </div>
+                            <div class="bd">老师， 因为正文不能无限细节和篇幅的缘故， 有些细节点没有说， 我也一直很困惑， 希望能帮忙解答下，辛苦了<br>1. 表的逻辑结构 ，表 —&gt; 段 —&gt; 段中存在数据段(leaf node segment) ，索引段( Non-leaf node segment）,请问数据段就是主键索引的数据， 索引段就是二级索引的数据么<br>2. 建立的每个索引都有要维护一个数据段么 ？？ 那么新插入一行值 ， 岂不是每个索引段都会维护这个值<br>3. 索引的n阶表示n个数据页么。那是不是插入第一行数据树高1 ，就是一个数据页， 插入二三行，树高是二，那就是两个数据页，而且B+树只有leaf node存数据，所以父节点实际上有没有数据，但是占一个页 ，好浪费 ， 是我理解有误么 <br>4. 树高取决于数据页的大小么 ， 这个不是很能理解 ，数据页为16k 。 那么树高不是一个定值了么，难道还和里面存数据的大小有关么<br>5. 查询数据的时候，大致的流程细化来说 ,我这么理解对么 。 通过优化器到表里的数据段／索引段取数据 ，数据是按照段-&gt;区-&gt;页维度去取 ， 取完后先放到数据缓冲池中，再通过二分法查询叶结点的有序链表数组找到行数据返回给用户 。 当数据量大的时候，会存在不同的区，取范围值的时候会到不同的区取页的数据返回用户。    <br><br>这块知识有点比较难理解，看书和一些文章的时候也比较晦涩，希望老师能解答下，感觉这块啃不透 是不是索引设计起来就比较吃力 <br></div>
+                            <span class="time">2018-11-24 11:25</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. 这样理解也算对，不过要记得 主键也是索引的一种哈<br>2. 是的，所以说索引越多，“维护成本”越大<br>3. 如果是几百个儿子节点共用一个父节点，是不是就不会看上去那么浪费啦<br>4. 树高其实取决于叶子树（数据行数）和“N叉树”的N。 而N是由页大小和索引大小决定的。<br>5. 基本是你说的流程。不过不是“优化器”去取的，是执行器调用引擎，引擎内部才管理了你说的 段、页这些数据</p>
+                                <p class="reply-time">2018-11-24 14:36</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/a1/78/71d37164.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">老北</span>
+                            </div>
+                            <div class="bd">背景:<br>我们现在有一张表,每天生成300W数据, 然后每天用delete xx where id = x 这样的方式来删除.<br>不用truncate是因为DBA说truncate会重建自适应哈希索引,可能对整个库性能有影响.<br><br>操作:<br>这个表的主键id是递增的.<br>当我执行 explain select min(id) from t 时,是走的全表扫描.<br>而且我目前在从库执行这个sql,直接就卡住了.<br>执行 explain select max(id) from t 时, 结果是 Select tables optimized away<br>(目前最大id 5亿左右,实际数据量只有300W)<br><br>问题:<br>想问下老师<br>1. 为什么 min(id) 会是全表扫描呢? 是和存在大量的delete后未释放空间有关系吗?<br>2. 像这种业务场景,mysql怎么处理比较快速呢?  使用rename 表名有什么风险吗?<br> <br></div>
+                            <span class="time">2018-11-24 17:29</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">额你们DBA可能对自适应哈希索引（AHI）有误解…有其他同学也在评论中有提到AHI，我答疑文章会安排说明。<br><br>看你的描述，最好就是rename 重建一个新的，然后找低峰期删掉旧的表。<br><br>还有你这么说，应该id就是这个表的自增主键了，正常即使删除也不会全表扫描。不过我现在怀疑可能删的事务有没提交的，导致MySQL 没法回收复用旧空间。（这个可以简单从文件大小判断）<br><br>不过总之，rename +新建表，上面这个问题也自动解决了</p>
+                                <p class="reply-time">2018-11-24 20:55</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/cc/af/25509210.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">locust</span>
+                            </div>
+                            <div class="bd">老师，有这么个问题<br>一张表两个字段id, uname,id主键，uname普通索引<br>SELECT * FROM test_like WHERE uname LIKE &#39;j&#39;&#47; &#39;j%&#39; &#47; &#39;%j&#39;&#47; &#39;%j%&#39;<br>模糊查询like后面四种写法都可以用到uname的普通索引<br><br>添加一个age字段<br>like后面的&#39;%j&#39;&#47; &#39;%j%&#39; 这两种情况用不到索引<br>把select * 改为 select id &#47; select uname &#47; select id,uname<br>like后面&#39;j&#39;&#47; &#39;j%&#39; &#47; &#39;%j&#39;&#47; &#39;%j%&#39;  这四种情况又都可以用到uname普通索引<br><br>建立uname,age的联合索引<br>模糊查询还是 LIKE &#39;j&#39;&#47; &#39;j%&#39; &#47; &#39;%j&#39;&#47; &#39;%j%&#39;四种情况<br>其中select id &#47; select uname &#47; select id,uname <br>会用到uname的普通索引<br>select *  会用到uname,age的组合索引<br><br>看到好些文章会说模糊查询时以%开头不会用到索引，实践后发现结论跟文章描述的有出入。<br>看了索引的这两节内容对上面的各种情况有的可以解释通了，有的仍然有些模糊，想问下老师上面这些情况使用索引时为什么是这样的？ <br></div>
+                            <span class="time">2018-11-28 10:21</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">好问题，这个是关于“用索引” 和 “用索引快速定位记录”的区别。<br><br>08 篇讲到这个问题了，周五关注一下。<br><br>简单回答：“用索引”有一种用法是 “顺序扫描索引”<br></p>
+                                <p class="reply-time">2018-11-28 10:29</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f8/70/f3a33a14.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">某、人</span>
+                            </div>
+                            <div class="bd">先回答老师的问题:<br>如果c列上重复率很低的情况下,两个索引都可以不用建。因为如果过滤只剩下几条数据,排序也不影响<br>如果C列重复度比较高,就需要建立(c,b)的联合索引了,来消除排序了。因为在数据量大的情况下,排序是一个非常耗时的操作,<br>很有可能还需要磁盘临时表来做排序。而且如果没有(c,b)联合索引,limit 1仅仅表示返回给客户端一条数据,没有起到限制扫描行数的作用<br>ca列上的索引,由于满足最左前缀,不用加。因为c是固定值,那么a列就是有序的.那么这里limit 1就很好限制了只用精准扫描一条数据.<br>所以有时候如果在where条件建立索引的效率差的情况下,在order by limit这一列建索引也是很好的方案,排好序,在回表,只要过滤出满足条件的limit行,就能及时停止扫描<br>老师我有几个问题:<br>1.using where的时候,需要回表,然后把数据传输给server层,server层来过滤数据。那么这些数据是存在server层的哪个地方呢？<br>2.limit起到限制扫描行数作用并且有using where的时候,limit这个操作时在存储引擎层做的还是在server层做的？<br>3.ICP是不是做得不太好,感觉很多地方没有用到索引下推,都会显示using index condition <br></div>
+                            <span class="time">2018-11-23 16:59</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">回答得很好。<br>1. 没有存，就是一个临时内存，读出来马上判断，然后扫描下一行可以复用<br>2. Server层。 接上面的逻辑，读完以后顺便判断一下够不够limit 的数了，够就结束循环<br>3. 嗯，你很细心，其实它表示的是“可以下推”，实际上是“可以，但没有”</p>
+                                <p class="reply-time">2018-11-23 18:40</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">benson42</span>
+                            </div>
+                            <div class="bd">这两个语句，你可以用这个语句代替 ： alter table T engine=InnoDB。可以解释一下原理吗。 <br></div>
+                            <span class="time">2018-11-23 07:07</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/7f/e4/990dcd8e.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">gether</span>
+                            </div>
+                            <div class="bd"> ca索引可以去掉，cb索引可以保留。<br>ca索引，通过索引对数据进行筛选，回表的时候，a本身就是主键索引，所以可以保证有序；<br>cb索引，b上并没有索引，ab索引也无法满足最左匹配原则，可以保留加快排序速度。<br>但如果查询结果很少的话，内存中排序也够了吧，也没必要建立cb索引。老师，我理解的对不？ <br></div>
+                            <span class="time">2018-11-23 08:52</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/2e/53/bf62683f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">狼的诱惑</span>
+                            </div>
+                            <div class="bd">踩过坑：有人问我联合索引的技巧，回答的不是很好<br>总结：<br>1、覆盖索引：如果查询条件使用的是普通索引（或是联合索引的最左原则字段），查询结果是联合索引的字段或是主键，不用回表操作，直接返回结果，减少IO磁盘读写读取正行数据<br>2、最左前缀：联合索引的最左 N 个字段，也可以是字符串索引的最左 M 个字符<br>3、联合索引：根据创建联合索引的顺序，以最左原则进行where检索，比如（age，name）以age=1 或 age= 1 and name=‘张三’可以使用索引，单以name=‘张三’ 不会使用索引，考虑到存储空间的问题，还请根据业务需求，将查找频繁的数据进行靠左创建索引。<br>4、索引下推：like &#39;hello%’and age &gt;10 检索，MySQL5.6版本之前，会对匹配的数据进行回表查询。5.6版本后，会先过滤掉age&lt;10的数据，再进行回表查询，减少回表率，提升检索速度<br> <br></div>
+                            <span class="time">2018-11-27 15:38</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">赞，下次再问你就这么答，棒棒哒</p>
+                                <p class="reply-time">2018-11-28 18:43</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/f3/0b/0128ae45.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">工资不交税</span>
+                            </div>
+                            <div class="bd">老师好，文章提到建立一个（身份证号、姓名）的联合索引，是不是浪费空间？后文解释如果根据身份证号查询姓名和年龄就会用到覆盖索引。这里我不理解的是，年龄并不在联合索引内，那是不是应该回表啊？ <br></div>
+                            <span class="time">2018-11-23 07:52</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/03/f7/3a493bec.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">老杨同志</span>
+                            </div>
+                            <div class="bd">表记录<br>--a--|--b--|--c--<br>  1     2     3<br>  1     3     2<br>  1     4     3<br>  2     1     3<br>  2     2     2<br>  2     3     4<br>主键 a，b的聚簇索引组织顺序相当于 order by a,b <br>也就是先按a排序，再按b排序，c无序<br>  <br>索引 ca 的组织是先按c排序，在按a排序，同时记录主键<br>--c--|--a--|--主键ab--<br>  2     1      1,3<br>  2     2      2,2<br>  3     1      1,2<br>  3     1      1,4<br>  3     2      2,1<br>  4     2      2,3<br>索引 cb 的组织是先按c排序，在按b排序，同时记录主键<br>--c--|--b--|--c--|--主键ab--<br>  2     1      2,2<br>  2     3      1,3<br>  3     1      2,1<br>  3     2      1,2<br>  3     4      1,4<br>  4     3      2,3<br>  <br>对于下面的语句 <br>select ... from geek where c=N order by a  <br>走ca,cb索引都能定位到满足c=N主键<br>而且主键的聚簇索引本身就是按order by a,b排序，无序重新排序。所以ca可以去掉<br><br>select ... from geek where c=N order by b <br>这条sql如果只有 c单个字段的索引，定位记录可以走索引，但是order by b的顺序与主键顺序不一致，需要额外排序<br>cb索引可以把排序优化调<br><br>   <br></div>
+                            <span class="time">2018-11-23 10:16</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/9f/1d/ec173090.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">melon</span>
+                            </div>
+                            <div class="bd">关于联合索引我的理解是这样的：比如一个联合索引(a,b,c)，其实质是按a,b,c的顺序拼接成了一个二进制字节数组，索引记录是按该字节数组逐字节比较排序的，所以其是先按a排序，再按b排序，再按c排序的，至于其为什么是按最左前缀匹配的也就显而易见了，没看过源码，不知道理解的对不对，希望老师指正。<br><br>给表创建索引时，应该创建哪些索引，每个索引应该包含哪些字段，字段的顺序怎么排列，这个问题没有标准答案，需要根据具体的业务来做权衡。不过有些思路还是可供参考的：<br>1.既然是一个权衡问题，没有办法保证所有的查询都高效，那就要优先保证高频的查询高效，较低频次的查询也尽可能的使用到尽可能长的最左前缀索引。可以借助pt-query-digest来采样统计业务查询语句的访问频度，可能需要迭代几次才能确定联合索引的最终字段及其排序。<br>2.业务是在演进的，所以索引也是要随着业务演进的，并不是索引建好了就万事大吉了，业务发生变化时，我们需要重新审视当初建的索引是不是还依然高效，依然能满足业务需求。<br>3.业内流传的有一些mysql 军规，其实这些并不是真正的军规，只是典型场景下的最佳实践。真正的军规其实就一条：高效的效满足业务需求。比如有个军规规定一个表上的索引数不超过5个，但如果我们现在有一些历史数据表、历史日志表，我们很明确的知道这些表上不会再有数据写入了，但我们的查询需求很多也很多样化，那我们在这些表上的索引数能不能超过5个？当然是没有任何问题的。当然关于这份军规还是要认真看一下的，但看的重点不是去记住它，而是要弄明白每一条军规它为什么这么规定，它这样规定是基于什么考虑，适用的场景和前提是什么，这些都弄明白了，你记不记得住这些军规都无所谓了，因为你已经把它溶化到了你的血液中，具体到自己的具体业务时游刃有余将是必然。 <br></div>
+                            <span class="time">2018-11-27 11:46</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">非常赞，尤其是第三段对“军规”的理解</p>
+                                <p class="reply-time">2018-11-27 13:49</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/a0/fe/ac5a62f3.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">grey</span>
+                            </div>
+                            <div class="bd">老师你好，上篇文章中有人提问“数据量很大的时候，二级索引比主键索引更快”，这个结论是只有在使用覆盖索引时才成立吧，非覆盖索引还是要回表查询。 <br></div>
+                            <span class="time">2018-11-23 17:38</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是的</p>
+                                <p class="reply-time">2018-11-23 18:29</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/21/30/8ecce1e1.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">北天魔狼</span>
+                            </div>
+                            <div class="bd">老师，我是非科班做开发的小白（公司没有DBA），最近一直认为数据库和程序运行环境都比开发语言本身重要。尤其是数据库，数据行上亿必须在数据库上想办法。也买了一本高性能MySQL，看完类型，索引，查询，后面就看不懂了。特别期待后面的章节，六点上地铁，看的入迷差点坐过站 <br></div>
+                            <span class="time">2018-11-23 07:17</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/ab/e1/f6b921fa.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">壹笙漂泊</span>
+                            </div>
+                            <div class="bd">总结：<br>回表：回到主键索引树搜索的过程，称为回表<br>覆盖索引：某索引已经覆盖了查询需求，称为覆盖索引，例如：select ID from T where k between 3 and 5<br>在引擎内部使用覆盖索引在索引K上其实读了三个记录，R3~R5(对应的索引k上的记录项)，但对于MySQL的Server层来说，它就是找引擎拿到了两条记录，因此MySQL认为扫描行数是2<br>最左前缀原则：B+Tree这种索引结构，可以利用索引的&quot;最左前缀&quot;来定位记录<br>只要满足最左前缀，就可以利用索引来加速检索。<br>最左前缀可以是联合索引的最左N个字段，也可以是字符串索引的最左M个字符<br>第一原则是：如果通过调整顺序，可以少维护一个索引，那么这个顺序往往就是需要优先考虑采用的。<br>索引下推：在MySQL5.6之前，只能从根据最左前缀查询到ID开始一个个回表。到主键索引上找出数据行，再对比字段值。<br>MySQL5.6引入的索引下推优化，可以在索引遍历过程中，对索引中包含的字段先做判断，直接过滤掉不满足条件的记录，减少回表次数。<br><br>课后题：<br>ca没有必要，cb有必要。因为a、b联合索引，直接查询b不会使用主键联合索引。<br><br>疑问：<br>以前看过某些文章上面写：如果查询顺序和联合索引的顺序不一致，优化器会自动做优化，是这样的吗老师？ <br></div>
+                            <span class="time">2018-11-23 17:48</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是的，查询语句的where里面各个判断调换顺序没关系的</p>
+                                <p class="reply-time">2018-11-24 01:48</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/df/e7/e3c450c2.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">lionetes</span>
+                            </div>
+                            <div class="bd">alter table T engine=InnoDB 是用来释放 delete 操作引起的页的空洞,也就是碎片空间 操作时候尽量避免当前表的dml 操作.<br>表数据很大情况 建议使用 Percona Toolkit 工具来执行<br><br><br>5.6版本的 ICP 对分区表没有作用吧,  子查询也要失去作用, ICP 用于range，ref，eq_ref和ref_or_null访问方法 涉及到<br>ICP 的使用 查询过程要表的整行才有效？<br><br>ca  cb 索引 感觉 都没有问题<br><br>from : mysql 文档<br>In this query, key_part1 is constant, so all rows accessed through the index are in key_part2 order, and an index on (key_part1, key_part2) avoids sorting if the WHERE clause is selective enough to make an index range scan cheaper than a table scan:<br><br> <br></div>
+                            <span class="time">2018-11-23 13:23</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/8b/d9/c03fbd11.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">HwangZHen</span>
+                            </div>
+                            <div class="bd">包含主键后应该是cab，根据最左匹配原则，cb是有必要的，ca没有必要 <br></div>
+                            <span class="time">2018-11-23 09:44</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/51/c8/83852d5a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">梦康</span>
+                            </div>
+                            <div class="bd">图4中是5.6的话，会在回表的时候再优化iops吗？比如查到的是满足条件的1000行张三，会先对其id做排序，然后再回表么？这样挨得近的主键的I&#47;O操作就能合并了。会有这样的优化吗？ <br></div>
+                            <span class="time">2018-11-23 08:00</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/75/94/8f0ada2c.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">dior</span>
+                            </div>
+                            <div class="bd">面试官问：说下怎么让mysql的myisam引擎支持事务，网上搜了下，也没有结果！ <br></div>
+                            <span class="time">2018-12-19 12:37</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">……… 面试官是魔鬼吗<br><br>我怀疑他是想说用lock table 来实现，但是这样只能实现串行化隔离级别，<br><br>其它隔离都实现不了。<br><br>但是因为mysiam不支持崩溃恢复，所以即使用lock table硬实现，也是问题多多：<br><br>ACID里面， 原子性和持久性做不到；<br>隔离性只能实现基本用不上的串行化；<br>一致性在正常运行的时候依赖于串行化，在异常崩溃的时候也不能保证。<br><br>这样实现的事务不要也罢。<br><br>你这么答复面试官，应该能加到分吧</p>
+                                <p class="reply-time">2018-12-21 03:27</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/f9/aa/4437fe1a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">龙猫9527</span>
+                            </div>
+                            <div class="bd">之前面试问过我一道题，mysql的联合索引是怎么储存的……，当时没答上来。 <br></div>
+                            <span class="time">2018-12-01 09:59</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">现在如果再问你，你来回答下<br><br>再发条评论上来吧</p>
+                                <p class="reply-time">2018-12-01 10:26</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

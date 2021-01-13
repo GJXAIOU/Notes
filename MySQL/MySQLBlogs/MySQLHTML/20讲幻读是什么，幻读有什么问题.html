@@ -1,0 +1,486 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                20讲幻读是什么，幻读有什么问题
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/97/b7/9719ecdc5d6f443817438205259f8bb7.jpg">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>在上一篇文章最后，我给你留了一个关于加锁规则的问题。今天，我们就从这个问题说起吧。</p><p>为了便于说明问题，这一篇文章，我们就先使用一个小一点儿的表。建表和初始化语句如下（为了便于本期的例子说明，我把上篇文章中用到的表结构做了点儿修改）：</p><pre><code>CREATE TABLE `t` (
+  `id` int(11) NOT NULL,
+  `c` int(11) DEFAULT NULL,
+  `d` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `c` (`c`)
+) ENGINE=InnoDB;
+
+insert into t values(0,0,0),(5,5,5),
+(10,10,10),(15,15,15),(20,20,20),(25,25,25);
+</code></pre><p>这个表除了主键id外，还有一个索引c，初始化语句在表中插入了6行数据。</p><p>上期我留给你的问题是，下面的语句序列，是怎么加锁的，加的锁又是什么时候释放的呢？</p><pre><code>begin;
+select * from t where d=5 for update;
+commit;
+</code></pre><p>比较好理解的是，这个语句会命中d=5的这一行，对应的主键id=5，因此在select 语句执行完成后，id=5这一行会加一个写锁，而且由于两阶段锁协议，这个写锁会在执行commit语句的时候释放。</p><p>由于字段d上没有索引，因此这条查询语句会做全表扫描。那么，其他被扫描到的，但是不满足条件的5行记录上，会不会被加锁呢？</p><p>我们知道，InnoDB的默认事务隔离级别是可重复读，所以本文接下来没有特殊说明的部分，都是设定在可重复读隔离级别下。</p><h1>幻读是什么？</h1><p>现在，我们就来分析一下，如果只在id=5这一行加锁，而其他行的不加锁的话，会怎么样。</p><p>下面先来看一下这个场景：</p><p><img src="https://static001.geekbang.org/resource/image/5b/8b/5bc506e5884d21844126d26bbe6fa68b.png" alt=""></p><center><span class="reference">图 1 假设只在id=5这一行加行锁</span></center><!-- [[[read_end]]] --><p>可以看到，session A里执行了三次查询，分别是Q1、Q2和Q3。它们的SQL语句相同，都是select * from t where d=5 for update。这个语句的意思你应该很清楚了，查所有d=5的行，而且使用的是当前读，并且加上写锁。现在，我们来看一下这三条SQL语句，分别会返回什么结果。</p><ol>
+<li>
+<p>Q1只返回id=5这一行；</p>
+</li>
+<li>
+<p>在T2时刻，session B把id=0这一行的d值改成了5，因此T3时刻Q2查出来的是id=0和id=5这两行；</p>
+</li>
+<li>
+<p>在T4时刻，session C又插入一行（1,1,5），因此T5时刻Q3查出来的是id=0、id=1和id=5的这三行。</p>
+</li>
+</ol><p>其中，Q3读到id=1这一行的现象，被称为“幻读”。也就是说，幻读指的是一个事务在前后两次查询同一个范围的时候，后一次查询看到了前一次查询没有看到的行。</p><p>这里，我需要对“幻读”做一个说明：</p><ol>
+<li>
+<p>在可重复读隔离级别下，普通的查询是快照读，是不会看到别的事务插入的数据的。因此，幻读在“当前读”下才会出现。</p>
+</li>
+<li>
+<p>上面session B的修改结果，被session A之后的select语句用“当前读”看到，不能称为幻读。幻读仅专指“新插入的行”。</p>
+</li>
+</ol><p>如果只从第8篇文章<a href="https://time.geekbang.org/column/article/70562">《事务到底是隔离的还是不隔离的？》</a>我们学到的事务可见性规则来分析的话，上面这三条SQL语句的返回结果都没有问题。</p><p>因为这三个查询都是加了for update，都是当前读。而当前读的规则，就是要能读到所有已经提交的记录的最新值。并且，session B和sessionC的两条语句，执行后就会提交，所以Q2和Q3就是应该看到这两个事务的操作效果，而且也看到了，这跟事务的可见性规则并不矛盾。</p><p>但是，这是不是真的没问题呢？</p><p>不，这里还真就有问题。</p><h1>幻读有什么问题？</h1><p><strong>首先是语义上的。</strong>session A在T1时刻就声明了，“我要把所有d=5的行锁住，不准别的事务进行读写操作”。而实际上，这个语义被破坏了。</p><p>如果现在这样看感觉还不明显的话，我再往session B和session C里面分别加一条SQL语句，你再看看会出现什么现象。</p><p><img src="https://static001.geekbang.org/resource/image/7a/07/7a9ffa90ac3cc78db6a51ff9b9075607.png" alt=""></p><center><span class="reference">图 2 假设只在id=5这一行加行锁--语义被破坏</span></center><p>session B的第二条语句update t set c=5 where id=0，语义是“我把id=0、d=5这一行的c值，改成了5”。</p><p>由于在T1时刻，session A 还只是给id=5这一行加了行锁， 并没有给id=0这行加上锁。因此，session B在T2时刻，是可以执行这两条update语句的。这样，就破坏了 session A 里Q1语句要锁住所有d=5的行的加锁声明。</p><p>session C也是一样的道理，对id=1这一行的修改，也是破坏了Q1的加锁声明。</p><p><strong>其次，是数据一致性的问题。</strong></p><p>我们知道，锁的设计是为了保证数据的一致性。而这个一致性，不止是数据库内部数据状态在此刻的一致性，还包含了数据和日志在逻辑上的一致性。</p><p>为了说明这个问题，我给session A在T1时刻再加一个更新语句，即：update t set d=100 where d=5。</p><p><img src="https://static001.geekbang.org/resource/image/dc/92/dcea7845ff0bdbee2622bf3c67d31d92.png" alt=""></p><center><span class="reference">图 3 假设只在id=5这一行加行锁--数据一致性问题</span></center><p>update的加锁语义和select ...for update 是一致的，所以这时候加上这条update语句也很合理。session A声明说“要给d=5的语句加上锁”，就是为了要更新数据，新加的这条update语句就是把它认为加上了锁的这一行的d值修改成了100。</p><p>现在，我们来分析一下图3执行完成后，数据库里会是什么结果。</p><ol>
+<li>
+<p>经过T1时刻，id=5这一行变成 (5,5,100)，当然这个结果最终是在T6时刻正式提交的;</p>
+</li>
+<li>
+<p>经过T2时刻，id=0这一行变成(0,5,5);</p>
+</li>
+<li>
+<p>经过T4时刻，表里面多了一行(1,5,5);</p>
+</li>
+<li>
+<p>其他行跟这个执行序列无关，保持不变。</p>
+</li>
+</ol><p>这样看，这些数据也没啥问题，但是我们再来看看这时候binlog里面的内容。</p><ol>
+<li>
+<p>T2时刻，session B事务提交，写入了两条语句；</p>
+</li>
+<li>
+<p>T4时刻，session C事务提交，写入了两条语句；</p>
+</li>
+<li>
+<p>T6时刻，session A事务提交，写入了update t set d=100 where d=5 这条语句。</p>
+</li>
+</ol><p>我统一放到一起的话，就是这样的：</p><pre><code>update t set d=5 where id=0; /*(0,0,5)*/
+update t set c=5 where id=0; /*(0,5,5)*/
+
+insert into t values(1,1,5); /*(1,1,5)*/
+update t set c=5 where id=1; /*(1,5,5)*/
+
+update t set d=100 where d=5;/*所有d=5的行，d改成100*/
+</code></pre><p>好，你应该看出问题了。这个语句序列，不论是拿到备库去执行，还是以后用binlog来克隆一个库，这三行的结果，都变成了 (0,5,100)、(1,5,100)和(5,5,100)。</p><p>也就是说，id=0和id=1这两行，发生了数据不一致。这个问题很严重，是不行的。</p><p>到这里，我们再回顾一下，<strong>这个数据不一致到底是怎么引入的？</strong></p><p>我们分析一下可以知道，这是我们假设“select * from t where d=5 for update这条语句只给d=5这一行，也就是id=5的这一行加锁”导致的。</p><p>所以我们认为，上面的设定不合理，要改。</p><p>那怎么改呢？我们把扫描过程中碰到的行，也都加上写锁，再来看看执行效果。</p><p><img src="https://static001.geekbang.org/resource/image/34/47/34ad6478281709da833856084a1e3447.png" alt=""></p><center><span class="reference">图 4 假设扫描到的行都被加上了行锁</span></center><p>由于session A把所有的行都加了写锁，所以session B在执行第一个update语句的时候就被锁住了。需要等到T6时刻session A提交以后，session B才能继续执行。</p><p>这样对于id=0这一行，在数据库里的最终结果还是 (0,5,5)。在binlog里面，执行序列是这样的：</p><pre><code>insert into t values(1,1,5); /*(1,1,5)*/
+update t set c=5 where id=1; /*(1,5,5)*/
+
+update t set d=100 where d=5;/*所有d=5的行，d改成100*/
+
+update t set d=5 where id=0; /*(0,0,5)*/
+update t set c=5 where id=0; /*(0,5,5)*/
+</code></pre><p>可以看到，按照日志顺序执行，id=0这一行的最终结果也是(0,5,5)。所以，id=0这一行的问题解决了。</p><p>但同时你也可以看到，id=1这一行，在数据库里面的结果是(1,5,5)，而根据binlog的执行结果是(1,5,100)，也就是说幻读的问题还是没有解决。为什么我们已经这么“凶残”地，把所有的记录都上了锁，还是阻止不了id=1这一行的插入和更新呢？</p><p>原因很简单。在T3时刻，我们给所有行加锁的时候，id=1这一行还不存在，不存在也就加不上锁。</p><p><strong>也就是说，即使把所有的记录都加上锁，还是阻止不了新插入的记录，</strong>这也是为什么“幻读”会被单独拿出来解决的原因。</p><p>到这里，其实我们刚说明完文章的标题 ：幻读的定义和幻读有什么问题。</p><p>接下来，我们再看看InnoDB怎么解决幻读的问题。</p><h1>如何解决幻读？</h1><p>现在你知道了，产生幻读的原因是，行锁只能锁住行，但是新插入记录这个动作，要更新的是记录之间的“间隙”。因此，为了解决幻读问题，InnoDB只好引入新的锁，也就是间隙锁(Gap Lock)。</p><p>顾名思义，间隙锁，锁的就是两个值之间的空隙。比如文章开头的表t，初始化插入了6个记录，这就产生了7个间隙。</p><p><img src="https://static001.geekbang.org/resource/image/e7/61/e7f7ca0d3dab2f48c588d714ee3ac861.png" alt=""></p><center><span class="reference">图 5 表t主键索引上的行锁和间隙锁</span></center><p>这样，当你执行 select * from t where d=5 for update的时候，就不止是给数据库中已有的6个记录加上了行锁，还同时加了7个间隙锁。这样就确保了无法再插入新的记录。</p><p>也就是说这时候，在一行行扫描的过程中，不仅将给行加上了行锁，还给行两边的空隙，也加上了间隙锁。</p><p>现在你知道了，数据行是可以加上锁的实体，数据行之间的间隙，也是可以加上锁的实体。但是间隙锁跟我们之前碰到过的锁都不太一样。</p><p>比如行锁，分成读锁和写锁。下图就是这两种类型行锁的冲突关系。</p><p><img src="https://static001.geekbang.org/resource/image/c4/51/c435c765556c0f3735a6eda0779ff151.png" alt=""></p><center><span class="reference">图6 两种行锁间的冲突关系</span></center><p>也就是说，跟行锁有冲突关系的是“另外一个行锁”。</p><p>但是间隙锁不一样，<strong>跟间隙锁存在冲突关系的，是“往这个间隙中插入一个记录”这个操作。</strong>间隙锁之间都不存在冲突关系。</p><p>这句话不太好理解，我给你举个例子：</p><p><img src="https://static001.geekbang.org/resource/image/7c/98/7c37732d936650f1cda7dbf27daf7498.png" alt=""></p><center><span class="reference">图7 间隙锁之间不互锁</span></center><p>这里session B并不会被堵住。因为表t里并没有c=7这个记录，因此session A加的是间隙锁(5,10)。而session B也是在这个间隙加的间隙锁。它们有共同的目标，即：保护这个间隙，不允许插入值。但，它们之间是不冲突的。</p><p>间隙锁和行锁合称next-key lock，每个next-key lock是前开后闭区间。也就是说，我们的表t初始化以后，如果用select * from t for update要把整个表所有记录锁起来，就形成了7个next-key lock，分别是 (-∞,0]、(0,5]、(5,10]、(10,15]、(15,20]、(20, 25]、(25, +suprenum]。</p><blockquote>
+<p>备注：这篇文章中，如果没有特别说明，我们把间隙锁记为开区间，把next-key lock记为前开后闭区间。</p>
+</blockquote><p>你可能会问说，这个suprenum从哪儿来的呢？</p><p>这是因为+∞是开区间。实现上，InnoDB给每个索引加了一个不存在的最大值suprenum，这样才符合我们前面说的“都是前开后闭区间”。</p><p><strong>间隙锁和next-key lock的引入，帮我们解决了幻读的问题，但同时也带来了一些“困扰”。</strong></p><p>在前面的文章中，就有同学提到了这个问题。我把他的问题转述一下，对应到我们这个例子的表来说，业务逻辑这样的：任意锁住一行，如果这一行不存在的话就插入，如果存在这一行就更新它的数据，代码如下：</p><pre><code>begin;
+select * from t where id=N for update;
+
+/*如果行不存在*/
+insert into t values(N,N,N);
+/*如果行存在*/
+update t set d=N set id=N;
+
+commit;
+</code></pre><p>可能你会说，这个不是insert ... on duplicate key update 就能解决吗？但其实在有多个唯一键的时候，这个方法是不能满足这位提问同学的需求的。至于为什么，我会在后面的文章中再展开说明。</p><p>现在，我们就只讨论这个逻辑。</p><p>这个同学碰到的现象是，这个逻辑一旦有并发，就会碰到死锁。你一定也觉得奇怪，这个逻辑每次操作前用for update锁起来，已经是最严格的模式了，怎么还会有死锁呢？</p><p>这里，我用两个session来模拟并发，并假设N=9。</p><p><img src="https://static001.geekbang.org/resource/image/df/be/df37bf0bb9f85ea59f0540e24eb6bcbe.png" alt=""></p><center><span class="reference">图8 间隙锁导致的死锁</span></center><p>你看到了，其实都不需要用到后面的update语句，就已经形成死锁了。我们按语句执行顺序来分析一下：</p><ol>
+<li>
+<p>session A 执行select ... for update语句，由于id=9这一行并不存在，因此会加上间隙锁(5,10);</p>
+</li>
+<li>
+<p>session B 执行select ... for update语句，同样会加上间隙锁(5,10)，间隙锁之间不会冲突，因此这个语句可以执行成功；</p>
+</li>
+<li>
+<p>session B 试图插入一行(9,9,9)，被session A的间隙锁挡住了，只好进入等待；</p>
+</li>
+<li>
+<p>session A试图插入一行(9,9,9)，被session B的间隙锁挡住了。</p>
+</li>
+</ol><p>至此，两个session进入互相等待状态，形成死锁。当然，InnoDB的死锁检测马上就发现了这对死锁关系，让session A的insert语句报错返回了。</p><p>你现在知道了，<strong>间隙锁的引入，可能会导致同样的语句锁住更大的范围，这其实是影响了并发度的</strong>。其实，这还只是一个简单的例子，在下一篇文章中我们还会碰到更多、更复杂的例子。</p><p>你可能会说，为了解决幻读的问题，我们引入了这么一大串内容，有没有更简单一点的处理方法呢。</p><p>我在文章一开始就说过，如果没有特别说明，今天和你分析的问题都是在可重复读隔离级别下的，间隙锁是在可重复读隔离级别下才会生效的。所以，你如果把隔离级别设置为读提交的话，就没有间隙锁了。但同时，你要解决可能出现的数据和日志不一致问题，需要把binlog格式设置为row。这，也是现在不少公司使用的配置组合。</p><p>前面文章的评论区有同学留言说，他们公司就使用的是读提交隔离级别加binlog_format=row的组合。他曾问他们公司的DBA说，你为什么要这么配置。DBA直接答复说，因为大家都这么用呀。</p><p>所以，这个同学在评论区就问说，这个配置到底合不合理。</p><p>关于这个问题本身的答案是，如果读提交隔离级别够用，也就是说，业务不需要可重复读的保证，这样考虑到读提交下操作数据的锁范围更小（没有间隙锁），这个选择是合理的。</p><p>但其实我想说的是，配置是否合理，跟业务场景有关，需要具体问题具体分析。</p><p>但是，如果DBA认为之所以这么用的原因是“大家都这么用”，那就有问题了，或者说，迟早会出问题。</p><p>比如说，大家都用读提交，可是逻辑备份的时候，mysqldump为什么要把备份线程设置成可重复读呢？（这个我在前面的文章中已经解释过了，你可以再回顾下第6篇文章<a href="https://time.geekbang.org/column/article/69862">《全局锁和表锁 ：给表加个字段怎么有这么多阻碍？》</a>的内容）</p><p>然后，在备份期间，备份线程用的是可重复读，而业务线程用的是读提交。同时存在两种事务隔离级别，会不会有问题？</p><p>进一步地，这两个不同的隔离级别现象有什么不一样的，关于我们的业务，“用读提交就够了”这个结论是怎么得到的？</p><p>如果业务开发和运维团队这些问题都没有弄清楚，那么“没问题”这个结论，本身就是有问题的。</p><h1>小结</h1><p>今天我们从上一篇文章的课后问题说起，提到了全表扫描的加锁方式。我们发现即使给所有的行都加上行锁，仍然无法解决幻读问题，因此引入了间隙锁的概念。</p><p>我碰到过很多对数据库有一定了解的业务开发人员，他们在设计数据表结构和业务SQL语句的时候，对行锁有很准确的认识，但却很少考虑到间隙锁。最后的结果，就是生产库上会经常出现由于间隙锁导致的死锁现象。</p><p>行锁确实比较直观，判断规则也相对简单，间隙锁的引入会影响系统的并发度，也增加了锁分析的复杂度，但也有章可循。下一篇文章，我就会为你讲解InnoDB的加锁规则，帮你理顺这其中的“章法”。</p><p>作为对下一篇文章的预习，我给你留下一个思考题。</p><p><img src="https://static001.geekbang.org/resource/image/0d/3d/0d796060073668ca169166a8903fbf3d.png" alt=""></p><center><span class="reference">图9 事务进入锁等待状态</span></center><p>如果你之前没有了解过本篇文章的相关内容，一定觉得这三个语句简直是风马牛不相及。但实际上，这里session B和session C的insert 语句都会进入锁等待状态。</p><p>你可以试着分析一下，出现这种情况的原因是什么？</p><p>这里需要说明的是，这其实是我在下一篇文章介绍加锁规则后才能回答的问题，是留给你作为预习的，其中session C被锁住这个分析是有点难度的。如果你没有分析出来，也不要气馁，我会在下一篇文章和你详细说明。</p><p>你也可以说说，你的线上MySQL配置的是什么隔离级别，为什么会这么配置？你有没有碰到什么场景，是必须使用可重复读隔离级别的呢？</p><p>你可以把你的碰到的场景和分析写在留言区里，我会在下一篇文章选取有趣的评论跟大家一起分享和分析。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><h1>上期问题时间</h1><p>我们在本文的开头回答了上期问题。有同学的回答中还说明了读提交隔离级别下，在语句执行完成后，是只有行锁的。而且语句执行完成后，InnoDB就会把不满足条件的行行锁去掉。</p><p>当然了，c=5这一行的行锁，还是会等到commit的时候才释放的。</p><p>评论区留言点赞板：</p><blockquote>
+<p>@薛畅 、@张永志同学给出了正确答案。而且提到了在读提交隔离级别下，是只有行锁的。<br>
+@帆帆帆帆帆帆帆帆、@欧阳成 对上期的例子做了验证，需要说明一下，需要在启动配置里面增加performance_schema=on，才能用上这个功能，performance_schema库里的表才有数据。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/09/77/09c1073f99cf71d2fb162a716b5fa577.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/5c/f4/88f107d9.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">令狐少侠</span>
+                            </div>
+                            <div class="bd">老师，今天的文章对我影响很大，发现之前掌握的知识有些错误的地方，课后我用你的表结构根据以前不清楚的地方实践了一遍，现在有两个问题，麻烦您解答下<br>1.我在事务1中执行 begin;select * from t where c=5 for update;事务未提交，然后事务2中begin;update t set c=5 where id=0;执行阻塞，替换成update t set c=11 where id=0;执行不阻塞，我觉得原因是事务1执行时产生next-key lock范围是(0,5].(5,10]。我想问下update set操作c=xxx是会加锁吗？以及加锁的原理。<br>2.一直以为gap只会在二级索引上，看了你的死锁案例，发现主键索引上也会有gap锁？ <br></div>
+                            <span class="time">2018-12-28 15:37</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. 好问题。你可以理解为要在索引c上插入一个(c=5,id=0)这一行，是落在(0,5],(5,10]里面的，11可以对吧<br><br>2. 嗯，主键索引的间隙上也要有Gap lock保护的</p>
+                                <p class="reply-time">2018-12-28 15:54</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f3/2d/711d73b2.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">薛畅</span>
+                            </div>
+                            <div class="bd">可重复读隔离级别下，经试验：<br>SELECT * FROM t where c&gt;=15 and c&lt;=20 for update; 会加如下锁：<br>next-key lock:(10, 15], (15, 20]<br>gap lock:(20, 25)<br><br>SELECT * FROM t where c&gt;=15 and c&lt;=20  order by c desc for update; 会加如下锁：<br>next-key lock:(5, 10], (10, 15], (15, 20]<br>gap lock:(20, 25)<br><br>session C 被锁住的原因就是根据索引 c 逆序排序后多出的 next-key lock:(5, 10]<br><br>同时我有个疑问：加不加 next-key lock:(5, 10] 好像都不会影响到 session A 可重复读的语义，那么为什么要加这个锁呢？ <br></div>
+                            <span class="time">2018-12-29 09:03</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是的，这个其实就是为啥总结规则有点麻烦，有时候只是因为代码是这么写的</p>
+                                <p class="reply-time">2018-12-29 09:18</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/ef/3e/9c3a8abc.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">AI杜嘉嘉</span>
+                            </div>
+                            <div class="bd">说真的，这一系列文章实用性真的很强，老师非常负责，想必牵扯到老师大量精力，希望老师再出好文章，谢谢您了，辛苦了 <br></div>
+                            <span class="time">2018-12-28 13:59</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">精力花了没事，睡一觉醒来还是一条好汉<br>主要还是得大家有收获，我就值了</p>
+                                <p class="reply-time">2018-12-28 19:03</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/0c/ca/6173350b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">郭江伟</span>
+                            </div>
+                            <div class="bd">insert into t values(0,0,0),(5,5,5),<br>(10,10,10),(15,15,15),(20,20,20),(25,25,25);<br>运行mysql&gt; begin;<br>Query OK, 0 rows affected (0.00 sec)<br>mysql&gt; select * from t where c&gt;=15 and c&lt;=20 order by c desc for update;<br>c 索引会在最右侧包含主键值，c索引的值为(0,0) (5,5) (10,10) (15,15) (20,20) (25,25)<br>此时c索引上锁的范围其实还要匹配主键值 。<br>思考题答案是，上限会扫到c索引(20,20) 上一个键，为了防止c为20 主键值小于25 的行插入，需要锁定(20,20) (25,25) 两者的间隙；开启另一会话(26,25,25)可以插入，而(24,25,25)会被堵塞。<br>下限会扫描到(15,15)的下一个键也就是(10,10),测试语句会继续扫描一个键就是(5,5) ，此时会锁定，(5,5) 到(15,15)的间隙，由于id是主键不可重复所以下限也是闭区间；<br>在本例的测试数据中添加(21,25,25)后就可以正常插入(24,25,25) <br></div>
+                            <span class="time">2018-12-28 13:38</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">感觉你下一篇看起来会很轻松了哈</p>
+                                <p class="reply-time">2018-12-28 19:04</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLE4LYb3jrH63ZV98Zpc8DompwDgb1O3nffMoZCmiaibauRyEFv6NDNsST9RWxZExvMLMWb50zaanoQ/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">慧鑫coming</span>
+                            </div>
+                            <div class="bd">这篇需要多读几遍，again <br></div>
+                            <span class="time">2018-12-28 08:24</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/fd/d5/0194ea41.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">沉浮</span>
+                            </div>
+                            <div class="bd">通过打印锁日志帮助理解问题<br>锁信息见括号里的说明。<br><br>TABLE LOCK table `guo_test`.`t` trx id 105275 lock mode IX<br>RECORD LOCKS space id 31 page no 4 n bits 80 index c of table `guo_test`.`t` trx id 105275 lock_mode X<br>Record lock, heap no 4 PHYSICAL RECORD: n_fields 2; compact format; info bits 0 												----(Next-Key Lock，索引锁c（5，10])<br> 0: len 4; hex 8000000a; asc     ;;<br> 1: len 4; hex 8000000a; asc     ;;<br><br>Record lock, heap no 5 PHYSICAL RECORD: n_fields 2; compact format; info bits 0	 										     	----(Next-Key Lock，索引锁c (10,15])	<br> 0: len 4; hex 8000000f; asc     ;;<br> 1: len 4; hex 8000000f; asc     ;;<br><br>Record lock, heap no 6 PHYSICAL RECORD: n_fields 2; compact format; info bits 0      											----(Next-Key Lock，索引锁c (15,20])	<br> 0: len 4; hex 80000014; asc     ;;<br> 1: len 4; hex 80000014; asc     ;;<br><br>Record lock, heap no 7 PHYSICAL RECORD: n_fields 2; compact format; info bits 0             									----(Next-Key Lock，索引锁c (20,25])	<br> 0: len 4; hex 80000019; asc     ;;<br> 1: len 4; hex 80000019; asc     ;;<br><br>RECORD LOCKS space id 31 page no 3 n bits 80 index PRIMARY of table `guo_test`.`t` trx id 105275 lock_mode X locks rec but not gap<br>Record lock, heap no 5 PHYSICAL RECORD: n_fields 5; compact format; info bits 0  <br>----(记录锁 锁c=15对应的主键）<br> 0: len 4; hex 8000000f; asc     ;;<br> 1: len 6; hex 0000000199e3; asc       ;;<br> 2: len 7; hex ca000001470134; asc     G 4;;<br> 3: len 4; hex 8000000f; asc     ;;<br> 4: len 4; hex 8000000f; asc     ;;<br><br>Record lock, heap no 6 PHYSICAL RECORD: n_fields 5; compact format; info bits 0<br> 0: len 4; hex 80000014; asc     ;;<br>----(记录锁 锁c=20对应的主键）<br> 1: len 6; hex 0000000199e3; asc       ;;<br> 2: len 7; hex ca000001470140; asc     G @;;<br> 3: len 4; hex 80000014; asc     ;;<br> 4: len 4; hex 80000014; asc     ;;<br>由于字数限制，正序及无排序的日志无法帖出，倒序日志比这两者，多了范围(Next-Key Lock，索引锁c（5，10])，个人理解是，加锁分两次，第一次，即正序的锁，第二次为倒序的锁，即多出的(5,10],在RR隔离级别，<br>innodb在加锁的过程中会默认向后锁一个记录，加上Next-Key Lock,第一次加锁的时候10已经在范围，由于倒序，向后，即向5再加Next-key Lock,即多出的(5,10]范围 <br></div>
+                            <span class="time">2018-12-28 16:06</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">优秀</p>
+                                <p class="reply-time">2018-12-28 17:14</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/da/ec/779c1a78.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">往事随风，顺其自然</span>
+                            </div>
+                            <div class="bd">总结：for update 是锁住所有行还有间隙锁，但是间隙之间互不冲突，但是互不冲突，为什么插入9这一行会被间隙锁等待，原来没有这一行，这和查询9这一行不是一样？ <br></div>
+                            <span class="time">2018-12-28 08:09</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/a9/29/dad1f942.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">en</span>
+                            </div>
+                            <div class="bd">老师您好，我mysql的隔离级别是可重复读，数据是(0,0,0),(5,5,5),(10,10,10),(15,15,15),(20,20,20),(25,25,25)，使用了begin;select * from t where c&gt;=15 and c&lt;=20 order by c desc for update;然后sessionB的11阻塞了，但是(6,6,6)的插入成功了这是什么原因呢？ <br></div>
+                            <span class="time">2018-12-31 10:21</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/d1/7c/4639f22c.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">郭健</span>
+                            </div>
+                            <div class="bd">老师，想请教您几个问题。1.在第六章MDL锁的时候，您说给大表增加字段和增加索引的时候要小心，之前做过测试，给一个一千万的数据增加索引有时需要40分钟，但是增加索引不会对表增加MDL锁吧。除了增加索引慢，还会对数据库有什么影响吗，我问我们dba，他说就开始和结束的时候上一下锁，没什么影响，我个人是持怀疑态度的。2，老师讲到表锁除了MDL锁，还有显示命令lock table的命令的表锁，老师我可以认为，在mysql中如果不显示使用lock table表锁的话，那么mysql是永远不会使用表锁的，如果锁的条件没有索引，使用的是锁住行锁+间隙控制并发。 <br></div>
+                            <span class="time">2018-12-30 16:13</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1. 在锁方面你们dba说的基本是对的。一开始和结束有写锁，执行中间40分钟只有读锁<br>但是1000万的表要做40分钟，可能意味着系统压力大（或者配置偏小），这样可能不是没影响对，比较这个操作还是要吃IO和CPU的<br><br>2. 嗯，innodb引擎是这样的。</p>
+                                <p class="reply-time">2018-12-30 19:23</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/e3/2e/77ad18f4.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">滔滔</span>
+                            </div>
+                            <div class="bd">老师，听了您的课收获满满～～感谢您的付出！您可不可以在分析死锁的时候讲一下如何分析死锁日志，期待～～ <br></div>
+                            <span class="time">2018-12-29 18:20</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">谢谢你的肯定。<br><br>嗯死锁分析会有一篇专门说。<br><br>不过你可以提前说一下碰到的疑问</p>
+                                <p class="reply-time">2018-12-29 20:08</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/29/36/c6bb0893.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">胡月</span>
+                            </div>
+                            <div class="bd">老师，今天线上遇上了一个死锁的问题，您能帮我分析下吗。<br>根据前面文章的理解：死锁产生的原因如下<br>线程1：update语句where c= 1 然后 update语句where c=2<br>线程2：update语句where c=2然后 update语句where c=1<br>如果线程1获取c=1的锁，等待c=2的锁，线程2获取了c=2的锁，等待c=1的锁，就会产生死锁。<br>但是线上的情况是<br>线程1：update语句where c= 1 然后 update语句where c=2<br>线程2：update语句where c=1然后 update语句where c=2<br>按说不会产生死锁啊，因为如果线程1获取了c=1的锁，线程2就阻塞了。线程1执行完之后，线程2执行就可以了死锁日志如下：<br><br> (1) TRANSACTION:<br>TRANSACTION 9418928, ACTIVE 0.088 sec fetching rows<br>mysql tables in use 1, locked 1<br>LOCK WAIT 66 lock struct(s), heap size 13864, 8 row lock(s)<br>LOCK BLOCKING MySQL thread id: 11495130 block 11105198<br>MySQL thread id 11105198, OS thread handle 0x2b086bf45700, query id 88822589 39.106.161.89 daogou Searching rows for update<br>UPDATE union_pid<br>		SET	USE_TIMES = USE_TIMES + 1<br>		WHERE PID = &#39;mm_128160800_40474215_33107450401&#39;<br> (1) WAITING FOR THIS LOCK TO BE GRANTED:<br>RECORD LOCKS space id 134 page no 93 n bits 192 index `PRIMARY` of table `shanfan`.`union_pid` trx id 9418928 lock_mode X locks rec but not gap waiting<br>Record lock, heap no 86 PHYSICAL RECORD: n_fields 12; compact format; info bits 0<br><br> (2) TRANSACTION:<br>TRANSACTION 9418929, ACTIVE 0.088 sec fetching rows<br>mysql tables in use 1, locked 1<br>280 lock struct(s), heap size 46632, 17 row lock(s), undo log entries 1<br>MySQL thread id 11495130, OS thread handle 0x2b086be41700, query id 88822594 39.106.161.89 daogou Searching rows for update<br>UPDATE union_pid<br>		SET	USE_TIMES = USE_TIMES + 1<br>		WHERE PID = &#39;1000501132_0_1432392817&#39;<br>(2) HOLDS THE LOCK(S):<br>RECORD LOCKS space id 134 page no 93 n bits 192 index `PRIMARY` of table `shanfan`.`union_pid` trx id 9418929 lock_mode X locks rec but not gap<br>Record lock, heap no 86 PHYSICAL RECORD: n_fields 12; compact format; info bits 0<br><br> (2) WAITING FOR THIS LOCK TO BE GRANTED:<br>RECORD LOCKS space id 134 page no 68 n bits 264 index `PRIMARY` of table `shanfan`.`union_pid` trx id 9418929 lock_mode X locks rec but not gap waiting<br>Record lock, heap no 116 PHYSICAL RECORD: n_fields 12; compact format; info bits 0<br><br> WE ROLL BACK TRANSACTION (1) <br></div>
+                            <span class="time">2018-12-29 18:08</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">PID是唯一索引吗？ 给一下表结构。这两个语句分别对应的主键ID如果单独查出来分别是多少</p>
+                                <p class="reply-time">2018-12-29 20:33</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/fe/68/e0bebd9a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">高枕</span>
+                            </div>
+                            <div class="bd">林老师，今天我又回头看第四节 深入浅出谈索引（上），里面有这样一段话：为了让一个查询尽量少地读磁盘，就必须让查询过程访问尽量少的数据块。那么，我们就不应该使用二叉树，而是要使用“N 叉”树。这里，“N 叉”树中的“N”取决于数据块的大小。<br>我想问的是，<br>一 mysql是以page为最小单位的，mysql一次磁盘io能只读一个块吗？还是多个块组成的page？<br>二 若一次只能读一个page，也就是多个块的话，这个N的大小是不是应该取决于page的大小呢？<br>三 主键索引叶子结点存放的实际数据，应该是通过指针跟叶子结点连接的吗？还是直接存在叶子结点所在的页里吗？ <br></div>
+                            <span class="time">2018-12-29 12:21</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/e5/39/951f89c8.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">信信</span>
+                            </div>
+                            <div class="bd">老师你好，如果图1的字段d有索引，按前面说的T1时刻后，只有id等于5这一行加了写锁。那么session B  操作的是id等于0这一行，应该不会被阻断吧？如果没阻断的话，仍然会产生语义问题及数据不一致的情况啊。想不明白。。。 <br></div>
+                            <span class="time">2018-12-29 00:36</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">如果d有索引，而且写法是d=5，那么其他语句要把其他行的d改成5，也是不行的哦</p>
+                                <p class="reply-time">2018-12-29 09:15</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/c7/a1/6e500f6b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">可凡不凡</span>
+                            </div>
+                            <div class="bd">老师<br>update tab1  set name =(select name from tab2 where status =2)...<br>tab2.status 上有二级非唯一索引,rr 隔离级别<br>上述情况<br>tab2.id 上的的索引会被锁吗?<br>实际开发 看到的死锁情况 是这条语句在等待 s 锁 但是没有 gap 锁,也没有设置 semi-consistent read <br></div>
+                            <span class="time">2018-12-28 09:44</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">Tab2满足条件的航上会加读锁</p>
+                                <p class="reply-time">2018-12-28 10:05</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/06/c4/11c9aa38.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">小新</span>
+                            </div>
+                            <div class="bd">这篇文章真的需要多啃几遍， <br></div>
+                            <span class="time">2018-12-28 08:53</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">嗯嗯，而且这篇是下篇的基础</p>
+                                <p class="reply-time">2018-12-28 09:43</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/ec/01/978d54af.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">Justin</span>
+                            </div>
+                            <div class="bd">下一章老师会不会讲走普通索引，锁普通索引的时候，主键索引，以及其他索引的加锁顺序或者规则呢？很是好奇  <br></div>
+                            <span class="time">2018-12-28 00:50</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">嗯嗯，就是这些内容<br><br>这篇文章末尾的问题如果一眼看懂的同学应该看起来就轻松的</p>
+                                <p class="reply-time">2018-12-28 09:46</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/6b/c6/2534e14a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">spraith</span>
+                            </div>
+                            <div class="bd">以前没用过 for update 语句，我上一个问题的答案应该找到了，原来 select 语句只有加了 for update 语句才会加写锁的 <br></div>
+                            <span class="time">2019-01-12 03:11</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">你得到了它</p>
+                                <p class="reply-time">2019-01-12 13:02</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/6b/c6/2534e14a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">spraith</span>
+                            </div>
+                            <div class="bd">图1的Q1语句，每次 select 是否都是自动加写锁的？如果是，那为了实现可重复读搞出来的mvcc好像就没必要了啊，因为别的事务都只能等待前面的写锁释放才能再写，所以Q1所在的事务自然就能实现“可重复读”，似乎不需要mvcc。<br>求老师解答 <br></div>
+                            <span class="time">2019-01-12 03:06</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/1d/b5/971261fd.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">alias cd=rm -rf</span>
+                            </div>
+                            <div class="bd">思考题猜测：<br>因为sessionA虽然有索引，但是因为排序需要扫描全表。所以为全表增加了gap lock。导致insert都需要等待锁释放。<br>是否sessionA不加order by，sessionC就不用block了？ <br></div>
+                            <span class="time">2019-01-10 09:23</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/ed/d2/e3ae7ddd.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">三木禾</span>
+                            </div>
+                            <div class="bd">老师，我的数据库版本是5.6.39-log，存储引擎为innodb,事务的隔离级别为  REPEATABLE-READ<br>CREATE TABLE `t` (<br>  `id` int(11) NOT NULL,<br>  `c` int(11) DEFAULT NULL,<br>  `d` int(11) DEFAULT NULL,<br>  PRIMARY KEY (`id`),<br>  KEY `c` (`c`)<br>) ENGINE=InnoDB DEFAULT CHARSET=utf8；<br>但是我在一个sessionA执行begin;  select * from t where d=5 for update;<br>得到 5 | 5 | 5 |  这一行数据<br>sessionB 执行update t set id=5 set id=0;  然后这条语句阻塞<br>sessionC执行insert into t(id,c,d) values(1,1,5);  也阻塞，跟您的图1 的执行结果不一样，为什么啊？<br> <br></div>
+                            <span class="time">2019-01-07 20:46</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">图1是为了推导“如果不阻塞会发生什么现象”<br><br>最后我们推论出来需要阻塞<br><br>实际上跟你验证的这个结果一致的</p>
+                                <p class="reply-time">2019-01-07 22:04</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

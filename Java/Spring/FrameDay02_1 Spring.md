@@ -1,41 +1,20 @@
----
-layout:     post
-title:      Frame Study -> Spring01
-subtitle:   Spring 学习整理
-date:       2020-02-29
-author:     GJXAIOU
-header-img: img/post-bg-universe.jpg
-catalog: true
-tags:
-    - Spring
----
-
-
-
 # Frame02_01 Spring
 
-**主要内容**
-
-* Spring 框架简介及官方压缩包目录介绍
-* Spring 环境搭建
-* IoC 详解
-* Spring 创建 Bean 的三种方式(包含两种工厂方式)
-* scope 属性讲解(包含单例设计模式)
-* DI 详解
-* Spring 中几种注入方式
-* 利用 Spring DI 实现生成 SqlSessionFactory 对象
-
-
+[TOC]
 
 ## 一、Spring 框架简介及官方压缩包目录介绍
 
 - Spring 框架宗旨：不重新发明技术，让原有技术使用起来更加方便。
+
 - ==**Spring 几大核心功能**==
   - IoC/DI：控制反转/依赖注入；
   - AOP：面向切面编程；
   - 声明式事务；
 
-- Spring Framework runtime （系统图见下）
+- Spring Framework runtime 
+  
+  ![Spring Framework Runtime](FrameDay02_1%20Spring.resource/Spring%20Framework%20Runtime.png)
+  
   -  test： spring 提供的测试功能；
   - Core  Container：是核心容器，里面的内容是 Spring 启动最基本的条件；
     - Beans: **Spring中负责创建类对象并管理对象**；
@@ -50,10 +29,8 @@ tags:
     - **transactions**：对应 `spring-tx.jar`,声明式事务时使用；
   - WEB：**需要 Spring 完成 web 相关功能时需要**；
     - 例如：由 tomcat 加载 spring 配置文件时需要有 spring-web包
-
-Servlet 是具体的业务功能，不能封装
-
-![Spring Framework Runtime](FrameDay02_1%20Spring.resource/Spring%20Framework%20Runtime.png)
+  
+  Servlet 是具体的业务功能，不能封装
 
    - Spring 框架中重要概念
       - 容器(Container): 将 Spring 当作一个大容器.
@@ -84,12 +61,13 @@ commons-logging.jar
   - 上面的文件名称和路径可以自定义，这么起名称是为了记住 Spring 容器 ApplicationContext,
 而 `applicationContext.xml` 中配置的信息最终存储到了 AppliationContext 容器中。
 
--  spring 配置文件（applicationContext.xml）是基于 schema（MyBatis 是基于 DTD）
-    -  schema 文件扩展名 `.xsd`
-    - 把 schema 理解成 DTD 的升级版.（DTD是XML的语法检查器）
-    - schema 比 DTD 具备更好的扩展性.拓展性体现如下：
-      - 每次引入一个 xsd 文件是一个 namespace(即xmlns)；
-    - 配置文件中一般只需要引入基本 schema；
+- spring 配置文件（applicationContext.xml）是基于 schema（MyBatis 是基于 DTD）
+  -  schema 文件扩展名 `.xsd`
+  - 把 schema 理解成 DTD 的升级版.（DTD是XML的语法检查器）
+  - schema 比 DTD 具备更好的扩展性.拓展性体现如下：
+
+    每次引入一个 xsd 文件是一个 namespace(即xmlns)；
+  - 配置文件中一般只需要引入基本 schema；
   配置文件的基本内容为：
 ```xml
 <?xml version="1.0" encoding="UTF-8"?> 
@@ -587,7 +565,8 @@ public class B{
 ```lib
 asm-3.3.1.jar
 cglib-2.2.2.jar
-commons-logging-1.1.1.jar
+slf4j-api-1.7.5.jar
+slf4j-log4j12-1.7.5.jar
 commons-logging-1.1.3.jar
 javassist-3.17.1-GA.jar
 jstl-1.2.jar
@@ -597,8 +576,7 @@ log4j-core-2.0-rc1.jar
 mybatis-3.2.7.jar
 mybatis-spring-1.2.3.jar
 mysql-connector-java-5.1.30.jar
-slf4j-api-1.7.5.jar
-slf4j-log4j12-1.7.5.jar
+
 spring-aop-4.1.6.RELEASE.jar
 spring-beans-4.1.6.RELEASE.jar
 spring-context-4.1.6.RELEASE.jar

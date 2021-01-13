@@ -1,0 +1,348 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  
+  
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                44讲答疑文章（三）：说一说这些好问题
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/a7/01/a7603105fd2296b77bd67df9cc456e01.jpg">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>这是我们专栏的最后一篇答疑文章，今天我们来说说一些好问题。</p><p>在我看来，能够帮我们扩展一个逻辑的边界的问题，就是好问题。因为通过解决这样的问题，能够加深我们对这个逻辑的理解，或者帮我们关联到另外一个知识点，进而可以帮助我们建立起自己的知识网络。</p><p>在工作中会问好问题，是一个很重要的能力。</p><p>经过这段时间的学习，从评论区的问题我可以感觉出来，紧跟课程学习的同学，对SQL语句执行性能的感觉越来越好了，提出的问题也越来越细致和精准了。</p><p>接下来，我们就一起看看同学们在评论区提到的这些好问题。在和你一起分析这些问题的时候，我会指出它们具体是在哪篇文章出现的。同时，在回答这些问题的过程中，我会假设你已经掌握了这篇文章涉及的知识。当然，如果你印象模糊了，也可以跳回文章再复习一次。</p><h1>join的写法</h1><p>在第35篇文章<a href="https://time.geekbang.org/column/article/80147">《join语句怎么优化？》</a>中，我在介绍join执行顺序的时候，用的都是straight_join。@郭健 同学在文后提出了两个问题：</p><ol>
+<li>
+<p>如果用left join的话，左边的表一定是驱动表吗？</p>
+</li>
+<li>
+<p>如果两个表的join包含多个条件的等值匹配，是都要写到on里面呢，还是只把一个条件写到on里面，其他条件写到where部分？</p>
+</li>
+</ol><p>为了同时回答这两个问题，我来构造两个表a和b：</p><!-- [[[read_end]]] --><pre><code>create table a(f1 int, f2 int, index(f1))engine=innodb;
+create table b(f1 int, f2 int)engine=innodb;
+insert into a values(1,1),(2,2),(3,3),(4,4),(5,5),(6,6);
+insert into b values(3,3),(4,4),(5,5),(6,6),(7,7),(8,8);
+</code></pre><p>表a和b都有两个字段f1和f2，不同的是表a的字段f1上有索引。然后，我往两个表中都插入了6条记录，其中在表a和b中同时存在的数据有4行。</p><p>@郭健 同学提到的第二个问题，其实就是下面这两种写法的区别：</p><pre><code>select * from a left join b on(a.f1=b.f1) and (a.f2=b.f2); /*Q1*/
+select * from a left join b on(a.f1=b.f1) where (a.f2=b.f2);/*Q2*/
+</code></pre><p>我把这两条语句分别记为Q1和Q2。</p><p>首先，需要说明的是，这两个left join语句的语义逻辑并不相同。我们先来看一下它们的执行结果。</p><p><img src="https://static001.geekbang.org/resource/image/87/bd/871f890532349781fdc4a4287e9f91bd.png" alt=""></p><center><span class="reference">图1 两个join的查询结果</span></center><p>可以看到：</p><ul>
+<li>语句Q1返回的数据集是6行，表a中即使没有满足匹配条件的记录，查询结果中也会返回一行，并将表b的各个字段值填成NULL。</li>
+<li>语句Q2返回的是4行。从逻辑上可以这么理解，最后的两行，由于表b中没有匹配的字段，结果集里面b.f2的值是空，不满足where 部分的条件判断，因此不能作为结果集的一部分。</li>
+</ul><p>接下来，我们看看实际执行这两条语句时，MySQL是怎么做的。</p><p>我们先一起看看语句Q1的explain结果：</p><p><img src="https://static001.geekbang.org/resource/image/b7/17/b7f27917ceb0be90ef7b201f2794c817.png" alt=""></p><center><span class="reference">图2 Q1的explain结果</span></center><p>可以看到，这个结果符合我们的预期：</p><ul>
+<li>驱动表是表a，被驱动表是表b；</li>
+<li>由于表b的f1字段上没有索引，所以使用的是Block Nexted Loop Join（简称BNL） 算法。</li>
+</ul><p>看到BNL算法，你就应该知道这条语句的执行流程其实是这样的：</p><ol>
+<li>
+<p>把表a的内容读入join_buffer 中。因为是select * ，所以字段f1和f2都被放入join_buffer了。</p>
+</li>
+<li>
+<p>顺序扫描表b，对于每一行数据，判断join条件（也就是a.f1=b.f1 and a.f2=b.f2)是否满足，满足条件的记录, 作为结果集的一行返回。如果语句中有where子句，需要先判断where部分满足条件后，再返回。</p>
+</li>
+<li>
+<p>表b扫描完成后，对于没有被匹配的表a的行（在这个例子中就是(1,1)、(2,2)这两行），把剩余字段补上NULL，再放入结果集中。</p>
+</li>
+</ol><p>对应的流程图如下：</p><p><img src="https://static001.geekbang.org/resource/image/8f/d7/8fd4b4b179fb84caaecece84b6406ad7.jpg" alt=""></p><center><span class="reference">图3 left join -BNL算法</span></center><p>可以看到，这条语句确实是以表a为驱动表，而且从执行效果看，也和使用straight_join是一样的。</p><p>你可能会想，语句Q2的查询结果里面少了最后两行数据，是不是就是把上面流程中的步骤3去掉呢？我们还是先看一下语句Q2的expain结果吧。</p><p><img src="https://static001.geekbang.org/resource/image/f5/9c/f5712c56dc84d331990409a5c313ea9c.png" alt=""></p><center><span class="reference">图4 Q2的explain结果</span></center><p>这里先和你说一句题外话，专栏马上就结束了，我也和你一起根据explain结果“脑补”了很多次一条语句的执行流程了，所以我希望你已经具备了这个能力。今天，我们再一起分析一次SQL语句的explain结果。</p><p>可以看到，这条语句是以表b为驱动表的。而如果一条join语句的Extra字段什么都没写的话，就表示使用的是Index Nested-Loop Join（简称NLJ）算法。</p><p>因此，语句Q2的执行流程是这样的：顺序扫描表b，每一行用b.f1到表a中去查，匹配到记录后判断a.f2=b.f2是否满足，满足条件的话就作为结果集的一部分返回。</p><p>那么，<strong>为什么语句Q1和Q2这两个查询的执行流程会差距这么大呢？</strong>其实，这是因为优化器基于Q2这个查询的语义做了优化。</p><p>为了理解这个问题，我需要再和你交代一个背景知识点：在MySQL里，NULL跟任何值执行等值判断和不等值判断的结果，都是NULL。这里包括， select NULL = NULL 的结果，也是返回NULL。</p><p>因此，语句Q2里面where a.f2=b.f2就表示，查询结果里面不会包含b.f2是NULL的行，这样这个left join的语义就是“找到这两个表里面，f1、f2对应相同的行。对于表a中存在，而表b中匹配不到的行，就放弃”。</p><p>这样，这条语句虽然用的是left join，但是语义跟join是一致的。</p><p>因此，优化器就把这条语句的left join改写成了join，然后因为表a的f1上有索引，就把表b作为驱动表，这样就可以用上NLJ 算法。在执行explain之后，你再执行show warnings，就能看到这个改写的结果，如图5所示。</p><p><img src="https://static001.geekbang.org/resource/image/d7/ab/d74878e7469edb8b713a18c6158530ab.png" alt=""></p><center><span class="reference">图5 Q2的改写结果</span></center><p>这个例子说明，即使我们在SQL语句中写成left join，执行过程还是有可能不是从左到右连接的。也就是说，<strong>使用left join时，左边的表不一定是驱动表。</strong></p><p>这样看来，<strong>如果需要left join的语义，就不能把被驱动表的字段放在where条件里面做等值判断或不等值判断，必须都写在on里面。</strong>那如果是join语句呢？</p><p>这时候，我们再看看这两条语句：</p><pre><code>select * from a join b on(a.f1=b.f1) and (a.f2=b.f2); /*Q3*/
+select * from a join b on(a.f1=b.f1) where (a.f2=b.f2);/*Q4*/
+</code></pre><p>我们再使用一次看explain 和 show warnings的方法，看看优化器是怎么做的。</p><p><img src="https://static001.geekbang.org/resource/image/d9/f5/d9952e4c2150bc649c7f2977e6ea80f5.png" alt=""></p><center><span class="reference">图6 join语句改写</span></center><p>可以看到，这两条语句都被改写成：</p><pre><code>select * from a join b where (a.f1=b.f1) and (a.f2=b.f2);
+</code></pre><p>执行计划自然也是一模一样的。</p><p>也就是说，在这种情况下，join将判断条件是否全部放在on部分就没有区别了。</p><h1>Simple Nested Loop Join 的性能问题</h1><p>我们知道，join语句使用不同的算法，对语句的性能影响会很大。在第34篇文章<a href="https://time.geekbang.org/column/article/79700">《到底可不可以使用join？》</a>的评论区中，@书策稠浊 和 @朝夕心 两位同学提了一个很不错的问题。</p><p>我们在文中说到，虽然BNL算法和Simple Nested Loop Join 算法都是要判断M*N次（M和N分别是join的两个表的行数），但是Simple Nested Loop Join 算法的每轮判断都要走全表扫描，因此性能上BNL算法执行起来会快很多。</p><p>为了便于说明，我还是先为你简单描述一下这两个算法。</p><p>BNL算法的执行逻辑是：</p><ol>
+<li>
+<p>首先，将驱动表的数据全部读入内存join_buffer中，这里join_buffer是无序数组；</p>
+</li>
+<li>
+<p>然后，顺序遍历被驱动表的所有行，每一行数据都跟join_buffer中的数据进行匹配，匹配成功则作为结果集的一部分返回。</p>
+</li>
+</ol><p>Simple Nested Loop Join算法的执行逻辑是：顺序取出驱动表中的每一行数据，到被驱动表去做全表扫描匹配，匹配成功则作为结果集的一部分返回。</p><p>这两位同学的疑问是，Simple Nested Loop Join算法，其实也是把数据读到内存里，然后按照匹配条件进行判断，为什么性能差距会这么大呢？</p><p>解释这个问题，需要用到MySQL中索引结构和Buffer Pool的相关知识点：</p><ol>
+<li>
+<p>在对被驱动表做全表扫描的时候，如果数据没有在Buffer Pool中，就需要等待这部分数据从磁盘读入；<br>
+从磁盘读入数据到内存中，会影响正常业务的Buffer Pool命中率，而且这个算法天然会对被驱动表的数据做多次访问，更容易将这些数据页放到Buffer Pool的头部（请参考<a href="https://time.geekbang.org/column/article/80147">第35篇文章</a>中的相关内容)；</p>
+</li>
+<li>
+<p>即使被驱动表数据都在内存中，每次查找“下一个记录的操作”，都是类似指针操作。而join_buffer中是数组，遍历的成本更低。</p>
+</li>
+</ol><p>所以说，BNL算法的性能会更好。</p><h1>distinct 和 group by的性能</h1><p>在第37篇文章<a href="https://time.geekbang.org/column/article/80477">《什么时候会使用内部临时表？》</a>中，@老杨同志 提了一个好问题：如果只需要去重，不需要执行聚合函数，distinct 和group by哪种效率高一些呢？</p><p>我来展开一下他的问题：如果表t的字段a上没有索引，那么下面这两条语句：</p><pre><code>select a from t group by a order by null;
+select distinct a from t;
+</code></pre><p>的性能是不是相同的?</p><p>首先需要说明的是，这种group by的写法，并不是SQL标准的写法。标准的group by语句，是需要在select部分加一个聚合函数，比如：</p><pre><code>select a,count(*) from t group by a order by null;
+</code></pre><p>这条语句的逻辑是：按照字段a分组，计算每组的a出现的次数。在这个结果里，由于做的是聚合计算，相同的a只出现一次。</p><blockquote>
+<p>备注：这里你可以顺便复习一下<a href="https://time.geekbang.org/column/article/80477">第37篇文章</a>中关于group by的相关内容。</p>
+</blockquote><p>没有了count(*)以后，也就是不再需要执行“计算总数”的逻辑时，第一条语句的逻辑就变成是：按照字段a做分组，相同的a的值只返回一行。而这就是distinct的语义，所以不需要执行聚合函数时，distinct 和group by这两条语句的语义和执行流程是相同的，因此执行性能也相同。</p><p>这两条语句的执行流程是下面这样的。</p><ol>
+<li>
+<p>创建一个临时表，临时表有一个字段a，并且在这个字段a上创建一个唯一索引；</p>
+</li>
+<li>
+<p>遍历表t，依次取数据插入临时表中：</p>
+<ul>
+<li>如果发现唯一键冲突，就跳过；</li>
+<li>否则插入成功；</li>
+</ul>
+</li>
+<li>
+<p>遍历完成后，将临时表作为结果集返回给客户端。</p>
+</li>
+</ol><h1>备库自增主键问题</h1><p>除了性能问题，大家对细节的追问也很到位。在第39篇文章<a href="https://time.geekbang.org/column/article/80531">《自增主键为什么不是连续的？》</a>评论区，@帽子掉了 同学问到：在binlog_format=statement时，语句A先获取id=1，然后语句B获取id=2；接着语句B提交，写binlog，然后语句A再写binlog。这时候，如果binlog重放，是不是会发生语句B的id为1，而语句A的id为2的不一致情况呢？</p><p>首先，这个问题默认了“自增id的生成顺序，和binlog的写入顺序可能是不同的”，这个理解是正确的。</p><p>其次，这个问题限定在statement格式下，也是对的。因为row格式的binlog就没有这个问题了，Write row event里面直接写了每一行的所有字段的值。</p><p>而至于为什么不会发生不一致的情况，我们来看一下下面的这个例子。</p><pre><code>create table t(id int auto_increment primary key);
+insert into t values(null);
+</code></pre><p><img src="https://static001.geekbang.org/resource/image/b5/25/b55b2167aa301d899ccc86a00b496b25.png" alt=""></p><center><span class="reference">图7 insert 语句的binlog</span></center><p>可以看到，在insert语句之前，还有一句SET INSERT_ID=1。这条命令的意思是，这个线程里下一次需要用到自增值的时候，不论当前表的自增值是多少，固定用1这个值。</p><p>这个SET INSERT_ID语句是固定跟在insert语句之前的，比如@帽子掉了同学提到的场景，主库上语句A的id是1，语句B的id是2，但是写入binlog的顺序先B后A，那么binlog就变成：</p><pre><code>SET INSERT_ID=2;
+语句B；
+SET INSERT_ID=1;
+语句A；
+</code></pre><p>你看，在备库上语句B用到的INSERT_ID依然是2，跟主库相同。</p><p>因此，即使两个INSERT语句在主备库的执行顺序不同，自增主键字段的值也不会不一致。</p><h1>小结</h1><p>今天这篇答疑文章，我选了4个好问题和你分享，并做了分析。在我看来，能够提出好问题，首先表示这些同学理解了我们文章的内容，进而又做了深入思考。有你们在认真的阅读和思考，对我来说是鼓励，也是动力。</p><p>说实话，短短的三篇答疑文章无法全部展开同学们在评论区留下的高质量问题，之后有的同学还会二刷，也会有新的同学加入，大家想到新的问题就请给我留言吧，我会继续关注评论区，和你在评论区交流。</p><p>老规矩，答疑文章也是要有课后思考题的。</p><p>在<a href="https://time.geekbang.org/column/article/70562">第8篇文章</a>的评论区， @XD同学提到一个问题：他查看了一下innodb_trx，发现这个事务的trx_id是一个很大的数（281479535353408），而且似乎在同一个session中启动的会话得到的trx_id是保持不变的。当执行任何加写锁的语句后，trx_id都会变成一个很小的数字（118378）。</p><p>你可以通过实验验证一下，然后分析看看，事务id的分配规则是什么，以及MySQL为什么要这么设计呢？</p><p>你可以把你的结论和分析写在留言区，我会在下一篇文章和你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><h1>上期问题时间</h1><p>上期的问题是，怎么给分区表t创建自增主键。由于MySQL要求主键包含所有的分区字段，所以肯定是要创建联合主键的。</p><p>这时候就有两种可选：一种是(ftime, id)，另一种是(id, ftime)。</p><p>如果从利用率上来看，应该使用(ftime, id)这种模式。因为用ftime做分区key，说明大多数语句都是包含ftime的，使用这种模式，可以利用前缀索引的规则，减少一个索引。</p><p>这时的建表语句是：</p><pre><code>CREATE TABLE `t` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ftime` datetime NOT NULL,
+  `c` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ftime`,`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+PARTITION BY RANGE (YEAR(ftime))
+(PARTITION p_2017 VALUES LESS THAN (2017) ENGINE = MyISAM,
+ PARTITION p_2018 VALUES LESS THAN (2018) ENGINE = MyISAM,
+ PARTITION p_2019 VALUES LESS THAN (2019) ENGINE = MyISAM,
+ PARTITION p_others VALUES LESS THAN MAXVALUE ENGINE = MyISAM);
+</code></pre><p>当然，我的建议是你要尽量使用InnoDB引擎。InnoDB表要求至少有一个索引，以自增字段作为第一个字段，所以需要加一个id的单独索引。</p><pre><code>CREATE TABLE `t` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ftime` datetime NOT NULL,
+  `c` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ftime`,`id`),
+  KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+PARTITION BY RANGE (YEAR(ftime))
+(PARTITION p_2017 VALUES LESS THAN (2017) ENGINE = InnoDB,
+ PARTITION p_2018 VALUES LESS THAN (2018) ENGINE = InnoDB,
+ PARTITION p_2019 VALUES LESS THAN (2019) ENGINE = InnoDB,
+ PARTITION p_others VALUES LESS THAN MAXVALUE ENGINE = InnoDB);
+</code></pre><p>当然把字段反过来，创建成：</p><pre><code>  PRIMARY KEY (`id`,`ftime`),
+  KEY `id` (`ftime`)
+</code></pre><p>也是可以的。</p><p>评论区留言点赞板：</p><blockquote>
+<p>@夹心面包 、@郭江伟 同学提到了最后一种方案。</p>
+</blockquote><blockquote>
+<p>@aliang 同学提了一个好问题，关于open_files_limit和innodb_open_files的关系，我在回复中做了说明，大家可以看一下。</p>
+</blockquote><blockquote>
+<p>@万勇 提了一个好问题，实际上对于现在官方的版本，将字段加在中间还是最后，在性能上是没差别的。但是，我建议大家养成习惯（如果你是DBA就帮业务开发同学养成习惯），将字段加在最后面，因为这样还是比较方便操作的。这个问题，我也在评论的答复中做了说明，你可以看一下。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/09/77/09c1073f99cf71d2fb162a716b5fa577.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/36/d2/c7357723.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">发条橙子 。</span>
+                            </div>
+                            <div class="bd">啧啧， 原来我写的 left join 一直都不是标准的，每次后面都会加上 where ， 还一直以为左面是驱动表 。既然实际上 left join 后加上 where 的话， 肯定会被优化器优化成 join  where 的形式， 那是否下次写 left join   ..where 的时候， 不如直接写成 join .. where ，省去优化器自己去优化，这样是不是稍稍快些 <br></div>
+                            <span class="time">2019-02-23 15:12</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/fJ5BEicRVnXAwCxkIYhJZ0woiaQ38ibUYkYH125bzL2Y2ib1YS9b7Q9S5qia2Cia9UWzUoDBGeWJibB7p9xSnib7iaU8kzw/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">千木</span>
+                            </div>
+                            <div class="bd">老师您好，join使用join_buffer和内存区别那个问题的第一点解释我还是有些纳闷，你说由于从磁盘拿数据到内存里面会导致等等的性能问题我能够理解，但是说即使使用nbl算法也会涉及到从磁盘拿数据到内存吧，所以这点导致两种算法执行差异貌似不太合理，您觉得呢？ <br></div>
+                            <span class="time">2019-02-23 13:16</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/e2/2c/0d04f87b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">龙文</span>
+                            </div>
+                            <div class="bd">老师你好，我在第21讲求助了一个死锁问题，当时你回复说后面会解答，不过我浏览了下后续文章没找到解答，所以再次求助下。ps:用的阿里云的rds,提了工单没效果啊<br>作者回复: 有的，你看一下第40篇 “insert 唯一键冲突”这一段<br><br>ps:我已经离开阿里云挺久的了 <br><br>---------------------------------------------<br>谢谢老师,我看了第40篇,还是有地方不太明白,再打扰下<br>mysql 版本5.6<br>隔离级别为rc<br>CREATE TABLE `uk_test` (<br>  `id` bigint(20) NOT NULL AUTO_INCREMENT,<br>  `a` int(11) NOT NULL,<br>  `b` int(11) NOT NULL,<br>  `c` int(11) NOT NULL,<br>  PRIMARY KEY (`id`),<br>  UNIQUE KEY `uk_a_b` (`a`,`b`) USING BTREE<br>) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4<br>表中数据：<br>+----+---+---+---+<br>| id | a | b | c |<br>+----+---+---+---+<br>| 1 | 1 | 1 | 2 |<br>| 6 | 1 | 2 | 1 |<br>+----+---+---+---+<br>sql:执行顺序<br>session1:begin;<br>session2:begin;<br>session1:select * from uk_test where a = 1 and b = 1 for update;<br>session2:select * from uk_test where a = 1 and b = 1 for update;<br>session1:insert into uk_test (a,b,c) values(1,1,2) on duplicate key update c = 2;<br>session2:ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction<br><br>我的疑问是:<br>1.rc隔离级别下对唯一键的insert也会加next-key lock吗？<br><br>2.死锁日志显示<br>  session 1已经成功加上行锁(lock_mode X locks rec but not gap),<br><br>  session 2在等待同一个行锁(lock_mode X locks rec but not gap waiting),<br><br>  session1这时因为等待lock_mode X waiting而死锁。<br>  这里的lock_mode X waiting是指next-key lock吗？<br>  如果是的话，没想明白这里怎么形成资源循环等待了？<br>我的猜测是session1 这时持有行锁，要next-key lock 所以要去加gap锁。session 2持有gap锁在等行锁。但如果是这样为什么session2 在rc下select for update，且记录存在时会加gap锁?还有gap锁加锁不是不互斥吗？<br>  <br></div>
+                            <span class="time">2019-02-23 11:31</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/e2/2c/0d04f87b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">龙文</span>
+                            </div>
+                            <div class="bd">老师你好，我在第21讲求助了一个死锁问题，当时你回复说后面会解答，不过我浏览了下后续文章没找到解答，所以再次求助下。ps:用的阿里云的rds,提了工单没效果啊 <br></div>
+                            <span class="time">2019-02-23 00:40</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">有的，你看一下第40篇 “insert 唯一键冲突”这一段<br><br>ps:我已经离开阿里云挺久的了 </p>
+                                <p class="reply-time">2019-02-23 09:46</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/57/6e/dd0eee5f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">夜空中最亮的星（华仔）</span>
+                            </div>
+                            <div class="bd">订阅了好几个专栏 mysql这个是最优先看的，别的专栏可以跟不上 这个必须跟上，老师计划出第二季吗？ <br></div>
+                            <span class="time">2019-02-22 18:42</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/57/6e/dd0eee5f.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">夜空中最亮的星（华仔）</span>
+                            </div>
+                            <div class="bd">这么快就要结束，好快啊 <br></div>
+                            <span class="time">2019-02-22 15:26</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">跟进得很快啊大家</p>
+                                <p class="reply-time">2019-02-22 18:01</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/00/f0/08409e78.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">一大只</span>
+                            </div>
+                            <div class="bd">老师好，我做了下课后题的实验，不清楚为啥设计，下面记录了我看到的现象，不一定对哈。<br>使用start transaction with consistent snapshot;<br>同一个session的开启快照事务后的trx_id很大并且一致，如果关闭这个session，开启另一个session使用snapshot，初始值的trx_id也是与之前的session一致的。<br><br>如果再打开第二个session使用snapshot，第一次查询trx表，会发现第一个session还是很大只，第二个打开的trx_id会很小，但这个很小的trx_id是第一个打开的session的最小trx_id+1。这时，如果commit；再start snapshot，那么将会出现一个比第一个session还要大一点的trx_id，我开了几个session，第一次是+24，随后都是加12，如下图：<br>+---------------------+-----------------+<br>| trx_mysql_thread_id | trx_id          |<br>+---------------------+-----------------+<br>|               14672 | 421259275839776 |<br>|               14661 | 421259275838864 |<br>|               14645 | 421259275837952 |<br>|               14587 | 421259275837040 |<br>|               14578 | 421259275835216 |<br>+---------------------+-----------------+<br><br>只有一个session打开snapshot情况下，trx_id在commit后会增加，但在事务内不会看到trx_id增加,使用select,select lock in share mode不会导致trx_id增加。<br><br>一个ddl操作应该是  trx_id+18<br><br>不在事务内的dml操作：<br>delete 1条  trx_id+2  <br>delete 多条 trx_id+6<br>insert 1条 trx_id+1<br>insert values (),()...多条trx_id+5<br>update 1条  trx_id+2<br>update 多条 trx_id+6<br><br>snapshot事务内的dml操作：<br>事务内先select * from tb for update;再delete from tb where id=xxx;这样的delete trx_id+1<br>如果是事务内直接delete from tb where id=xxx;或delete from tb;这样的delete trx_id+6<br><br>事务内update 1条 trx_id+2，如果先select * fom tb for update;再update 1条，有时候是trx_id+2，有时候是trx_id+5<br>事务内update 多条 trx_id+6<br> <br></div>
+                            <span class="time">2019-02-22 14:13</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">很好的验证<br>下一篇文章会讲到哈</p>
+                                <p class="reply-time">2019-02-23 10:38</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f9/a4/f0b92135.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">万勇</span>
+                            </div>
+                            <div class="bd">感谢老师上一期的解答，还请教一个分区表的问题，分区表创建的聚集索引是分区本地维护的吧，但是主键索引要保证全局唯一性。那分区和主键索引之间是不是要建立一种关系？另外分区表如果我们创建普通索引，按道理可以分区创建的，分区维护自己的普通索引，各分区之间互不影响。 <br></div>
+                            <span class="time">2019-02-22 12:00</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">就是我这篇末尾建议的几种建表方法,就是建立联系了</p>
+                                <p class="reply-time">2019-02-22 14:06</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/33/4b/71905da9.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">克劳德</span>
+                            </div>
+                            <div class="bd">老师好，如果group by用作数据去重，根据文章中描述的，流程2会遍历表依次插入进临时表。<br>我理解的遍历表是通过扫描主键索引来做的，因此同一组的记录只会留下主键值最小的那个，是否正确？<br>能否通过扫描其他索引，来达到去重后的记录不按照主键值来决定？<br> <br></div>
+                            <span class="time">2019-02-22 10:44</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">1.对,就是扫描这个索引的过程中,第一个碰到的值<br>2. 可以,你用force index试试</p>
+                                <p class="reply-time">2019-02-22 14:08</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/51/f5/211dff03.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">白永伟</span>
+                            </div>
+                            <div class="bd">老师，关于备库自增id我有一个问题。既然binlog不管是statement模式还是row模式，里面的insert语句跟着的自增id都是固定的。那假如发生主备切换，备库变成主库后，客户端往新主库里插入数据时，自增id的起始值是多少，有没有可能跟已有的记录id冲突？尤其是备库还没有处理完同步过来的binlog就开始接受客户端请求时。如果要求备库必须处理完binlog才能接受客户端请求，那么怎么保证主备切换的过程中，不影响用户使用。谢谢。 <br></div>
+                            <span class="time">2019-02-22 09:56</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/60/2a/9e0ba423.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">孟晓冬</span>
+                            </div>
+                            <div class="bd">老师，你好，这是表结构<br>CREATE TABLE `graph` (<br>  `id` int(11) NOT NULL AUTO_INCREMENT,<br>  `name` varchar(20) NOT NULL COMMENT &#39;报表名称&#39;,<br>  `ip` varchar(50) DEFAULT NULL COMMENT &#39;报表来自于哪台cat-client机器ip, NULL表示合并同domain所有ip&#39;,<br>  `domain` varchar(50) NOT NULL COMMENT &#39;报表处理的Domain信息&#39;,<br>  `period` datetime NOT NULL COMMENT &#39;报表时间段&#39;,<br>  `type` tinyint(4) NOT NULL COMMENT &#39;报表数据格式, 1&#47;xml, 2&#47;json, 3&#47;csv, 默认3&#39;,<br>  `detail_content` mediumtext NOT NULL COMMENT &#39;详细绘图内容&#39;,<br>  `summary_content` mediumtext NOT NULL COMMENT &#39;概要绘图内容&#39;,<br>  `creation_date` datetime NOT NULL COMMENT &#39;报表创建时间&#39;,<br>  PRIMARY KEY (`id`),<br>  UNIQUE KEY `graph_period_ip_domain_name` (`period`,`ip`,`domain`,`name`)<br>) ENGINE=InnoDB AUTO_INCREMENT=5913464 DEFAULT CHARSET=utf8 COMMENT=&#39;小时图表曲线&#39;<br>差不多有600万条记录，我删除完550万条记录后，执行select min(id) from graph;比较慢<br>root@localhost:cat 09:01:06&gt; select min(id) from graph;<br>+---------+<br>| min(id) |<br>+---------+<br>| 5513664 |<br>+---------+<br>1 row in set (8.27 sec)<br>然后做了alter table graph ENGINE=InnoDB;这个操作后，就快了，<br>root@localhost:cat 09:06:20&gt; select min(id) from graph;<br>+---------+<br>| min(id) |<br>+---------+<br>| 5513664 |<br>+---------+<br>1 row in set (0.00 sec)<br>这是为什么呀？<br> <br></div>
+                            <span class="time">2019-02-22 09:44</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">看下13篇</p>
+                                <p class="reply-time">2019-02-22 10:57</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

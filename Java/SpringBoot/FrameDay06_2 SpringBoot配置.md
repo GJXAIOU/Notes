@@ -74,7 +74,6 @@ friends:
 行内写法：
 
 ```yaml
-
 friends: {lastName: zhangsan,age: 18}
 ```
 
@@ -132,78 +131,77 @@ person.maps.k2=14
 person.lists=lisi,zhaoliu
 person.dog.name=小狗
 person.dog.age=12
-
 ```
 
 #### 2.对应的两种属性注入方式
 
 - 属性值注入方式一：JavaBean：具体的属性值在上面的 yml  配置文件中
 
-```java
-// 只有该组件是容器中的组件，才能使用容器提供的@ConfigurationProperties功能，因此要加@Component；
-@Component
-// @ConfigurationProperties：告诉SpringBoot将本类中的所有属性和配置文件中相关的配置进行绑定，最终作用是：将配置文件中配置的每一个属性的值，映射到这个组件中
-// prefix = "person"：配置文件中哪个下面的所有属性进行一一映射
-@ConfigurationProperties(prefix = "person")
-@Getter
-@Setter
-public class Person {
-    private String lastName;
-    private Integer age;
-    private Boolean boss;
-    private Date birth;
-
-    private Map<String,Object> maps;
-    private List<Object> lists;
-    private Dog dog;
-}
-```
+    ```java
+    // 只有该组件是容器中的组件，才能使用容器提供的@ConfigurationProperties功能，因此要加@Component；
+    @Component
+    // @ConfigurationProperties：告诉SpringBoot将本类中的所有属性和配置文件中相关的配置进行绑定，最终作用是：将配置文件中配置的每一个属性的值，映射到这个组件中
+    // prefix = "person"：配置文件中哪个下面的所有属性进行一一映射
+    @ConfigurationProperties(prefix = "person")
+    @Getter
+    @Setter
+    public class Person {
+        private String lastName;
+        private Integer age;
+        private Boolean boss;
+        private Date birth;
+    
+        private Map<String,Object> maps;
+        private List<Object> lists;
+        private Dog dog;
+    }
+    ```
 
 - 属性值注入方式二：加载 properties 中属性值
 
-取值方式类似于之前 spring 中的配置文件
+    取值方式类似于之前 spring 中的配置文件
 
-```java
-<bean class="Person">
-    <property name="lastName" value="字面量，布尔值等等"></property>
-<bean/>
-```
+    ```xml
+    <bean class="Person">
+        <property name="lastName" value="字面量，布尔值等等"></property>
+    <bean/>
+    ```
 
-可以使用 `${key}` 从环境变量、配置文件中获取值，或者 `#{SpEL}` 使用表达式
+    <font color="#3498DB">可以使用 `${key}` 从环境变量、配置文件中获取值，或者 `#{SpEL}` 使用表达式。</font>
 
-```java
-package com.gjxaiou.springboot.bean;
+    ```java
+    package com.gjxaiou.springboot.bean;
+    
+    @Component
+    public class Person {
+        @Value("${person.last-name}")
+        private String lastName;
+        @Value("#{11*2}")
+        private Integer age;
+        @Value("true")
+        private Boolean boss;
+    
+        private Date birth;
+        @Value("${person.maps}")
+        private Map<String,Object> maps;
+        private List<Object> lists;
+        private Dog dog;
+    ```
 
-@Component
-public class Person {
-    @Value("${person.last-name}")
-    private String lastName;
-    @Value("#{11*2}")
-    private Integer age;
-    @Value("true")
-    private Boolean boss;
+    附：Dog Bean：
 
-    private Date birth;
-    @Value("${person.maps}")
-    private Map<String,Object> maps;
-    private List<Object> lists;
-    private Dog dog;
-```
+    ```java
+    @Getter
+    @Setter
+    public class Dog {
+        private String name;
+        private Integer age;
+    }
+    ```
 
-附：Dog Bean：
+    
 
-```java
-@Getter
-@Setter
-public class Dog {
-    private String name;
-    private Integer age;
-}
-```
-
-
-
-附：我们可以导入配置文件处理器（pom.xml），以后编写配置(配置文件进行绑定)就有提示了
+<font color="#3498DB">附：我们可以导入配置文件处理器（pom.xml），以后编写配置(配置文件进行绑定)就有提示了</font>
 
 ```xml
 <!--导入配置文件处理器，配置文件进行绑定就会有提示-->
@@ -239,8 +237,6 @@ public class SpringBoot02ConfigApplicationTests {
 }
 ```
 
-
-
 ## 四、配置文件说明
 
 ### （一）`@Value` 获取值和 `@ConfigurationProperties` 获取值比较
@@ -263,38 +259,40 @@ public class SpringBoot02ConfigApplicationTests {
 
 - **松散绑定**：就是代码中的变量名和 yml 文件中的变量名的对应绑定
 
-以 person.firstName 变量为例，对应的 yml 文件中可以为：`person.firstName` `person.first-name` `person.first_name` `PERSON_FIRSTNAME`都可以，其中 `-` 和 `_` 都表示大写。
+    以 person.firstName 变量为例，对应的 yml 文件中可以为：`person.firstName` `person.first-name` `person.first_name` `PERSON_FIRSTNAME`都可以，其中 `-` 和 `_` 都表示大写。
 
 - **数据校验**：类上面需要增加：`@Validated`注解，同时需要校验的变量名上面加上对应想校验的格式；示例如下：
 
-```java
-@Component
-@ConfigurationProperties(prefix = "person")
-@Validated
-public class Person {
+    ```java
+    @Component
+    @ConfigurationProperties(prefix = "person")
+    @Validated
+    public class Person {
+    
+        // 表示要校验 lastName 的值是否为邮箱格式
+        @Email
+        private String lastName;
+    ```
 
-    // 表示要校验 lastName 的值是否为邮箱格式
-    @Email
-    private String lastName;
-```
+    
 
 ### （二）`@PropertySource` & `@ImportResource` & `@Bean`
 
 - @**PropertySource**：作用是**加载指定的配置文件**；
 
-    因为上面的  `@ConfigurationProperties(prefix = "person")` 默认从全局配置文件中获取值；如果这两个命令都写并且默认的配置文件和 `person.properties` 中都有属性值，则加载全局配置文件中的值；
-
-```java
-@PropertySource(value = {"classpath:person.properties"})
-@Component
-public class Person {
-    private String lastName;
-    private Integer age;
-    private Boolean boss;
-
-```
-
-对应的 `person.properties` 文件
+    因为上面的  `@ConfigurationProperties(prefix = "person")` 默认从全局配置文件中获取值；如果这两个命令都写并且默认的配置文件和 `person.properties` 中都有属性值，则加载全局配置文件中的值；			  
+    
+    ```java
+    @PropertySource(value = {"classpath:person.properties"})
+    @Component
+    public class Person {
+        private String lastName;		
+        private Integer age;	
+        private Boolean boss;
+    }
+    ```
+    
+    对应的 `person.properties` 文件
 
 ```properties
 person.last-name=李四

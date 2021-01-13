@@ -1,0 +1,571 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+
+#watermark {
+
+  position: relative;
+  overflow: hidden;
+}
+
+#watermark .x {
+  position: absolute;
+  top: 800;
+  left: 400;
+  color: #3300ff;
+  font-size: 50px;
+  pointer-events: none;
+  opacity:0.3;
+  filter:Alpha(opacity=50);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+    </style>
+
+
+    <style type="text/css">
+ html{color:#333;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-rendering:optimizelegibility;font-family:Helvetica Neue,PingFang SC,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif}html.borderbox *,html.borderbox :after,html.borderbox :before{box-sizing:border-box}article,aside,blockquote,body,button,code,dd,details,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,menu,nav,section{display:block}audio,canvas,video{display:inline-block}body,button,input,select,textarea{font:300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}blockquote{position:relative;color:#999;font-weight:400;border-left:1px solid #1abc9c;padding-left:1em;margin:1em 3em 1em 2em}@media only screen and (max-width:640px){blockquote{margin:1em 0}}abbr,acronym{border-bottom:1px dotted;font-variant:normal}abbr{cursor:help}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}ol,ul{list-style:none}caption,th{text-align:left}q:after,q:before{content:""}sub,sup{font-size:75%;line-height:0;position:relative}:root sub,:root sup{vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a{color:#1abc9c}a:hover{text-decoration:underline}.typo a{border-bottom:1px solid #1abc9c}.typo a:hover{border-bottom-color:#555;color:#555}.typo a:hover,a,ins{text-decoration:none}.typo-u,u{text-decoration:underline}mark{background:#fffdd1;border-bottom:1px solid #ffedce;padding:2px;margin:0 5px}code,pre,pre tt{font-family:Courier,Courier New,monospace}pre{background:hsla(0,0%,97%,.7);border:1px solid #ddd;padding:1em 1.5em;display:block;-webkit-overflow-scrolling:touch}hr{border:none;border-bottom:1px solid #cfcfcf;margin-bottom:.8em;height:10px}.typo-small,figcaption,small{font-size:.9em;color:#888}b,strong{font-weight:700;color:#000}[draggable]{cursor:move}.clearfix:after,.clearfix:before{content:"";display:table}.clearfix:after{clear:both}.clearfix{zoom:1}.textwrap,.textwrap td,.textwrap th{word-wrap:break-word;word-break:break-all}.textwrap-table{table-layout:fixed}.serif{font-family:Palatino,Optima,Georgia,serif}.typo-dl,.typo-form,.typo-hr,.typo-ol,.typo-p,.typo-pre,.typo-table,.typo-ul,.typo dl,.typo form,.typo hr,.typo ol,.typo p,.typo pre,.typo table,.typo ul,blockquote{margin-bottom:1rem}h1,h2,h3,h4,h5,h6{font-family:PingFang SC,Helvetica Neue,Verdana,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;color:#000;line-height:1.35}.typo-h1,.typo-h2,.typo-h3,.typo-h4,.typo-h5,.typo-h6,.typo h1,.typo h2,.typo h3,.typo h4,.typo h5,.typo h6{margin-top:1.2em;margin-bottom:.6em;line-height:1.35}.typo-h1,.typo h1{font-size:2em}.typo-h2,.typo h2{font-size:1.8em}.typo-h3,.typo h3{font-size:1.6em}.typo-h4,.typo h4{font-size:1.4em}.typo-h5,.typo-h6,.typo h5,.typo h6{font-size:1.2em}.typo-ul,.typo ul{margin-left:1.3em;list-style:disc}.typo-ol,.typo ol{list-style:decimal;margin-left:1.9em}.typo-ol ol,.typo-ol ul,.typo-ul ol,.typo-ul ul,.typo li ol,.typo li ul{margin-bottom:.8em;margin-left:2em}.typo-ol ul,.typo-ul ul,.typo li ul{list-style:circle}.typo-table td,.typo-table th,.typo table caption,.typo table td,.typo table th{border:1px solid #ddd;padding:.5em 1em;color:#666}.typo-table th,.typo table th{background:#fbfbfb}.typo-table thead th,.typo table thead th{background:hsla(0,0%,95%,.7)}.typo table caption{border-bottom:none}.typo-input,.typo-textarea{-webkit-appearance:none;border-radius:0}.typo-em,.typo em,caption,legend{color:#000;font-weight:inherit}.typo-em{position:relative}.typo-em:after{position:absolute;top:.65em;left:0;width:100%;overflow:hidden;white-space:nowrap;content:"\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"}.typo img{max-width:100%}.common-content{font-weight:400;color:#353535;line-height:1.75rem;white-space:normal;word-break:normal;font-size:1rem}.common-content img{display:block;max-width:100%;background-color:#eee}.common-content audio,.common-content video{width:100%;background-color:#eee}.common-content center,.common-content font{margin-top:1rem;display:inline-block}.common-content center{width:100%}.common-content pre{margin-top:1rem;padding-left:0;padding-right:0;position:relative;overflow:hidden}.common-content pre code{font-size:.8rem;font-family:Consolas,Liberation Mono,Menlo,monospace,Courier;display:block;width:100%;box-sizing:border-box;padding-left:1rem;padding-right:1rem;overflow-x:auto}.common-content hr{border:none;margin-top:1.5rem;margin-bottom:1.5rem;border-top:1px solid #f5f5f5;height:1px;background:none}.common-content b,.common-content h1,.common-content h2,.common-content h3,.common-content h4,.common-content h5,.common-content strong{font-weight:700}.common-content h1,.common-content h2{font-size:1.125rem;margin-bottom:.45rem}.common-content h3,.common-content h4,.common-content h5{font-size:1rem;margin-bottom:.45rem}.common-content p{font-weight:400;color:#353535;margin-top:.15rem}.common-content .orange{color:#ff5a05}.common-content .reference{font-size:1rem;color:#888}.custom-rich-content h1{margin-top:0;font-weight:400;font-size:15.25px;border-bottom:1px solid #eee;line-height:2.8}.custom-rich-content li,.custom-rich-content p{font-size:14px;color:#888;line-height:1.6}table.hljs-ln{margin-bottom:0;border-spacing:0;border-collapse:collapse}table.hljs-ln,table.hljs-ln tbody,table.hljs-ln td,table.hljs-ln tr{box-sizing:border-box}table.hljs-ln td{padding:0;border:0}table.hljs-ln td.hljs-ln-numbers{min-width:15px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;cursor:pointer;user-select:none}table.hljs-ln td.hljs-ln-code,table.hljs-ln td.hljs-ln-numbers{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px;line-height:20px;vertical-align:top}table.hljs-ln td.hljs-ln-code{position:relative;padding-right:10px;padding-left:10px;overflow:visible;color:#24292e;word-wrap:normal;white-space:pre}video::-webkit-media-controls{overflow:hidden!important}video::-webkit-media-controls-enclosure{width:calc(100% + 32px);margin-left:auto}.button-cancel{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel,.button-primary{-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary{color:#fff;background-color:#ff5a05;border-radius:3px}@font-face{font-family:iconfont;src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot);src:url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.woff) format("woff"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.ttf) format("truetype"),url(//at.alicdn.com/t/font_372689_bwwwtosxtzp.svg#iconfont) format("svg")}@font-face{font-family:player-font;src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot);src:url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.eot#iefix) format("embedded-opentype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.woff) format("woff"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.ttf) format("truetype"),url(//at.alicdn.com/t/font_509397_1cyjv4o90qiod2t9.svg#player-font) format("svg")}.iconfont{font-family:iconfont!important;font-size:16px;font-style:normal;-webkit-font-smoothing:antialiased;-webkit-text-stroke-width:.2px;-moz-osx-font-smoothing:grayscale}html{background:#fff;min-height:100%;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{width:100%}body.fixed{overflow:hidden;position:fixed;width:100vw;height:100vh}i{font-style:normal}a{word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}a:hover{text-decoration:none}.fade-enter-active,.fade-leave-active{transition:opacity .3s}.fade-enter,.fade-leave-to{opacity:0}.MathJax,.MathJax_CHTML,.MathJax_MathContainer,.MathJax_MathML,.MathJax_PHTML,.MathJax_PlainSource,.MathJax_SVG{outline:0}.ios-app-switch .js-audit{display:none}._loading_wrap_{position:fixed;width:100vw;height:100vh;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999}._loading_div_class_,._loading_wrap_{display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}._loading_div_class_{word-wrap:break-word;padding:.5rem .75rem;text-align:center;z-index:9999;font-size:.6rem;max-width:60%;color:#fff;border-radius:.25rem;-ms-flex-direction:column;flex-direction:column}._loading_div_class_ .message{color:#353535;font-size:16px;line-height:3}.spinner{animation:circle-rotator 1.4s linear infinite}.spinner *{line-height:0;box-sizing:border-box}@keyframes circle-rotator{0%{transform:rotate(0deg)}to{transform:rotate(270deg)}}.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:circle-dash 1.4s ease-in-out infinite,circle-colors 5.6s ease-in-out infinite}@keyframes circle-colors{0%{stroke:#ff5a05}to{stroke:#ff5a05}}@keyframes circle-dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}to{stroke-dashoffset:187;transform:rotate(450deg)}}.confirm-box-wrapper,.confirm-box-wrapper .mask{position:absolute;top:0;left:0;right:0;bottom:0}.confirm-box-wrapper .mask{background:rgba(0,0,0,.6)}.confirm-box-wrapper .confirm-box{position:fixed;top:50%;left:50%;width:267px;background:#fff;transform:translate(-50%,-50%);border-radius:7px}.confirm-box-wrapper .confirm-box .head{margin:0 18px;font-size:18px;text-align:center;line-height:65px;border-bottom:1px solid #d9d9d9}.confirm-box-wrapper .confirm-box .body{padding:18px;padding-bottom:0;color:#353535;font-size:12.5px;max-height:150px;overflow:auto}.confirm-box-wrapper .confirm-box .foot{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;padding:18px}.confirm-box-wrapper .confirm-box .foot .button-cancel{border:1px solid #d9d9d9}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+
+    </style>
+    <style type="text/css">
+        .button-cancel[data-v-87ffcada]{color:#888;border:1px solid #888;border-radius:3px;margin-right:12px}.button-cancel[data-v-87ffcada],.button-primary[data-v-87ffcada]{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:35px;display:inline-block;font-size:15px;text-align:center;line-height:36px}.button-primary[data-v-87ffcada]{color:#fff;background-color:#ff5a05;border-radius:3px}.pd[data-v-87ffcada]{padding-left:1.375rem;padding-right:1.375rem}.article[data-v-87ffcada]{max-width:70rem;margin:0 auto}.article .article-unavailable[data-v-87ffcada]{color:#fa8919;font-size:15px;font-weight:600;line-height:24px;border-radius:5px;padding:12px;background-color:#f6f7fb;margin-top:20px}.article .article-unavailable .iconfont[data-v-87ffcada]{font-size:12px}.article .main[data-v-87ffcada]{padding:1.25rem 0;margin-bottom:52px}.article-title[data-v-87ffcada]{color:#353535;font-weight:400;line-height:1.65rem;font-size:1.34375rem}.article-info[data-v-87ffcada]{color:#888;font-size:.9375rem;margin-top:1.0625rem}.article-content[data-v-87ffcada]{margin-top:1.0625rem}.article-content.android video[data-v-87ffcada]::-webkit-media-controls-fullscreen-button{display:none}.copyright[data-v-87ffcada]{color:#b2b2b2;padding-bottom:20px;margin-top:20px;font-size:13px}.audio-player[data-v-87ffcada]{width:100%;margin:20px 0}.to-comment[data-v-87ffcada]{overflow:hidden;padding-top:10px;margin-bottom:-30px}.to-comment a.button-primary[data-v-87ffcada]{float:right;height:20px;font-size:12px;line-height:20px;padding:4px 8px;cursor:pointer}.article-comments[data-v-87ffcada]{margin-top:2rem}.article-comments h2[data-v-87ffcada]{text-align:center;color:#888;position:relative;z-index:1;margin-bottom:1rem}.article-comments h2[data-v-87ffcada]:before{border-top:1px dotted #888;content:"";position:absolute;top:56%;left:0;width:100%;z-index:-1}.article-comments h2 span[data-v-87ffcada]{font-size:15.25px;font-weight:400;padding:0 1rem;background:#fff;display:inline-block}.article-sub-bottom[data-v-87ffcada]{z-index:10;cursor:pointer}.switch-btns[data-v-87ffcada]{height:76px;cursor:pointer;padding-top:24px;padding-bottom:24px;border-bottom:10px solid #f6f7fb;position:relative}.switch-btns[data-v-87ffcada]:before{content:" ";height:1px;background:#e8e8e8;position:absolute;top:0;left:0;-webkit-box-sizing:border-box;box-sizing:border-box;left:1.375rem;right:1.375rem}.switch-btns .btn[data-v-87ffcada]{height:38px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.switch-btns .btn .tag[data-v-87ffcada]{-webkit-box-flex:0;-ms-flex:0 0 62px;flex:0 0 62px;text-align:center;color:#888;font-size:14px;border-radius:10px;height:22px;line-height:22px;background:#f6f7fb;font-weight:400}.switch-btns .btn .txt[data-v-87ffcada]{margin-left:10px;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;color:#888;font-size:15px;height:22px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}@media (max-width:769px){.article .breadcrumb[data-v-87ffcada]{padding-top:10px;padding-bottom:10px}}
+
+
+
+
+
+    </style>
+
+    <style type="text/css">
+        .comment-item{list-style-position:inside;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;margin-bottom:1rem}.comment-item a{border-bottom:none}.comment-item .avatar{width:2.625rem;height:2.625rem;-ms-flex-negative:0;flex-shrink:0;border-radius:50%}.comment-item .info{margin-left:.5rem;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.comment-item .info .hd{width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .username{color:#888;font-size:15.25px;font-weight:400;line-height:1.2}.comment-item .info .hd .control{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center}.comment-item .info .hd .control .btn-share{color:#888;font-size:.75rem;margin-right:1rem}.comment-item .info .hd .control .btn-praise{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-size:15.25px;text-decoration:none}.comment-item .info .hd .control .btn-praise i{color:#888;display:inline-block;font-size:.75rem;margin-right:.3rem;margin-top:-.01rem}.comment-item .info .hd .control .btn-praise i.on,.comment-item .info .hd .control .btn-praise span{color:#ff5a05}.comment-item .info .bd{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6}.comment-item .info .time{color:#888;font-size:9px;line-height:1}.comment-item .info .reply .reply-hd{font-size:15.25px}.comment-item .info .reply .reply-hd span{margin-left:-12px;color:#888;font-weight:400}.comment-item .info .reply .reply-hd i{color:#ff5a05;font-size:15.25px}.comment-item .info .reply .reply-content{color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all}.comment-item .info .reply .reply-time{color:#888;font-size:9px}
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+
+    <div data-v-87ffcada="" class="article" id="watermark">
+        
+        <div data-v-87ffcada="" class="main main-app">
+            <h1 data-v-87ffcada="" class="article-title pd">
+                26讲备库为什么会延迟好几个小时
+            </h1>
+            <div data-v-87ffcada="" class="article-content typo common-content pd"><img data-v-87ffcada=""
+                                                                                        src="https://static001.geekbang.org/resource/image/e4/10/e40f71da5614561c9a766c17361c0610.jpg">
+
+
+                <div data-v-87ffcada="" id="article-content" class="">
+                    <div class="text">
+                        <p>在上一篇文章中，我和你介绍了几种可能导致备库延迟的原因。你会发现，这些场景里，不论是偶发性的查询压力，还是备份，对备库延迟的影响一般是分钟级的，而且在备库恢复正常以后都能够追上来。</p><p>但是，如果备库执行日志的速度持续低于主库生成日志的速度，那这个延迟就有可能成了小时级别。而且对于一个压力持续比较高的主库来说，备库很可能永远都追不上主库的节奏。</p><p>这就涉及到今天我要给你介绍的话题：备库并行复制能力。</p><p>为了便于你理解，我们再一起看一下第24篇文章<a href="https://time.geekbang.org/column/article/76446">《MySQL是怎么保证主备一致的？》</a>的主备流程图。</p><p><img src="https://static001.geekbang.org/resource/image/1a/ef/1a85a3bac30a32438bfd8862e5a34eef.png" alt=""></p><center><span class="reference">图1 主备流程图</span></center><p>谈到主备的并行复制能力，我们要关注的是图中黑色的两个箭头。一个箭头代表了客户端写入主库，另一箭头代表的是备库上sql_thread执行中转日志（relay log）。如果用箭头的粗细来代表并行度的话，那么真实情况就如图1所示，第一个箭头要明显粗于第二个箭头。</p><p>在主库上，影响并发度的原因就是各种锁了。由于InnoDB引擎支持行锁，除了所有并发事务都在更新同一行（热点行）这种极端场景外，它对业务并发度的支持还是很友好的。所以，你在性能测试的时候会发现，并发压测线程32就比单线程时，总体吞吐量高。</p><p>而日志在备库上的执行，就是图中备库上sql_thread更新数据(DATA)的逻辑。如果是用单线程的话，就会导致备库应用日志不够快，造成主备延迟。</p><!-- [[[read_end]]] --><p>在官方的5.6版本之前，MySQL只支持单线程复制，由此在主库并发高、TPS高时就会出现严重的主备延迟问题。</p><p>从单线程复制到最新版本的多线程复制，中间的演化经历了好几个版本。接下来，我就跟你说说MySQL多线程复制的演进过程。</p><p>其实说到底，所有的多线程复制机制，都是要把图1中只有一个线程的sql_thread，拆成多个线程，也就是都符合下面的这个模型：</p><p><img src="https://static001.geekbang.org/resource/image/bc/45/bcf75aa3b0f496699fd7885426bc6245.png" alt=""></p><center><span class="reference">图2 多线程模型</span></center><p>图2中，coordinator就是原来的sql_thread, 不过现在它不再直接更新数据了，只负责读取中转日志和分发事务。真正更新日志的，变成了worker线程。而work线程的个数，就是由参数slave_parallel_workers决定的。根据我的经验，把这个值设置为8~16之间最好（32核物理机的情况），毕竟备库还有可能要提供读查询，不能把CPU都吃光了。</p><p>接下来，你需要先思考一个问题：事务能不能按照轮询的方式分发给各个worker，也就是第一个事务分给worker_1，第二个事务发给worker_2呢？</p><p>其实是不行的。因为，事务被分发给worker以后，不同的worker就独立执行了。但是，由于CPU的调度策略，很可能第二个事务最终比第一个事务先执行。而如果这时候刚好这两个事务更新的是同一行，也就意味着，同一行上的两个事务，在主库和备库上的执行顺序相反，会导致主备不一致的问题。</p><p>接下来，请你再设想一下另外一个问题：同一个事务的多个更新语句，能不能分给不同的worker来执行呢？</p><p>答案是，也不行。举个例子，一个事务更新了表t1和表t2中的各一行，如果这两条更新语句被分到不同worker的话，虽然最终的结果是主备一致的，但如果表t1执行完成的瞬间，备库上有一个查询，就会看到这个事务“更新了一半的结果”，破坏了事务逻辑的原子性。</p><p>所以，coordinator在分发的时候，需要满足以下这两个基本要求：</p><ol>
+<li>
+<p>不能造成更新覆盖。这就要求更新同一行的两个事务，必须被分发到同一个worker中。</p>
+</li>
+<li>
+<p>同一个事务不能被拆开，必须放到同一个worker中。</p>
+</li>
+</ol><p>各个版本的多线程复制，都遵循了这两条基本原则。接下来，我们就看看各个版本的并行复制策略。</p><h1>MySQL 5.5版本的并行复制策略</h1><p>官方MySQL 5.5版本是不支持并行复制的。但是，在2012年的时候，我自己服务的业务出现了严重的主备延迟，原因就是备库只有单线程复制。然后，我就先后写了两个版本的并行策略。</p><p>这里，我给你介绍一下这两个版本的并行策略，即按表分发策略和按行分发策略，以帮助你理解MySQL官方版本并行复制策略的迭代。</p><h3>按表分发策略</h3><p>按表分发事务的基本思路是，如果两个事务更新不同的表，它们就可以并行。因为数据是存储在表里的，所以按表分发，可以保证两个worker不会更新同一行。</p><p>当然，如果有跨表的事务，还是要把两张表放在一起考虑的。如图3所示，就是按表分发的规则。</p><p><img src="https://static001.geekbang.org/resource/image/8b/76/8b6976fedd6e644022d4026581fb8d76.png" alt=""></p><center><span class="reference">图3 按表并行复制程模型</span></center><p>可以看到，每个worker线程对应一个hash表，用于保存当前正在这个worker的“执行队列”里的事务所涉及的表。hash表的key是“库名.表名”，value是一个数字，表示队列中有多少个事务修改这个表。</p><p>在有事务分配给worker时，事务里面涉及的表会被加到对应的hash表中。worker执行完成后，这个表会被从hash表中去掉。</p><p>图3中，hash_table_1表示，现在worker_1的“待执行事务队列”里，有4个事务涉及到db1.t1表，有1个事务涉及到db2.t2表；hash_table_2表示，现在worker_2中有一个事务会更新到表t3的数据。</p><p>假设在图中的情况下，coordinator从中转日志中读入一个新事务T，这个事务修改的行涉及到表t1和t3。</p><p>现在我们用事务T的分配流程，来看一下分配规则。</p><ol>
+<li>
+<p>由于事务T中涉及修改表t1，而worker_1队列中有事务在修改表t1，事务T和队列中的某个事务要修改同一个表的数据，这种情况我们说事务T和worker_1是冲突的。</p>
+</li>
+<li>
+<p>按照这个逻辑，顺序判断事务T和每个worker队列的冲突关系，会发现事务T跟worker_2也冲突。</p>
+</li>
+<li>
+<p>事务T跟多于一个worker冲突，coordinator线程就进入等待。</p>
+</li>
+<li>
+<p>每个worker继续执行，同时修改hash_table。假设hash_table_2里面涉及到修改表t3的事务先执行完成，就会从hash_table_2中把db1.t3这一项去掉。</p>
+</li>
+<li>
+<p>这样coordinator会发现跟事务T冲突的worker只有worker_1了，因此就把它分配给worker_1。</p>
+</li>
+<li>
+<p>coordinator继续读下一个中转日志，继续分配事务。</p>
+</li>
+</ol><p>也就是说，每个事务在分发的时候，跟所有worker的冲突关系包括以下三种情况：</p><ol>
+<li>
+<p>如果跟所有worker都不冲突，coordinator线程就会把这个事务分配给最空闲的woker;</p>
+</li>
+<li>
+<p>如果跟多于一个worker冲突，coordinator线程就进入等待状态，直到和这个事务存在冲突关系的worker只剩下1个；</p>
+</li>
+<li>
+<p>如果只跟一个worker冲突，coordinator线程就会把这个事务分配给这个存在冲突关系的worker。</p>
+</li>
+</ol><p>这个按表分发的方案，在多个表负载均匀的场景里应用效果很好。但是，如果碰到热点表，比如所有的更新事务都会涉及到某一个表的时候，所有事务都会被分配到同一个worker中，就变成单线程复制了。</p><h3>按行分发策略</h3><p>要解决热点表的并行复制问题，就需要一个按行并行复制的方案。按行复制的核心思路是：如果两个事务没有更新相同的行，它们在备库上可以并行执行。显然，这个模式要求binlog格式必须是row。</p><p>这时候，我们判断一个事务T和worker是否冲突，用的就规则就不是“修改同一个表”，而是“修改同一行”。</p><p>按行复制和按表复制的数据结构差不多，也是为每个worker，分配一个hash表。只是要实现按行分发，这时候的key，就必须是“库名+表名+唯一键的值”。</p><p>但是，这个“唯一键”只有主键id还是不够的，我们还需要考虑下面这种场景，表t1中除了主键，还有唯一索引a：</p><pre><code>CREATE TABLE `t1` (
+  `id` int(11) NOT NULL,
+  `a` int(11) DEFAULT NULL,
+  `b` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `a` (`a`)
+) ENGINE=InnoDB;
+
+insert into t1 values(1,1,1),(2,2,2),(3,3,3),(4,4,4),(5,5,5);
+</code></pre><p>假设，接下来我们要在主库执行这两个事务：</p><p><img src="https://static001.geekbang.org/resource/image/f1/78/f19916e27b8ff28e87ed3ad9f5473378.png" alt=""></p><center><span class="reference">图4 唯一键冲突示例</span></center><p>可以看到，这两个事务要更新的行的主键值不同，但是如果它们被分到不同的worker，就有可能session B的语句先执行。这时候id=1的行的a的值还是1，就会报唯一键冲突。</p><p>因此，基于行的策略，事务hash表中还需要考虑唯一键，即key应该是“库名+表名+索引a的名字+a的值”。</p><p>比如，在上面这个例子中，我要在表t1上执行update t1 set a=1 where id=2语句，在binlog里面记录了整行的数据修改前各个字段的值，和修改后各个字段的值。</p><p>因此，coordinator在解析这个语句的binlog的时候，这个事务的hash表就有三个项:</p><ol>
+<li>
+<p>key=hash_func(db1+t1+“PRIMARY”+2), value=2; 这里value=2是因为修改前后的行id值不变，出现了两次。</p>
+</li>
+<li>
+<p>key=hash_func(db1+t1+“a”+2), value=1，表示会影响到这个表a=2的行。</p>
+</li>
+<li>
+<p>key=hash_func(db1+t1+“a”+1), value=1，表示会影响到这个表a=1的行。</p>
+</li>
+</ol><p>可见，<strong>相比于按表并行分发策略，按行并行策略在决定线程分发的时候，需要消耗更多的计算资源。</strong>你可能也发现了，这两个方案其实都有一些约束条件：</p><ol>
+<li>
+<p>要能够从binlog里面解析出表名、主键值和唯一索引的值。也就是说，主库的binlog格式必须是row；</p>
+</li>
+<li>
+<p>表必须有主键；</p>
+</li>
+<li>
+<p>不能有外键。表上如果有外键，级联更新的行不会记录在binlog中，这样冲突检测就不准确。</p>
+</li>
+</ol><p>但，好在这三条约束规则，本来就是DBA之前要求业务开发人员必须遵守的线上使用规范，所以这两个并行复制策略在应用上也没有碰到什么麻烦。</p><p>对比按表分发和按行分发这两个方案的话，按行分发策略的并行度更高。不过，如果是要操作很多行的大事务的话，按行分发的策略有两个问题：</p><ol>
+<li>
+<p>耗费内存。比如一个语句要删除100万行数据，这时候hash表就要记录100万个项。</p>
+</li>
+<li>
+<p>耗费CPU。解析binlog，然后计算hash值，对于大事务，这个成本还是很高的。</p>
+</li>
+</ol><p>所以，我在实现这个策略的时候会设置一个阈值，单个事务如果超过设置的行数阈值（比如，如果单个事务更新的行数超过10万行），就暂时退化为单线程模式，退化过程的逻辑大概是这样的：</p><ol>
+<li>
+<p>coordinator暂时先hold住这个事务；</p>
+</li>
+<li>
+<p>等待所有worker都执行完成，变成空队列；</p>
+</li>
+<li>
+<p>coordinator直接执行这个事务；</p>
+</li>
+<li>
+<p>恢复并行模式。</p>
+</li>
+</ol><p>读到这里，你可能会感到奇怪，这两个策略又没有被合到官方，我为什么要介绍这么详细呢？其实，介绍这两个策略的目的是抛砖引玉，方便你理解后面要介绍的社区版本策略。</p><h1>MySQL 5.6版本的并行复制策略</h1><p>官方MySQL5.6版本，支持了并行复制，只是支持的粒度是按库并行。理解了上面介绍的按表分发策略和按行分发策略，你就理解了，用于决定分发策略的hash表里，key就是数据库名。</p><p>这个策略的并行效果，取决于压力模型。如果在主库上有多个DB，并且各个DB的压力均衡，使用这个策略的效果会很好。</p><p>相比于按表和按行分发，这个策略有两个优势：</p><ol>
+<li>
+<p>构造hash值的时候很快，只需要库名；而且一个实例上DB数也不会很多，不会出现需要构造100万个项这种情况。</p>
+</li>
+<li>
+<p>不要求binlog的格式。因为statement格式的binlog也可以很容易拿到库名。</p>
+</li>
+</ol><p>但是，如果你的主库上的表都放在同一个DB里面，这个策略就没有效果了；或者如果不同DB的热点不同，比如一个是业务逻辑库，一个是系统配置库，那也起不到并行的效果。</p><p>理论上你可以创建不同的DB，把相同热度的表均匀分到这些不同的DB中，强行使用这个策略。不过据我所知，由于需要特地移动数据，这个策略用得并不多。</p><h1>MariaDB的并行复制策略</h1><p>在<a href="https://time.geekbang.org/column/article/76161">第23篇文章</a>中，我给你介绍了redo log组提交(group commit)优化， 而MariaDB的并行复制策略利用的就是这个特性：</p><ol>
+<li>
+<p>能够在同一组里提交的事务，一定不会修改同一行；</p>
+</li>
+<li>
+<p>主库上可以并行执行的事务，备库上也一定是可以并行执行的。</p>
+</li>
+</ol><p>在实现上，MariaDB是这么做的：</p><ol>
+<li>
+<p>在一组里面一起提交的事务，有一个相同的commit_id，下一组就是commit_id+1；</p>
+</li>
+<li>
+<p>commit_id直接写到binlog里面；</p>
+</li>
+<li>
+<p>传到备库应用的时候，相同commit_id的事务分发到多个worker执行；</p>
+</li>
+<li>
+<p>这一组全部执行完成后，coordinator再去取下一批。</p>
+</li>
+</ol><p>当时，这个策略出来的时候是相当惊艳的。因为，之前业界的思路都是在“分析binlog，并拆分到worker”上。而MariaDB的这个策略，目标是“模拟主库的并行模式”。</p><p>但是，这个策略有一个问题，它并没有实现“真正的模拟主库并发度”这个目标。在主库上，一组事务在commit的时候，下一组事务是同时处于“执行中”状态的。</p><p>如图5所示，假设了三组事务在主库的执行情况，你可以看到在trx1、trx2和trx3提交的时候，trx4、trx5和trx6是在执行的。这样，在第一组事务提交完成的时候，下一组事务很快就会进入commit状态。</p><p><img src="https://static001.geekbang.org/resource/image/8f/c3/8fec5fb48d6095aecc80016826efbfc3.png" alt=""></p><center><span class="reference">图5 主库并行事务</span></center><p>而按照MariaDB的并行复制策略，备库上的执行效果如图6所示。</p><p><img src="https://static001.geekbang.org/resource/image/8a/22/8ac3799c1ff2f9833619a1624ca3e622.png" alt=""></p><center><span class="reference">图6 MariaDB 并行复制，备库并行效果</span></center><p>可以看到，在备库上执行的时候，要等第一组事务完全执行完成后，第二组事务才能开始执行，这样系统的吞吐量就不够。</p><p>另外，这个方案很容易被大事务拖后腿。假设trx2是一个超大事务，那么在备库应用的时候，trx1和trx3执行完成后，就只能等trx2完全执行完成，下一组才能开始执行。这段时间，只有一个worker线程在工作，是对资源的浪费。</p><p>不过即使如此，这个策略仍然是一个很漂亮的创新。因为，它对原系统的改造非常少，实现也很优雅。</p><h1>MySQL 5.7的并行复制策略</h1><p>在MariaDB并行复制实现之后，官方的MySQL5.7版本也提供了类似的功能，由参数slave-parallel-type来控制并行复制策略：</p><ol>
+<li>
+<p>配置为DATABASE，表示使用MySQL 5.6版本的按库并行策略；</p>
+</li>
+<li>
+<p>配置为 LOGICAL_CLOCK，表示的就是类似MariaDB的策略。不过，MySQL 5.7这个策略，针对并行度做了优化。这个优化的思路也很有趣儿。</p>
+</li>
+</ol><p>你可以先考虑这样一个问题：同时处于“执行状态”的所有事务，是不是可以并行？</p><p>答案是，不能。</p><p>因为，这里面可能有由于锁冲突而处于锁等待状态的事务。如果这些事务在备库上被分配到不同的worker，就会出现备库跟主库不一致的情况。</p><p>而上面提到的MariaDB这个策略的核心，是“所有处于commit”状态的事务可以并行。事务处于commit状态，表示已经通过了锁冲突的检验了。</p><p>这时候，你可以再回顾一下两阶段提交，我把前面<a href="https://time.geekbang.org/column/article/76161">第23篇文章</a>中介绍过的两阶段提交过程图贴过来。</p><p><img src="https://static001.geekbang.org/resource/image/5a/28/5ae7d074c34bc5bd55c82781de670c28.png" alt=""></p><center><span class="reference">图7 两阶段提交细化过程图</span></center><p>其实，不用等到commit阶段，只要能够到达redo log prepare阶段，就表示事务已经通过锁冲突的检验了。</p><p>因此，MySQL 5.7并行复制策略的思想是：</p><ol>
+<li>
+<p>同时处于prepare状态的事务，在备库执行时是可以并行的；</p>
+</li>
+<li>
+<p>处于prepare状态的事务，与处于commit状态的事务之间，在备库执行时也是可以并行的。</p>
+</li>
+</ol><p>我在第23篇文章，讲binlog的组提交的时候，介绍过两个参数：</p><ol>
+<li>
+<p>binlog_group_commit_sync_delay参数，表示延迟多少微秒后才调用fsync;</p>
+</li>
+<li>
+<p>binlog_group_commit_sync_no_delay_count参数，表示累积多少次以后才调用fsync。</p>
+</li>
+</ol><p>这两个参数是用于故意拉长binlog从write到fsync的时间，以此减少binlog的写盘次数。在MySQL 5.7的并行复制策略里，它们可以用来制造更多的“同时处于prepare阶段的事务”。这样就增加了备库复制的并行度。</p><p>也就是说，这两个参数，既可以“故意”让主库提交得慢些，又可以让备库执行得快些。在MySQL 5.7处理备库延迟的时候，可以考虑调整这两个参数值，来达到提升备库复制并发度的目的。</p><h1>MySQL 5.7.22的并行复制策略</h1><p>在2018年4月份发布的MySQL 5.7.22版本里，MySQL增加了一个新的并行复制策略，基于WRITESET的并行复制。</p><p>相应地，新增了一个参数binlog-transaction-dependency-tracking，用来控制是否启用这个新策略。这个参数的可选值有以下三种。</p><ol>
+<li>
+<p>COMMIT_ORDER，表示的就是前面介绍的，根据同时进入prepare和commit来判断是否可以并行的策略。</p>
+</li>
+<li>
+<p>WRITESET，表示的是对于事务涉及更新的每一行，计算出这一行的hash值，组成集合writeset。如果两个事务没有操作相同的行，也就是说它们的writeset没有交集，就可以并行。</p>
+</li>
+<li>
+<p>WRITESET_SESSION，是在WRITESET的基础上多了一个约束，即在主库上同一个线程先后执行的两个事务，在备库执行的时候，要保证相同的先后顺序。</p>
+</li>
+</ol><p>当然为了唯一标识，这个hash值是通过“库名+表名+索引名+值”计算出来的。如果一个表上除了有主键索引外，还有其他唯一索引，那么对于每个唯一索引，insert语句对应的writeset就要多增加一个hash值。</p><p>你可能看出来了，这跟我们前面介绍的基于MySQL 5.5版本的按行分发的策略是差不多的。不过，MySQL官方的这个实现还是有很大的优势：</p><ol>
+<li>
+<p>writeset是在主库生成后直接写入到binlog里面的，这样在备库执行的时候，不需要解析binlog内容（event里的行数据），节省了很多计算量；</p>
+</li>
+<li>
+<p>不需要把整个事务的binlog都扫一遍才能决定分发到哪个worker，更省内存；</p>
+</li>
+<li>
+<p>由于备库的分发策略不依赖于binlog内容，所以binlog是statement格式也是可以的。</p>
+</li>
+</ol><p>因此，MySQL 5.7.22的并行复制策略在通用性上还是有保证的。</p><p>当然，对于“表上没主键”和“外键约束”的场景，WRITESET策略也是没法并行的，也会暂时退化为单线程模型。</p><h1>小结</h1><p>在今天这篇文章中，我和你介绍了MySQL的各种多线程复制策略。</p><p>为什么要有多线程复制呢？这是因为单线程复制的能力全面低于多线程复制，对于更新压力较大的主库，备库是可能一直追不上主库的。从现象上看就是，备库上seconds_behind_master的值越来越大。</p><p>在介绍完每个并行复制策略后，我还和你分享了不同策略的优缺点：</p><ul>
+<li>如果你是DBA，就需要根据不同的业务场景，选择不同的策略；</li>
+<li>如果是你业务开发人员，也希望你能从中获取灵感用到平时的开发工作中。</li>
+</ul><p>从这些分析中，你也会发现大事务不仅会影响到主库，也是造成备库复制延迟的主要原因之一。因此，在平时的开发工作中，我建议你尽量减少大事务操作，把大事务拆成小事务。</p><p>官方MySQL5.7版本新增的备库并行策略，修改了binlog的内容，也就是说binlog协议并不是向上兼容的，在主备切换、版本升级的时候需要把这个因素也考虑进去。</p><p>最后，我给你留下一个思考题吧。</p><p>假设一个MySQL 5.7.22版本的主库，单线程插入了很多数据，过了3个小时后，我们要给这个主库搭建一个相同版本的备库。</p><p>这时候，你为了更快地让备库追上主库，要开并行复制。在binlog-transaction-dependency-tracking参数的COMMIT_ORDER、WRITESET和WRITE_SESSION这三个取值中，你会选择哪一个呢？</p><p>你选择的原因是什么？如果设置另外两个参数，你认为会出现什么现象呢？</p><p>你可以把你的答案和分析写在评论区，我会在下一篇文章跟你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。</p><h1>上期问题时间</h1><p>上期的问题是，什么情况下，备库的主备延迟会表现为一个45度的线段？评论区有不少同学的回复都说到了重点：备库的同步在这段时间完全被堵住了。</p><p>产生这种现象典型的场景主要包括两种：</p><ul>
+<li>一种是大事务（包括大表DDL、一个事务操作很多行）；</li>
+<li>还有一种情况比较隐蔽，就是备库起了一个长事务，比如</li>
+</ul><pre><code>begin; 
+select * from t limit 1;
+</code></pre><p>然后就不动了。</p><p>这时候主库对表t做了一个加字段操作，即使这个表很小，这个DDL在备库应用的时候也会被堵住，也不能看到这个现象。</p><p>评论区还有同学说是不是主库多线程、从库单线程，备库跟不上主库的更新节奏导致的？今天这篇文章，我们刚好讲的是并行复制。所以，你知道了，这种情况会导致主备延迟，但不会表现为这种标准的呈45度的直线。</p><p>评论区留言点赞板：</p><blockquote>
+<p>@易翔 、 @万勇、@老杨同志 等同学的回复都提到了我们上面说的场景；</p>
+</blockquote><blockquote>
+<p>@Max 同学提了一个很不错的问题。主备关系里面，备库主动连接，之后的binlog发送是主库主动推送的。之所以这么设计也是为了效率和实时性考虑，毕竟靠备库轮询，会有时间差。</p>
+</blockquote><p><img src="https://static001.geekbang.org/resource/image/09/77/09c1073f99cf71d2fb162a716b5fa577.jpg" alt=""></p>
+                    </div>
+                </div>
+
+            </div>
+            <div data-v-87ffcada="" class="article-comments pd"><h2 data-v-87ffcada=""><span
+                    data-v-87ffcada="">精选留言</span></h2>
+                <ul data-v-87ffcada="">
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/03/f7/3a493bec.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">老杨同志</span>
+                            </div>
+                            <div class="bd">尝试回答 慧鑫coming 的问题。<br>老师图片的步骤有下面5步<br>1 redo log prepare write<br>2 binlog write<br>3 redo log prepare fsync<br>4 binlog fsync<br>5 redo log commit write<br><br>1)如果更新通一条记录是有锁的，只能一个事务执行，其他事务等待锁。<br><br>2)第4步的时候会因为下面两个参数，等其他没有锁冲突的事务，一起刷盘，此时一起执行的事务拥有相同的commit_id<br>binlog_group_commit_sync_delay<br>binlog_group_commit_sync_no_delay_count<br><br>3)执行步骤5后，释放锁，等待锁的事务开始执行。<br><br>所以对同一行更新的事务，不可能拥有相同的commit_id <br></div>
+                            <span class="time">2019-01-11 10:57</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">，你比我回复得详细，顶起</p>
+                                <p class="reply-time">2019-01-11 11:51</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/05/d4/e06bf86d.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">长杰</span>
+                            </div>
+                            <div class="bd">举个例子，一个事务更新了表 t1 和表 t2 中的各一行，如果这两条更新语句被分到不同 worker 的话，虽然最终的结果是主备一致的，但如果表 t1 执行完成的瞬间，备库上有一个查询，就会看到这个事务“更新了一半的结果”，破坏了事务逻辑的原子性。<br><br>老师这块不太明白，备库有查询会看到更新了一半的结果，t1的worker执行完了更新会commit吗？如果不commit，备库查询应该看不到吧？如果commit，就破坏了事物的原子性，肯定是有问题的。 <br></div>
+                            <span class="time">2019-01-11 11:17</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">应该是说，它迟早要commit，但是两个worker是两个线程，没办法约好“同时提交”，这样就有可能出现一个先提交一个后提交。<br>这两个提交之间的时间差，就能被用户看到“一半事务”，好问题<br></p>
+                                <p class="reply-time">2019-01-11 11:55</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f0/da/74bbb9e6.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">志兵(Subin)</span>
+                            </div>
+                            <div class="bd">mysql 5.7并行复制有一个bug，是seconds_behind_master记录并不准备，显示为0，但是实际并不为0，能不能解释一下为什么？并且有没有其他地方可以读到准确的值呢 <br></div>
+                            <span class="time">2019-01-12 18:30</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">“记录并不准备” ？</p>
+                                <p class="reply-time">2019-01-12 19:39</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/84/49/abb7bfe3.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">观弈道人</span>
+                            </div>
+                            <div class="bd">丁老师你好，问个题外问题，mysql已经通过gap锁解决了在rr级别下的幻读问题，那么serializable隔离级别目前还有什么用途，一般文章上说的，serializable 主要是为了解决幻读，谢谢回答。 <br></div>
+                            <span class="time">2019-01-12 17:31</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">serializable隔离级别确实用得很少（我没有见过在生产上使用的哈）</p>
+                                <p class="reply-time">2019-01-12 19:38</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/11/11/18/8cee35f9.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">HuaMax</span>
+                            </div>
+                            <div class="bd">课后题。关键点在于主库单线程，针对三种不同的策略，COMMIT_ORDER：没有同时到达redo log的prepare 状态的事务，备库退化为单线程；WRITESET：通过对比更新的事务是否存在冲突的行，可以并发执行；WRITE_SESSION：在WRITESET的基础上增加了线程的约束，则退化为单线程。综上，应选择WRITESET策略 <br></div>
+                            <span class="time">2019-01-12 12:12</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">准确</p>
+                                <p class="reply-time">2019-01-12 12:59</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/0f/f8/ba/14e05601.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">约书亚</span>
+                            </div>
+                            <div class="bd">MySQL 5.7并行复制那里没有看懂。问题有点多请见谅哈。<br>文中提到处于prepare状态的事务，可以并行。<br>那说明，主库commit之前，就要把binlog同步到从库了吧？ (问题1)<br>还提到了prepare状态和commit状态的事务，可以并行。<br>我想象中的同步的步骤是，一组事务（其中有还没commit的，也有已经commit的）的binlog被从库获取到，并行执行sql的同时再后去下一组事务。但下一组事务在上一组执行完之前，不会执行。所以就是这样的流程 ： 同步binlog-&gt;执行，同时同步新binlog-&gt;等待执行完-&gt;执行，同时同步新binlog。<br>是这样吗（问题2）<br>可为什么从库会看到prepare和commit的两种事务，而不全是prepared？(问题3)<br>隐约觉得这似乎涉及到了异步&#47;半同步，AFTER_COMMIT&#47;AFTER_SYNC的内容了，后面会有详细介绍嘛？(问题4)<br><br> <br></div>
+                            <span class="time">2019-01-12 09:47</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">啊 不是不是<br>备库并行复制跟semi-sync没关系的。<br>并不是说“让所有的事务处于prepare状态，然后中间要等备库执行”<br><br><br>“处于prepare状态的事务，可以并行” 在实现上是，主库在写binlog的时候会给这些binlog里面记commit_id和sequence_no，来说明事务之间在主库上并行prepare的状态；<br><br>备库是通过解析binlog拿到 commit_id 和 sequence_no，来决定要怎么并发的。<br><br></p>
+                                <p class="reply-time">2019-01-12 12:57</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/10/ba/f9/351e4fc0.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">生活在别处</span>
+                            </div>
+                            <div class="bd">writeset 是在主库生成后直接写入到 binlog 里面的，这样在备库执行的时候，不需要解析 binlog 内容，节省了很多计算量；矛盾吧？不解析binlog怎么知道是同一个写集合？ <br></div>
+                            <span class="time">2019-01-11 22:22</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">是说，不需要解析出binlog里面的行信息。你提的对，我加个说明进去</p>
+                                <p class="reply-time">2019-01-12 01:39</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/e5/39/951f89c8.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">信信</span>
+                            </div>
+                            <div class="bd">文中提到：5.7.22的并行复制中，对于每个唯一索引，insert 语句对应的 writeset 就要多增加一个 hash 值。这是不是只适用于row格式的binlog啊？因为update 最终也是拆成了delete和insert。。。另外，如果是statement格式的binlog，那么唯一索引的update语句应该也需要多增加一个hash值了吧？ <br></div>
+                            <span class="time">2019-01-11 22:02</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">跟最开始介绍的策略一样，update的writeset里， 每一个唯一索引就对应两个hash值<br></p>
+                                <p class="reply-time">2019-01-12 03:00</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/e5/39/951f89c8.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">信信</span>
+                            </div>
+                            <div class="bd">老师您好，有个问题想半天：主库上可以同时running 的事务在备库上不可以并行。最后认为innodb是单线程执行多客户端发来的存储命令的，不知这样理解对不对？请老师解答。 <br></div>
+                            <span class="time">2019-01-11 21:16</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">主库上可以同时running 的事务在备库上不可以并行。<br><br>这个不对呀，比如两个线程可以同时running，有两种情况：<br>1. 两个更新不同的行，这样在备库就可以并行；<br>2. 更新同一行，一个在执行，一个在锁等待，都是running，这种在备库就不能并行</p>
+                                <p class="reply-time">2019-01-12 03:02</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">库淘淘</span>
+                            </div>
+                            <div class="bd">我认为还是要采用writeset 模式 由于是单线程插入了很多数据，
+<br>参数commit_order 是对多线程效果比较好，对于这种情况，性能几乎没有什么提升
+<br>参数writeset_session 是为了保证同session事务的顺序性，性能上也没有什么提升 <br></div>
+                            <span class="time">2019-01-11 15:06</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/30/28/6e019a7a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">锅子</span>
+                            </div>
+                            <div class="bd">老师好，由一个疑问，在MySQL5.7.22中，slave_parallel_type=database，而binlog_transaction_dependency_tracking=commit_order，这2个参数会不会冲突呢？如果会以哪个策略为准呢？ <br></div>
+                            <span class="time">2019-01-11 14:16</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">那就是以slave_parallel_type=database为准了</p>
+                                <p class="reply-time">2019-01-11 15:04</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/b7/00/12149f4e.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">郭刚</span>
+                            </div>
+                            <div class="bd">MySQL的分支版本MariaDB,Oracle,percona如何选型呢？ <br></div>
+                            <span class="time">2019-01-11 13:05</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/e3/2e/77ad18f4.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">滔滔</span>
+                            </div>
+                            <div class="bd">老师，想请教您一个问题，看到网上有一段话&quot;使用倒序索引可以提升order by desc的性能&quot;，想问一下这是否还要看具体的范围查询语句是&lt;还是&gt;，如果是&gt;使用倒序索引可以提升order by desc的性能，但是如果是&lt;应该使用默认升序索引会更快，是这样么？ <br></div>
+                            <span class="time">2019-01-11 12:19</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">不是，就是看order by</p>
+                                <p class="reply-time">2019-01-11 13:28</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/34/5c/6b4757a0.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">倪大人</span>
+                            </div>
+                            <div class="bd">啊突然发现前面理解错了<br>求问下老师，WRITESET_SESSION什么时候会需要呀，就是什么时候需要“主库上同一个线程先后执行的两个事务，在备库执行的时候，要保证相同的先后顺序” <br></div>
+                            <span class="time">2019-01-11 12:05</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">我也没想到有什么场景必须得用WRITESET_SESSION</p>
+                                <p class="reply-time">2019-01-11 12:18</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/f9/a4/f0b92135.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">万勇</span>
+                            </div>
+                            <div class="bd">1.如果是多张表分别插入数据，我觉得选用commit_order值，每个表按照顺序插入数据分批提交，备库的worker线程可以并行执行不同的表。<br>2.如果是单表顺序插入大量数据，我觉得选用wirteset_session值，备库要保证执行的顺序。<br>3.如果是多张表无序的插入数据，我觉得选用writeset值，两个事务没有操作一张表，可以并行运行。 <br></div>
+                            <span class="time">2019-01-11 11:57</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/34/5c/6b4757a0.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">倪大人</span>
+                            </div>
+                            <div class="bd">作业题：<br>“主库单线程插入了很多数据” =&gt; 不适合用COMMIT_ORDER，因为每组提交的事务都只包含一个事务，如果用COMMIT_ORDER就相当于备库一直串行执行，并且还得等每个事务提交之后才能取下一批执行，会慢一些。<br><br>而WRITESET_SESSION相比WRITESET，按我的理解就是为了解决文里举的“唯一索引a”这个例子的情况，所以结论是：如果表有唯一索引就选WRITESET，没有就选WRITESET_SESSION。<br><br> <br></div>
+                            <span class="time">2019-01-11 11:54</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">第二部分不是很准确，要再重新理解下哈<br><br>（不过看你后面的评论，应该是get到点了）</p>
+                                <p class="reply-time">2019-01-11 12:08</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/14/0c/ca/6173350b.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">郭江伟</span>
+                            </div>
+                            <div class="bd">如果单线程插入很多数据，从库开并行复制，binlog-transaction-dependency-tracking只能用writeset，理由是：<br>commit_order 参数按照同时进入prepare 和commit 来判断是否是否可以并行，这里是单线程，在一个commit成功返回前不会有下一个事务<br>write_session 意思是主库上同一个线程执行的事务，在从库执行的时候需要保证先后顺序；当主库是单线程做了很多事务时，即使从库将事务分发到多个worker，从库仍然是串行执行 <br></div>
+                            <span class="time">2019-01-11 11:25</span>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/12/d2/7e/bd8c372a.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">你有资格吗？</span>
+                            </div>
+                            <div class="bd">打卡 <br></div>
+                            <span class="time">2019-01-11 10:49</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">看到你的用户名，我吓了一跳</p>
+                                <p class="reply-time">2019-01-11 11:49</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="https://static001.geekbang.org/account/avatar/00/13/df/e7/e3c450c2.jpg" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">lionetes</span>
+                            </div>
+                            <div class="bd">越来越喜欢看评论区啦  <br></div>
+                            <span class="time">2019-01-11 08:47</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">我也是^_^</p>
+                                <p class="reply-time">2019-01-11 11:10</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+                    <li data-v-87ffcada="" class="comment-item"><img
+                            src="http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLE4LYb3jrH63ZV98Zpc8DompwDgb1O3nffMoZCmiaibauRyEFv6NDNsST9RWxZExvMLMWb50zaanoQ/132" class="avatar">
+                        <div class="info">
+                            <div class="hd"><span class="username">慧鑫coming</span>
+                            </div>
+                            <div class="bd">老师，有个问题，mariadb的并行策略，当同一组中有3个事务，它们都对同一行同一字段值进行更改，而它们的commit_id相同，可以在从库并行执行，那么3者的先后顺序是怎么保证不影响该行该字段的最终结果与主库一致？ <br></div>
+                            <span class="time">2019-01-11 08:27</span>
+                            
+                            <div class="reply">
+                                <div class="reply-hd"><span>作者回复</span></div>
+                                <p class="reply-content">好问题<br>不过这个是不可能的哈，对同一行的修改，第一个拿到行锁的事务还没提交前，另外两个会被行锁堵住的，这两个进入不了commit状态。所以这三个的commit_id不会相同的</p>
+                                <p class="reply-time">2019-01-11 11:09</p>
+                            </div>
+                            
+                        </div>
+                    </li>
+                    
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
