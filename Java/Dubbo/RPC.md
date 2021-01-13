@@ -12,7 +12,7 @@
 
 **完整的 RPC 框架**
 
-在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中“RPC 协议”就指明了程序如何进行网络传输和序列化。
+在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中「RPC 协议」就指明了程序如何进行网络传输和序列化。
 
 [![img](RPC.resource/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)](https://s3.51cto.com/oss/201906/17/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)
 
@@ -20,7 +20,7 @@
 
 从单机走向分布式产生了很多分布式的通信方式
 
-- 最古老也是最有效,并且永不过时的,TCP/DP的二进制传输。事实上所有的通信方式归根结底都是TCP/UDP
+- 最古老有效的使用 TCP/UDP 的二进制传输。事实上所有的通信方式归根结底都是 TCP/UDP
 
 - CORBA (Common Object Request Broker Architecture)。古老而复杂的,支持面向对象的通信协议
 
@@ -28,43 +28,43 @@
 
     基于 http+xml 的标准化 Web API，服务端提供服务的接口是 xml 格式，并且该格式在 HTTP 上进行传输。因为 xml 本身大，就是纯文本， HTTP 本身传输也是纯文本，所以慢。
 
-- RestFul ( Representational State Transfer)
+- RestFul ( Representational State Transfer，表现层状态转换)
 
-    回归简单化本源的 Web API 的事实标准h ttp://mashibing.com/product/java
+    回归简单化本源的 Web API 的事实标准h ttp://mashibing.com/product/java，使用 HTTP + JSON
 
-    http + json
+- RMI （Remote Method InvocationJava）
 
-- RMI Remote Method InvocationJava
-
-    内部的分布式通信协议，只支持 Java 语言。
+    内部的分布式通信协议，只支持 Java 语言，不能跨语言。
 
 - JMS (Java Message Service)
 
-    JavaEE 中的消息框架标准,为很多MQ所支持
+    JavaEE 中的消息框架标准,为很多 MQ 所支持
 
-- RPC(Remote Procedure Call) 
+- RPC(Remote Procedure Call，远程过程调用) 
 
-    远程过程调用,这只一个统称,重点在于方法调用(不支持对象的概念),具体实现甚至可以用 RMI RestFul 等去实现,但一般不用.因为 RMI 不能跨语言.而 RestFul效率太低。多用于服务器集群间的通信,因此常使用更加高效短小精悍的传输模式以提高效率。
+    这是一个统称，重点在于方法调用(不支持对象的概念)。多用于服务器集群间的通信。
 
 
 
 ## 二、常见协议框架
 
 **问题**
-首先 client 需要将所有服务、方法以及参数进行虚拟化之后传输，这里使用的 Java 自带的 Serializable，缺点：只支持 Java 语言，同时效率低，并且转换的二进制长度也比较长。
+首先 client 需要将所有服务、方法以及参数进行序列化之后传输，这里使用的 Java 自带的 Serializable，缺点：只支持 Java 语言，效率低，并且转换的二进制长度也比较长。
 
-其他的 RPC 序列化框架：
-序列化就是将对象转换为二进制数组，其中 JSON 和 xml 就是先将对象转换为 JSON 或者 xml 格式，然后在转换为二进制
+序列化：序列化就是将对象转换为二进制数组，其中 JSON 和 xml 就是先将对象转换为 JSON 或者 xml 格式，然后再转换为二进制。
+
+RPC 序列化框架：
+
 - java.io.Serializable
 - Hessian
-- google protobuf
-- facebook Thrift
+-  Protobuf（Google）
+-  Thrift（Facebook）
 - kyro
 - fst
-- Json 序列化框架
+- JSON 序列化框架
     - Jackson
-    - Google Gson
-    - Alibaba FastJson
+    - Gson（Google）
+    -  FastJson（Alibaba）
 - xmlrpc(xstream)
 
  RPC 通讯协议
@@ -74,27 +74,27 @@
  同步、异步  阻塞、非阻塞
 - WebService
 
-## RPC组成 
+## 三、RPC 组成结构
 
 一个 RPC 的核心功能主要有 5 个部分组成，分别是：客户端、客户端 Stub、网络传输模块、服务端 Stub、服务端等。
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200912232743848.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NzMTIzbWxr,size_16,color_FFFFFF,t_70#pic_center)
 
-- 下面分别介绍核心 RPC 框架的重要组成：
-    - 客户端(Client)：服务调用方。
-    - 客户端存根(Client Stub)：存放服务端地址信息，将客户端的请求参数数据信息打包成网络消息，再通过网络传输发送给服务端。
-    - 服务端存根(Server Stub)：接收客户端发送过来的请求消息并进行解包，然后再调用本地服务进行处理。
-    - 服务端(Server)：服务的真正提供者。
-    - Network Service：底层传输，可以是 TCP 或 HTTP。
+下面分别介绍核心 RPC 框架的重要组成：
+- 客户端(Client)：服务调用方。
+- 客户端存根(Client Stub)：存放服务端地址信息，将客户端的请求参数数据信息打包成网络消息，再通过网络传输发送给服务端。
+- 服务端存根(Server Stub)：接收客户端发送过来的请求消息并进行解包，然后再调用本地服务进行处理。
+- 服务端(Server)：服务的真正提供者。
+- Network Service：底层传输，可以是 TCP 或 HTTP。
 
-### TCP/IP 模拟RPC
+### TCP/IP 模拟 RPC
 
 由服务的调用方与服务的提供方建立 Socket 连接，并由服务的调用方通过 Socket 将需要调用的接口名称、方法名称和参数序列化后传递给服务的提供方，服务的提供方反序列化后再利用反射调用相关的方法。
 
-***将结果返回给服务的调用方，整个基于 TCP 协议的 RPC 调用大致如此。
+***将结果返回给服务的调用方，整个基于 TCP 协议的 RPC 调用大致如此**。
 
 
 
-## 项目搭建
+## 四、项目搭建
 
 ### 基本包：common
 
@@ -157,8 +157,8 @@
 
 ## 01 最基础二进制传递
 
-这个例子使用了最原始的客户端服务器交互方式，硬编码完成功能，非常紧耦合。
-需要对对象很了解，因为是对对象中所有属性都要传输接收，一旦更改属性，代码全部要变。同时传输过程和业务糅合在一起了。
+该例使用了最原始的客户端服务器交互方式：硬编码完成功能，非常紧耦合。
+**缺点**：需要对对象很了解，因为是对对象中所有属性都要传输接收，一旦更改属性，代码全部要变。同时传输过程和业务逻辑糅合在一起。
 
 **过程**：client 端直接将对象中 id 属性通过网络传输给 server，然后 server 端生成一个接口实现类来处理，并且将生成的 User 对象中的所有属性通过网络传输给 client，最后 client 得到属性组装为一个 User 对象。
 
@@ -179,16 +179,17 @@
             DataOutputStream dos = new DataOutputStream(baos);
             /**
              * 因为无论是什么数据或者协议，最终在网络上传输的都是二进制
-             * 注意这里是写死的，缺少灵活性，这里是将 123 通过 DataOutputStream 转换为二进制之后放入 ByteArrayOutputStream（就是一个
-             *      byte[] 数组），服务器端通过 DataInputStream 读取并通过后来的 readInt 方法转换为 int 类型。
+             * 注意这里是写死的，缺少灵活性，这里是将 123 通过 DataOutputStream 转换为二进制之后放入 ByteArrayOutputStream（就是一个 byte[] 数组），服务器端通过 DataInputStream 读取并通过后来的 readInt 方法转换为 int 类型。
              */
             dos.writeInt(123);
     
             // 发送出要查询的 id，写出去。
             socket.getOutputStream().write(baos.toByteArray());
             socket.getOutputStream().flush();
+            
+            // 服务端进行处理（具体见下面的服务端代码）
     
-            //接收服务端返回的结果
+            // 接收服务端返回的结果
             DataInputStream dis = new DataInputStream(socket.getInputStream());
     
             // 读取各个属性再转换为对象
@@ -225,7 +226,9 @@
             while (running) {
                 // 接收连接并对连接进行处理
                 Socket client = server.accept();
+                
                 process(client);
+                
                 client.close();
             }
             server.close();
@@ -273,8 +276,7 @@
 
 ## 02 简化客户端的流程 引入stub(客户端存根)
 
-客户端不需要知道网络连接的细节，只需要知道接口的用法就好了～
-将网络部分进行封装。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
+客户端不需要知道网络连接的细节，只需要知道接口的用法就好了，即将网络部分进行封装。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
 **缺点**： Stub 只能代理一个方法。
 
 - Client 端
@@ -319,7 +321,7 @@
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream dos = new DataOutputStream(baos);
             // 注意这里是写死的，缺少灵活性
-            dos.writeInt(123);
+            dos.writeInt(id);
     
             // 3.发送给服务器要查询的id
             socket.getOutputStream().write(baos.toByteArray());
@@ -340,21 +342,20 @@
 
 - Server 没有改变
 
-## 03 使用动态代理生成service类供客户端调用 彻底隐藏所有网络细节
+## 03 使用动态代理生成 service 类供客户端调用 彻底隐藏所有网络细节
 
 **问题**：
 
 首先使用一个类实现服务器端暴露的 service 接口，然后在这个实现类中添加网络访问的步骤。但是如果每次暴露一个接口就需要一个实现类，所以能不能动态的产生这个类。
 
-- 在02的client中 用stub调用方法 底层暴露了 希望用封装的Service调用 而且隐藏底层细节
-    于是引入动态代理 生成service类给client使用 在stub中也不用写每一个业务函数的细节
-- 在02的stub中 随着业务的增多方法会越来越多 那就会堆积很多函数 需要反射来使手写的函数减少
-    当外部使用返回的动态代理对象去调用某个功能的时候 内部就会method反射
+- 在 02 的 client 中用 stub 调用方法，同时暴露了底层代码，希望用封装的 Service 调用而且可以隐藏底层细节，**于是引入动态代理 生成 service 类给 client 使用，在 stub 中也不用写每一个业务函数的细节**。
+- 在 02 的 stub 中，随着业务的增多方法会越来越多，导致堆积很多函数，可以使用反射来使手写的函数减少，即当外部使用返回的动态代理对象去调用某个功能的时候，内部就会 method 反射。
 
-改动客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，stub 不 是 new 出来的，而是使用它的静态方法getStub
+**改动优化**：
 
-这个版本相对于上个版本的优点还不能直观显现，因为硬编码部分还没有改动完成，rpc4 中将通用化这个动态代理
-就是不管调用什么版本，在 invoke 方法中的处理就是都是写入 123，对于 UserService 中暴露的其他方法没有处理。
+客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，stub 不 是 new 出来的，而是使用它的静态方法getStub
+
+这个版本相对于上个版本的优点还不能直观显现，因为硬编码部分还没有改动完成，rpc4 中将通用化这个动态代理。就是不管调用什么版本，在 invoke 方法中的处理就是都是写入 123，对于 UserService 中暴露的其他方法没有处理。
 
 - Client 端
 
