@@ -2,134 +2,136 @@
 
 # Dubbo入门介绍及学习笔记总结
 
-https://www.bilibili.com/video/BV1ns411c7jV?from=search&seid=10412979914972996053
-
-https://www.bilibili.com/video/BV1ns411c7jV?p=11
+[视频1](https://www.bilibili.com/video/BV1ns411c7jV?from=search&seid=10412979914972996053) 和 [视频2](https://www.bilibili.com/video/BV1ns411c7jV?p=11)。
 
 ### 文章目录
 
-- - [分布式简要说明](https://blog.csdn.net/qq_41157588/article/details/106737191#_5)
-    - - [应用架构及发展演变](https://blog.csdn.net/qq_41157588/article/details/106737191#_13)
-        - [Dubbo和SpringCloud对比](https://blog.csdn.net/qq_41157588/article/details/106737191#DubboSpringCloud_16)
-        - [发展演变](https://blog.csdn.net/qq_41157588/article/details/106737191#_19)
-        - [RPC简介](https://blog.csdn.net/qq_41157588/article/details/106737191#RPC_30)
-    - [Dubbo核心概念](https://blog.csdn.net/qq_41157588/article/details/106737191#Dubbo_63)
-    - [Dubbo特性一览](https://blog.csdn.net/qq_41157588/article/details/106737191#Dubbo_68)
-    - - [dubbo设计架构](https://blog.csdn.net/qq_41157588/article/details/106737191#dubbo_70)
-    - [Dubbo的特性](https://blog.csdn.net/qq_41157588/article/details/106737191#Dubbo_79)
-    - [dubbo环境搭建 ZooKeeper注册中心](https://blog.csdn.net/qq_41157588/article/details/106737191#dubbo_ZooKeeper_100)
-    - - [搭建zookeeper注册中心环境](https://blog.csdn.net/qq_41157588/article/details/106737191#zookeeper_101)
-        - [zookeeper监控中心的配置](https://blog.csdn.net/qq_41157588/article/details/106737191#zookeeper_115)
-    - [Dubbo环境搭建，创建提供者、消费者项目](https://blog.csdn.net/qq_41157588/article/details/106737191#Dubbo_141)
-    - - [Dubbo服务提供消费者接口搭建](https://blog.csdn.net/qq_41157588/article/details/106737191#Dubbo_144)
-        - [服务提供者配置及测试](https://blog.csdn.net/qq_41157588/article/details/106737191#_240)
-        - [服务消费者配置及测试](https://blog.csdn.net/qq_41157588/article/details/106737191#_294)
-    - [dubbo-monitor-simple简易监控中心](https://blog.csdn.net/qq_41157588/article/details/106737191#dubbomonitorsimple_379)
-    - [Dubbo与SpringBoot整合](https://blog.csdn.net/qq_41157588/article/details/106737191#DubboSpringBoot_392)
-    - - [boot-user-service-provider 服务提供者](https://blog.csdn.net/qq_41157588/article/details/106737191#bootuserserviceprovider__394)
-        - [boot-order-service-consumer 服务消费者](https://blog.csdn.net/qq_41157588/article/details/106737191#bootorderserviceconsumer__468)
-    - [Dubbo配置](https://blog.csdn.net/qq_41157588/article/details/106737191#Dubbo_566)
-    - - [dubbo与springboot整合的三种方式](https://blog.csdn.net/qq_41157588/article/details/106737191#dubbospringboot_619)
-    - [高可用](https://blog.csdn.net/qq_41157588/article/details/106737191#_632)
-    - - [集群下dubbo负载均衡配置](https://blog.csdn.net/qq_41157588/article/details/106737191#dubbo_646)
-    - [整合hystrix，服务熔断与降级处理](https://blog.csdn.net/qq_41157588/article/details/106737191#hystrix_672)
-    - - [服务降级](https://blog.csdn.net/qq_41157588/article/details/106737191#_673)
-        - [集群容错](https://blog.csdn.net/qq_41157588/article/details/106737191#_686)
-        - [整合hystrix](https://blog.csdn.net/qq_41157588/article/details/106737191#hystrix_724)
-    - [dubbo原理](https://blog.csdn.net/qq_41157588/article/details/106737191#dubbo_778)
-    - - [RPC原理](https://blog.csdn.net/qq_41157588/article/details/106737191#RPC_779)
-    - [netty通信原理](https://blog.csdn.net/qq_41157588/article/details/106737191#netty_793)
-    - [dubbo原理](https://blog.csdn.net/qq_41157588/article/details/106737191#dubbo_803)
-    - - [1.dubbo原理 -框架设计](https://blog.csdn.net/qq_41157588/article/details/106737191#1dubbo	_804)
-        - [2.dubbo原理 -启动解析、加载配置信息](https://blog.csdn.net/qq_41157588/article/details/106737191#2dubbo__816)
-        - [3.dubbo原理 -服务暴露](https://blog.csdn.net/qq_41157588/article/details/106737191#3dubbo__818)
-        - [4.dubbo原理 -服务引用](https://blog.csdn.net/qq_41157588/article/details/106737191#4dubbo__821)
-        - [5.dubbo原理 -服务调用](https://blog.csdn.net/qq_41157588/article/details/106737191#5dubbo__823)
+[TOC]
 
 
 
-该笔记为个人及参考资料总结，还有不全面的地方等 请评论提出，我会改进。
-感谢您的参考和查看，还请您多多支持，可以的话点个赞或者收藏起来。
+## 一、分布式简要说明
 
-## 分布式简要说明
-
-**Dubbo是用于分布式系统的框架所以我们要先了解什么是分布式**
 **分布式系统是若干独立计算机的集合，这些计算机对于用户来说就像单个相关系统**。
 
 老式系统(单一应用架构)就是把一个系统，统一放到一个服务器当中然后每一个服务器上放一个系统，如果说要更新代码的话，每一个服务器上的系统都要重新去部署十分的麻烦。
 
 而分布式系统就是将一个完整的系统拆分成多个不同的服务，然后在将每一个服务单独的放到一个服务器当中。
 
-### 应用架构及发展演变
+### （一）应用架构及发展演变
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610124652869.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/20200610124652869.png)
 
-### Dubbo和SpringCloud对比
+#### 1.ORM
 
-![在这里插入图片描述](笔记.resource/20200613161517225.png)
-
-### 发展演变
-
-**ORM**
 **单一应用架构**：一个项目装到一个服务器当中，也可以运行多个服务器每一个服务器当中都装一个项目。
-缺点：1.如果要添加某一个功能的话就要把一个项目重新打包，在分别部署到每一个服务器当中去。2.如果后期项目越来越大的话单台服务器跑一个项目压力会很大的。会不利于维护，开发和程序的性能。
-![img](https://img-blog.csdnimg.cn/20200610151507780.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-**MVC**
-**垂直应用架构**：将应用切割成几个互不相干的小应用，在将每个小应用独立放到一个服务器上，如果哪一个应用的访问数量多就多加几台服务器。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610151528657.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-**分布式服务架构**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612180812112.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+缺点：
 
-### RPC简介
+- 如果要添加某一个功能的话就要把一个项目重新打包，在分别部署到每一个服务器当中去。
+
+- 如果后期项目越来越大的话单台服务器跑一个项目压力会很大的。会不利于维护，开发和程序的性能。
+    <img src="Dubbo 笔记.resource/image-20210117222950981-1610894058736.png" alt="image-20210117222950981" style="zoom:50%;" />
+
+#### 2.MVC
+
+**垂直应用架构**：将应用切割成几个互不相干的小应用，在将每个小应用独立放到一个服务器上，如果哪一个应用的访问数量多就多加几台服务器。
+
+![image-20210117223414623](Dubbo 笔记.resource/image-20210117223414623.png)
+
+#### 3.分布式服务架构
+
+![在这里插入图片描述](Dubbo 笔记.resource/20200612180812112.png)
+
+
+
+#### 4.SOA
+
+**流动计算架构**：在分布式应用架构的基础上增加了一个**调度、治理中心**基于访问压力实时管理集群容量、提高集群的利用率，用于提高机器利用率的 资源调度和治理中心(SOA) 是关键 **(不浪费计算机资源)**
+
+
+
+### （二）RPC 简介
+
+**RPC（Remote Procedure Call，远程过程调用）**，是一种进程问通信方式，他是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间(通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
 
 **分布式应用架构(远程过程调用)**：当垂直应用越来越多，应用之间交互不可避免，将核心业务抽取出来，作为独立的服务，逐渐形成稳定的服务中心，使前端应用能更快速的响应多变的市场需求。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610152020688.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-**什么叫RPC**
-
-1. **RPC [ Remote Procedure Call]\**是指远程过程调用**，是一种进程问通信方式，他是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间(通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
-2. **RPC（Remote Procedure Call）—远程过程调用**，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。也就是说两台服务器A，B，一个应用部署在A服务器上，想要调用B服务器上应用提供的方法，由于不在一个内存空间，不能直接调用，需要通过网络来表达调用的语义和传达调用的数据。
+![在这里插入图片描述](Dubbo 笔记.resource/20200610152020688.png)
 
 **RPC工作原理**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020061015260046.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/2020061015260046.png)
 
-1. Client像调用本地服务似的调用远程服务；
-2. Client stub接收到调用后，将方法、参数序列化
-3. 客户端通过sockets将消息发送到服务端
-4. Server stub 收到消息后进行解码（将消息对象反序列化）
-5. Server stub 根据解码结果调用本地的服务
-6. 本地服务执行(对于服务端来说是本地执行)并将结果返回给Server stub
-7. Server stub将返回结果打包成消息（将结果消息对象序列化）
-8. 服务端通过sockets将消息发送到客户端
-9. Client stub接收到结果消息，并进行解码（将结果消息发序列化）
-10. 客户端得到最终结果。
+- Client像调用本地服务似的调用远程服务；
+
+- Client stub接收到调用后，将方法、参数序列化
+
+- 客户端通过sockets将消息发送到服务端
+
+- Server stub 收到消息后进行解码（将消息对象反序列化）
+
+- Server stub 根据解码结果调用本地的服务
+
+- 本地服务执行(对于服务端来说是本地执行)并将结果返回给Server stub
+
+- Server stub将返回结果打包成消息（将结果消息对象序列化）
+
+- 服务端通过sockets将消息发送到客户端
+
+- Client stub接收到结果消息，并进行解码（将结果消息发序列化）
+
+- 客户端得到最终结果。
 
 **RPC 调用分以下两种：**
 **同步调用**：客户方等待调用执行完成并返回结果。
 **异步调用**：客户方调用后不用等待执行结果返回，但依然可以通过回调通知等方式获取返回结果。若客户方不关心调用返回结果，则变成单向异步调用，单向调用不用返回结果。
 
 **RPC步骤解析**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610174636250.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-RPC相关资料可访问博客：
-http://blog.csdn.net/smartbetter/article/details/100360835
 
-**SOA**
-**流动计算架构**：在分布式应用架构的基础上增加了一个**调度、治理中心**基于访问压力实时管理集群容量、提高集群的利用率，用于提高机器利用率的 资源调度和治理中心(SOA) 是关键 **(不浪费计算机资源)**
+```sequence
+Title: 标题： RPC 调用步骤解析
+Client->Client Stub: 1.客户端调用
+Client Stub -> Client Stub: 2.序列化
+Client Stub -> Server Stub: 3.发送消息
+Server Stub -> Server Stub: 4.反序列化
+Server Stub -> Server: 5.调用本地服务
+Server -> Server: 6.服务处理
+Server --> Server Stub: 7.返回处理结果
+Server Stub --> Server Stub: 8.将结果序列化
+Server Stub --> Client Stub: 9.返回消息
+Client Stub --> Client Stub: 10.反序列化
+Client Stub --> Client: 11.返回调用结果
+```
+
+
+
+### （三）Dubbo 和 SpringCloud 对比
+
+| 项目         | Dubbo     | Spring Cloud |
+| ------------ | --------- | ------------ |
+| 服务注册中心 | Zookeeper | Eureka       |
+| 服务调用方式 | RPC       | REST  API    |
+| 服务网关     | 没有      | Zuul         |
+| 断路器       | 不完善    | Hystrix      |
+| 分布式配置   | 无        | Config       |
+| 服务跟踪     | 无        | Sleuth       |
+| 消息总线     | 无        | Bus          |
+| 数据流       | 无        | Stream       |
+| 批量任务     | 无        | Task         |
+
+
 
 ## Dubbo核心概念
 
 Dubbo官网: http://dubbo.apache.org/en-us/index.html
 
-Dubbo 是一款高性能、轻量级的开源Java RPC框架，它提供了三大核
-
-心能力：面向接口的远程方法调用，智能容错和负载均衡，服务自动注册和发现。分布式系统是将一个系统拆分为多个不同的服务
+Dubbo 是一款高性能、轻量级的开源Java RPC框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，服务自动注册和发现。分布式系统是将一个系统拆分为多个不同的服务
 
 ## Dubbo特性一览
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610170234620.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/20200610170234620.png)
 
 ### dubbo设计架构
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610170317960.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/20200610170317960.png)
 该图来自Dubbo官网，描述了服务注册中心、服务提供方、服务消费方、服务监控中心之间的调用关系。
 
 **服务提供者（Provider）**：暴露服务的服务提供方，服务提供者在启动时，向注册中心注册自己提供的服务。
@@ -137,7 +139,7 @@ Dubbo 是一款高性能、轻量级的开源Java RPC框架，它提供了三大
 **注册中心（Registry）**：注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于长连接推送变更数据给消费者。
 **监控中心（Monitor）**：服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到监控中心。
 
-## Dubbo的特性
+## Dubbo 的特性
 
 **（1）服务注册中心**
 
@@ -164,9 +166,9 @@ Dubbo 是一款高性能、轻量级的开源Java RPC框架，它提供了三大
 **（4）服务版本，服务分组**
 在Dubbo配置文件中可以通过制定版本实现连接制定提供者，也就是通过服务版本可以控制服务的不兼容升级；当同一个服务有多种实现时，可以使用服务分组进行区分。
 
-## dubbo环境搭建 ZooKeeper注册中心
+## Dubbo 环境搭建 ZooKeeper 注册中心
 
-### 搭建zookeeper注册中心环境
+### 搭建 zookeeper 注册中心环境
 
 Dubbo官方文档: http://dubbo.apache.org/en-us/docs/user/quick-start.html
 在zookeeper官网下载zookeeper
