@@ -16,7 +16,7 @@
 
 MySQL被设计为一个单进程多线程架构的数据库，数据库实例在系统上的表现就是一个进程。
 
-当启动实例时， MySQL 数据库会去读取配置文件， 根据配置文件的参数来启动数据库实例。当然也可以没有配置文件，  MySQL 这时就会按照编译时的默认参数设置启动实例。 用 `mysql --help I grep my.cnf` 命令可以查看当 MySQL 数据库实例启动时配置， 会在`/etc/my.cnf`  `/etc/mysql/my.cnf`  `/usr/local/mysql/etc/my.cnf` 或者 `/export/servers/mysql/etc/my.cnf`  `~/.my.cnf` 位置依次查找配置文件，重复参数以最后为准。
+当启动实例时， MySQL 数据库会去读取配置文件， 根据配置文件的参数来启动数据库实例。当然也可以没有配置文件，  MySQL 这时就会按照编译时的默认参数设置启动实例。 用 `mysql --help I grep my.cnf` 命令可以查看当 MySQL 数据库实例启动时配置， 会在`/etc/my.cnf`  `/etc/mysql/my.cnf`  `/usr/etc/my.cnf` 或者 `/export/servers/mysql/etc/my.cnf`  `~/.my.cnf` 位置依次查找配置文件，重复参数以最后为准。
 
 ## 二、MySQL 体系结构
 
