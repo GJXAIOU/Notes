@@ -338,7 +338,18 @@ typedef struct zskiplist {
 
 如果 content 数组中保存 5 个的都是 `int16_t` 类型的整数值，则该数组大小为：`sizeof(int16_t) * 5 = 16 * 5 = 80位`
 
-![img](Redis.resource/720994-20180704175038775-372816996.png)
+```c
+typedef struct intset {
+    // 编码方式
+    uint32_t encoding;
+    // 集合包含的元素数量，即数组长度
+    uint32_t length;
+    // 保存元素的数组；该数组的真正类型取决于 encoding 的属性。
+    int8_t contents[];
+} intset;
+```
+
+![img](https://images2018.cnblogs.com/blog/720994/201807/720994-20180704175038775-372816996.png)
 
 contents 数组是整数集合的底层实现：整数集合的每个元素都是 contents 数组的一个数组项，各个项在数组中按值的大小**从小到大有序地排列**，并且数组中**不包含任何重复项**。
 
@@ -777,9 +788,31 @@ Redis 基于 Reactor 模式开发了自己的网络事件处理器，被称为�
 
 - 文件事件分派器接收I/O多路复用程序传来地套接字，并根据套接字产生地事件地类型，调用响应地事件处理器。
 
-- 文件事件处理器的四个组成部分，分别时套接字、I/O多路复用程序、文件事件分派器（dispatcher），以及事件处理器。
+ 
 
-![image-20200401181022525](Redis.resource/image-20200401181022525.png)
+#### 12.1.1 文件事件处理器地构成
+
+ 
+
+文件事件处理器的四个组成部分，分别时套接字、I/O多路复用程序、文件事件分派器（dispatcher），以及事件处理器。
+
+![img](https://atts.w3cschool.cn/attachments/image/cimg/2015-09-13_55f524b50e6e6.png)
+
+文件事件是对套接字操作的抽象，每当一个套接字准备好执行连接应答（accept）、写入、读取、关闭等操作时，就会产生一个文件事件。因为一个服务器通常会连接多个套接字，所以多个文件事件有可能会并发地出现。
+
+ 
+
+I/O多路复用程序负责监听多个套接字，并向文件事件分派器传送产生了事件地套接字。
+
+ 
+
+尽管多个文件事件可能会并发地出现，但I/O多路复用程序总是会将所有产生事件地套接字都放到一个队列里面，然后通过这个队列，以有序（sequentially）、同步（synchronously）、每次一个套接字的方式向文件事件分派器传送套接字。
+
+ 
+
+文件事件分派器接收I/O多路复用程序传来地套接字，并根据套接字产生地事件地类型，调用响应地事件处理器。
+
+ 
 
 #### 12.1.2I/O多路复用程序的实现
 
@@ -1098,123 +1131,122 @@ PSYNC功能由一下三个部分构成：
 
 
 
-# Sentinel（哨兵）
+## Sentinel（哨兵）
 
-哨兵的主要功能**监控**（包括主节点存活检测、主从运行情况检测）、**提醒（**当被监控的某个 Redis 服务器出现问题时， Sentinel 可以通过 API 向管理员或者其他应用程序发送通知。）、**自动故障转移**（主从切换）。哨兵模式的最小配置是一主一从。
+- 哨兵的主要功能
+  - **监控**：包括主节点存活检测、主从运行情况检测。
+  - **提醒**：当被监控的某个 Redis 服务器出现问题时， Sentinel 可以通过 API 向管理员或者其他应用程序发送通知。
+  - **自动故障转移**：主从切换。哨兵模式的最小配置是一主一从。
 
-由一个或者多个 Sentinel 实例组成的 Sentinel 系统可以监视任意多个主服务器，以及他们属下对应的所有从服务器，并在被监视的主服务器下线的时候自动将该主服务器的某个从服务器升级为从服务器。
+- 由一个或者多个 Sentinel 实例组成的 Sentinel 系统可以监视任意多个主服务器，以及他们属下对应的所有从服务器，并在被监视的主服务器下线的时候自动将该主服务器的某个从服务器升级为从服务器。 
 
 - Redis 启动并初始化 Sentinel：`redis-sentinel /path/to/your/sentinel.conf`
 
 当一个 Sentinel 启动时， 它需要执行以下步骤：
 
-1. 初始化服务器。
+- 初始化服务器。
 
-    因为 Sentinel 本质是一个运行在特殊模式下的 Redis 服务器，初始化过程和普通的部分一样，但是不会载入 RDB 或者 AOF 文件，
+  **因为 Sentinel 本质是一个运行在特殊模式下的 Redis 服务器，初始化过程和普通的部分一样，但不会载入 RDB 或者 AOF 文件**。
 
-2. 将普通 Redis 服务器使用的代码替换成 Sentinel 专用代码。
+- 将普通 Redis 服务器使用的代码替换成 Sentinel 专用代码。
 
-    比如普通服务器使用 6379 作为端口号，但是 Sentinel 使用 26379 作为端口，还有特殊的命令表等等。
+  比如普通服务器使用 6379 作为端口号，但是 Sentinel 使用 26379 作为端口，还有特殊的命令表等等。
 
-3. 初始化 Sentinel 状态。
+- 初始化 Sentinel 状态。
 
-    服务器会创建一个 sentinelState 结构保存所有和 Sentinel 功能相关的状态，（普通服务器是 RedisServer 结构）
+  服务器会创建一个 sentinelState 结构保存所有和 Sentinel 功能相关的状态，（普通服务器是 RedisServer 结构）。
 
-4. 根据给定的配置文件， 初始化 Sentinel 的监视主服务器列表。
+- 根据给定的配置文件， 初始化 Sentinel 的监视主服务器列表。
 
-    上面的 sentinelState 结构中的字典类型的变量 masters 记录了所有被 Sentinel 监视的主服务器的相关信息
+  上面的 sentinelState 结构中的字典类型的变量 masters 记录了所有被 Sentinel 监视的主服务器的相关信息。
 
-    - 字典的键是被监视主服务器的名字。
-    - 而字典的值则是被监视主服务器对应的 sentinelRedisInstance 结构（每个结构都是一个被 Sentinel 监视的 Redis 服务器实例，该实例可以是主服务器、从服务器或者另一个 Sentinel）。
+  - 字典的键是被监视主服务器的名字。
+  - 字典的值则是被监视主服务器对应的 sentinelRedisInstance 结构（每个结构都是一个被 Sentinel 监视的 Redis 服务器实例，该实例可以是主服务器、从服务器或者另一个 Sentinel）。
 
-5. 创建连向主服务器的网络连接。
+- 创建连向主服务器的网络连接。
 
-    Sentinel 将成为主服务器的客户端， 它可以向主服务器发送命令， 并从命令回复中获取相关的信息。
+  Sentinel 将成为主服务器的客户端， 它可以向主服务器发送命令， 并从命令回复中获取相关的信息。对于每个被 Sentinel 监视的主服务器来说， Sentinel 会创建两个连向主服务器的异步网络连接：
 
-    对于每个被 Sentinel 监视的主服务器来说， Sentinel 会创建两个连向主服务器的异步网络连接：
-
-    - 一个是命令连接， 这个连接专门用于向主服务器发送命令， 并接收命令回复。
-    - 另一个是订阅连接， 这个连接专门用于订阅主服务器的 `__sentinel__:hello` 频道。【因为 Redis 服务器不会保存任何信息，但是客户端可能不在线，所以为了不丢失 hello 频道的信息，但是采用一个订阅连接来接收该频道信息。】
+  - 一个是命令连接， 这个连接专门用于向主服务器发送命令， 并接收命令回复。
+  - 另一个是订阅连接， 这个连接专门用于订阅主服务器的 `__sentinel__:hello` 频道。【因为 Redis 服务器不会保存任何信息，但是客户端可能不在线，所以为了不丢失 hello 频道的信息，但是采用一个订阅连接来接收该频道信息。】
 
 #### 获取主服务器、从服务器、哨兵服务器信息
 
 - 获得主服务器信息
-    Sentinel每隔10s通过命令连接向主服务器发info命令，Sentinel 从该命令的返回信息中获取两方面信息：
+    Sentinel 每隔 10s 通过命令连接向主服务器发 `info` 命令，Sentinel 从该命令的返回信息中获取两方面信息：
 
-    - 关于主服务器本身的信息
-    - 关于主服务器属下的所有从服务器信息。
+    关于主服务器本身的信息和主服务属下的所有从服务器信息。
 
 - 获取从服务器信息
 
-    因为之前已经拿到了主服务器的info信息，里面包含的从的信息，sentinel再向从服务器建立2个连接（命令连接和订阅连接），然后同样以每十秒一次的频率向从服务器发送 INFO 信息，自然就获得了从服务器的信息【最重要的就是从服务器的优先级和从服务器的**复制偏移量**，更新到自己的slave字典中
+    通过主服务器的`info`信息中包含的从服务器信息，Sentinel 再向从服务器建立 2 个连接（命令连接和订阅连接），然后同样以每十秒一次的频率向从服务器发送 INFO 信息，自然就获得了从服务器的信息【最重要的就是从服务器的优先级和从服务器的**复制偏移量**，更新到自己的 slave 字典中。
 
-- 获得其他sentinel的信息
-    sentinel怎么知道其他的哨兵，是通过暴露自己的方式，让其他哨兵感知到的，sentinel会向主从服务器都向**sentinel**:hellp频道发布消息，消息内容会包含sentinel自身信息和监控的主机信息，那么其他的sentinel
-    通过订阅这个频道，可以知道其他sentinel的信息。从而使得监视同一个主服务器的多个Sentinel可以走动发现对方。发现后就可以互相创建命令连接，最终跟新自身的sentinel字典
-
-
-
-#### ==三、高可用的方案（哨兵的完整工作过程）==
-
-**检测主观下线**
-每个 sentinel 每隔 1s 向所有与它创建了命令连接的实例（主、从、其他哨兵）发送 ping，如果在 `down-after-nukkuseconds` 时间内都是返回无效回复，就会被判定为主观下线，然后在结构的 flags 标志改为 `SRI_S_DOWN`
-
-**检测客观下线**
- 当 sentinel 判定一台服务器主观下线后，会去向其他的 sentinel 询问(其他哨兵也会像上面一样去探测)，如果反馈达到一定数量(数量 quorum 由配置文件配置)，则被判定为客观下线。
-
-**选举 sentinel 的 leader**
-
-如果主服务器被判定客观下线，监视这个下线主服务器的各个 Sentinel 会进行协商选出领头 Sentinel 来对下线主服务器执行故障转移操作。
-
- sentinel选举是基于 raft 算法选出 leader 的。
- 参考文档：https://www.jianshu.com/writer#/notebooks/28197258/notes/57839517/preview
-
-**故障转移**
- 当选出sentinel的leader后，就可以执行故障转移高可用
-
-- 步骤一：在从服务器里，挑选一个转换为新的主服务器
-    挑选的依据主要是根据是否存活，优先级高低，**最大偏移量大小**，运行id 大小（小的优先），依次选下去。
-    发送命令 slaveof no one后，从就会变成主，再次期间，sentinel每隔1s向服务器发送info命令直到info 返回的role是master了，就确认从已经正确切换成主
-- 步骤二：修改从服务器的复制目标为新的主服务器
-    通过 向其他的从服务器发送新的slaveof 命令
-- 让已下线的主设置为新的主服务的从，如果旧主重新上线就变成了新主的从
-    保存在自身结构中，这样下掉的主回来就变成新的从了，同样是执行 SLAVEOF 命令
+- 获得其他 Sentinel 的信息
+    Sentinel 通过暴露自己的方式让其他哨兵感知到的从而知道其它哨兵，Sentinel 会向主从服务器都 `sentinel:hellp` 频道发布消息，消息内容会包含 sentinel 自身信息和监控的主机信息，那么其他的 sentinel
+    通过订阅这个频道，可以知道其他 sentinel 的信息。从而使得监视同一个主服务器的多个 Sentinel 可以走动发现对方。发现后就可以互相创建命令连接，最终跟新自身的 sentinel 字典。
 
 
 
-哨兵模式的缺陷：
-在哨兵模式中，仍然只有一个Master节点。当并发写请求较大时，哨兵模式并不能缓解写压力。
+#### ==高可用的方案（哨兵的完整工作过程）==
 
-只有主节点才具有写能力，如果在一个集群中，能够配置多个主节点，就可以缓解写压力了。这个就是redis-cluster集群模式。
+- **检测主观下线**
+  每个 Sentinel 每隔 1s 向所有与它创建了命令连接的实例（主、从、其他哨兵）发送 ping，如果在 `down-after-nukkuseconds` 时间内都是返回无效回复，就会被判定为主观下线，然后在结构的 flags 标志改为 `SRI_S_DOWN`
 
+- **检测客观下线**
+   当 Sentinel 判定一台服务器主观下线后，会去向其他的 Sentinel 询问(其他哨兵也会像上面一样去探测)，如果反馈达到一定数量(数量 quorum 由配置文件配置)，则被判定为客观下线。
 
+- **选举 Sentinel 的 leader**
+
+  如果主服务器被判定客观下线，监视这个下线主服务器的各个 Sentinel 会进行协商选出领头 Sentinel 来对下线主服务器执行故障转移操作。
+
+   Sentinel选举是基于 raft 算法选出 leader 的。
+   参考文档：https://www.jianshu.com/writer#/notebooks/28197258/notes/57839517/preview
+
+- **故障转移**
+   当选出 Sentinel 的 leader 后，就可以执行故障转移高可用
+
+  - 步骤一：在从服务器里，挑选一个转换为新的主服务器
+      挑选的依据主要是根据是否存活，优先级高低，**最大偏移量大小**，运行 id  大小（小的优先），依次选下去。
+      发送命令 `slaveof no one` 后，从就会变成主，在此期间，Sentinel 每隔 1s 向服务器发送 info 命令直到info 返回的 role 是 master 了，就确认从已经正确切换成主。
+  - 步骤二：修改从服务器的复制目标为新的主服务器
+      通过向其他的从服务器发送新的 `slaveof` 命令
+  - 让已下线的主设置为新的主服务的从，如果旧主重新上线就变成了新主的从
+      保存在自身结构中，这样下掉的主回来就变成新的从了，同样是执行 SLAVEOF 命令
+
+#### 哨兵模式的缺陷
+
+在哨兵模式中，仍然只有一个 Master 节点。当并发写请求较大时，哨兵模式并不能缓解写压力。
+
+只有主节点才具有写能力，如果在一个集群中，能够配置多个主节点，就可以缓解写压力了。这个就是 redis-cluster 集群模式。
 
 
 
 #  集群(Cluster)
 
-**哨兵着眼于高可用，**在master宕机时会自动将slave提升为master，继续提供服务。
+**哨兵模式着眼于高可用**：在 Master 宕机时会自动将 Slave 提升为 Master，继续提供服务。
 
-**集群着眼于扩展性**，在单个redis内存不足时，使用Cluster进行分片存储。Redis 集群是 Redis 提供的分布式数据库方案，集群通过分片（sharding）来进行数据共享，并提供复制和故障转移功能。
+**集群模式着眼于扩展性**：在单个 Redis 内存不足时，使用 Cluster 进行分片存储。Redis 集群是 Redis 提供的分布式数据库方案，集群通过分片（sharding）来进行数据共享，并提供复制和故障转移功能。
 
-**集群模式**
-（1）由多个 Redis 服务器组成的分布式网络服务集群；
-（2）集群之中有**多个Master主节点**，每一个主节点都可读可写；可以给每一个主节点添加从节点，主节点和从节点遵循主从模型的特性
-（3）节点之间会互相通信，两两相连；
-（4）Redis集群无中心节点。
+### 集群模式
 
-**集群分片策略**
-Redis-cluster分片策略用来解决key存储位置。
+- 由多个 Redis 服务器组成的分布式网络服务集群；
+- 集群之中有**多个 Master 主节点**，每一个主节点都可读可写；可以给每一个主节点添加从节点，主节点和从节点遵循主从模型的特性
+- 节点之间会互相通信，两两相连；
+- Redis 集群无中心节点。 
+
+### 集群分片策略
+
+Redis-cluster 分片策略用来解决 key 存储位置。
 
 ![image-20200602095139785](Redis.resource/image-20200602095139785.png)
 
-**集群将整个数据库分为16384个槽位slot，所有key-value数据都存储在这些slot中的某一个上**。一个slot槽位可以存放多个数据，key的槽位计算公式为：slot_number=crc16(key)%16384，其中crc16为16位的循环冗余校验和函数。
+**集群将整个数据库分为 16384 个槽位 slot，所有 key-value 数据都存储在这些 slot 中的某一个上**。一个 slot 槽位可以存放多个数据，key 的槽位计算公式为：`slot_number=crc16(key)%16384`，其中 crc16 为 16 位的循环冗余校验和函数。
 
-集群中的每个主节点都可以处理0个至16383个槽，当16384个槽都有节点在负责处理时，集群进入上线状态，并开始处理客户端发送的数据命令请求。
+集群中的每个主节点都可以处理 0 个至 16383 个槽，当 16384 个槽都有节点在负责处理时，集群进入上线状态，并开始处理客户端发送的数据命令请求。
 
-**集群redirect转向**：
+### 集群 redirect 转向
 
-由于Redis集群无中心节点，请求会随机发给任意主节点；
+由于 Redis 集群无中心节点，请求会随机发给任意主节点；
 
 **主节点只会处理自己负责槽位的命令请求，其它槽位的命令请求，该主节点会返回客户端一个转向错误。
 客户端根据错误中包含的地址和端口重新向正确的负责的主节点发起命令请求。**
@@ -1223,45 +1255,45 @@ Redis-cluster分片策略用来解决key存储位置。
 
 ### 节点
 
-- 一个Redis集群通常由多个节点组成，刚开始时，每个节点是相互独立的。我们必须将各个独立的节点连接起来。
+- 一个 Redis 集群通常由多个节点组成，刚开始时，每个节点是相互独立的。我们必须将各个独立的节点连接起来。
 
-- 节点通过握手来将其他节点添加到自己所处的集群中。
+- 节点通过握手来将其他节点添加到自己所处的集群中。如通过 `127.0.0.1:7000>CLUSTER MEET 127.0.0.1 7001` 可以将 7001 添加到节点 7000 所在的集群里。
 
-- 127.0.0.1:7000>CLUSTER MEET 127.0.0.1 7001 可以将7001添加到节点7000所在的集群里。
-
-- 一个节点就是一个运行在集群模式下的 Redis 服务器， Redis 服务器在启动时会根据 `cluster-enabled` 配置选项的是否为 `yes` 来决定是否开启服务器的集群模式
+- 一个节点就是一个运行在集群模式下的 Redis 服务器， Redis 服务器在启动时会根据 `cluster-enabled` 配置选项的是否为 `yes` 来决定是否开启服务器的集群模式。
 
     除此之外， 节点会继续使用 `redisServer` 结构来保存服务器的状态， 使用 `redisClient` 结构来保存客户端的状态， 至于那些只有在集群模式下才会用到的数据， 节点将它们保存到了 `cluster.h/clusterNode` 结构， `cluster.h/clusterLink` 结构， 以及 `cluster.h/clusterState` 结构里面
 
-    - `clusterNode` 结构保存了一个节点的当前状态， 比如节点的创建时间， 节点的名字， 节点当前的配置纪元， 节点的 IP 和地址， 等等。
-
-        每个节点都会使用一个 `clusterNode` 结构来记录自己的状态， 并为集群中的所有其他节点（包括主节点和从节点）都创建一个相应的`clusterNode` 结构， 以此来记录其他节点的状态：
+    - `clusterNode` 结构保存了一个节点的当前状态， 比如节点的创建时间， 节点的名字， 节点当前的配置纪元， 节点的 IP 和地址， 等等。每个节点都会使用一个 `clusterNode` 结构来记录自己的状态， 并为集群中的所有其他节点（包括主节点和从节点）都创建一个相应的`clusterNode` 结构， 以此来记录其他节点的状态：
 
     - 每个节点都保存着一个 `clusterState` 结构， 这个结构记录了在当前节点的视角下， 集群目前所处的状态 —— 比如集群是在线还是下线， 集群包含多少个节点， 集群当前的配置纪元
 
 ### CLUSTER MEET 命令的实现
 
-通过向节点 A 发送 CLUSTER MEET 命令， 客户端可以让接收命令的节点 A 将另一个节点 B 添加到节点 A 当前所在的集群里面：
+通过向节点 A 发送 CLUSTER MEET 命令， 客户端可以让接收命令的节点 A 将另一个节点 B 添加到节点 A 当前所在的集群里面，过程和图见下：
 
-1. 节点 A 会为节点 B 创建一个 `clusterNode` 结构， 并将该结构添加到自己的 `clusterState.nodes` 字典里面。
-2. 之后， 节点 A 将根据 CLUSTER MEET 命令给定的 IP 地址和端口号， 向节点 B 发送一条 `MEET` 消息（message）。
-3. 如果一切顺利， 节点 B 将接收到节点 A 发送的 `MEET` 消息， 节点 B 会为节点 A 创建一个 `clusterNode` 结构， 并将该结构添加到自己的 `clusterState.nodes` 字典里面。
-4. 之后， 节点 B 将向节点 A 返回一条 `PONG` 消息。
-5. 如果一切顺利， 节点 A 将接收到节点 B 返回的 `PONG` 消息， 通过这条 `PONG` 消息节点 A 可以知道节点 B 已经成功地接收到了自己发送的 `MEET` 消息。
-6. 之后， 节点 A 将向节点 B 返回一条 `PING` 消息。
-7. 如果一切顺利， 节点 B 将接收到节点 A 返回的 `PING` 消息， 通过这条 `PING` 消息节点 B 可以知道节点 A 已经成功地接收到了自己返回的 `PONG` 消息， 握手完成。
+- 节点 A 会为节点 B 创建一个 `clusterNode` 结构， 并将该结构添加到自己的 `clusterState.nodes` 字典里面。
 
-图 IMAGE_HANDSHAKE 展示了以上步骤描述的握手过程。
+- 然后节点 A 将根据 CLUSTER MEET 命令给定的 IP 地址和端口号， 向节点 B 发送一条 `MEET` 消息（message）。
+
+- 如果一切顺利， 节点 B 将接收到节点 A 发送的 `MEET` 消息， 节点 B 会为节点 A 创建一个 `clusterNode` 结构， 并将该结构添加到自己的 `clusterState.nodes` 字典里面。
+
+- 之后， 节点 B 将向节点 A 返回一条 `PONG` 消息。
+
+- 如果一切顺利， 节点 A 将接收到节点 B 返回的 `PONG` 消息， 通过这条 `PONG` 消息节点 A 可以知道节点 B 已经成功地接收到了自己发送的 `MEET` 消息。
+
+- 之后， 节点 A 将向节点 B 返回一条 `PING` 消息。
+
+- 如果一切顺利， 节点 B 将接收到节点 A 返回的 `PING` 消息， 通过这条 `PING` 消息节点 B 可以知道节点 A 已经成功地接收到了自己返回的 `PONG` 消息， 握手完成。
 
 ![img](https://atts.w3cschool.cn/attachments/image/cimg/2015-09-13_55f528a75c69b.png)
 
 之后， 节点 A 会将节点 B 的信息通过 Gossip 协议传播给集群中的其他节点， 让其他节点也与节点 B 进行握手， 最终， 经过一段时间之后， 节点 B 会被集群中的所有节点认识。
 
-#### 槽指派
+### 槽指派
 
-Redis集群通过分片的方式来保存数据库中的键值对，集群的整个数据库被分为16384个槽（slot）。
+Redis 集群通过分片的方式来保存数据库中的键值对，集群的整个数据库被分为 16384 个槽（slot）。
 
-数据库中每个键都属于其中一个槽，每个节点可以处理0-16383个槽。
+数据库中每个键都属于其中一个槽，每个节点可以处理 0-16383 个槽。
 
 当16384个槽都有节点在处理时，集群处于上线状态，只要有一个槽没有得到处理，那么集群处于下线状态。
 
@@ -1275,7 +1307,7 @@ Redis集群通过分片的方式来保存数据库中的键值对，集群的整
 
 客户端向节点发送键命令，节点首先要计算这个键属于哪个槽。计算方式是计算键的 CRC-16 校验和然后 & 16383 得到一个介于 0 到 16383 的整数作为 key 的槽号。
 
-如果是自己负责这个槽，那么直接执行命令，如果不是，向客户端返回一个MOVED错误，指引客户端转向正确的节点。确定 i 漕之后，判断方式是节点检查自己的 clusterState.slots 数组的项 i ,如果值是 clusterState.myself 则是当前节点负责，节点可以执行客户端发送的命令，如果不等会根据数组中项 i 的值指向的 clusterNode 结构记录的 IP 和端口号转向正确的漕。
+如果是自己负责这个槽，那么直接执行命令，如果不是，向客户端返回一个 MOVED 错误，指引客户端转向正确的节点。确定 i 漕之后，判断方式是节点检查自己的 clusterState.slots 数组的项 i ,如果值是 clusterState.myself 则是当前节点负责，节点可以执行客户端发送的命令，如果不等会根据数组中项 i 的值指向的 clusterNode 结构记录的 IP 和端口号转向正确的漕。
 
 集群节点保存键值对以及键值对过期时间的方式和单机一致，，区别就是节点只能使用 0 号数据库，单机没有限制。
 
@@ -1381,23 +1413,77 @@ Redis集群的节点分为主节点（可能有多个）和从节点。
 
  
 
- 
+
+
+
 
 ## 事务
 
 Redis 通过 MULTI、EXEC、WATCH 等命令来实现事务功能。事务提供了一种将多个命令请求打包，然后一次性、按顺序执行多个命令的机制。事务在执行期间，服务器不会中断事务去执行其他命令。**事务首先以 `MULTI` 开始，接着多个命令放入事务中，最后由 `EXEC` 命令将这个事务提交。**
 
+==事务中的多个命令被一次性发送给服务器，而不是一条一条发送，这种方式被称为流水线，它可以减少客户端与服务器之间的网络通信次数从而提升性能。==
+
+ **相关命令**
+
+| 命令        | 格式                    | 作用                                                         | 返回结果                                                     |
+| ----------- | ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **WATCH**   | **WATCH key [key ...]** | 将给出的`Keys`标记为`监测态`，作为事务执行的条件             | always OK.                                                   |
+| **UNWATCH** | **UNWATCH**             | 清除事务中`Keys`的 `监测态`，如果调用了**EXEC** or **DISCARD**，则没有必要再手动调用**UNWATCH** | always OK.                                                   |
+| **MULTI**   | **MULTI**               | `显式`开启`redis事务`，后续`commands`将排队，等候使用**EXEC**进行原子执行 | always OK.                                                   |
+| **EXEC**    | **EXEC**                | 执行事务中的`commands`队列，恢复连接状态。如果**WATCH**在之前被调用，只有`监测`中的`Keys`没有被修改，命令才会被执行，否则停止执行（详见下文，`CAS机制`） | **成功：** 返回数组 —— 每个元素对应着原子事务中一个 `command`的返回结果; **失败：** 返回`NULL`（`Ruby` 返回``nil``）; |
+| **DISCARD** | **DISCARD**             | 清除事务中的`commands`队列，恢复连接状态。如果**WATCH**在之前被调用，`释放` `监测`中的`Keys` | always OK.                                                   |
+
+**注意：**
+
+- `MULTI`,`EXEC`,`DISCARD`才是`显式`开启并控制事务的常用命令，可类比`关系型数据库`中的  `BEGAIN`,`COMMIT`,`ROLLBACK`（事实上，差距很大）；
+
+- `WATCH`命令的使用是为了解决 `事务并发` 产生的`不可重复读`和`幻读`的问题（简单理解为给`Key加锁`）；
+
+
+
+MULTI, EXEC, DISCARD and WATCH 是Redis事务的基础。`用来显式开启并控制一个事务，它们允许在一个步骤中执行一组命令`。并提供两个重要的保证：
+
+- **事务中的所有命令都会被序列化并按顺序执行**。在执行Redis事务的过程中，不会出现由另一个客户端发出的请求。这保证 `命令队列` 作为一个单独的原子操作被执行。
+- **队列中的命令要么全部被处理，要么全部被忽略**。EXEC命令触发事务中所有命令的执行，因此，当客户端在事务上下文中失去与服务器的连接，
+- 如果发生在调用MULTI命令之前，则不执行任何`commands`；
+- 如果在此之前EXEC命令被调用，则所有的`commands`都被执行。
+
+同时，redis使用AOF([append-only file](https://redis.io/topics/persistence#append-only-file))，使用一个额外的`write操作`将事务写入磁盘。如果发生宕机，进程奔溃等情况，可以使用redis-check-aof tool 修复append-only file，使服务正常启动，并恢复部分操作。
+
+- 以下示例以原子方式，递增键foo和bar。
+
+```
+>MULTI
+OK
+>INCR foo
+QUEUED
+>INCR bar
+QUEUED
+>EXEC
+1）（整数）1
+2）（整数）1
+复制代码
+```
+
+从上面的命令执行中可以看出，`EXEC`返回一个`数组`，`其中每个元素都是事务中单个命令的返回结果，而且顺序与命令的发出顺序相同`。 当Redis连接处于`MULTI`请求的上下文中时，所有命令将以`字符串QUEUED`（**从Redis协议的角度作为状态回复发送**）作为回复，并在`命令队列`中排队。只有EXEC被调用时，排队的命令才会被执行，此时才会有`真正的返回结果`。
+
+------
+
+
+
 ### 事务的实现
+
+事务是开始到结束经历三个阶段：
 
 - 事务开始
 
-    　MULTI命令可以将执行该命令的客户端从非事务状态切换至事务状态。**本质上就是将客户端状态的 flags 属性中的 `REDIS_MUTLI` 标识打开。
+    　MULTI 命令可以将执行该命令的客户端从非事务状态切换至事务状态。**本质上就是将客户端状态的 flags 属性中的 `REDIS_MUTLI` 标识打开**。 MULTI 返回 OK。
 
 - 命令入队
 
     - 当客户端处于非事务状态，该客户端发出的所有命令会立刻被服务器执行。
 
-    - 切换到事务状态后，如果客户端发送的命令为EXEC、DISCARD、WATCH、MULTI，那么服务器会立即执行，其他命令则会放入事务队列里，然后向客户端返回 QUEUED 回复。 
+    - 切换到事务状态后，如果客户端发送的命令为 EXEC、DISCARD、WATCH、MULTI，那么服务器会立即执行，其他命令则会放入事务队列里，然后向客户端返回 QUEUED 回复。 
 
     每个 Redis 客户端都有自己的事务状态，该状态**保存在客户端状态的 mstate 属性中，事务状态包括一个事务队列和一个已入队命令的计数器（即队列长度）**。
 
@@ -1422,7 +1508,7 @@ Redis 通过 MULTI、EXEC、WATCH 等命令来实现事务功能。事务提供�
 
 - 事务执行
 
-    处于事务状态时，EXEC会被立即执行。服务器会遍历这个客户端的事务队列，执行队列中的所有命令，最后将结果返回给客户端。该 EXEC 命令实现原理如下：
+    处于事务状态时，EXEC 会被立即执行。服务器会遍历这个客户端的事务队列，执行队列中的所有命令，最后将结果返回给客户端。该 EXEC 命令实现原理如下：
 
     - 首先创建一个空白的回复队列
     - 然后遍历事务队列中的每个项，读取命令的参数、参数的个数和要执行的命令【循环遍历执行】
@@ -1431,17 +1517,17 @@ Redis 通过 MULTI、EXEC、WATCH 等命令来实现事务功能。事务提供�
     - 清空客户端的事务状态，包括清零入队命令计数器和释放事务队列。
     - 最后将事务的执行结果返回给客户端。
 
-### WATCH命令的实现
+### WATCH 命令的实现
 
-- WATCH命令是一个乐观锁，它可以在EXEC命令执行之前，监视任意数量的数据库键，并在EXEC执行时，检查被监视的键是否至少有一个被修改过了，如果是，那么服务器将拒绝执行事务。 
+- WATCH 命令是一个乐观锁，它可以在 EXEC 命令执行之前，监视任意数量的数据库键，并在 EXEC 执行时，检查被监视的键是否至少有一个被修改过了，如果是，那么服务器将拒绝执行事务。 
 
-- 每个Redis数据库（redisDb 结构）都保存着一个 `watched_keys`字典，这个字典的键是被 WATCH 监视的键，**值是一个链表，记录了所有监视相应数据库键的客户端**。 通过字典服务器可以知道哪些数据库键正在被监视，同时哪些客户端正在监视这些数据库键。
+- 每个 Redis 数据库（redisDb 结构）都保存着一个 `watched_keys`字典，这个字典的键是被 WATCH 监视的键，**值是一个链表，记录了所有监视相应数据库键的客户端**。 通过字典服务器可以知道哪些数据库键正在被监视，同时哪些客户端正在监视这些数据库键。
 
-- 监控机制的触发：当执行如 set、sadd 等命令之后会调用 touchWatchKey 函数对 watched_keys 字典进行检查，查看是否有客户端正在监视刚刚被修改的键，如果某个键被修改，那么监视该键的客户端的 `REDIS_DIRTY_CAS` 标识就会被打开。 表示该客户端的事务安全性已经被破坏。【客户端中有一个被监视的键发生修改，该客户端都会被添加标志，则该客户端提交的事务都不安全】
+- 监控机制的触发：当执行如 set、sadd 等命令之后会调用 `touchWatchKey` 函数对`watched_keys` 字典进行检查，查看是否有客户端正在监视刚刚被修改的键，如果某个键被修改，那么监视该键的客户端的 `REDIS_DIRTY_CAS` 标识就会被打开。 表示该客户端的事务安全性已经被破坏。【客户端中有一个被监视的键发生修改，该客户端都会被添加标志，则该客户端提交的事务都不安全】
 
 - 执行 EXEC 时，服务器会根据客户端的 `REDIS_DIRTY_CAS` 标识是否被打开来决定是否执行事务。
 
-### 事务的ACID特性
+### 事务的 ACID特性
 
 - 原子性：可以保证
 
@@ -1471,20 +1557,67 @@ Redis 通过 MULTI、EXEC、WATCH 等命令来实现事务功能。事务提供�
 
 ------
 
-### Redis事务不支持Rollback（`重点`）
+### Redis 事务不支持 Rollback（重点）
 
 **事实上 Redis 命令在事务执行时可能会失败，但仍会继续执行剩余命令而不是`Rollback`（事务回滚）**。然而针对这种情况具备很好的解释：
 
-- Redis 命令可能会执行失败，仅仅是由于错误的语法被调用（命令排队时检测不出来的错误），或者使用错误的数据类型操作某个`Key`： 这意味着，实际上失败的命令都是编程错误造成的，都是开发中能够被检测出来的，生产环境中不应该存在。（这番话，彻底甩锅，“都是你们自己编程错误，与我们无关”。）
+- Redis 命令可能会执行失败，仅仅是由于错误的语法被调用（命令排队时检测不出来的错误），或者使用错误的数据类型操作某个`Key`： 这意味着，实际上失败的命令都是编程错误造成的，都是开发中能够被检测出来的，生产环境中不应该存在。
 - 由于不必支持`Rollback`,`Redis`内部简洁并且更加高效。
 
-“**如果错误就是发生了呢？**”通常情况下，回滚并不能挽救编程错误。**鉴于没有人能够挽救程序员的错误**，并且`Redis命令`失败所需的错误类型不太可能进入生产环境，所以我们选择了不支持错误回滚（Rollback）这种更简单快捷的方法。
+“**如果错误就是发生了呢？**”通常情况下，回滚并不能挽救编程错误。**鉴于没有人能够挽救程序员的错误**，并且Redis 命令失败所需的错误类型不太可能进入生产环境，所以我们选择了不支持错误回滚（Rollback）这种更简单快捷的方法。
 
-------
+## 事务中的错误
+
+**事务期间，可能会遇到两种命令错误：**
+
+- **在调用`EXEC`命令之前出现错误（`COMMAND`排队失败）。**
+- 例如，命令可能存在`语法错误`（参数数量错误，错误的命令名称...）；
+- 或者可能存在`某些关键条件`，如内存不足的情况（如果服务器使用`maxmemory`指令做了`内存限制`）。
+
+*客户端会在`EXEC`调用之前检测第一种错误*。 通过检查排队命令的`状态回复`（***注意：这里是指`排队`的`状态回复`，而不是`执行结果`***），如果命令使用`QUEUED`进行响应，则它已正确排队，否则Redis将返回错误。如果排队命令时发生错误，大多数客户端将`中止该事务并清除命令队列`。然而：
+
+- 在`Redis 2.6.5之前`，这种情况下，在`EXEC`命令调用后，客户端会执行命令的子集（成功排队的命令）而忽略之前的错误。
+- 从`Redis 2.6.5开始`，服务端会记住在累积命令期间发生的错误，当`EXEC`命令调用时，`将拒绝执行事务，并返回这些错误，同时自动清除命令队列`。
+- 示例如下：
+
+```
+>MULTI
++OK
+>INCR a b c
+-ERR wrong number of arguments for 'incr' command
+复制代码
+```
+
+> 这是由于`INCR`命令的语法错误，将在调用`EXEC`之前被检测出来，并终止事务（version2.6.5+）。
+
+- **在调用`EXEC`命令之后出现错误。**
+- 例如，使用`错误的值`对某个`key`执行操作（如针对`String`值调用`List`操作）
+
+*`EXEC`命令执行之后发生的错误并不会被特殊对待*：`即使事务中的某些命令执行失败，其他命令仍会被正常执行`。
+
+- 示例如下：
+
+```
+>MULTI
++OK
+>SET a 3
++QUEUED
+>LPOP a
++QUEUED
+>EXEC
+*2
++OK
+-ERR Operation against a key holding the wrong kind of value
+复制代码
+```
+
+> - `EXEC`返回一个包含两个元素的字符串数组，一个元素是`OK`，另一个是`-ERR……`。
+> - **能否将错误合理的反馈给用户这取决于`客户端library`(如：`Spring-data-redis.redisTemplate`)的自身实现。**
+> - 需要注意的是，**即使命令失败，队列中的所有其他命令也会被处理----Redis不会停止命令的处理**。
 
 ### 清除命令队列
 
-`DISCARD`被用来中止事务。事务中的所有命令将不会被执行,连接将恢复正常状态。
+`DISCARD`被用来中止事务。事务中的所有命令将不会被执行，连接将恢复正常状态。
 
 ## 排序
 
@@ -1536,7 +1669,241 @@ Redis 的 sort 命令可以对列表键、集合键和有序集合键的值进�
     - 在 Redis 中，并不是所有数据都一直存储在内存中，可以将一些很久没用的 value 交换到磁盘，而 Memcached 的数据则会一直在内存中。
     - **Memcached 将内存分割成特定长度的块来存储数据，以完全解决内存碎片的问题。但是这种方式会使得内存的利用率不高**，例如块的大小为 128 bytes，只存储 100 bytes 的数据，那么剩下的 28 bytes 就浪费掉了。
 
+## Redis 持久化
 
+Redis 是内存型数据库，为了解决数据在断电后以及因进程退出造成数据丢失问题，需要将内存中的数据持久化到硬盘上，当下次重启时利用之前持久化文件即可实现数据恢复。
+
+#### （一）RDB（Redis Database） 持久化（默认）
+
+==**RDB 持久化是把当前进程数据生成快照保存到硬盘的过程**，触发 RDB 持久化过程分为手动触发和自动触发。==
+
+- 触发机制
+
+    - ==手动触发分别对应 save 和 bgsave 命令==：
+
+        - **save 命令：阻塞当前 Redis 服务器，直到 RDB 过程完成为止**，对于内存比较大的实例会造成长时间阻塞，线上环境不建议使用。运行 save 命令对应 Redis 日志如下：
+            `DB saved on disk`
+
+        - bgsave 命令：**bgsave 命令是针对 save 阻塞问题做的优化（save 相对废弃了）。Redis 进程执行 fork 操作创建子进程，RDB 持久化过程由子进程负责，完成后自动结束。阻塞只发生在 fork 阶段，因此时间很短。**运行 bgsave 名字对应的 Redis 日志如下：
+
+            ```java
+            Background saving started by pid 3152
+            DB saved on disk
+            RDB: 0MB of memory userd by copy-on-write
+            Background saving terminated with success
+            ```
+
+            ==**bgsave 流程说明：**==
+
+            - 执行 bgsave 命令，**Redis 父进程判断当前是否存在正在执行的子进程**，如只 RDB/AOF 子进程，如果存在 bgsave 命令直接返回。
+            - 父进程执行 fork 操作创建子进程，fork 操作过程中父进程会阻塞，通过 `info stats` 命令查看`latest_fork_usec` 选项，可以获取最近一个 `fork` 操作的耗时，单位为微秒。
+            - 父进程 fork 完成后，bgsave 命令返回 `“Background saving started”`信息并不再阻塞父进程，可以继续响应其他命令。
+            - 子进程创建 RDB 文件，**根据父进程内存生成临时快照文件，完成后对原有文件进行原子替换**。执行 `lastsave` 命令可以获取最后一次生成 RDB 的时间，对应 info 统计的 `rdb_last_save_time` 选项。
+            - 进程发送信号给父进程表示完成，父进程更新统计信息，具体见 `info Persistence` 下的 `rdb_*` 相关选项。
+
+    - Redis 内部还存在自动触发 RDB 的持久化机制，例如以下场景:
+
+        - 使用 save 相关配置，如 `save m n` 表示 m 秒之内数据集存在 n 次修改时，自动触发 bgsave。
+        - 如果从节点执行全量复制操作，主节点自动执行bgsave生成RDB文件并发送给从节点。
+        - 执行 `debug reload` 命令重新加载 Redis 时，也会自动触发 save 操作。
+
+    - 默认情况下执行 `shutdown` 命令时，如果没有开启 AOF 持久化功能则自动执行 bgsave。
+
+- RDB 文件处理
+
+    - 保存：**RDB 文件保存在 dir 配置指定的目录下**，文件名通过 `dbfilename` 配置指定。可以通过执行 `config set dir {newDir}`  和 `config set dbfilename {newFileName}` 运行期动态执行，当下次运行时 RDB 文件会保存到新目录。
+
+    - ==压缩：Redis 默认采用 LZF 算法对生成的 RDB 文件做压缩处理，压缩后的文件远远小于内存大小==，默认开启，可以通过参数 `config set rdbcompression {yes|no}` 动态修改。
+
+    - 校验：如果 Redis 加载损坏的 RDB 文件时拒绝启动，并打印如下日志：
+
+        `Short read or OOM loading DB. Unrecoverable error , aborting now.`这时可以使用Redis提供的redis-check-dump工具检测RDB文件并获取对应的错误报告
+
+- RDB 的优缺点
+
+    - RDB的优点:
+
+        - ==RDB 是一个紧凑压缩的二进制文件，代表  Redis  在某一个时间点上的数据快照==。非常适合用于备份，全量复制等场景。比如每6小时执行 bgsave 备份，并把 RDB 文件拷贝到远程机器或者文件系统中（如 hdfs），用于灾难恢复。
+        - ==Redis 加载 RDB 恢复数据远远快于 AOF 方式==。
+
+    - RDB 的缺点
+
+        - ==RDB 方式数据没办法做到实时持久化/秒级持久化。因为 bgsave 每次运行都要执行 fork 操作创建子进程，属于重量级操作，频繁执行成本过高。==
+        - RDB文件使用特定二进制格式保存，Redis版本演进过程中有多个格式的RDB 版本，存在老版本Redis服务无法兼容新版RDB格式的问题。
+
+**针对 RDB 不适合实时持久化的问题，Redis 提供了 AOF 持久化方式来解决**
+
+#### （二）AOF 持久化
+
+**AOF(append only file) 持久化：以独立日志的方式记录每次写命令，重启时再重新执行 AOF 文件中命令达到恢复数据的目的。AOF 的主要作用是解决了数据持久化的实时性，目前已经是 Redis 持久化的主流方式。**
+
+- 使用 AOF
+
+    开启 AOF 功能需要设置配置：`appendonly yes` 默认不开启。AOF 文件通过 `append filename` 配置设置，默认文件名是 `appendonly.aof`。保存路径同 RDB 持久化方式一致。通过 dir 配置指定。
+
+- AOF 的工作流程操作：**命令写入（append）、文件同步（sync）、文件重写（rewrite）、重启加载（load）**。工作流程如下：
+
+    - ==**所有的写入命令会追加到 `aof_buf`（缓冲区）中。**==
+
+        AOF 命令写入的内容直接是文本协议格式。例如 `set hello world` 这条命令，在 AOF 缓冲区会追加如下文本：`\r\n$3\r\nset\r\n$5\r\nhello\r\n$5\r\nworld\r\n`。
+
+        - 为什么使用文本协议
+
+            文本协议具有很好的兼容性。
+            开启AOF后，所有写入命令都包含追加操作，直接采用协议格式，避免二次处理开销。
+            文本协议具有可读性，方便直接修改和处理。
+
+        - AOF为什么把命令追加到 `aof_buf` 中
+
+            **Redis 使用单线程响应命令，如果每次写 AOF 文件命令都直接追加到硬盘，那么性能完全取决于当前硬盘负载。写入缓冲区 `aof_buf` 中，还有另一个好处，Redis 可以提供多种缓冲区同步硬盘的策略，在性能和安全性方面做出平衡。**
+
+    - ==**AOF 缓冲区根据对应的策略向硬盘做同步操作。**==
+
+        Redis 提供了多种 AOF 缓冲区同步文件策略，由参数 `appendfsync` 控制，不同值的含义如表所示
+
+        - 配置为 `no`,由于操作系统每次同步 AOF 文件的周期不可控，而且会极大每次同步硬盘的数据量，虽然提升了性能，但数据安全性无法保证。
+
+        - `write` 操作会触发延迟写（delayed write）机制，Linux在内核提供页缓冲区用来提高硬盘IO性能。write操作在写入系统缓冲区后直接返回。同步硬盘操作依赖于系统调度机制，列如：缓冲区页空间写满或达到特定时间周期。同步文件之前，如果此时系统故障宕机，缓冲区内数据将丢失。
+        - **`fsync` 针对单个文件操作（比如AOF文件），做强制硬盘同步**，`fsync` 将阻塞知道写入硬盘完成后返回，保证了数据持久化。
+        - 配置为 `always` 时，每次写入都要同步 AOF 文件，在一般的 STAT 硬盘上，Redis 只能支持大约几百TPS 写入，显然跟Redis高性能特性背道而驰，不建议配置。
+        - 配置为 `everysec` ,是建议的同步策略，也是默认配置，做到兼顾性能和数据安全性，理论上只有在系统突然宕机的情况下丢失 1s 的数据。（严格来说最多丢失1s数据是不准确）
+
+    - ==**随着 AOF 文件越来越大，需要定期对 AOF 文件进行重写，达到压缩的目的。**==
+
+        **AOF 文件重写就是把 Redis 进程内的数据转化为写命令同步到新 AOF 文件的过程**。所以重写后的AOF文件为什么可以变小，原因如下
+
+        - **进程内已经超时的数据不再写文件**。
+
+        - **旧的 AOF 文件含有无效命令**，如del key1、 hdel key2、srem keys、set a 111、set a 222等。重写使用进程内数据直接生成，这样新的AOF文件只保留最终数据的写入命令。
+
+        - **多条写命令可以合并为一个**，如lpush list a、lpush list b、 lpush list c 可以转化为：lpush list a b c。为了防止但挑明了过大造成客户端缓冲区溢出，对于list、set、hash、zset等类型曹组，以64个元素为界拆分为多条。
+
+    > AOF重写过程可以手动触发和自动触发：
+    >
+    > - 手动触发：直接调用 bgrewriteaof 命令
+    > - 自动触发：根据 `auto-aof-rewrite-min-size` 和 `auto-aof-rewrite-percentage` 参数确定自动触发时机
+    >     - `auto-aof-rewrite-min-size`：表示运行 AOF 重写时文件最小体积，默认为 64MB
+    >     - auto-aof-rewrite-percentage:代表当前AOF文件空间（aof_current_size）和上一次重写后AOF文件空间（aof_base_size）的值
+    >
+    >  **当触发AOF重写时的运行流程：**
+    >
+    > - 执行AOF重写请求。
+    >     如果当前进程正在执行AOF重写，请求不执行并返回如下响应:`ERR Background append only file rewriting already in progress`。如果当前进程正在执行bgsave操作，重写命令延迟到bgsave完成后再执行，返回如下响应：`Background append only file rewriting scheduled`。
+    >  - 父进程执行fork创建子进程，开销等同于bgsave过程。
+    > - 主进程fork操作完成后，继续响应其他命令。所有修改命令依然写入AOF缓冲区并更具appendfsync策略同步到硬盘，保证原有AOF机制正确性。
+    > - 由于fork操作运用写时复制技术，子进程只能共享fork操作时的内存数据。由于父进程依然响应命令，Redis使用"AOF重写缓冲区"保存这部分新数据，防止新AOF文件生成期间丢失这部分数据。
+    >     - 子进程根据内存快照，按照命令合并规则写入到新的AOF文件。每次批量写入硬盘数据量由配置aof-rewrite-incremental-fsync控制，默认为32MB，防止单次刷盘数据过多造成硬盘阻塞。
+    > - 新AOF文件写入完成后，子进程发送信号给父进程，父进程更新统计信息，具体见info persistence下的aof_*相关统计。
+    > - 父进程把AOF重写缓冲区的数据写入到新的AOF文件。
+    > - 使用新AOF文件替换老文件，完成AOF重写。
+
+- ==**当 Redis 服务重启时，可以加载 AOF 文件进行数据恢复**==。
+
+    AOF和RDB文件都可以用于服务器重启时的数据恢复。Redis持久化文件加载流程：
+
+    -  AOF持久化开启且存在AOF文件时，优先加载AOF文件，打印如下日志：`DB loaded from append only file: 5.841 seconds`
+
+    -  AOF关闭或者AOF文件不存在时，加载RDB文件，打印如下日志：
+    -  加载AOF/RDB文件完成后，Redis启动成功。
+    -  AOF/RDB文件存在错误时，Redis启动失败并打印错误信息
+
+**RDB 以及 AOF 优缺点**
+
+- RDB
+
+- 优点：
+
+    - 只有一个文件dump.rdb，方便持久化；
+    - **fork一个子进程来完成写操作，将数据写到磁盘上一个临时RDB文件中，主进程可以继续处理命令，保证了redis的高性能**；当子进程完成写临时文件后，将原来的rdb文件替换掉，**这样的好处是可以copy-on-write**。
+    - 数据集较大时，比AOF的启动效率更高。
+
+    缺点：
+
+    - 数据不安全，RDB持久化是周期性的保存数据，如果在未触发下一次存储时服务宕机，就会丢失增量数据。
+
+- AOF(Append Only File)：**将redis执行的每条写命令追加到单独的日志文件appendonly.aof中，可以做到全程持久化**.当开启AOF后，服务端每执行一次写操作就会把该条命令追加到一个单独的AOF缓冲区的末尾，然后把AOF缓冲区的内容写入AOF文件里，但是AOF存储的是指令序列，恢复时要花费很长时间且文件更大。
+
+    优点：
+
+    - 数据安全，aof持久化每进行一此命令操作就记录到aof文件一次。
+    - 通过append模式写文件，即使中途服务器宕机，也可以通过redis-check-aof工具解决数据一致性问题；
+    - rewrite模式，aof重写可以把内存中的数据，逆化成命令，写入到aof日志中，解决aof日志过大的问题。
+
+    >appendfsync always   #每1个命令都立即同步到aof
+    >appendfsync everysec   #每秒写一次
+
+    缺点：
+
+    - AOF存储的是指令序列，恢复时要花费很长时间且文件更大
+
+
+
+
+
+## 事件
+
+Redis 服务器是一个事件驱动程序。
+
+### 文件事件
+
+服务器通过套接字与客户端或者其它服务器进行通信，文件事件就是对套接字操作的抽象。
+
+Redis 基于 Reactor 模式开发了自己的网络事件处理器，使用 I/O 多路复用程序来同时监听多个套接字，并将到达的事件传送给文件事件分派器，分派器会根据套接字产生的事件类型调用相应的事件处理器。
+
+![image-20200401181022525](Redis.resource/image-20200401181022525.png)
+
+### 时间事件
+
+服务器有一些操作需要在给定的时间点执行，时间事件是对这类定时操作的抽象。
+
+时间事件又分为：
+
+- 定时事件：是让一段程序在指定的时间之内执行一次；
+- 周期性事件：是让一段程序每隔指定时间就执行一次。
+
+Redis 将所有时间事件都放在一个无序链表中，通过遍历整个链表查找出已到达的时间事件，并调用相应的事件处理器。
+
+#### 事件的调度与执行
+
+服务器需要不断监听文件事件的套接字才能得到待处理的文件事件，但是不能一直监听，否则时间事件无法在规定的时间内执行，因此监听时间应该根据距离现在最近的时间事件来决定。
+
+事件调度与执行由 aeProcessEvents 函数负责，伪代码如下：
+
+```python
+def aeProcessEvents():
+    # 获取到达时间离当前时间最接近的时间事件
+    time_event = aeSearchNearestTimer()
+    # 计算最接近的时间事件距离到达还有多少毫秒
+    remaind_ms = time_event.when - unix_ts_now()
+    # 如果事件已到达，那么 remaind_ms 的值可能为负数，将它设为 0
+    if remaind_ms < 0:
+        remaind_ms = 0
+    # 根据 remaind_ms 的值，创建 timeval
+    timeval = create_timeval_with_ms(remaind_ms)
+    # 阻塞并等待文件事件产生，最大阻塞时间由传入的 timeval 决定
+    aeApiPoll(timeval)
+    # 处理所有已产生的文件事件
+    procesFileEvents()
+    # 处理所有已到达的时间事件
+    processTimeEvents()
+```
+
+将 aeProcessEvents 函数置于一个循环里面，加上初始化和清理函数，就构成了 Redis 服务器的主函数，伪代码如下：
+
+```python
+def main():
+    # 初始化服务器
+    init_server()
+    # 一直处理事件，直到服务器关闭为止
+    while server_is_not_shutdown():
+        aeProcessEvents()
+    # 服务器关闭，执行清理操作
+    clean_server()
+```
+
+从事件处理的角度来看，服务器运行流程如下：
+
+<img src="Redis.resource/image-20200401181105659.png" alt="image-20200401181105659" style="zoom: 50%;" />
 
 ### 十四、一个简单的论坛系统分析
 
@@ -1624,7 +1991,12 @@ Redis 没有关系型数据库中的表这一概念来将同种类型的数据�
 - **线程安全角度原因**：ABBA
     同时有请求 A 和请求 B 进行更新操作，那么会出现
 
-    线程 A 更新了数据库 然后 线程 B 更新了数据库，然后线程 B 更新了缓存，最后线程 A 更新了缓存（A 可能有网络延迟，所以可能比 B 迟到）
+    - 线程 A 更新了数据库
+    - 线程 B 更新了数据库
+    - 线程 B 更新了缓存
+    - 线程 A 更新了缓存
+
+    > 这就出现请求A更新缓存应该比请求B更新缓存早才对，但是因为网络等原因，B却比A更早更新了缓存。这就导致了**脏数据**，因此不考虑。
 
 - **业务场景角度原因：**
 
@@ -1714,6 +2086,491 @@ ok**，那就将第二次删除作为异步的。自己起一个线程，异步�
 
 **备注说明：**上述的订阅binlog程序在mysql中有现成的中间件叫canal，可以完成订阅binlog日志的功能。至于oracle中，博主目前不知道有没有现成中间件可以使用。另外，重试机制，博主是采用的是消息队列的方式。如果对一致性要求不是很高，直接在程序中另起一个线程，每隔一段时间去重试即可，这些大家可以灵活自由发挥，只是提供一个思路。
 
+## Redis 的内存回收机制(过期键值对的删除策略、内存淘汰机制)
+
+### 设置与移除键的生存时间或过期时间
+
+redis 一共有 4 个命令来设置键的生存时间（可以存活多久）或过期时间（什么时候被删除）
+
+- expire ：将 key 的生存时间设置为 ttl 秒
+- pexpire ：将 key 的生存时间设置为 ttl 毫秒
+- expireat ：将 key 的过期时间设置为 timestamp 所指定的秒数时间戳
+- pexpireat ：将 key 的过期时间设置为 timestamp 所指定的毫秒数时间戳
+
+上述四种命令本质上都是通过 pexpireat 命令来实现的。
+
+```shell
+127.0.0.1:6379> set a test
+OK
+127.0.0.1:6379> EXPIRE a 5
+(integer) 1
+127.0.0.1:6379> get a // 距离设置生存时间命令的 5 秒内执行
+"test"
+127.0.0.1:6379> get a // 距离设置生存时间命令的 5 秒后执行
+(nil)
+```
+
+如果自己不小心设置错了过期时间，那么我们可以删除先前的过期时间
+
+可以使用下面命令来返回键剩余的生存时间： ttl 是以秒为单位，返回键的剩余生存时间；同理还有 pttl 命令是以毫秒为单位，返回键的剩余生存时间
+
+#### 移除过期时间
+
+persist 命令可以移除一个键的过期时间，举个栗子：
+
+```shell
+127.0.0.1:6379> EXPIRE c 1000
+(integer) 1
+127.0.0.1:6379> ttl c   // 有过期时间
+(integer) 9996
+127.0.0.1:6379> PERSIST c
+(integer) 1
+127.0.0.1:6379> ttl c  // 无过期时间
+(integer) -1
+```
+
+此时，如果我们没有移除过期时间，那么如果一个键过期了，那它什么时候会
+
+### Redis 过期键的删除策略（即什么时候删除）
+
+Redis 可以为每个键设置过期时间，当键过期时，会自动删除该键。**对于散列表这种容器，只能为整个键设置过期时间（整个散列表），而不能为键里面的单个元素设置过期时间。**
+
+- **惰性过期**：**只有当访问一个 key 时，才会判断 key 是否过期，过期则清除**。该策略可以最大化的节省CPU资源，但是如果 某些键值对一直不使用，会造成一定量的内存浪费，对内存不友好。除非手动执行 flushdb 操来于清空当前数据库中的所有 key
+
+    执行**数据写入**过程中，首先通过expireIfNeeded函数对写入的key进行过期判断。
+
+    ```cpp
+    /*
+     * 为执行写入操作而取出键 key 在数据库 db 中的值。
+     *
+     * 和 lookupKeyRead 不同，这个函数不会更新服务器的命中/不命中信息。
+     *
+     * 找到时返回值对象，没找到返回 NULL 。
+     */
+    robj *lookupKeyWrite(redisDb *db, robj *key) {
+    
+        // 删除过期键
+        expireIfNeeded(db,key);
+    
+        // 查找并返回 key 的值对象
+        return lookupKey(db,key);
+    }
+    ```
+
+     执行**数据读取**过程中，首先通过expireIfNeeded函数对写入的key进行过期判断。
+
+    ```kotlin
+    /*
+     * 为执行读取操作而取出键 key 在数据库 db 中的值。
+     *
+     * 并根据是否成功找到值，更新服务器的命中/不命中信息。
+     *
+     * 找到时返回值对象，没找到返回 NULL 。
+     */
+    robj *lookupKeyRead(redisDb *db, robj *key) {
+        robj *val;
+    
+        // 检查 key 释放已经过期
+        expireIfNeeded(db,key);
+    
+        // 从数据库中取出键的值
+        val = lookupKey(db,key);
+    
+        // 更新命中/不命中信息
+        if (val == NULL)
+            server.stat_keyspace_misses++;
+        else
+            server.stat_keyspace_hits++;
+    
+        // 返回值
+        return val;
+    }
+    ```
+
+     执行**过期动作expireIfNeeded**其实内部做了三件事情，分别是：
+
+    - 查看key判断是否过期
+    - 向slave节点传播执行过期key的动作并发送事件通知
+    - 删除过期key
+
+    ```kotlin
+    /*
+     * 检查 key 是否已经过期，如果是的话，将它从数据库中删除。
+     *
+     * 返回 0 表示键没有过期时间，或者键未过期。
+     *
+     * 返回 1 表示键已经因为过期而被删除了。
+     */
+    int expireIfNeeded(redisDb *db, robj *key) {
+    
+        // 取出键的过期时间
+        mstime_t when = getExpire(db,key);
+        mstime_t now;
+    
+        // 没有过期时间
+        if (when < 0) return 0; /* No expire for this key */
+    
+        /* Don't expire anything while loading. It will be done later. */
+        // 如果服务器正在进行载入，那么不进行任何过期检查
+        if (server.loading) return 0;
+    
+        // 当服务器运行在 replication 模式时
+        // 附属节点并不主动删除 key
+        // 它只返回一个逻辑上正确的返回值
+        // 真正的删除操作要等待主节点发来删除命令时才执行
+        // 从而保证数据的同步
+        if (server.masterhost != NULL) return now > when;
+    
+        // 运行到这里，表示键带有过期时间，并且服务器为主节点
+    
+        /* Return when this key has not expired */
+        // 如果未过期，返回 0
+        if (now <= when) return 0;
+    
+        /* Delete the key */
+        server.stat_expiredkeys++;
+    
+        // 向 AOF 文件和附属节点传播过期信息
+        propagateExpire(db,key);
+    
+        // 发送事件通知
+        notifyKeyspaceEvent(REDIS_NOTIFY_EXPIRED,
+            "expired",key,db->id);
+    
+        // 将过期键从数据库中删除
+        return dbDelete(db,key);
+    }
+    ```
+
+     判断key是否过期的数据结构是db->expires，也就是通过expires的数据结构判断数据是否过期。
+    内部获取过期时间并返回。
+
+    ```php
+    /* Return the expire time of the specified key, or -1 if no expire
+     * is associated with this key (i.e. the key is non volatile) 
+     *
+     * 返回给定 key 的过期时间。
+     *
+     * 如果键没有设置过期时间，那么返回 -1 。
+     */
+    long long getExpire(redisDb *db, robj *key) {
+        dictEntry *de;
+    
+        /* No expire? return ASAP */
+        // 获取键的过期时间
+        // 如果过期时间不存在，那么直接返回
+        if (dictSize(db->expires) == 0 ||
+           (de = dictFind(db->expires,key->ptr)) == NULL) return -1;
+    
+        /* The entry was found in the expire dict, this means it should also
+         * be present in the main dict (safety check). */
+        redisAssertWithInfo(NULL,key,dictFind(db->dict,key->ptr) != NULL);
+    
+        // 返回过期时间,#define dictGetSignedIntegerVal(he) ((he)->v.s64)
+        return dictGetSignedIntegerVal(de);
+    }
+    ```
+
+     整个数据查找过程类比hashtab的查找过程，首先定位hash桶，然后遍历hash桶下挂的链查找对应的节点。
+
+    ```php
+    /*
+     * 返回字典中包含键 key 的节点
+     *
+     * 找到返回节点，找不到返回 NULL
+     *
+     * T = O(1)
+     */
+    dictEntry *dictFind(dict *d, const void *key)
+    {
+        dictEntry *he;
+        unsigned int h, idx, table;
+    
+        // 字典（的哈希表）为空
+        if (d->ht[0].size == 0) return NULL; /* We don't have a table at all */
+    
+        // 如果条件允许的话，进行单步 rehash
+        if (dictIsRehashing(d)) _dictRehashStep(d);
+    
+        // 计算键的哈希值
+        h = dictHashKey(d, key);
+        // 在字典的哈希表中查找这个键
+        // T = O(1)
+        for (table = 0; table <= 1; table++) {
+    
+            // 计算索引值
+            idx = h & d->ht[table].sizemask;
+    
+            // 遍历给定索引上的链表的所有节点，查找 key
+            he = d->ht[table].table[idx];
+            // T = O(1)
+            while(he) {
+    
+                if (dictCompareKeys(d, key, he->key))
+                    return he;
+    
+                he = he->next;
+            }
+    
+            // 如果程序遍历完 0 号哈希表，仍然没找到指定的键的节点
+            // 那么程序会检查字典是否在进行 rehash ，
+            // 然后才决定是直接返回 NULL ，还是继续查找 1 号哈希表
+            if (!dictIsRehashing(d)) return NULL;
+        }
+    
+        // 进行到这里时，说明两个哈希表都没找到
+        return NULL;
+    }
+    ```
+
+- **定时删除:** **在设置键的过期时间的同时，创建一个定时器（timer），让定时器在键的过期时间来临时，立即执行对键的删除操作.** 即从设置key的Expire开始，就启动一个定时器，到时间就删除该key；这样会**对内存比较友好，但浪费CPU资源**
+
+- **定期删除:**每隔一段时间，程序就对数据库进行一次检查，删除里面的过期键。至于要删除多少过期键，以及要检查多少个数据库，则由算法决定。 即设置一个定时任务，比如10分钟删除一次过期的key；**间隔小则占用CPU,间隔大则浪费内存**
+
+  ​    
+
+    redis 的定期删除是通过定时任务实现的，也就是定时任务会循环调用 serverCron() 方法。然后定时检查过期数据的方法是 databasesCron() 。
+    定期删除的一大特点就是考虑了定时删除过期数据会占用 cpu 时间，所以每次执行 databasesCron() 的时候会限制cpu的占用不超过25%。
+
+     **activeExpireCycle() 执行具体过期数据的删除**，其他的动作不在该部分讨论当中。
+
+     该方法中删除过期数据的整个过程主要按照下面的逻辑进行：
+
+    - 遍历指定个数的db（如16）进行删除操作
+    - 针对每个db 随机获取过期数据每次遍历不超过指定数量（如20），发现过期数据并进行删除。
+    - 每个db的次数累积到16次的时候会进行判断时间是否超过25%，超过就停止删除数据过程。
+    - 最后如果删除的过期数据耗时（通过开始结束时间统计）超过待过期时间数量的25%的时候就停止删除过期数据过程。
+    - timelimit = 1000000*ACTIVE_EXPIRE_CYCLE_SLOW_TIME_PERC/server.hz/100的解释是：server.hz代表每秒调用的次数,所以上面这个公司就是每次执行占用的时候的25%用于过期数据删除。
+
+    
+
+    ```cpp
+    // 对数据库执行删除过期键，调整大小，以及主动和渐进式 rehash
+    void databasesCron(void) {
+    
+        // 如果服务器不是从服务器，那么执行主动过期键清除
+        if (server.active_expire_enabled && server.masterhost == NULL)
+            // 清除模式为 CYCLE_SLOW ，这个模式会尽量多清除过期键
+            activeExpireCycle(ACTIVE_EXPIRE_CYCLE_SLOW);
+    
+        // 在没有 BGSAVE 或者 BGREWRITEAOF 执行时，对哈希表进行 rehash
+        if (server.rdb_child_pid == -1 && server.aof_child_pid == -1) {
+            static unsigned int resize_db = 0;
+            static unsigned int rehash_db = 0;
+            unsigned int dbs_per_call = REDIS_DBCRON_DBS_PER_CALL;
+            unsigned int j;
+    
+            /* Don't test more DBs than we have. */
+            // 设定要测试的数据库数量
+            if (dbs_per_call > server.dbnum) dbs_per_call = server.dbnum;
+    
+            /* Resize */
+            // 调整字典的大小
+            for (j = 0; j < dbs_per_call; j++) {
+                tryResizeHashTables(resize_db % server.dbnum);
+                resize_db++;
+            }
+    
+            /* Rehash */
+            // 对字典进行渐进式 rehash
+            if (server.activerehashing) {
+                for (j = 0; j < dbs_per_call; j++) {
+                    int work_done = incrementallyRehash(rehash_db % server.dbnum);
+                    rehash_db++;
+                    if (work_done) {
+                        /* If the function did some work, stop here, we'll do
+                         * more at the next cron loop. */
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+    
+
+    ```cpp
+    void activeExpireCycle(int type) {
+        // 静态变量，用来累积函数连续执行时的数据
+        static unsigned int current_db = 0; /* Last DB tested. */
+        static int timelimit_exit = 0;      /* Time limit hit in previous call? */
+        static long long last_fast_cycle = 0; /* When last fast cycle ran. */
+    
+        unsigned int j, iteration = 0;
+        // 默认每次处理的数据库数量
+        unsigned int dbs_per_call = REDIS_DBCRON_DBS_PER_CALL;
+        // 函数开始的时间
+        long long start = ustime(), timelimit;
+    
+        // 快速模式
+        if (type == ACTIVE_EXPIRE_CYCLE_FAST) {
+            // 如果上次函数没有触发 timelimit_exit ，那么不执行处理
+            if (!timelimit_exit) return;
+            // 如果距离上次执行未够一定时间，那么不执行处理
+            if (start < last_fast_cycle + ACTIVE_EXPIRE_CYCLE_FAST_DURATION*2) return;
+            // 运行到这里，说明执行快速处理，记录当前时间
+            last_fast_cycle = start;
+        }
+    
+        /* 
+         * 一般情况下，函数只处理 REDIS_DBCRON_DBS_PER_CALL 个数据库，
+         * 除非：
+         *
+         * 1) 当前数据库的数量小于 REDIS_DBCRON_DBS_PER_CALL
+         * 2) 如果上次处理遇到了时间上限，那么这次需要对所有数据库进行扫描，
+         *     这可以避免过多的过期键占用空间
+         */
+        if (dbs_per_call > server.dbnum || timelimit_exit)
+            dbs_per_call = server.dbnum;
+    
+        // 函数处理的微秒时间上限
+        // ACTIVE_EXPIRE_CYCLE_SLOW_TIME_PERC 默认为 25 ，也即是 25 % 的 CPU 时间
+        timelimit = 1000000*ACTIVE_EXPIRE_CYCLE_SLOW_TIME_PERC/server.hz/100;
+        timelimit_exit = 0;
+        if (timelimit <= 0) timelimit = 1;
+    
+        // 如果是运行在快速模式之下
+        // 那么最多只能运行 FAST_DURATION 微秒 
+        // 默认值为 1000 （微秒）
+        if (type == ACTIVE_EXPIRE_CYCLE_FAST)
+            timelimit = ACTIVE_EXPIRE_CYCLE_FAST_DURATION; /* in microseconds. */
+    
+        // 遍历数据库
+        for (j = 0; j < dbs_per_call; j++) {
+            int expired;
+            // 指向要处理的数据库
+            redisDb *db = server.db+(current_db % server.dbnum);
+    
+            // 为 DB 计数器加一，如果进入 do 循环之后因为超时而跳出
+            // 那么下次会直接从下个 DB 开始处理
+            current_db++;
+    
+            do {
+                unsigned long num, slots;
+                long long now, ttl_sum;
+                int ttl_samples;
+    
+                /* If there is nothing to expire try next DB ASAP. */
+                // 获取数据库中带过期时间的键的数量
+                // 如果该数量为 0 ，直接跳过这个数据库
+                if ((num = dictSize(db->expires)) == 0) {
+                    db->avg_ttl = 0;
+                    break;
+                }
+                // 获取数据库中键值对的数量
+                slots = dictSlots(db->expires);
+                // 当前时间
+                now = mstime();
+    
+                // 这个数据库的使用率低于 1% ，扫描起来太费力了（大部分都会 MISS）
+                // 跳过，等待字典收缩程序运行
+                if (num && slots > DICT_HT_INITIAL_SIZE &&
+                    (num*100/slots < 1)) break;
+    
+                /* 
+                 * 样本计数器
+                 */
+                // 已处理过期键计数器
+                expired = 0;
+                // 键的总 TTL 计数器
+                ttl_sum = 0;
+                // 总共处理的键计数器
+                ttl_samples = 0;
+    
+                // 每次最多只能检查 LOOKUPS_PER_LOOP 个键
+                if (num > ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP)
+                    num = ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP;
+    
+                // 开始遍历数据库
+                while (num--) {
+                    dictEntry *de;
+                    long long ttl;
+    
+                    // 从 expires 中随机取出一个带过期时间的键
+                    if ((de = dictGetRandomKey(db->expires)) == NULL) break;
+                    // 计算 TTL
+                    ttl = dictGetSignedIntegerVal(de)-now;
+                    // 如果键已经过期，那么删除它，并将 expired 计数器增一
+                    if (activeExpireCycleTryExpire(db,de,now)) expired++;
+                    if (ttl < 0) ttl = 0;
+                    // 累积键的 TTL
+                    ttl_sum += ttl;
+                    // 累积处理键的个数
+                    ttl_samples++;
+                }
+    
+                /* Update the average TTL stats for this database. */
+                // 为这个数据库更新平均 TTL 统计数据
+                if (ttl_samples) {
+                    // 计算当前平均值
+                    long long avg_ttl = ttl_sum/ttl_samples;
+                    
+                    // 如果这是第一次设置数据库平均 TTL ，那么进行初始化
+                    if (db->avg_ttl == 0) db->avg_ttl = avg_ttl;
+                    /* Smooth the value averaging with the previous one. */
+                    // 取数据库的上次平均 TTL 和今次平均 TTL 的平均值
+                    db->avg_ttl = (db->avg_ttl+avg_ttl)/2;
+                }
+    
+                // 我们不能用太长时间处理过期键，
+                // 所以这个函数执行一定时间之后就要返回
+    
+                // 更新遍历次数
+                iteration++;
+    
+                // 每遍历 16 次执行一次
+                if ((iteration & 0xf) == 0 && /* check once every 16 iterations. */
+                    (ustime()-start) > timelimit)
+                {
+                    // 如果遍历次数正好是 16 的倍数
+                    // 并且遍历的时间超过了 timelimit
+                    // 那么断开 timelimit_exit
+                    timelimit_exit = 1;
+                }
+    
+                // 已经超时了，返回
+                if (timelimit_exit) return;
+    
+                // 如果已删除的过期键占当前总数据库带过期时间的键数量的 25 %
+                // 那么不再遍历
+            } while (expired > ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP/4);
+        }
+    }
+    ```
+
+    reids 同时使用了惰性过期和定期过期两种策略。通过配合使用，服务器可以很好的平衡 CPU 和内存。
+
+其中惰性删除为 redis 服务器内置策略。而定期删除可以通过以下两种方式设置： 1. 配置 redis.conf 的 hz 选项，默认为10 （即 1 秒执行 10 次，值越大说明刷新频率越快，对 Redis 性能损耗也越大） 2. 配置 redis.conf 的 maxmemory 最大值，当已用内存超过 maxmemory 限定时，就会触发主动清理策略
+
+### RDB 和 AOF 对过期键的处理
+
+- 生成 RDB 文件
+
+    程序会被数据库中的键进行检查，过期的键不会被保存到新创建的 RDB 文件中。因此**数据库中的过期键不会对生成新的 RDB 文件造成影响**
+
+- 载入 RDB 文件
+
+    这里需要分情况说明： 1. 如果服务器以主服务器模式运行，则在载入 RDB 文件时，程序会对文件中保存的键进行检查，过期键不会被载入到数据库中。**所以过期键不会对载入 RDB 文件的主服务器造成影响**。 2. 如果服务器以从服务器模式运行，则在载入 RDB 文件时，不论键是否过期都会被载入到数据库中。但由于主从服务器在进行数据同步时，从服务器的数据会被清空。所以一般来说，**过期键对载入 RDB 文件的从服务器也不会造成影响**。
+
+- AOF 文件写入
+
+    当服务器以 AOF 持久化模式运行时，如果数据库某个过期键还没被删除，那么 AOF 文件不会因为这个过期键而产生任何影响，依旧保留。
+
+    而当过期键被删除后，那么程序会向 AOF 文件追加一条 DEL 命令来显式地记录该键被删除。
+
+- AOF 重写
+
+    执行 AOF 重写过程中，也会被数据库的键进行检查，已过期的键不会被保存到重写后的 AOF 文件中。因此**不会对 AOF 重写造成影响**
+
+- 复制对过期键的处理
+
+    当服务器运行在复制模式下，由主服务器来控制从服务器的删除过期键动作，目的是保证主从服务器数据的一致性。
+
+    那到底是怎么控制的呢？ 1. 主服务器删除一个过期键后，会向所有从服务器发送一个 DEL 命令，告诉从服务器删除这个过期键 2. 从服务器接受到命令后，删除过期键
+
+    PS:从服务器在接收到客户端对过期键的读命令时，依旧会返回该键对应的值给客户端，而不会将其删除。
+
 
 
 ### ==内存淘汰机制==
@@ -1721,11 +2578,102 @@ ok**，那就将第二次删除作为异步的。自己起一个线程，异步�
 为了保证 Redis 的安全稳定运行，设置了一个 `max-memory` 的阈值，当内存用量到达阈值，新写入的键值对无法写入，此时就需要内存淘汰机制，在 Redis 的配置中有几种淘汰策略可以选择，详细如下：
 
 - `noeviction`: 当内存不足以容纳新写入数据时，新写入操作会**报错**；
-- `allkeys-lru`：在键空间中**移除最近最少使用的 key**；
-- `allkeys-random`：在键空间中**随机移除某个 key**；
-- `volatile-lru`：在设置了过期时间的键空间中，移除最近最少使用的 key；
-- `volatile-random`：在设置了过期时间的键空间中，随机移除某个 key；
-- `volatile-ttl`：在设置了过期时间的键空间中，有更早过期时间的 key 优先移除；
+- `allkeys-lru`：当内存不足以容纳新写入数据时，在键空间中**移除最近最少使用的 key**；
+- `allkeys-random`：当内存不足以容纳新写入数据时，在键空间中**随机移除某个 key**；
+- `volatile-lru`：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，移除最近最少使用的 key；
+- `volatile-random`：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，随机移除某个 key；
+- `volatile-ttl`：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，有更早过期时间的 key 优先移除；
+
+## Redis 主从复制
+
+Redis单节点存在单点故障问题，为了解决单点问题，一般需要对 Redis 配置从节点，然后使用哨兵来监听主节点的存活状态，如果主节点挂掉，从节点能继续提供缓存功能。
+
+**主从复制结合哨兵模式能解决单点故障问题，提高 Redis 可用性。主节点提供写操作，从节点仅提供读操作**。
+
+**主从复制的作用：**
+
+- **数据冗余**：实现数据冗余备份，这样一台节点挂了之后，其上的数据不至于丢失。
+- **故障恢复**：当主节点出现问题时，其从节点可以被提升为主节点继续提供服务，实现快速的故障恢复；
+- **负载均衡**：在主从复制的基础上，配合读写分离，可以由主节点提供写服务，由从节点提供读服务，分担服务器负载；尤其是在写少读多的场景下，通过多个从节点分担读负载，可以大大提高Redis服务器的并发量。
+
+### 主从复制的过程和原理
+
+**Redis主从复制默认是异步实现的**，避免客户端的等待。
+<img src="../../../../../Yu%2520Writer%2520Libraries/Interview/InterviewExperience/Redis.resource/image-20200602094035427.png" alt="image-20200602094035427" style="zoom:80%;" />
+
+**复制过程：**
+
+- 从节点执行`slavaof[masterIP][masterPort]`，保存主节点信息。
+- 从节点的定时任务发现主节点信息，建立和主节点的Socket连接；从节点发送Ping信号，主节点返回Pong，连接建立后，主节点将所有数据发送给从节点(**全量复制**)。
+- 完成了复制的建立过程后，主节点持续的把写命令发送给从节点(**增量复制**)，保证主从数据一致性。
+
+全量复制是从结点因为故障恢复或者新添加从结点时出现的初始化阶段的数据复制，这种复制是将主节点的数据全部同步到从结点来完成的，所以成本大但又不可避免。
+
+增量复制是主从结点正常工作之后的每个时刻进行的数据复制方式。
+
+**主从复制存在的问题：**
+
+一旦主节点宕机，从节点晋升为主节点，同时需要修改应用方的主节点地址、命令所有从节点去复制新的主节点，整个过程需要人工干预。
+
+解决方案：**哨兵**
+
+### 11.2 哨兵模式
+
+Redis Sentinel(哨兵)的主要功能包括主节点存活检测、主从运行情况检测、自动故障转移、主从切换。哨兵模式的最小配置是一主一从。
+
+<img src="../../../../../Yu%2520Writer%2520Libraries/Interview/InterviewExperience/Redis.resource/image-20200602094252997.png" alt="image-20200602094252997" style="zoom:80%;" />
+
+**哨兵功能**：
+
+- 监控（Monitoring）： Sentinel 会不断地检查你的主服务器和从服务器是否运作正常。
+- 提醒（Notification）： 当被监控的某个 Redis 服务器出现问题时， Sentinel 可以通过 API 向管理员或者其他应用程序发送通知。
+- 自动故障迁移（Automatic failover）： 当一个主服务器不能正常工作时， Sentinel 会开始一次自动故障迁移操作， 它会进行选举，将其中一个从服务器升级为新的主服务器， 并让失效主服务器的其他从服务器改为复制新的主服务器； 当客户端试图连接失效的主服务器时， 集群也会向客户端返回新主服务器的地址， 使得集群可以使用新主服务器代替失效服务器。
+
+
+**哨兵的工作原理：**
+
+1. 每个哨兵节点定期执行以下任务：每个哨兵节点以每秒一次的频率，向它所知的主服务器、从服务器以及其他的哨兵实例发送一个PING命令。
+2. 如果一个服务器距离上次回复PING命令的时间超过`down-after-milliseconds`所指定的值，那么这个实例会被哨兵标记为**主观下线**。
+3. 如果主服务器被标记为主观下线，那么正在监视这个服务器的所有哨兵节点，以每秒一次的频率确认主服务器的确进入了主观下线状态。
+4. 如果一个主服务器被标记为主观下线，并且有足够数量的哨兵(达到配置文件指定的数量)在指定的时间范围内同意这一判断，那么这个主服务器被标记为**客观下线**。
+5. 一般情况下，每个哨兵节点会以每10秒一次的频率向它已知的所有服务器发送INFO命令；当一个主服务器被标记为客观下线时，哨兵节点以每秒1次的频率向该主服务器的所有的从服务器发送INFO命令。
+6. 哨兵节点和其他哨兵节点协商主节点状态，如果处于SDOWN状态，则投票选出新的主节点，将剩余从节点指向新的主节点进行数据复制。**当原主服务器重新上线后，自动转为当前Master的从节点**。
+7. 当没有足够数量的哨兵节点同意主服务器下线时，主服务器的客观下线状态就会被移除；当主服务器重新向哨兵的PING命令返回有效回复时，主服务器的主观下线状态被移除。
+
+**哨兵模式的缺陷**：
+在哨兵模式中，仍然只有一个Master节点。当并发写请求较大时，哨兵模式并不能缓解写压力。
+
+只有主节点才具有写能力，如果在一个集群中，能够配置多个主节点，就可以缓解写压力了。**这个就是redis-cluster集群模式。**
+
+### 11.3 Redis-Cluster
+
+Redis Sentinal着眼于高可用，在master宕机时会自动将slave提升为master，继续提供服务。
+
+Redis Cluster着眼于扩展性，在单个redis内存不足时，使用Cluster进行分片存储。
+
+**集群模式**
+（1）由多个Redis服务器组成的分布式网络服务集群；
+（2）集群之中有多个Master主节点，每一个主节点都可读可写；可以给每一个主节点添加从节点，主节点和从节点遵循主从模型的特性
+（3）节点之间会互相通信，两两相连；
+（4）Redis集群无中心节点。
+
+**集群分片策略**
+Redis-cluster分片策略用来解决key存储位置。
+
+![image-20200602095139785](../../../../../Yu%2520Writer%2520Libraries/Interview/InterviewExperience/Redis.resource/image-20200602095139785.png)
+
+**集群将整个数据库分为16384个槽位slot，所有key-value数据都存储在这些slot中的某一个上**。一个slot槽位可以存放多个数据，key的槽位计算公式为：slot_number=crc16(key)%16384，其中crc16为16位的循环冗余校验和函数。
+
+集群中的每个主节点都可以处理0个至16383个槽，当16384个槽都有节点在负责处理时，集群进入上线状态，并开始处理客户端发送的数据命令请求。
+
+**集群redirect转向**：
+
+由于Redis集群无中心节点，请求会随机发给任意主节点；
+
+**主节点只会处理自己负责槽位的命令请求，其它槽位的命令请求，该主节点会返回客户端一个转向错误。
+客户端根据错误中包含的地址和端口重新向正确的负责的主节点发起命令请求。**
+
+![image-20200602095231276](../../../../../Yu%2520Writer%2520Libraries/Interview/InterviewExperience/Redis.resource/image-20200602095231276.png)
 
 ### 四、使用场景
 
@@ -1805,7 +2753,9 @@ ok**，那就将第二次删除作为异步的。自己起一个线程，异步�
 
 可以将多次IO往返的时间缩减为一次，前提是pipeline执行的指令之间没有因果相关性。使用redis-benchmark进行压测的时候可以发现影响redis的QPS峰值的一个重要因素是pipeline批次指令的数目。
 
+### Redis的同步机制
 
+Redis可以使用主从同步，从从同步。第一次同步时，主节点做一次bgsave，并同时将后续修改操作记录到内存buffer，待完成后将rdb文件全量同步到复制节点，复制节点接受完成后将rdb镜像加载到内存。加载完成后，再通知主节点将期间修改的操作记录同步到复制节点进行重放就完成了同步过程。
 
 
 

@@ -1,36 +1,31 @@
  
 
-# 一、shiro介绍 
+# shiro
 
-## （一）什么是shiro
+[TOC]
 
-Apache Shiro 是Java 的一个安全框架。Shiro 可以非常容易的开发出足够好的应用，其不仅可以用在JavaSE 环境，也可以用在JavaEE 环境。Shiro 可以帮助我们完成：**认证、授权、加密、会话管理、与****Web** **集成、缓存等**。
 
-## （二）为什么要学shiro
 
-- 既然shiro将安全认证相关的功能抽取出来组成一个框架，使用shiro就可以非常快速的完成认证、授权等功能的开发，降低系统成本。
+## 一、shiro 概念
 
-- shiro使用广泛，shiro可以运行在web应用，非web应用，集群分布式应用中越来越多的用户开始使用shiro。
+Apache Shiro 是Java 的一个安全框架。Shiro 可以非常容易的开发出足够好的应用，Shiro 可以帮助我们完成：**认证、授权、加密、会话管理、与 Web 集成、缓存等**。
 
-- java领域中spring security(原名Acegi)也是一个开源的权限管理框架，但是spring security依赖spring运行，而shiro就相对独立，最主要是因为shiro使用简单、灵活，所以现在越来越多的用户选择shiro。
+spring security 也是一个开源的权限管理框架，但是 spring security 依赖 spring 运行，而 shiro 就相对独立。
 
-## （三）基本功能
-
- 
+### 二、基本功能
 
 ![img](Shiro.resource/clip_image003.png)
 
-### Authentication
+- Authentication
 
-身份认证/登录，验证用户是不是拥有相应的身份；
+  身份认证/登录，**验证用户是不是拥有相应的身份**；
 
-### Authorization
+- Authorization
 
-授权，即权限验证，验证某个已认证的用户是否拥有某个权限；即判断用户是否能做事情，常见的如：验证某个用户是否拥有某个角色。或者细粒度的验证某个用户对某个资源是否具有某个权限；
+  授权，即权限验证，**验证某个已认证的用户是否拥有某个权限**；即判断用户是否能做事情，常见的如：验证某个用户是否拥有某个角色。或者细粒度的验证某个用户对某个资源是否具有某个权限；
 
-### Session Manager
-
-- 会话管理，即用户登录后就是一次会话，在没有退出之前，它的所有信息都在会话中；会话可以是普通JavaSE环境的，也可以是如Web环境的；
+- Session Manager
+  会话管理，即用户登录后就是一次会话，在没有退出之前，它的所有信息都在会话中；会话可以是普通 JavaSE 环境或者 web 环境的；
 
 - **Cryptography**：加密，保护数据的安全性，如密码加密存储到数据库，而不是明文存储；
 
@@ -46,87 +41,75 @@ Apache Shiro 是Java 的一个安全框架。Shiro 可以非常容易的开发�
 
 - **Remember Me**：记住我，这个是非常常见的功能，即一次登录后，下次再来的话不用登录了。
 
-  
+**Shiro** **不会去维护用户、维护权限；这些需要我们自己去设计/提供；然后通过**相应的接口注入给 Shiro 即可。
 
-  **Shiro** **不会去维护用户、维护权限；这些需要我们自己去设计/提供；然后通过**相应的接口注入给****Shiro即可。
-
- 
-
-## （四）Shiro架构
-
- 
+## 三、Shiro 架构
 
 ![img](Shiro.resource/clip_image004.png)
 
-### Subject
+- Subject「主体」
 
-​     Subject即主体，外部应用与subject进行交互，subject记录了当前操作用户，将用户的概念理解为当前操作的主体，可能是一个通过浏览器请求的用户，也可能是一个运行的程序。     Subject在shiro中是一个接口，接口中定义了很多认证授相关的方法，外部程序通过subject进行认证授，而subject是通过SecurityManager安全管理器进行认证授权
+  外部应用与 subject 进行交互，subject 记录了当前操作用户，将用户的概念理解为当前操作的主体，可能是一个通过浏览器请求的用户，也可能是一个运行的程序。 Subject 在 shiro 中是一个接口，接口中定义了很多认证授相关的方法，外部程序通过 subject 进行认证授权，而 subject 是通过 SecurityManager 安全管理器进行认证授权 。
 
-### SecurityManager 
+- SecurityManager 「安全管理器」
 
-​     SecurityManager即安全管理器，对全部的subject进行安全管理，它是shiro的核心，负责对所有的subject进行安全管理。通过SecurityManager可以完成subject的认证、授权等，实质上SecurityManager是通过Authenticator进行认证，通过Authorizer进行授权，通过SessionManager进行会话管理等。
+  对全部的 subject 进行安全管理，它是 shiro 的核心，负责对所有的 subject 进行安全管理。通过 SecurityManager 可以完成 subject 的认证、授权等，**实质上 SecurityManager 是通过Authenticator 进行认证，通过 Authorizer 进行授权，通过 SessionManager 进行会话管理等**。
 
-​     SecurityManager是一个接口，继承了Authenticator, Authorizer, SessionManager这三个接口。
+  SecurityManager 是一个接口，继承了 Authenticator, Authorizer, SessionManager 这三个接口。
 
-### Authenticator
+- Authenticator「认证器」
 
-​     Authenticator即认证器，对用户身份进行认证，Authenticator是一个接口，shiro提供ModularRealmAuthenticator实现类，通过ModularRealmAuthenticator基本上可以满足大多数需求，也可以自定义认证器。
+  对用户身份进行认证，Authenticator 是一个接口，shiro 提供 ModularRealmAuthenticator 实现类，通过ModularRealmAuthenticator 基本上可以满足大多数需求，也可以自定义认证器。
 
-### Authorizer
+- Authorizer「授权器」
 
-​     Authorizer即授权器，用户通过认证器认证通过，在访问功能时需要通过授权器判断用户是否有此功能的操作权限。
+- realm「领域」
 
-### 1.4.5 realm
+  相当于 datasource 数据源，securityManager 进行安全认证需要**通过 Realm 获取用户权限数据**，比如：如果用户身份数据在数据库那么 realm 就需要从数据库获取用户身份信息。
 
-​     Realm即领域，相当于datasource数据源，securityManager进行安全认证需要通过Realm获取用户权限数据，比如：如果用户身份数据在数据库那么realm就需要从数据库获取用户身份信息。
+​     注意：不要把 realm 理解成只是从数据源取数据，**在 realm 中还有认证授权校验的相关的代码**。
 
-​     注意：不要把realm理解成只是从数据源取数据，在realm中还有认证授权校验的相关的代码。
+- sessionManager「会话管理」
 
-### 1.4.6 sessionManager
+  shiro 框架定义了一套会话管理，它**不依赖 web 容器的 session**，所以 shiro 可以使用在非 web 应用上，也可以将分布式应用的会话集中在一点管理，此特性可使它实现单点登录。
 
-sessionManager即会话管理，shiro框架定义了一套会话管理，它不依赖web容器的session，所以shiro可以使用在非web应用上，也可以将分布式应用的会话集中在一点管理，此特性可使它实现单点登录。
+- SessionDAO「会话 DAO」
 
-### 1.4.7 SessionDAO
+  是对 session 会话操作的一套接口，比如要将 session 存储到数据库，可以通过 jdbc将会话存储到数据库。
 
-SessionDAO即会话dao，是对session会话操作的一套接口，比如要将session存储到数据库，可以通过jdbc将会话存储到数据库。
+- CacheManager「缓存管理」
 
-### 1.4.8 CacheManager
+  将用户权限数据存储在缓存，这样可以提高性能。
 
-CacheManager即缓存管理，将用户权限数据存储在缓存，这样可以提高性能。
+- Cryptography「密码管理」
 
-### 1.4.9 Cryptography
-
-​     Cryptography即密码管理，shiro提供了一套加密/解密的组件，方便开发。比如提供常用的散列、加/解密等功能。
+  shiro 提供了一套加密/解密的组件，方便开发。比如提供常用的散列、加/解密等功能。
 
  
 
-# 2 认证
+## 二、认证
 
-## 2.1 基本概念
+### （一） 基本概念
 
-### 2.1.1 身份验证
+- 身份验证
 
-即在应用中谁能证明他就是他本人。一般提供如他们的身份ID 一些标识信息来
+  即在应用中谁能证明他就是他本人。一般提供如他们的身份 ID 一些标识信息来表明他就是他本人，如提供身份证，用户名/密码来证明。
 
-表明他就是他本人，如提供身份证，用户名/密码来证明。
+  在 shiro 中，用户需要提供 principals （身份）和 credentials（证明）给 shiro，从而应用能验证用户身份：
 
-在 shiro 中，用户需要提供principals （身份）和credentials（证明）给shiro，从而应用能
+- principals
 
-验证用户身份：
+  身份，即**主体的标识属**性，可以是任何东西，如用户名、邮箱等，唯一即可。
 
-### 2.1.2 principals
+  **一个主体可以有多个 principals，但只有一个 Primary principals**，一般是用户名/密码/手机号。
 
-身份，即主体的标识属性，可以是任何东西，如用户名、邮箱等，唯一即可。
+- credentials
 
-一个主体可以有多个principals，但只有一个Primary principals，一般是用户名/密码/手机号。
+  证明/凭证，即只有主体知道的安全值，如密码/数字证书等。
 
-### 2.1.3 credentials
+  最常见的 principals 和 credentials 组合就是用户名/密码了。接下来先进行一个基本的身份认证。
 
-证明/凭证，即只有主体知道的安全值，如密码/数字证书等。
-
-最常见的principals和credentials组合就是用户名/密码了。接下来先进行一个基本的身份认证。
-
-## 2.2 认证流程
+### （二）认证流程
 
 ![img](Shiro.resource/clip_image005.png)
 

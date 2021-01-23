@@ -50,41 +50,41 @@
 
 
 
-### （二）RPC 简介
+### （二）RPC  简介
 
-**RPC（Remote Procedure Call，远程过程调用）**，是一种进程问通信方式，他是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间(通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
+**RPC（Remote Procedure Call，远程过程调用）**，是一种进程问通信方式，是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间(通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
 
 **分布式应用架构(远程过程调用)**：当垂直应用越来越多，应用之间交互不可避免，将核心业务抽取出来，作为独立的服务，逐渐形成稳定的服务中心，使前端应用能更快速的响应多变的市场需求。
+
 ![在这里插入图片描述](Dubbo 笔记.resource/20200610152020688.png)
-
-**RPC工作原理**
-![在这里插入图片描述](Dubbo 笔记.resource/2020061015260046.png)
-
-- Client像调用本地服务似的调用远程服务；
-
-- Client stub接收到调用后，将方法、参数序列化
-
-- 客户端通过sockets将消息发送到服务端
-
-- Server stub 收到消息后进行解码（将消息对象反序列化）
-
-- Server stub 根据解码结果调用本地的服务
-
-- 本地服务执行(对于服务端来说是本地执行)并将结果返回给Server stub
-
-- Server stub将返回结果打包成消息（将结果消息对象序列化）
-
-- 服务端通过sockets将消息发送到客户端
-
-- Client stub接收到结果消息，并进行解码（将结果消息发序列化）
-
-- 客户端得到最终结果。
 
 **RPC 调用分以下两种：**
 **同步调用**：客户方等待调用执行完成并返回结果。
 **异步调用**：客户方调用后不用等待执行结果返回，但依然可以通过回调通知等方式获取返回结果。若客户方不关心调用返回结果，则变成单向异步调用，单向调用不用返回结果。
 
-**RPC步骤解析**
+### （三）RPC 工作原理
+
+![在这里插入图片描述](Dubbo 笔记.resource/2020061015260046.png)
+
+- Client 像调用本地服务似的调用远程服务；
+
+- Client stub 接收到调用后，将方法、参数序列化
+
+- 客户端通过 sockets 将消息发送到服务端
+
+- Server stub 收到消息后进行解码（将消息对象反序列化）
+
+- Server stub 根据解码结果调用本地的服务
+
+- 本地服务执行(对于服务端来说是本地执行)并将结果返回给 Server stub
+
+- Server stub 将返回结果打包成消息（将结果消息对象序列化）
+
+- 服务端通过 sockets 将消息发送到客户端
+
+- Client stub 接收到结果消息，并进行解码（将结果消息发序列化）
+
+- 客户端得到最终结果。
 
 ```sequence
 Title: 标题： RPC 调用步骤解析
@@ -119,100 +119,84 @@ Client Stub --> Client: 11.返回调用结果
 
 
 
-## Dubbo核心概念
+## Dubbo 核心概念
 
-Dubbo官网: http://dubbo.apache.org/en-us/index.html
+[Dubbo官网]( http://dubbo.apache.org/en-us/index.html)
 
-Dubbo 是一款高性能、轻量级的开源Java RPC框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，服务自动注册和发现。分布式系统是将一个系统拆分为多个不同的服务
+Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，服务自动注册和发现。分布式系统是将一个系统拆分为多个不同的服务。
 
-## Dubbo特性一览
-
-![在这里插入图片描述](Dubbo 笔记.resource/20200610170234620.png)
-
-### dubbo设计架构
+### Dubbo 设计架构
 
 ![在这里插入图片描述](Dubbo 笔记.resource/20200610170317960.png)
-该图来自Dubbo官网，描述了服务注册中心、服务提供方、服务消费方、服务监控中心之间的调用关系。
 
-**服务提供者（Provider）**：暴露服务的服务提供方，服务提供者在启动时，向注册中心注册自己提供的服务。
-**服务消费者（Consumer）**: 调用远程服务的服务消费方，服务消费者在启动时，向注册中心订阅自己所需的服务，服务消费者，从提供者地址列表中，基于软负载均衡算法，选一台提供者进行调用，如果调用失败，再选另一台调用。
-**注册中心（Registry）**：注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于长连接推送变更数据给消费者。
-**监控中心（Monitor）**：服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到监控中心。
+- **服务提供者（Provider）**：暴露服务的服务提供方，服务提供者在启动时，向注册中心注册自己提供的服务。
+- **服务消费者（Consumer）**: 调用远程服务的服务消费方，服务消费者在启动时，向注册中心订阅自己所需的服务，服务消费者，从提供者地址列表中，基于软负载均衡算法，选一台提供者进行调用，如果调用失败，再选另一台调用。
+- **注册中心（Registry）**：注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于长连接推送变更数据给消费者。
+- **监控中心（Monitor）**：服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到监控中心。
 
-## Dubbo 的特性
+#### Dubbo 的特性
 
-**（1）服务注册中心**
+- 服务注册中心
+  - 相比 Hessian 类 RPC 框架，Dubbo 有自己的服务中心， 写好的服务可以注册到服务中心， 客户端从服务中心寻找服务，然后再到相应的服务提供者机器获取服务。通过服务中心可以实现集群、负载均衡、高可用(容错) 等重要功能。
+  - 服务中心一般使用 Zookeeper 实现，也有 Redis 和其他一些方式。以使用 Zookeeper 作为服务中心为例，服务提供者启动后会在 Zookeeper 的 /dubbo 节点下创建提供的服务节点，包含服务提供者 ip、port 等信息。服务提供者关闭时会从 Zookeeper 中移除对应的服务。
+  - 服务使用者会从注册中心 Zookeeper中寻找服务，同一个服务可能会有多个提供者，Dubbo 会帮我们找到合适的服务提供者，也就是针对服务提供者的负载均衡。
 
-- 相比Hessian类RPC框架，Dubbo有自己的服务中心， 写好的服务可以注册到服务中心， 客户端从服务中心寻找服务，然后再到相应的服务提供者机器获取服务。通过服务中心可以实现集群、负载均衡、高可用(容错) 等重要功能。
-- 服务中心一般使用zookeeper实现，也有redis和其他一些方式。以使用zookeeper作为服务中心为例，服务提供者启动后会在zookeeper的/dubbo节点下创建提供的服务节点，包含服务提供者ip、port等信息。服务提供者关闭时会从zookeeper中移除对应的服务。
-- 服务使用者会从注册中心zookeeper中寻找服务，同一个服务可能会有多个提供者，Dubbo会帮我们找到合适的服务提供者，也就是针对服务提供者的负载均衡。
+- 负载均衡
+  - 当同一个服务有多个提供者在提供服务时，客户端通过以下几种方案来正确的选择提供者 现负载均衡。
+  - random 随机选提供者，并可以给提供者设置权重。
+  - roundrobin 轮询选择提供者
+  - leastactive 最少活跃调用数，相同活跃数的随机，活跃数：指调用前后计数差。使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。
+  - consistenthash 一致性hash，相同参数的请求发到同一台机器上。
 
-**（2）负载均衡**
+- 简化测试，允许直连提供者
+  在开发阶段为了方便测试，通常系统客户端能指定调用某个服务提供者，那么可以在引用服务时加一个 url 参数去指定服务提供者。 配置如下：` <dubbo:reference id="xxxService"interface="com.alibaba.xxx.XxxService"url="dubbo://localhost:20890"/>`
 
-- 当同一个服务有多个提供者在提供服务时，客户端如何正确的选择提供者实 现负载均衡呢？dubbo也给我们提供了几种方案：
-    - random `随机`选提供者，并可以给提供者设置权重
-    - roundrobin `轮询`选择提供者
-    - leastactive 最少活跃调用数，相同活跃数的随机，活跃数：指调用前后计数差。使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。
-    - consistenthash 一致性hash，相同参数的请求发到同一台机器上。
+- 服务版本，服务分组
+  在 Dubbo 配置文件中可以通过制定版本实现连接制定提供者，也就是通过服务版本可以控制服务的不兼容升级；当同一个服务有多种实现时，可以使用服务分组进行区分。
 
-**（3）简化测试，允许直连提供者**
-在开发阶段为了方便测试，通常系统客户端能指定调用某个服务提供者，那么可以在引用服务时加一个url参数去指定服务提供者。 配置如下：
+## Dubbo 环境搭建  Zookeeper  注册中心
 
-```
- <dubbo:reference id="xxxService"interface="com.alibaba.xxx.XxxService"url="dubbo://localhost:20890"/>
-1
-```
+### 步骤一：搭建  Ｚookeeper  注册中心环境
 
-**（4）服务版本，服务分组**
-在Dubbo配置文件中可以通过制定版本实现连接制定提供者，也就是通过服务版本可以控制服务的不兼容升级；当同一个服务有多种实现时，可以使用服务分组进行区分。
+[Dubbo 官方文档]( http://dubbo.apache.org/en-us/docs/user/quick-start.html) 、官网下载安装 [Zookeeper](http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-3.4.14/)。
 
-## Dubbo 环境搭建 ZooKeeper 注册中心
+> 在 bin 文件下，启动 zkServer.cmd 会有报错，处理需要在 condif 文件中将 `zoo_sample.cfg` 文件复制一份，将名字改为 `zoo.cfg`。
 
-### 搭建 zookeeper 注册中心环境
+在 zookeeper 的文件夹下创建 data 文件夹，打开 zoo.cfg，修改 datadir，将 dataDir 数据保存为我们自定义的文件中(此步骤可省略) 。新增 `dataDir=../data`
 
-Dubbo官方文档: http://dubbo.apache.org/en-us/docs/user/quick-start.html
-在zookeeper官网下载zookeeper
-http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-3.4.14/
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610172645700.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-在bin文件下，启动zkServer.cmd会有报错，处理需要在condif文件中将zoo_sample.cfg文件复制一份，将名字改为zoo.cfg。
-`在zookeeper的文件夹下创建data文件夹，打开zoo.cfg，修改datadir，将dataDir数据保存为我们自定义的文件中`(此步骤可省略)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610173149263.png)
-配置完毕后，我们再次在conf下启动zkServer.cmd，这次可以成功启动
+配置完毕后，我们再次在 conf 下启动 zkServer.cmd，这次可以成功启动
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610173356318.png)
-继续运行zkCli.cmd，可以连接到zookeeper的服务器。
+继续运行 zkCli.cmd，可以连接到 Zookeeper 的服务器。
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610173644649.png)
-**此时，我们zookeeper的注册中心及环境以及搭建完毕。**
 
-### zookeeper监控中心的配置
+### 步骤二：Zookeeper 监控中心的配置
 
-**1、下载dubbo-admin**
+- 首先下载 dubbo-admin
 
-dubbo-admin下载地址 ：https://github.com/apache/dubbo-admin/tree/master
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612083918324.png)
-**2、解压后进入目录修改指定zookeeper地址**
-进入如下地址：dubbo-admin-master\dubbo-admin\src\main\resources\application.properties"
-将zookeeper的监控中心的地址配置为本地端口
+  [dubbo-admin下载地址](https://github.com/apache/dubbo-admin/tree/master)
 
-```
-#注册中心的地址
-dubbo.registry.address=zookeeper://127.0.0.1:2181
-```
+- 解压后进入目录修改指定 zookeeper 地址
+  进入如下地址：dubbo-admin-master\dubbo-admin\src\main\resources\application.properties"
+  将 zookeeper 的监控中心的地址配置为本地端口，增加如下配置即可
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610175513207.png)
-配置完毕后，我们在dubo-zookeeper\dubbo-admin-master\dubbo-admin文件夹下cmd打包测试下。
+  ```properties
+  #注册中心的地址
+  dubbo.registry.address=zookeeper://127.0.0.1:2181
+  ```
 
-```
-mvn clean package
-```
+  配置完毕后，我们在dubo-zookeeper\dubbo-admin-master\dubbo-admin文件夹下 cmd 中使用 `mvn clean package`打包测试下。
 
-在target文件中打包完成的jar包
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610175909584.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-cmd命令 `java -jar dubbo-admin-0.0.1-SNAPSHOT.jar`运行打包好的jar包
-启动成功后，可以看到一个7001的端口
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610180201513.png)
-此时我们的zookeeper的服务都为启动状态，在浏览器中访问 localhost:7001，访问到注册中心，输入账号密码root。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610180358177.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-此时，我们zookeeper监控中心的配置完成。注意，要访问到监控中心，一定要启动zookeeper注册中心的启动类
+  在 target 文件中打包完成的 jar 包
+  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610175909584.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+  cmd命令 `java -jar dubbo-admin-0.0.1-SNAPSHOT.jar`运行打包好的jar包
+  启动成功后，可以看到一个7001的端口
+  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610180201513.png)
+
+  此时我们的zookeeper的服务都为启动状态，在浏览器中访问 localhost:7001，访问到注册中心，输入账号密码root。
+
+  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610180358177.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+
+  此时，我们zookeeper监控中心的配置完成。注意，要访问到监控中心，一定要启动zookeeper注册中心的启动类
 
 ## Dubbo环境搭建，创建提供者、消费者项目
 

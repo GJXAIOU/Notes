@@ -1,17 +1,8 @@
----
-tags: [MySQL]
-style: summer
----
-
 # MySQL 必知必会 Chapter11-20
-
-@toc
 
 ## 章十一：使用数据处理函数
 
-减少使用函数，但是函数的可移植性却不强；
-
-### 文本处理函数
+### （一）文本处理函数
 
 函数 | 说明
 ---|---
@@ -28,141 +19,139 @@ upper()   |    将串转换为大写
 
 实例：`SELECT cust_name FROM customers WHERE soundex(contact) = soundex('Y. Lie');` # 按发音搜索
 
-### 日期和时间处理函数 
-|函数| 说明
-|---|---
- adddate()      |   增加一个日期（天，周等）
- addtime()     |    增加一个时间（时、分等）
-curdate()     | 返回当前日期 
- curtime()     |    返回当前时间 
- date()         |    返回日期时间的日期部分 
- datediff()     |    计算两个日期之差 
- date_add()   |      高度灵活的日期运算函数 
- date_format()   |  返回一个格式化的日期或时间串 
- day()           |   返回一个日期的天数部分 
- dayofweek()    |     对于一个日期，返回对应的星期几 
- hour()          |    返回一个时间的小时部分 
- minute()      |    返回一个时间的分钟部分 
- month()     |         返回一个日期的月份部分 
- now()       |       返回当前日期和事件 
- second()   |       返回一个时间的秒部分 
- time()       |        返回一个日期时间的时间部分 
- year()       |       返回一个日期的年份部分 |
+### （二）日期和时间处理函数 
+|函数 | 说明|
+|---|---|
+| adddate()      |   增加一个日期（天，周等）|
+| addtime()     |    增加一个时间（时、分等）|
+|curdate()     | 返回当前日期 |
+| curtime()     |    返回当前时间 |
+|date()         |    返回日期时间的日期部分 |
+| datediff()     |    计算两个日期之差 |
+| date_add()   |      高度灵活的日期运算函数 |
+| date_format()   |  返回一个格式化的日期或时间串 |
+| day()           |   返回一个日期的天数部分 |
+| dayofweek()    |     对于一个日期，返回对应的星期几 |
+| hour()          |    返回一个时间的小时部分 |
+| minute()      |    返回一个时间的分钟部分 |
+| month()     |         返回一个日期的月份部分 |
+| now()       |       返回当前日期和事件 |
+| second()   |       返回一个时间的秒部分 |
+| time()       |        返回一个日期时间的时间部分 |
+| year()       |       返回一个日期的年份部分 |
+
 默认使用日期的格式为：`yyyy-mm-dd`
 
 
-### 数值处理函数
+### （三）数值处理函数
 仅仅用于处理数值数据
+
 |函数| 说明|
-|---|---
-abs()         |   返回一个数的绝对值 
-cos()         |   返回一个角度的余弦
-exp()         |   返回一个数的指数值
-mod()         |   返回除操作的余数 
-pi()          |   返回圆周率 
-sin()         |   返回一个角度的正弦 
-sqrt()        |   返回一个数的平方根 
-tan()         |   返回一个角度的正切
-
-
+|---|---|
+|abs()         |   返回一个数的绝对值 |
+|cos()         |   返回一个角度的余弦|
+|exp()         |   返回一个数的指数值|
+|mod()         |   返回除操作的余数 |
+|pi()          |   返回圆周率 |
+|sin()         |   返回一个角度的正弦 |
+|sqrt()        |   返回一个数的平方根 |
+|tan()         |   返回一个角度的正切|
 
 ## 章十二：汇总数据
 聚类函数：运行在行组上，计算和返回单个值的函数
-|SQL 聚集函数 |
-|---|--- 
-avg()       |     返回某列的平均值 
-COUNT()     |     返回某列的行数 
-max()       |     返回某列的最大值 
-min()       |     返回某列的最小值 
-SUM()       |     返回某列值之和 
 
-- avg()实例：
-  - AVG()返回products表中所有产品的平均价格
+|SQL 聚集函数 | 说明 |
+|---|--- |
+|avg()       |     返回某列的平均值 |
+|COUNT()     |     返回某列的行数 |
+|max()       |     返回某列的最大值 |
+|min()       |     返回某列的最小值 |
+|SUM()       |     返回某列值之和 |
+
+- `avg()`实例：
+  - `AVG()` 返回 products 表中所有产品的平均价格
 `SELECT avg(prod_price) AS avg_price FROM products;`
-  - avg()只能作用于单列，获取 多列的平均值，要使用多个avg()
+  - `avg()`只能作用于单列，获取 多列的平均值，要使用多个 `avg()`
 `SELECT avg(item_price) AS avg_itemprice,avg(quantity) AS avg_quantity FROM orderitems;`
-  - **avg()函数忽略列值为 null 的行**；
+  - **`avg()` 函数忽略列值为 null 的行**；
 
-- COUNT()实例
-  - **COUNT(*)对表中行的数目进行计数，不忽略空值** 
+- COUNT() 实例
+  - **`COUNT(*)` 对表中行的数目进行计数，不忽略空值** 
 `SELECT COUNT(*) AS num_cust FROM customers; `
-  - **使用COUNT(column)对特定列中具有值的行进行计数，忽略NULL值**
+  - **使用 `COUNT(column)` 对特定列中具有值的行进行计数，忽略 NULL 值**
 `SELECT COUNT(cust_email) AS num_cust FROM customers;`  
 
 - max() & min()
-  - MAX()返回products表中最贵的物品的价格
+  - MAX() 返回 products 表中最贵的物品的价格
 `SELECT max(prod_price) AS max_price FROM products;`
-  - 在用于文本数据时，如果数据按相应的列排序，则MAX()返回最后一行
+  - 在用于文本数据时，如果数据按相应的列排序，则 `MAX()` 返回最后一行
 `SELECT max(prod_name) FROM products; `
-  - MIN()返回products表中最便宜物品的价格
+  - `MIN()` 返回 products 表中最便宜物品的价格
 `SELECT min(prod_price) AS min_price FROM products;`
-  - 在用于文本数据时，如果数据按相应的列排序，则MIN()返回最前面一行
+  - 在用于文本数据时，如果数据按相应的列排序，则 `MIN()` 返回最前面一行
 `SELECT min(prod_name) FROM products;` 
-  - MAX()函数忽略列值为 null 的行；在用于文本数据时，如果数据按相应的列排序，在 max() 返回最后一行；
-
-
+  - `MAX()` 函数忽略列值为 null 的行；在用于文本数据时，如果数据按相应的列排序，在 max() 返回最后一行；
 
 - SUM()
-  - 检索所订购物品的总数（所有quantity值之和）
+  - 检索所订购物品的总数（所有 quantity 值之和）
  `SELECT SUM(quantity) AS ordered FROM orderitems WHERE order_num = 20005;`
-  - 订单20005的总订单金额
+  - 订单 20005 的总订单金额
 `SELECT SUM(quantity * item_price) AS total_price FROM orderitems WHERE order_num = 20005;`
 
-- 聚类不同值DISTINCT
+- 聚类不同值 DISTINCT
   - 使用了 DISTINCT 参数，因此平均值只考虑各个不同的价格
 `SELECT avg(DISTINCT prod_price) AS avg_price FROM products WHERE vend_id = 1003;`
-  - DISTINCT 只能作用于COUNT(),不能用于COUNT(*)
-  - DISTINCT 同max(),min()的结合使用，没有意义 
+  - DISTINCT 只能作用于 `COUNT()`，不能用于 `COUNT(*)`。
+  - DISTINCT 同 `max()`, `min()` 的结合使用，没有意义 。
 
 - 组合聚类函数 
-4个聚集计算:物品的数目，产品价格的最高、最低以及平均值 
-```sql
-SELECT 
-    COUNT(*) AS num_items,
-    MIN(prod_price) AS price_min,
-    MAX(prod_price) AS price_max,
-    AVG(prod_price) AS price_avg
-FROM
-    products;
-```
+  4 个聚集计算:物品的数目，产品价格的最高、最低以及平均值 
+
+  ```sql
+  SELECT 
+      COUNT(*) AS num_items,
+      MIN(prod_price) AS price_min,
+      MAX(prod_price) AS price_max,
+      AVG(prod_price) AS price_avg
+  FROM
+      products;
+  ```
 
 
 ## 章十三： 分组计算    
 
 允许将数据分为多个逻辑组，以便能对每个组进行聚集计算；
-主要有：GROUP BY 和 HAVING 子句；**WHERE过滤行，HAVING过滤分组 **, 
-**WHERE在数据分组前进行过滤，HAVING在数据分组后进行过滤**
+主要有：GROUP BY 和 HAVING 子句；**WHERE 过滤行，HAVING 过滤分组 **, **WHERE 在数据分组前进行过滤，HAVING 在数据分组后进行过滤**。
 
 - GROUP BY 分组 
   - **如果分组列中具有 null 值，将 null 作为一个分组返回，如果有多组 null 值，则将他们分为一组**；
-  - **==GROUP BY 子句必须出现在 WHERE 子句之后，order by 子句之前==**；
+  - **==GROUP BY 子句必须出现在 WHERE 子句之后，ORDER BY 子句之前==**；
   - 示例：
-按vend_id**排序并分组**数据
+按 vend_id **排序并分组**数据
 `SELECT vend_id, COUNT(*) AS num_prods FROM products GROUP BY vend_id;`
-使用WITH ROLLUP关键字，可以得到每个分组以及每个分组汇总级别（针对每个分组）的值，下述语句得到所有分组COUNT(*)的和14 ，比上面显示结果在最后一栏加入一行所有的数据总数；
+使用 WITH ROLLUP 关键字，可以得到每个分组以及每个分组汇总级别（针对每个分组）的值，下述语句得到所有分组COUNT(*)的和14 ，比上面显示结果在最后一栏加入一行所有的数据总数；
 `SELECT vend_id, COUNT(*) AS num_prods FROM products GROUP BY vend_id with rollup;`
 
-- HAVING子句 过滤分组 
+- HAVING 子句 过滤分组 
   - **WHERE 过滤指定的是行而不是分组，HAVING 过滤的是分组**；同时 HAVING 支持所有的 WHERE 操作符；
   - 示例： COUNT(*) >=2（两个以上的订单）的那些分组
 `SELECT cust_id, COUNT(*) AS orders FROM orders GROUP BY cust_id HAVING COUNT(*)>=2;`
 或者使用：`SELECT cust_id, COUNT(*) AS orders FROM orders GROUP BY cust_id HAVING orders >= 2;`
 
-==WHERE 在数据分组前进行过滤，HAVING 在数据分组之后进行过滤==；
-
-- WHERE和HAVING组合使用 （进行递进式查询）
-列出具有2个（含）以上、价格为10（含）以上的产品的供应商
+- WHERE 和 HAVING 组合使用 （进行递进式查询）
+列出具有 2 个（含）以上、价格为 10（含）以上的产品的供应商
 `SELECT vend_id,COUNT(*) AS num_prods FROM products WHERE prod_price >=10 GROUP BY vend_id HAVING COUNT(*)>=2;`
-不加WHERE条件，结果不同 
+不加 WHERE 条件，结果不同 
 `SELECT vend_id,COUNT(*) AS num_prods FROM products GROUP BY vend_id HAVING COUNT(*) >=2;`
 
 
 
 - 分组和排序 
-检索总计订单价格大于等于50的订单的订单号和总计订单价格
-`SELECT order_num,SUM(quantity * item_price) AS ordertotal FROM orderitems GROUP BY order_num HAVING SUM(quantity * item_price) >=50;`
+  检索总计订单价格大于等于50的订单的订单号和总计订单价格
+  `SELECT order_num,SUM(quantity * item_price) AS ordertotal FROM orderitems GROUP BY order_num HAVING SUM(quantity * item_price) >=50;`
 
-按总计订单价格排序输出
+  按总计订单价格排序输出
+
 ```sql
 SELECT 
     order_num, SUM(quantity * item_price) AS ordertotal
@@ -183,16 +172,17 @@ ORDER BY ordertotal;
 
 **一般在使用 GROUP BY 子句时，同时给出 order by 子句，保证数据正确排序；**
 
-- SELECT子句总结及顺序 
-子句     |      说明            |           是否必须使用 
-|---|---|---
-SELECT     |   要返回的列或表达式  |     是 
-FROM       |     从中检索数据的表  |       仅在从表选择数据时使用 
-WHERE      |      行级过滤        |         否 
-GROUP BY   |    分组说明          |         仅在按组计算聚集时使用 
-HAVING     |     组级过滤          |         否 
-order by   |     输出排序顺序      |         否
-limit      |    要检索的行数       |           否 
+- SELECT 子句总结及顺序 
+
+  |子句     |      说明            |           是否必须使用 |
+  |---|---|---|
+  |SELECT     |   要返回的列或表达式  |     是 |
+  |FROM       |     从中检索数据的表  |       仅在从表选择数据时使用 |
+  |WHERE      |      行级过滤        |         否 |
+  |GROUP BY   |    分组说明          |         仅在按组计算聚集时使用 |
+  |HAVING     |     组级过滤          |         否 |
+  |order by   |     输出排序顺序      |         否|
+  |limit      |    要检索的行数       |           否 |
 
 
 
@@ -203,7 +193,7 @@ limit      |    要检索的行数       |           否
 
 - 利用子查询进行过滤
 执行过程为从内往外执行，
-列出订购物品TNT2的所有客户
+列出订购物品 TNT2 的所有客户
 ```sql
 SELECT cust_name, cust_contact
 FROM customers
@@ -217,7 +207,7 @@ WHERE cust_id IN (SELECT cust_id
 - 子查询不要嵌套太多；
 - 子查询不仅可以与 IN 操作符连用，还可以和`=`以及 `<>`等其他操作符连用；
 - 作为计算字段使用子查询
-显示customers 表中每个客户的订单总数
+显示 customers 表中每个客户的订单总数
 `SELECT cust_name,cust_state, (SELECT COUNT(*) FROM orders WHERE orders.cust_id = customers.cust_id) AS orders FROM customers order by cust_name;`
 
 

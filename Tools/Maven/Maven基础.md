@@ -2,7 +2,8 @@
 
 - Maven 是一个自动化的构建工具，服务于 Java 平台的项目构建和 jar 包依赖管理；
 - 并不是一个框架，用于帮助开发者管理框架所需的 jar 包；
-- 
+
+  
 
 
 ### 作用
@@ -18,10 +19,6 @@
 
 ### Maven 约定的目录结构
 
-![Maven约定的结构]($resource/Maven%E7%BA%A6%E5%AE%9A%E7%9A%84%E7%BB%93%E6%9E%84.png)
-
-
-**设置**
 - groupid :一般为公司域名
 - artifactid:项目名称
 - version:项目版本
@@ -55,8 +52,6 @@ provided:此依赖范围,对于编译和测试 classpath有效,而对运行时�
 
 ### 依赖的传递性
 A 依赖B,B依赖C,A能否使用C呢?那要看B依赖C的范围是不是 compile，如果是则可用,否则不可用。
-
-![依赖的传递性]($resource/%E4%BE%9D%E8%B5%96%E7%9A%84%E4%BC%A0%E9%80%92%E6%80%A7.png)
 
 
 
