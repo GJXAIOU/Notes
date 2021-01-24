@@ -271,7 +271,7 @@ InnoDB 中有两种 Checkpoint：区别在于：每次刷新多少页到磁盘�
 
     
 
-    ## 三、Master Thread 工作方式
+## 三、Master Thread 工作方式
 
 ### （一）1.0.X 之前的 Master Thread
 
@@ -331,7 +331,7 @@ goto loop;
     在以上的过程中，InnoDB存储引擎会先判断过去10秒之内磁盘的IO操作是否小于200次， 如果是，InnoDB存储引擎认为当前有足够的磁盘IO操作能力， 因此将100 个脏页刷新到磁盘。 接着，InnoDB存储引擎会合并插入缓冲。 不同千每秒一次操作时可能发生的合并插人缓冲操作， 这次的合并插人缓冲操作总会在这个阶段进行。 之后，InnoDB存储引擎会再进行一次将日志缓冲刷新到磁盘的操作。 这和每秒一次时发生的操作是一样的。
     接着InnoDB存储 引擎会进行 一步执行full purge操 作， 即删除 无用的Undo页。 对表进行update、 delete这类操作时， 原先的行被标记为删除， 但是因为一致性读(consistentread)的关系， 需要保留这些行版本的信息。 但是在full purge过程中，InnoDB存储引擎会判断当前事务系统中已被删除的行是否可以删除， 比如有时候可能还有查询操作需要读取之前版本的undo信息， 如果可以删除，lnnoDB会立即将其删除。
 
-### Background Loop
+#### Background Loop
 
 接着来看backgroundloop, 若当前没有用户活动（数据库空闲时）或者数据库关闭(shutdown), 就会切换到这个循环。backgroundloop会执行以下操作：
 
@@ -342,7 +342,7 @@ goto loop;
 
 若flushloop中也没有什么事情可以做了，InnoDB存储引擎会切换到suspend_loop, 将MasterThread挂起，等待事件的发生。若用户启用(enable)了InnoDB存储 引擎，却没有使用任何InnoDB存储引擎的表，那么MasterThread总是处千挂起的状态。
 
-### 1.2.X 之前的 Master Thread
+### （二）1.2.X 之前的 Master Thread
 
 上面操作的次数和每次刷新次数都是硬编码，无论磁盘怎么快都利用不完全，同时当写入密集的时候，脏页无法及时刷新到磁盘中，则当宕机产生的时候由于很多数据还没有刷新会磁盘会导致恢复的时间很久。
 
@@ -373,9 +373,47 @@ srv_master_thread log flush and writes: 1777 log writes only: 69
 
 
 
-### 1.2 版本中的 Master Thread
+### （三）1.2 版本中的 Master Thread
 
 区别一，分别使用 `srv_master_do_active_tasks()` 表示每秒中的动作， 使用 `srv_master_do_idle_tasks()` 表示每 10 秒的操作。
 
 区别二：将 脏页刷新从 Master Thread 分离为单独线程 Page Cleaner Thread 进行处理。
+
+
+
+
+
+## 四、InnoDB 关键特性
+
+### （一）插入缓冲（Insert Buffer）
+
+插入缓冲不是缓冲池的一个组成部分，InnoDB 缓冲池中有一个 Insert Buffer 信息，但是 Insert Buffer 和数据页一样也是物理页的组成部分。
+
+
+
+### （二）两次写（Double Write）
+
+
+
+
+
+### （三）自适应哈希索引（Adaptive Hash Index）
+
+
+
+
+
+
+
+### （四）异步 IO（Async IO)
+
+
+
+
+
+
+
+### (五)刷新邻接页（Flush Neighbor Page）
+
+
 
