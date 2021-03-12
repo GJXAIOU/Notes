@@ -1,29 +1,34 @@
+# ProGit
 
+[TOC]
+
+## 一、起步
 
 ### 初始运行 Git 前的配置
 
-每台计算机上只需要配置一次，程序升级时会保留配置信息。 你可以在任何时候再次通过运行命令来修改它们。
+每台计算机上只需要配置一次，程序升级时会保留配置信息，可随时修改。
 
 Git 自带一个 git config 的工具来帮助设置控制 Git 外观和行为的配置变量。 这些变量存储在三个不同的位
 置：
 
-- /etc/gitconfig 文件: 包含系统上每一个用户及他们仓库的通用配置（系统配置文件，需要管理员权限）。 **如果在执行 git config 时带上 `--system` 选项，那么它就会读写该文件中的配置变量**。 
+- `/etc/gitconfig` 文件: 包含系统上每一个用户及他们仓库的通用配置（是系统配置文件，需要管理员权限）。 **如果在执行 `git config` 时带上 `--system` 选项，那么它就会读写该文件中的配置变量**。 
 
-- ~/.gitconfig 或 ~/.config/git/config 文件：只针对**当前用户**。 你可以传递 --global 选项让 Git
-    读写此文件，这会对你系统上 **所有** 的仓库生效。
-
+- `~/.gitconfig` 或 `~/.config/git/config` 文件：只针对**当前用户**。 如果加上 `--global` 选项即对系统上 **所有** 的仓库生效。
+    
 - 当前使用仓库的 Git 目录中的 config 文件（即 .git/config）：针对该仓库。 你可以传递 --local 选
-    项让 Git 强制读写此文件，虽然默认情况下用的就是它。。 （当然，你需要进入某个 Git 仓库中才能让该选
-    项生效。）
-    每一个级别会覆盖上一级别的配置，所以 .git/config 的配置变量会覆盖 /etc/gitconfig 中的配置变量。
+    项让 Git 强制读写此文件（默认使用）。 （需进入某个 Git 仓库中才能让该选项生效。）
+    
+    
+    
+    从下往上会：下一层级覆盖上一层级配置。
     在 Windows 系统中，Git 会查找 $HOME 目录下（一般情况下是 `C:\Users\$USER` ）的 .gitconfig 文件。
     Git 同样也会寻找 /etc/gitconfig 文件，但只限于 MSys 的根目录下，即安装 Git 时所选的目标位置。 如果
     你在 Windows 上使用 Git 2.x 以后的版本，那么还有一个系统级的配置文件，Windows XP 上在
     C:\Documents and Settings\All Users\Application Data\Git\config ，Windows Vista 及更新
     的版本在 C:\ProgramData\Git\config 。此文件只能以管理员权限通过 git config -f <file> 来修
-    改。
+改。
     查看所有的配置以及它们所在的文件命令：`git config --list --show-origin`
-
+    
     ```shell
     C:\Users\gjx16>git config --list --show-origin
     file:E:/Program/VersionControl/Git/etc/gitconfig        core.fscache=true
@@ -77,9 +82,9 @@ file:C:/Users/gjx16/.gitconfig  GJXAIOU
 
 `命令  help` 或者 `命令 -h`， 如 `git config -h`
 
-### 二、Git 基础
+## 二、Git 基础
 
-#### 获取 Git 仓库
+### 获取 Git 仓库
 
 通常有两种获取 Git 项目仓库的方式：
 - 将尚未进行版本控制的本地目录转换为 Git 仓库；（在已存在目录中初始化仓库）
@@ -112,7 +117,7 @@ file:C:/Users/gjx16/.gitconfig  GJXAIOU
 
 编辑过某些文件之后，由于自上次提交后你对它们做了修改，Git 将它们标记为已修改文件。 在工作时，你可以择性地将这些修改过的文件放入暂存区，然后提交所有已暂存的修改，如此反复。
 
-![image-20210310151249594](Untitled.resource/image-20210310151249594.png)
+![image-20210310151249594](Progit.resource/image-20210310151249594.png)
 
 #### 检查当前文件状态
 
@@ -219,7 +224,7 @@ git rm 原File
 git add 新File
 ```
 
-#### 查看提交历史
+### 查看提交历史
 
 使用 `git log` 按照时间顺序列出所有提交（最近更新在最上方），会列出每个提交的 SHA-1 校验和、作者名字、邮箱、提交时间和提交说明。
 
@@ -436,7 +441,7 @@ git config --global alias.last  'log -1 HEAD'
 
 
 
-## Git  分支
+## 三、Git  分支
 
 ### 分支简介
 
@@ -467,7 +472,263 @@ $ git commit -m 'The initial commit of my project'
 
 创建分支本质是在**当前的提交对象上创建一个指针**，命令为：`git branch 新分支名称`。Git 通过 HAED 的特殊指针来确定当前在哪一个分支上，该指针指向当前所在的本地分支（可以将 HEAD 想象为当前分支的别名）。如果是在 master 分支上创建新的分支，则上面命令执行完成之后 HEAD 指针仍然指向 master 分支，因为只是创建了分支，并没有切换。
 
-![image-20210311213433027](ProGit.resource/image-20210311213433027.png)
+<img src="ProGit.resource/image-20210311213433027.png" alt="image-20210311213433027" style="zoom:50%;" />
+
+
+
+可以使用 `git log --online(可选） --decorate`  查看每个分支当前所指的对象。
+
+```shell
+$ git log --oneline --decorate
+f30ab (HEAD -> master, testing) add feature #32 - ability to add new
+formats to the central interface
+34ac2 Fixed bug #1328 - stack overflow under certain conditions
+98ca9 The initial commit of my project
+```
+
+当前 master 和 testing 分支均指向校验和以 f30ab 开头的提交对象，HEAD 指针指向 master 分支。
+
+如果想创建一个分支的同时切换过去使用 `git checkout -b 新分支名称`
+
+#### 分支切换
+
+使用 `git checkout 已存在分支名` 切换到一个已存在的分支，则 HEAD 指向切换后的分支。
+
+<img src="ProGit.resource/image-20210312102644472.png" alt="image-20210312102644472" style="zoom:50%;" />
+
+如果修改文件之后再次使用 `git commit`进行提交之后，testing 分支向前移动，但是 master 分支没有移动，其仍然指向运行 git checkout 时所指的对象。
+
+<img src="ProGit.resource/image-20210312102805005.png" alt="image-20210312102805005" style="zoom:50%;" />
+
+如果此时使用 `git checkout master` 切换为 master 分支之后，该命令首先使得 HEAD 指向了 master 分支，同时将工作目录恢复成 master 分支所指向的快照内容，即如果此时修改则项目开始于一个较旧的版本，即忽略 testing 分支的修改而向另一个方向修改。
+
+<img src="ProGit.resource/image-20210312103158253.png" alt="image-20210312103158253" style="zoom:50%;" />
+
+如果此时修改某些文件并且提交了，相当于在 master 分支上进行了修改，两次改动是基于不同的分支的，形成了项目分叉。
+
+<img src="ProGit.resource/image-20210312103521958.png" alt="image-20210312103521958" style="zoom: 67%;" />
+
+使用 `git log --oneline --decorate --graph --all` 查看分叉历史，包括提交历史、各个分支指向以及项目的分支分叉情况。
+
+```shell
+$ git log --oneline --decorate --graph --all
+* cb975df (HEAD -> refactor, notes/refactor) Feat:Git 基础知识
+* 51382d0 Feat:ProGit；增加 Git 笔记
+* 6790d6b Modify:修改 Dubbo 笔记
+*   2c764c7 Refactor: 批量修改笔记结构
+|\
+| * 229de5e Refactor: RPC 笔记补充
+| *   3142b8c Merge branch 'refactor' of https://github.com/GJXAIOU/Notes into refactor
+| |\
+| * | bb54c10 modify:Java8 新特性笔记修改完善
+* | | f59a360 Refactor: 批量更新笔记结构
+| |/
+|/|
+* | 6804154 Refactor:完成完善 Swagger 笔记
+|/
+* 2e3d476 Feat:Java8 修改
+```
+
+由于 **Git 的分支实质上仅是包含所指对象校验和（长度为 40 的 SHA-1 值字符串）的文件**，所以它的创建和销毁都异常高效。 创建一个新分支就相当于往一个文件中写入 41 个字节（40 个字符和 1 个换行符）。每次提交都会记录父对象。
+
+### 分支的新建和合并
+
+需求逻辑如下：
+
+- 开发某个网站，为实现某个新的用户需求，创建一个分支。
+
+- 在这个分支上开展工作。
+- 正在此时，你突然接到一个电话说有个很严重的问题需要紧急修补。 你将按照如下方式来处理：
+    - 切换到你的线上分支（production branch）。
+    - 为这个紧急任务新建一个分支，并在其中修复它。
+    - 在测试通过之后，切换回线上分支，然后合并这个修补分支，最后将改动推送到线上分支。
+    - 切换回你最初工作的分支上，继续工作。
+
+实现：
+
+在 master 分支上做了一些修改，然后解决 #53 号问题需要新建并切换到该解决问题分支，然后在 #53 号问题上进行修改并且做了提交， 则 iss53 分支不断向前推进，即 HEAD 指针指向 iss53 分支。
+
+<img src="ProGit.resource/image-20210312110738112.png" alt="image-20210312110738112" style="zoom:50%;" />
+
+<img src="ProGit.resource/image-20210312110722575.png" alt="image-20210312110722575" style="zoom:50%;" />
+
+<img src="ProGit.resource/image-20210312111027708.png" alt="image-20210312111027708" style="zoom:50%;" />
+
+现在需要解决一个线上突发问题，首先需要切换到 master 分支，但是，在你这么做之前，要留意你的工作目录和暂存区里那些还没有被提交的修改， 它可能会和你*即将检出的分支产生冲突从*而阻止 Git 切换到该分支。 最好的方法是，在你切换分支之前，保持好一个干净的状态。 有一些方法可以绕过这个问题（即，暂存（stashing） 和 修补提交（commit amending））， 我们会在 贮藏与清理 中看到关于这两个命令的介绍。 现在，我们假设你已经把你的修改全部提交了，这时你可以切换回 master分支了：
+
+使用 `git checkout master` 切换分支之后，此时工作目录和开始  #53 问题之前一样。因为当切换分支的时候， Git 会重置工作目录，使其看起来像回到了你在那个分支上最后一次提交的样子。Git 会自动添加、删除、修改文件以确保此时你的工作目录和这个分支最后一次提交时的样子一模一样。
+
+创建新的分支 hotfix 并解决问题之后进行提交：
+
+![image-20210312111635633](ProGit.resource/image-20210312111635633.png)
+
+最后将该 hotfix 分支合并到 master 分支上从而部署到线上。
+
+```shell
+git checkout master
+git merge hotfix
+Updating f42c576..3a0874c
+Fast-forward
+index.html | 2 ++
+1 file changed, 2 insertions(+)
+```
+
+在合并的时候，你应该注意到了“快进（fast-forward）”这个词。 由于你想要合并的分支 hotfix 所指向的提
+交 C4 是你所在的提交 C2 的直接后继， 因此 Git 会直接将指针向前移动。换句话说，当你试图合并两个分支时， 如果顺着一个分支走下去能够到达另一个分支，那么 Git 在合并两者的时候， 只会简单的将指针向前推进（指针右移），因为这种情况下的合并操作没有需要解决的分歧——这就叫做 “快进（fast-forward）”。此时最后的修改已经在 master 分支所指向的提交快照中。
+
+<img src="ProGit.resource/image-20210312112737854.png" alt="image-20210312112737854" style="zoom:50%;" />
+
+修复紧急问题之后需要回到原来工作，首先删除   hotfix 分支（因为 master 分支已经指向同一位置，因此不在需要 hotfix 分支），然后切换到 iss53 继续修改。
+
+<img src="ProGit.resource/image-20210312113522048.png" alt="image-20210312113522048" style="zoom:50%;" />
+
+你在 hotfix 分支上所做的工作并没有包含到 iss53 分支中。 如果你需要拉取 hotfix 所做的修改，你可以使
+用 git merge master 命令将 master 分支合并入 iss53 分支，或者你也可以等到 iss53 分支完成其使命，
+再将其合并回 master 分支。
+
+#### 分支合并
+
+将已经修正的 #53 号问题的 iss53 号分支合入  master 分支：
+
+```shell
+$ git checkout master
+Switched to branch 'master'
+$ git merge iss53
+Merge made by the 'recursive' strategy.
+index.html | 1 +
+1 file changed, 1 insertion(+)
+```
+
+因为开发历史从一个更早的地方开始开叉（diverged），因此 master 分支所在的提交并不是 iss53 分支所在提交的直接祖先，此时 Git 会使用两个分支末端所指的快照（C4 和 C5）以及这两个分支的公共祖先（C2）进行三方合并。
+
+<img src="ProGit.resource/image-20210312134633398.png" alt="image-20210312134633398" style="zoom: 67%;" />
+
+和之前将分支指针向前推进所不同的是，Git 将此次三方合并的结果做了一个新的快照并且自动创建一个新的提交指向它。 这个被称作一次合并提交，它的特别之处在于他有不止一个父提交。同时因为修改已经合并进来了，所以可以使用 `git branch -d iss53`删除 iss53 分支。
+
+<img src="ProGit.resource/image-20210312141736468.png" alt="image-20210312141736468" style="zoom:67%;" />
+
+#### 遇到冲突时的分支合并
+
+即在两个分支中，对同一个文件的同一个部分进行了不同的修改，如 #53 号问题和 hotfix 分支的修改都涉及同一个文件的同一处，在合并它们的时候就出产生冲突。
+
+```shell
+$ git merge iss53
+Auto-merging index.html
+CONFLICT (content): Merge conflict in index.html
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+此时 Git 做了合并，但是没有自动创建一个新的合并提交，Git 会暂停等待解决合并产生的冲突。这是可以使用 `git status` 命令来查看哪些因包含合并冲突而处于未合并（unmerged）状态的文件。
+
+```shell
+$ git status
+On branch master
+You have unmerged paths.
+(fix conflicts and run "git commit")
+Unmerged paths:
+(use "git add <file>..." to mark resolution)
+both modified: index.html
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+任何因包含合并冲突而有待解决的文件，都会以未合并状态标识出来。 Git 会在有冲突的文件中加入标准的冲突解决标记，这样你可以打开这些包含冲突的文件然后手动解决冲突。 出现冲突的文件会包含一些特殊区段，看起来像下面这个样子：
+
+```shell
+<<<<<<< HEAD:index.html
+<div id="footer">contact : email.support@github.com</div>
+=======
+<div id="footer">
+please contact us at support@github.com
+</div>
+>>>>>>> iss53:index.html
+```
+
+这表示 HEAD 所指示的版本（也就是你的 master 分支所在的位置，因为你在运行 merge 命令的时候已经检出到了这个分支）在这个区段的上半部分（`=======` 的上半部分），而 iss53 分支所指示的版本在 `=======` 的下半部分。 为了解决冲突，你必须选择使用由 `=======` 分割的两部分中的一个，或者你也可以自行合并这些内容。 例如，你可以通过把这段内容换成下面的样子来解决冲突：
+
+```shell
+<div id="footer">
+please contact us at email.support@github.com
+</div>
+```
+
+上述的冲突解决方案仅保留了其中一个分支的修改，并且 <<<<<<< , `=======` , 和 >>>>>>> 这些行被完全删除了。 在你解决了所有文件里的冲突之后，对每个文件使用 git add 命令来将其标记为冲突已解决。 一旦暂存这些原本有冲突的文件，Git 就会将它们标记为冲突已解决。
+
+等你退出合并工具之后，Git 会询问刚才的合并是否成功。 如果你回答是，Git 会暂存那些文件以表明冲突已解决： 你可以再次运行 git status 来确认所有的合并冲突都已被解决：
+
+如果你对结果感到满意，并且确定之前有冲突的的文件都已经暂存了，这时你可以输入 git commit 来完成合
+并提交。 默认情况下提交信息看起来像下面这个样子：如果你觉得上述的信息不够充分，不能完全体现分支合并的过程，你可以修改上述信息， 添加一些细节给未来检视这个合并的读者一些帮助，告诉他们你是如何解决合并冲突的，以及理由是什么。
+
+### 分支管理
+
+直接运行 `git branch` 会得到当前所有分支列表。
+
+```shell
+$ git branch
+  checkout
+  master
+* refactor
+```
+
+其中 `*` 表示它代表现在检出的那一个分支（也就是说，当前 HEAD 指针所指向的分支），即如果提交则 refactor 分支会向前移动。如果查看每个分支的最后来一次提交可以使用 `git branch -v`。
+
+- 选项一：`git branch --merged` 可以过滤上述列表中已经合并到当前分支的分支。
+
+    查询结果中分支前面没有 `*`的分支通常可以删除，因为他们的工作已经整合到另一个分支中了。
+
+- 选项二：`--no-merged` 可以过滤上述列表中尚未合并到当前分支的分支。
+
+    因为该部分分支包含未提交的，所以只能通过 `-D` 来强制删除。
+
+### 分支开发工作流
+
+开发过程中通常有多个分支，例如稳定的 master 分支和临时开发分支，不同分支具有不同的稳定性，当其具有一定的稳定性之后，再将其合并入具有更高级别稳定性的分支中。将其线性结构和流水线结构显示结果如下：
+
+![image-20210312193612420](ProGit.resource/image-20210312193612420.png)
+
+#### 主题分支
+
+像上面的 iss53 和 hotfix 等为了一个小需求临时创建修改之后又删除的分支。
+
+注意：新建和合并分支的时候，所有的操作都在本地 Git 版本库中，没有与服务器进行交互。
+
+
+
+### 远程分支
+
+远程引用是对远程仓库的引用（指针），包括分支、标签等等。可以使用 `git ls-remote <remote>` 或者 `git remote show <remote>` 来显式获取远程引用的完整列表和远程分支的更多信息。
+
+远程跟踪分支是远程分支状态的引用。也是无法移动的本地引用，只有进行网络通信 Git 就会为用户移动他们以精确反映远程仓库的状态。可以将其看做书签，该分支在远程仓库中的位置就是你最后一次连接到他们的位置。
+
+命名方式：`<remote>/<branch>` 如果想看最后一次与远程仓库 origin 通信时候 master 分支的状态，可以查看 origin/master 分支。
+
+这可能有一点儿难以理解，让我们来看一个例子。 假设你的网络里有一个在 git.ourcompany.com 的 Git 服
+务器。 如果你从这里克隆，Git 的 clone 命令会为你自动将其命名为 origin，拉取它的所有数据， 创建一个
+指向它的 master 分支的指针，并且在本地将其命名为 origin/master。 Git 也会给你一个与 origin 的
+master 分支在指向同一个地方的本地 master 分支，这样你就有工作的基础。
+
+<img src="ProGit.resource/image-20210312200111878.png" alt="image-20210312200111878" style="zoom:67%;" />
+
+如果你在本地的 master 分支做了一些工作，在同一段时间内有其他人推送提交到 git.ourcompany.com
+并且更新了它的 master 分支，这就是说你们的提交历史已走向不同的方向。 即便这样，只要你保持不与
+origin 服务器连接（并拉取数据），你的 origin/master 指针就不会移动。
+
+<img src="ProGit.resource/image-20210312201521299.png" alt="image-20210312201521299" style="zoom:67%;" />
+
+如果要与远程仓库同步数据，运行 `git fetch <remote>`，会从远程服务器中抓取本地没有的数据，并且更新本地数据库，然后移动 `<remote>/master`指针到更新之后的位置。
+
+<img src="ProGit.resource/image-20210312201729283.png" alt="image-20210312201729283" style="zoom: 67%;" />
+
+#### 推送
+
+当你想要公开分享一个分支时，需要将其推送到有写入权限的远程仓库上。 本地的分支并不会自动与远程仓库同步——你必须显式地推送想要分享的分支。 这样，你就可以把不愿意分享的内容放到私人分支上，而将需要和别人协作的内容推送到公开分支。
+
+
+
+
+
+
+
+
 
 
 
