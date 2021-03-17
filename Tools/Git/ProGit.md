@@ -181,7 +181,7 @@ $ git commit -m "Feat:ProGit；增加 Git 笔记";
 如果手动使用 `rm` 将工作目录中文件删除，则使用 `git status` 则该文件就处于 「Changes not staged for  commit（未暂存清单）」中，则在使用 `git rm`删除该文件，则下一次提交的时候该文件就不再纳入版本管理了。如果要删除之前修改过或已经放到暂存区的文件，则必须使用
 强制删除选项 -f（译注：即 force 的首字母）。 这是一种安全特性，用于防止误删尚未添加到快照的数据，这样的数据不能被 Git 恢复。
 
-如果想将文件从 Git 仓库（包括暂存区）删除（不想让 Git 追踪），但是本地工作目录保留，使用 `git rum --cached`即可。同时 `git rm` 后面可以使用匹配模式。
+如果想将文件从 Git 仓库（包括暂存区）删除（不想让 Git 追踪），但是本地工作目录保留，使用 `git rm --cached`即可。同时 `git rm` 后面可以使用匹配模式。
 
 #### 移动文件
 
@@ -624,10 +624,10 @@ please contact us at email.support@github.com
 $ git branch
   checkout
   master
-* refactor
+* refactor   # 表示现在检出（HEAD 指针指向）的分支，如果有提交则该分支向前移动
 ```
 
-其中 `*` 表示它代表现在检出（HEAD 指针指向）的那一个分支，即如果提交则 refactor 分支会向前移动。如果查看每个分支的最后来一次提交可以使用 `git branch -v`。
+查看每个分支的最后来一次提交信息使用 `git branch -v`。
 
 - 选项一：`git branch --merged` 可以过滤上述列表中已经合并到当前分支的分支。
 
@@ -641,7 +641,7 @@ $ git branch
 
 开发过程中不同分支具有不同的稳定性，当其具有一定的稳定性之后，再将其合并入具有更高级别稳定性的分支中。将其线性结构和流水线结构显示结果如下：
 
-<img src="ProGit.resource/image-20210312193612420.png" alt="image-20210312193612420" style="zoom:67%;" />
+<img src="ProGit.resource/image-20210312193612420.png" alt="image-20210312193612420" style="zoom: 80%;" />
 
 #### 主题分支
 
@@ -655,46 +655,182 @@ $ git branch
 
 远程跟踪分支是远程分支状态的引用。也是无法移动的本地引用，只有进行网络通信 Git 就会为用户移动他们以精确反映远程仓库的状态。可以将其看做书签，该分支在远程仓库中的位置就是你最后一次连接到他们的位置。
 
-远程分支命名方式：`<remote>/<branch>` 如果想看最后一次与远程仓库 origin 通信时候 master 分支的状态，可以查看 origin/master 分支。
+远程分支命名方式：`<remote>/<branch>` 。
 
-示例：假设你的网络里有一个在 git.ourcompany.com 的 Git 服务器。 如果你从这里克隆，Git 的 clone 命令会为你自动将其命名为 origin，拉取它的所有数据， 创建一个指向它的 master 分支的指针，并且在本地将其命名为 origin/master。 Git 也会给你一个与 origin 的 master 分支在指向同一个地方的本地 master 分支。
+示例：Git 的 clone 命令会自动将远程服务器命名为 origin，拉取它的所有数据， 创建一个指向它的 master 分支的指针（即本地名为 origin/master）。和指向同一个地方的本地 master 分支。
 
 <img src="ProGit.resource/image-20210312200111878.png" alt="image-20210312200111878" style="zoom:67%;" />
 
-如果你在本地的 master 分支做了一些工作，在同一段时间内有其他人推送提交到 git.ourcompany.com
-并且更新了它的 master 分支，这就是说你们的提交历史已走向不同的方向。**但是只要你保持不与**
-**origin 服务器连接（并拉取数据），你的 origin/master 指针就不会移动。**
+如本地 master 分支就行修改，在同一段时间内有其他人推送提交到远程服务器并更新了它的 master 分支，。**但是只要你保持不与 origin 服务器连接（并拉取数据），本地的 origin/master 指针就不会移动。**
 
 <img src="ProGit.resource/image-20210312201521299.png" alt="image-20210312201521299" style="zoom:67%;" />
 
-如果要与远程仓库同步数据，运行 `git fetch <remote>`，会从远程服务器中抓取本地没有的数据，并且更新本地数据库，然后移动 `<remote>/master`指针到更新之后的位置。
+使用 `git fetch <remote>` 与远程仓库同步数据，即从远程服务器中抓取本地没有的数据，并且更新本地数据库，然后移动 `<remote>/master`指针到更新之后的位置。
 
 <img src="ProGit.resource/image-20210312201729283.png" alt="image-20210312201729283" style="zoom: 67%;" />
 
 #### 推送
 
-当你想要公开分享一个分支时，需要将其推送到有写入权限的远程仓库上。 本地的分支并不会自动与远程仓库同步（必须显式推送）。则可以把不愿意分享的内容放到私人分支上，而将需要和别人协作的内容推送到公开分支：`git  push <remote> <branch>`。
+当你想要公开分享一个分支时（推送到远程仓库中），因为本地的分支不会自动与远程仓库同步（必须显式推送）。则可以把不愿意分享的内容放到私人分支上，而将需要和别人协作的内容推送到公开分支。
 
-如使用 `git push  origin  serverfix` 则 Git 会自动将 `serverfix` 分支名称展开为 `refs/heads/serverfix:refs/heads/serverfix`，即推送本地的 `serverfix` 分支来更新远程仓库上的
+推送命令为：`git push <remote> <branch>`，如果本地和远程分支名称不同可以：`git push <remote> <localBranch>:<remoteBranch>`
 
-`serverfix` 分支。如果本地分支和远程名称不一致，可以使用 `git push origin serverfix:otherfix` 来将本地的 `serverfix` 分支推送作为远程的 `otherfix` 分支。
+> 如使用 `git push origin serverfix`， 则 Git 会自动将 `serverfix` 分支名称展开为 `refs/heads/serverfix:refs/heads/serverfix`，即推送本地的 `serverfix` 分支来更新远程仓库上的`serverfix` 分支。如果本地分支和远程名称不一致，可以使用 `git push origin serverfix:otherfix` 来将本地的 `serverfix` 分支推送作为远程的 `otherfix` 分支。
 
-下一次其他协作者使用 `git fetch origin`从服务器上抓取数据时，他们会在本地生成一个远程分支 `origin/serverfix`，指向服务器的 `serverfix`分支的引用。但是本地不会自动生成一个新的 `serverfix` 分支，只有一个不可修改的 `origin/serverfix` 指针。
+- 下一次其他协作者使用 `git fetch origin`从服务器上抓取数据时，他们会在本地生成一个远程分支 `origin/serverfix`，指向服务器的 `serverfix`分支的引用。但是本地不会自动生成一个新的 `serverfix` 分支，只有一个不可修改的 `origin/serverfix` 指针。【但是 master 会】。
 
-如果想将远程分支工作合到自己当前的分支：`git merge origin/serverfix`。
+- 如想将远程分支工作合到自己当前的分支：`git merge origin/serverfix`。
 
-如果自己也想有用于工作的 `serverfix` 分支，则使用 `git checkout -b serverfix  origin/serverfix`，并且起点位于 `origin/serverfix`。
+- 如自己也想有用于工作的 `serverfix` 分支，则使用 `git checkout -b serverfix  origin/serverfix`，并且起点位于 `origin/serverfix`。
 
 #### 跟踪分支
 
 从一个远程跟踪分支检出一个本地分支会自动创建所谓的“跟踪分支”（它跟踪的分支叫做“上游分支”）。
-跟踪分支是与远程分支有直接关系的本地分支。 如果在一个跟踪分支上输入 git pull，Git 能自动地识别去哪个服务器上抓取、合并到哪个分支。
+**跟踪分支是与远程分支有直接关系的本地分支**。 如果在一个跟踪分支上输入 `git pull`，Git 能自动地识别去哪个服务器上抓取、合并到哪个分支。
 
 当克隆一个仓库时，它通常会自动地创建一个跟踪 origin/master 的 master 分支。当然可以自定义跟踪的仓库和分支：`git checkout -b <branch> <remote>/<branch>`  或者使用  `git checkout --track  <remote>/<branch>`。当然如果尝试检出的分支(a) 不存在且（b)刚好只有一个名字与之匹配的远程分支，则使用 `git checkout serverfix` 就会自动创建一个跟踪分支。如果本地分支和远程分支设置不同名称：`git checkout -b  localName  origin/serverfix`，则本地分支 localName 会自动从  origin/serverfix 拉取。
 
-设置已有的本地分支跟踪一个刚刚拉取下来的远程分支，或者想要修改正在跟踪的上游分支， 你可以在任意时间使用 -u 或 --set-upstream-to 选项运行 git branch 来显式地设置。`git branch -u origin/serverfix`
+设置已有的本地分支跟踪一个刚刚拉取下来的远程分支，或者想要修改正在跟踪的上游分支， 你可以在任意时间使用 -u 或 --set-upstream-to 选项来显式地设置。`git branch -u origin/serverfix`
 
 使用 `git branch -vv` 查看所有跟踪分支（本地分支）。包括每一个分支正在跟踪哪一个远程分支以及与本地分支是否有领先、落后或者都有。
+
+```shell
+$ git branch -vv
+# iss53 在跟踪 origin/iss53， ahead 2 表示本地有 2 个提交还没有推送到服务器上
+iss53 7e424c3 [origin/iss53: ahead 2] forgot the brackets
+# 本地追踪远程，并且分支是最新的
+master 1ae2a45 [origin/master] deploying index fix
+# 领先 3 落后 1 即服务器上有 1 次提交没有合并并且本地有 3 次提交还没有推送。
+* serverfix f8674d9 [teamone/server-fix-good: ahead 3, behind 1] this should do it
+# testing 分支没有跟踪任何远程分支
+testing 5ea463a trying something new
+```
+
+注：以上数据来源于从每个服务器上最后一次抓取数据，如果要获取最新先使用 `git fetch -all` 先拉取一下最新信息。
+
+#### 拉取
+
+`git fetch <remote>` 从远程主机服务器上拉取本地没有数据时候，**不会修改工作目录中的内容**。只会获取数据然后让用户自行合并。如果只想拉取某个特定分支数据：`get fetch <remote> <branchName>`。拉取下来之后可以通过 `git log -p FETCH_HEAD` 来查看拉取下来更新的数据信息，看有没有冲突。 但是 `git pull` 含义相当于 `git fetch` 加上 `git merge`，即查找当前分支所跟踪的服务器与分支，然后从服务器抓取数据之后尝试与本地指定分支合并。`git pull <remote>  <remoteBranch>:<localBranch>`，如果是与当前分支合并，则最后的 `:<localBranch>` 可以省略。
+
+![img](ProGit.resource/16c84ff492a9de1a)
+
+#### 删除远程分支
+
+通常是通过远程分支已经完成所有合作功能并且将其合并到远程仓库的 master 之后，使用 `git push <remote> --delete  <分支名称>` 进行远程分支删除，该命令只是从服务器上移除这个指针，但是 Git  服务器通常保留数据一段时间直到垃圾回收，所以恢复较为容易。
+
+### 变基（整合不同分支的修改方式之一）
+
+整合来自不同分支的修改主要两种方法：`merge` 和 `rebase`。
+
+#### 变基的基本操作
+
+如果开发任务分叉到两个不同的分支，然后各自提交了更新，则在整合分支时候的方法：
+
+- 方法一：使用 `merge`命令，会将两个分支的最新快照（C3）和 （C4）以及两者最近的共同祖先 C2 进行三方合并，合并的结果就是生成一个新的快照并提交。
+
+<img src="ProGit.resource/image-20210315110607401.png" alt="image-20210315110607401" style="zoom:67%;" />
+
+- 方法二：**变基**：提取在 C4 中引入的补丁和修改，然后在 C3 的基础上应用一次。即使用 `rebase` 命令将提交到某一个分支上的所有修改都移至另一个分支上。
+
+变基的实现步骤：首先将检出 `experiment` 分支，然后将其变基到 `master` 分支上。它的原理是首先找到这两个分支（即当前分支 experiment、变基操作的目标基底分支 master） 的最近共同祖先 C2，然后对比当前分支相对于该祖先的历次提交，提取相应的修改并存为临时文件， 然后将当前分支指向目标基底 C3, 最后以此将之前另存为临时文件的修改依序应用。最后切换为 master 分支，进行一次快进合并。
+
+<img src="ProGit.resource/image-20210315112334696.png" alt="image-20210315112334696" style="zoom:80%;" />
+
+<img src="ProGit.resource/image-20210315112548540.png" alt="image-20210315112548540" style="zoom:80%;" />
+
+结果中 C4’ 指向的快照和之前 C5 指向的快照一样，但是经过变基的分支记录看起来是串行的，更加简洁。如向某个其他人维护的项目贡献代码时。 你首先在自己的分支里进行开发，当开发完成时你需要先将你的代码变基到origin/master 上，然后再向主项目提交修改。 这样的话，该项目的维护者就不再需要进行整合工作，只需要快进合并便可。
+
+变基是将一系列提交按照原有次序依次应用到另一分支上，而合并是把最终结果合在一起。最终结果都一致。
+
+#### 更有趣的变基例子。 P96 – 103
+
+
+
+
+
+## 服务器上的 Git
+
+架设公共的 git 服务器、选择服务器通讯协议，或者使用仓库托管服务器避免自己搭建和维护。
+
+### 协议
+
+#### 本地协议：Local
+
+用于团队每个成员都可以访问一个共享的文件系统，其中远程版本就是同一台主机上的另一个目录。
+
+
+
+## 分布式 Git （可以看一下）
+
+
+
+
+
+
+
+## GitHub
+
+### 账户的创建和配置
+
+可以通过 https:// 协议访问，如果仅仅是 clone  甚至不需要注册。
+
+如果使用  SSH 远程，需要配置一个公钥。
+
+### 对项目作出贡献
+
+首先对项目进行 Fork 进行派生，然后 GitHub 会在你的空间中创建一个完全属于你的项目副本，且你对其有推送权限。
+
+通过这种方式，项目的管理者不再需要忙着把用户添加到贡献者列表并给予他们推送权限。 人们可以派生这个项目，将修改推送到派生出的项目副本中，并通过创建拉取请求（Pull Request，简称 PR）来让他们的改动进入源版本库。 创建了拉取请求后，就会开启一个可供审查代码的板块，项目的拥有者和贡献者可以在此讨论相关修改，直到项目拥有者对其感到满意，并且认为这些修改可以被合并到版本库。
+
+流程通常如下：
+1. 派生一个项目
+2. 从 master 分支创建一个新分支
+3. 提交一些修改来改进项目
+4. 将这个分支推送到 GitHub 上
+5. 创建一个拉取请求 Pull Request =》PR
+6. 讨论，根据实际情况继续修改
+7. 项目的拥有者合并或关闭你的拉取请求
+8. 将更新后的 master 分支同步到你的派生中
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
