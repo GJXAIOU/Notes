@@ -6,6 +6,8 @@
 
 - 【强制】代码中的**命名均不能以下划线或美元符号开始或者结束**；
 
+- 【强制】代码和注释中都要避免使用任何语言的种族歧视性词语；如将 blackList / whiteList 换成：blockList / allowList
+
 - 【强制】**类名使用 UpperCamelCase 风格**，必须遵从驼峰形式，但以下情形例外：DO / BO /DTO / VO / AO  
 
 - 【强制】**方法名、参数名、成员变量、局部变量都统一使用 lowerCamelCase 风格**，必须遵从驼峰形式。
@@ -17,29 +19,62 @@
 - 【强制】中括号是数组类型的一部分，数组定义如下：String[] args;
 
 - 【强制】POJO 类中**布尔类型的变量，都不要加 is**，否则部分框架解析会引起序列化错误。反例：定义为基本数据类型 Boolean isDeleted；的属性，它的方法也是 isDeleted()，RPC
-框架在反向解析的时候，“以为”对应的属性名称是 deleted，导致属性获取不到，进而抛出异常。
+  框架在反向解析的时候，“以为”对应的属性名称是 deleted，导致属性获取不到，进而抛出异常。
+
+  说明：在本文MySQL规约中的建表约定第一条，表达是与否的变量采用 `is_xxx` 的命名方式，所以，需要在 `<resultMap>` 设置从 `is_xxx` 到 `xxx` 的映射关系。
 
 - 【强制】**包名统一使用小写，点分隔符之间有且仅有一个自然语义的英语单词**。**包名统一使用单数形式，但是类名如果有复数含义，类名可以使用复数形式。**
 
-- 【推荐】为了达到代码自解释的目标，任何自定义编程元素在命名时，使用尽量完整的单词组合来表达其意。
+- 【强制】**避免在子父类的成员变量之间、或者不同代码块的局部变量之间采用完全相同的命名，使可理解性降低**。 说明：子类、父类成员变量名相同，即使是public类型的变量也能够通过编译，另外，局部变量在同一方法内的不同代码块中同名也是合法的，这些情况都要避免。对于非setter/getter的参数名称也要避免与成员变量名称相同。 反例：
+
+    ```java
+    public class ConfusingName {
+    	public int stock;
+        
+    	// 非setter/getter的参数名称，不允许与本类成员变量同名
+    	public void get(String alibaba) {
+    		if (condition) {
+    			final int money = 666;
+    			// ...
+    		}
+            
+    		for (int i = 0; i < 10; i++) {
+    			// 在同一方法体中，不允许与其它代码块中的money命名相同
+    			final int money = 15978;
+    			// ...
+    		}
+    	}
+    }
+    
+    class Son extends ConfusingName {
+    	// 不允许与父类的成员变量名称相同
+    	public int stock;
+    }
+    ```
+
+- 【推荐】为了达到代码自解释的目标，任何自定义编程元素在命名时，使用尽量完整的单词组合来表达其意。杜绝不规范的缩写
 正例：从远程仓库拉取代码的类命名为 PullCodeFromRemoteRepository。
+
+- 【推荐】在常量与变量的命名时，**表示类型的名词放在词尾**，以提升辨识度。 正例：startTime / workQueue / nameList / TERMINATED_THREAD_COUNT
 
 - 【推荐】**如果模块、接口、类、方法使用了设计模式，在命名时体现出具体模式**。说明：将设计模式体现在名字中，有利于阅读者快速理解架构设计理念。
 正例：public class OrderFactory; public class LoginProxy;
 
 - 【推荐】**接口类中的方法和属性不要加任何修饰符号**（public 也不要加），保持代码的简洁性，并**加上有效的 Javadoc 注释**。尽量**不要在接口里定义变量**，如果一定要定义变量，肯定是与接口方法相关，并且是整个应用的基础常量。
-正例：接口方法签名：void f();
-接口基础常量表示：String COMPANY = "alibaba";
+正例：接口方法签名：`void f();`
+接口基础常量表示：`String COMPANY = "alibaba";`
 说明：JDK8 中接口允许有默认实现，那么这个 default 方法，是对所有实现类都有价值的默认实现。
 
 - 接口和实现类的命名有两套规则：
-  - 1）【强制】对于 Service 和 DAO 类，基于 SOA 的理念，暴露出来的服务一定是接口，内部的实现类用 Impl 的后缀与接口区别。
-正例：CacheServiceImpl 实现 CacheService 接口。
+  - 【强制】对于 Service 和 DAO 类，基于 SOA 的理念，暴露出来的服务一定是接口，内部的实现类用 Impl 的后缀与接口区别。
+正例：`CacheServiceImpl` 实现 `CacheService` 接口。
 
-  - 2）【推荐】如果是形容能力的接口名称，取对应的形容词做接口名（通常是–able 的形式）。正例：AbstractTranslator 实现 Translatable。
+  - 【推荐】如果是形容能力的接口名称，取对应的形容词做接口名（通常是–able 的形式）。
 
+      正例：AbstractTranslator 实现 Translatable。
+  
 -  【参考】**枚举类名建议带上 Enum 后缀，枚举成员名称需要全大写，单词间用下划线隔开**。说明：枚举其实就是特殊的常量类，且构造方法被默认强制是私有。
-正例：枚举名字为 ProcessStatusEnum 的成员名称：SUCCESS / UNKOWN_REASON。
+正例：枚举名字为 `ProcessStatusEnum` 的成员名称：`SUCCESS` / `UNKOWN_REASON`。
 
 - 【参考】各层命名规约：
   - A) Service/DAO 层方法命名规约
@@ -59,30 +94,54 @@
 ## (二) 常量定义
 
 - 【强制】**不允许任何未经定义的常量直接出现在代码中**。
+
+    ```java
+    反例：
+    // 本例中，开发者A定义了缓存的key，然后开发者B使用缓存时少了下划线，即key是"Id#taobao"+tradeId，导致出现故障
+    String key = "Id#taobao_" + tradeId;
+    cache.put(key, value);
+    ```
+
 - 【强制】**long 或者 Long 初始赋值时，使用大写的 L，不能是小写的 l**，小写容易跟数字 1 混淆，造成误解。
 
 -  【推荐】==不要使用一个常量类维护所有常量，按常量功能进行归类，分开维护。==
 说明：大而全的常量类，非得使用查找功能才能定位到修改的常量，不利于理解和维护。正例：缓存相关常量放在类 CacheConsts 下；系统配置相关常量放在类 ConfigConsts 下。
 
 - 【推荐】常量的复用层次有五层：跨应用共享常量、应用内共享常量、子工程内共享常量、包内共享常量、类内共享常量。
+  
   - 1） 跨应用共享常量：放置在二方库中，通常是 client.jar 中的 constant 目录下。
-  - 2） 应用内共享常量：放置在一方库中，通常是 modules 中的 constant 目录下。
-反例：易懂变量也要统一定义成应用内共享常量，两位攻城师在两个类中分别定义了表示
-“是”的变量：
-类 A 中：public static final String YES =  "yes";
-类 B 中：public static final String YES = "y"; A.YES.equals(B.YES)，预期是 true，但实际返回为 false，导致线上问题。
-
-  * 3） 子工程内部共享常量：即在当前子工程的 constant 目录下。
+  
+- 2） 应用内共享常量：放置在一方库中，通常是 modules 中的 constant 目录下。
+  反例：易懂变量也要统一定义成应用内共享常量，两位攻城师在两个类中分别定义了表示
+  “是”的变量：
+  类 A 中：`public static final String YES =  "yes";`
+  类 B 中：`public static final String YES = "y"; `
+  
+    `A.YES.equals(B.YES)`，预期是 true，但实际返回为 false，导致线上问题。
+  
+* 3） 子工程内部共享常量：即在当前子工程的 constant 目录下。
   * 4） 包内共享常量：即在当前包下单独的 constant 目录下。
   * 5） 类内共享常量：直接在类内部 private static final 定义。
+  
+- 【推荐】如果变量值仅在一个固定范围内变化用enum类型来定义。 说明：如果存在名称之外的延伸属性应使用enum类型，下面正例中的数字就是延伸信息，表示一年中的第几个季节。 正例：
 
-- 【推荐】如果**变量值仅在一个范围内变化，且带有名称之外的延伸属性，定义为枚举类**。下面正例中的数字就是延伸信息，表示星期几。
-正例：public  Enum  {  MONDAY(1),  TUESDAY(2),  WEDNESDAY(3),  THURSDAY(4),  FRIDAY(5),  SATURDAY(6), SUNDAY(7);}
+  ```java
+  public enum SeasonEnum {
+  	SPRING(1), SUMMER(2), AUTUMN(3), WINTER(4);
+  	private int seq;
+  	SeasonEnum(int seq) {
+          this.seq = seq;
+  	}
+  	public int getSeq() {
+  		return seq;
+  	}
+  }
+  ```
 
 ## (三) 代码格式
 
 - 【强制】大括号的使用约定。如果是 **大括号内为空，则简洁地写成{}** 即可，不需要换行；
-  
+
 - 【强制】 左/右 小括号和字符之间不出现空格；
 
 - 【强制】**if/for/while/switch/do 等保留字与括号之间都必须加空格**。
@@ -92,27 +151,40 @@
 
 - 【强制】**注释的双斜线与注释内容之间有且仅有一个空格**。
 
-- 【强制】单行字符数限制不超过 120 个，超出需要换行，换行时遵循如下原则：
-  1） 第二行相对第一行缩进 4 个空格，从第三行开始，不再继续缩进，参考示例。
-  2） **运算符与下文一起换**行。
-  3） 方法调用的**点符号与下文一起换行**。
-  4） 方法调用时，**多个参数，需要换行时，在逗号后进行**。
-  5） 在括号前不要换行，见反例。正例：
-```java
-StringBuffer sb = new  StringBuffer();
-// 超过 120 个字符的情况下，换行缩进 4 个空格，点号和方法名称一起换行
-sb.append("zi").append("xin")...
-  .append("huang")...
-  .append("huang")...
-  .append("huang");
-```
+- 【强制】在进行类型强制转换时，右括号与强制转换值之间不需要任何空格隔开。
 
+- 【强制】单行字符数限制不超过 120 个，超出需要换行，换行时遵循如下原则：
+  
+  - 第二行相对第一行缩进 4 个空格，从第三行开始，不再继续缩进，参考示例。
+  - **运算符与下文一起换**行。
+  - 方法调用的**点符号与下文一起换行**。
+  - 方法调用时，**多个参数，需要换行时，在逗号后进行**。
+  - 在括号前不要换行（即换行之后不能最前面就是括号）：
+  
+  ```java
+  StringBuffer sb = new  StringBuffer();
+  // 超过 120 个字符的情况下，换行缩进 4 个空格，点号和方法名称一起换行
+  sb.append("zi").append("xin")...
+    .append("huang")...
+    .append("huang")...
+    .append("huang");
+  ```
+  
 - 【强制】方法参数在定义和传入时，**多个参数逗号后边必须加空格**。
 
-- 【强制】IDE 的 text file encoding 设置为 UTF-8; IDE 中文件的换行符使用 Unix 格式，不要使用 Windows 格式。
+- 【强制】IDE 的 `text file encoding` 设置为 UTF-8; IDE 中文件的换行符使用 Unix 格式，不要使用 Windows 格式。
 
-- 【推荐】**方法体内的执行语句组、变量的定义语句组、不同的业务逻辑之间或者不同的语义之间插入一个空行**。相同业务逻辑和语义之间不需要插入空行。
-说明：没有必要插入多个空行进行隔开。
+- 【推荐】**单个方法的总行数不超过80行。** 
+
+    说明：除注释之外的方法签名、左右大括号、方法内代码、空行、回车及任何不可见字符的总行数不超过80行。 
+
+    正例：代码逻辑分清红花和绿叶，个性和共性，绿叶逻辑单独出来成为额外方法，使主干代码更加清晰；共性逻辑抽取成为共性方法，便于复用和维护。
+
+- 【推荐】没有必要增加若干空格来使变量的赋值等号与上一行对应位置的等号对齐。
+
+- 【推荐】不同逻辑、不同语义、不同业务的代码之间插入一个空行分隔开来以提升可读性。 
+
+  说明：任何情形，没有必要插入多个空行进行隔开。
 
 ## (四)  OOP 规约
 
@@ -120,92 +192,250 @@ sb.append("zi").append("xin")...
 
 - 【强制】所有的**覆写方法，必须加@Override 注解**。
 
-- 【强制】相同参数类型，相同业务含义，才可以使用 Java 的可变参数，避免使用 Object。说明：**可变参数必须放置在参数列表的最后**。（提倡同学们**尽量不用可变参数编程**）
-正例：public User getUsers(String type, Integer... ids) {...}
+    如果在抽象类中对方法签名进行修改，使用注解之后，其实现类会马上编译报错。
 
-- 【强制】外部正在调用或者二方库依赖的接口，不允许修改方法签名，避免对接口调用方产生影响。**接口过时必须加@Deprecated 注解，并清晰地说明采用的新接口或者新服务是什么**。
+- 【强制】相同参数类型，相同业务含义，才可以使用 Java 的可变参数，避免使用 Object。
+
+  说明：**可变参数必须放置在参数列表的最后**。（提倡**尽量不用可变参数编程**）
+  正例：`public List<User> getUsers(String type, Long... ids) {...}`
+
+- 【强制】外部正在调用或者二方库依赖的接口，不允许修改方法签名，避免对接口调用方产生影响。**接口过时必须加 `@Deprecated` 注解，并清晰地说明采用的新接口或者新服务是什么**。
+
+    注释：`@Deprecated` 注解可以用来注解类、接口、成员方法和成员变量等，用来表示某个元素（类、方法等）已经过时。当其它程序调用的时候编译器会有横删除线警告提示。
 
 - 【强制】**不能使用过时的类或方法**。
 
 - 【强制】Object 的 **equals 方法**容易抛空指针异常，**应使用常量或确定有值的对象来调用equals。**
-正例："test".equals(object);反例：object.equals("test");
-说明：**推荐使用 java.util.Objects#equals（JDK7 引入的工具类）**
-即推荐使用示例：`Objects.equals(value, that.getValue());`,因为
-```java
-	//看这个Objects.equals的源码如下
-    public static boolean equals(Object a, Object b) {
-        return (a == b) || (a != null && a.equals(b));
+  正例：`"test".equals(object);`反例：`object.equals("test");`
+  说明：**推荐使用 java.util.Objects#equals（JDK7 引入的工具类）**
+  即推荐使用示例：`Objects.equals(value, that.getValue());`,因为
+
+  ```java
+  //看这个Objects.equals的源码如下
+  public static boolean equals(Object a, Object b) {
+      return (a == b) || (a != null && a.equals(b));
+  }
+  // 在判断方法总做了空指针判断
+  ```
+
+- 【强制】所有的**相同类型的包装类对象之间值的比较，全部使用 equals 方法比较**。
+
+    说明：对于 Integer var =  ? 在-128 至 127 范围内的赋值，Integer 对象是在IntegerCache.cache 产生，会复用已有对象，这个区间内的 Integer 值可以直接使用==进行判断，但是这个区间之外的所有数据，都会在堆上产生，并不会复用已有对象，这是一个大坑，推荐使用 equals 方法进行判断。
+
+- 【强制】任何货币金额，均以最小货币单位且整型类型来进行存储。
+
+- 【强制】浮点数之间的等值判断，基本数据类型不能用`==`来比较，包装数据类型不能用equals来判断。 说明：浮点数采用“尾数+阶码”的编码方式，类似于科学计数法的“有效数字+指数”的表示方式。二进制无法精确表示大部分的十进制小数。 
+
+    ```java
+    //反例： 
+    float a = 1.0F - 0.9F;
+    float b = 0.9F - 0.8F;
+    
+    if (a == b) {
+    // 预期进入此代码块，执行其它业务逻辑
+    // 但事实上a==b的结果为false
     }
-    // 在判断方法总做了空指针判断
-```
+    
+    Float x = Float.valueOf(a);
+    Float y = Float.valueOf(b);
+    if (x.equals(y)) {
+    // 预期进入此代码块，执行其它业务逻辑
+    // 但事实上equals的结果为false
+    }
+    
+    // 正例： 
+    //(1) 指定一个误差范围，两个浮点数的差值在此范围之内，则认为是相等的。 float a = 1.0F - 0.9F;
+    float b = 0.9F - 0.8F;
+    float diff = 1e-6F;
+    if (Math.abs(a - b) < diff) {
+    	System.out.println("true");
+    } 
+    // (2) 使用BigDecimal来定义值，再进行浮点数的运算操作。
+    BigDecimal a = new BigDecimal("1.0");
+    BigDecimal b = new BigDecimal("0.9");
+    BigDecimal c = new BigDecimal("0.8");
+    BigDecimal x = a.subtract(b);
+    BigDecimal y = b.subtract(c);
+    if (x.compareTo(y) == 0) {
+    	System.out.println("true");
+    }
+    ```
 
+- 【强制】如上所示 BigDecimal 的等值比较应使用 `compareTo()` 方法，而不是 `equals()` 方法。 
 
-- 【强制】所有的**相同类型的包装类对象之间值的比较，全部使用 equals 方法比较**。说明：对于 Integer var =  ? 在-128 至 127 范围内的赋值，Integer 对象是在IntegerCache.cache 产生，会复用已有对象，这个区间内的 Integer 值可以直接使用==进行判断，但是这个区间之外的所有数据，都会在堆上产生，并不会复用已有对象，这是一个大坑，推荐使用 equals 方法进行判断。
+    说明：`equals()` 方法会比较值和精度（1.0与1.00返回结果为false），而`compareTo()`会忽略精度。
 
-- 关于基本数据类型与包装数据类型的使用标准如下：
-1） 【强制】所有的 **POJO 类属性必须使用包装数据类型**。
-2） 【强制】RPC（Remote Procedure Call 远程过程调用） 方法的**返回值和参数必须使用包装数据类型**。
-3） 【推荐】**所有的局部变量使用基本数据类型。**
-说明：POJO 类属性没有初值是提醒使用者在需要使用时，必须自己显式地进行赋值，任何NPE 问题，或者入库检查，都由使用者来保证。
-正例：数据库的查询结果可能是 null，因为自动拆箱，用基本数据类型接收有 NPE 风险。反例：比如显示成交总额涨跌情况，即正负 x%，x 为基本数据类型，调用的 RPC 服务，调用不成功时，返回的是默认值，页面显示为 0%，这是不合理的，应该显示成中划线。所以包装数据类型的 null 值，能够表示额外的信息，如：远程调用失败，异常退出。
+- 【强制】定义数据对象 DO 类时，属性类型要与数据库字段类型相匹配。 
+
+    正例：**数据库字段的 bigint 必须与类属性的 Long 类型相对应**。
+
+    反例：某个案例的数据库表 id 字段定义类型 bigint unsigned，实际类对象属性为 Integer，随着 id 越来越大，超过 Integer 的表示范围而溢出成为负数。
+
+- 【强制】禁止使用构造方法 `BigDecimal(double)` 的方式把 double 值转化为 BigDecimal 对象。 
+
+    说明：`BigDecimal(double)` 存在精度损失风险，在精确计算或值比较的场景中可能会导致业务逻辑异常。如：`BigDecimal g = new BigDecimal(0.1F); `实际的存储值为：0.10000000149 
+
+    正例：**优先推荐入参为 String 的构造方法，或使用 BigDecimal 的 valueOf 方法**，此方法内部其实执行了 Double 的 toString，而 Double 的 toString 按 double 的实际能表达的精度对尾数进行了截断。 
+
+    ```java
+    BigDecimal recommend1 = new BigDecimal("0.1"); 
+    BigDecimal recommend2 = BigDecimal.valueOf(0.1);
+    ```
+
+- ==关于基本数据类型与包装数据类型的使用标准如下：==
+  1） 【强制】所有的 **POJO 类属性必须使用包装数据类型**。
+  2） 【强制】RPC（Remote Procedure Call 远程过程调用） 方法的**返回值和参数必须使用包装数据类型**。
+  3） 【推荐】**所有的局部变量使用基本数据类型。**
+  说明：POJO 类属性没有初值是提醒使用者在需要使用时，必须自己显式地进行赋值，任何NPE 问题，或者入库检查，都由使用者来保证。
+  正例：数据库的查询结果可能是 null，因为自动拆箱，用基本数据类型接收有 NPE 风险。
+
+  反例：比如显示成交总额涨跌情况，即正负 x%，x 为基本数据类型，调用的 RPC 服务，调用不成功时，返回的是默认值，页面显示为 0%，这是不合理的，应该显示成中划线。所以包装数据类型的 null 值，能够表示额外的信息，如：远程调用失败，异常退出。
 
 - 【强制】**定义 DO/DTO/VO 等 POJO 类时，不要设定任何属性默认值**。
-反例：POJO 类的 gmtCreate 默认值为 new  Date();但是这个属性在数据提取时并没有置入具体值，在更新其它字段时又附带更新了此字段，导致创建时间被修改成当前时间。
+  反例：POJO 类的 gmtCreate 默认值为 new  Date(); 但是这个属性在数据提取时并没有置入具体值，在更新其它字段时又附带更新了此字段，导致创建时间被修改成当前时间。
 
 - 【强制】序列化类新增属性时，请不要修改 serialVersionUID 字段，避免反序列失败；如果完全不兼容升级，避免反序列化混乱，那么请修改 serialVersionUID 值。
-说明：注意 serialVersionUID 不一致会抛出序列化运行时异常。
+  说明：注意 serialVersionUID 不一致会抛出序列化运行时异常。
 
 - 【强制】**构造方法里面禁止加入任何业务逻辑，如果有初始化逻辑，请放在 init 方法中**。
 
 - 【强制】**POJO 类必须写 toString 方法**。使用 IDE 的中工具：source> generate  toString
-时，如果**继承了另一个 POJO 类，注意在前面加一下 super.toString**。
-说明：在方法**执行抛出异常时，可以直接调用 POJO 的 toString()方法打印其属性值**，便于排查问题。
+  时，如果**继承了另一个 POJO 类，注意在前面加一下 super.toString**。
+  说明：在方法**执行抛出异常时，可以直接调用 POJO 的 toString()方法打印其属性值**，便于排查问题。
+
+- 【强制】禁止在 POJO 类中，同时存在对应属性 xxx 的 `isXxx()` 和 `getXxx()` 方法。 说明：框架在调用属性 xxx 的提取方法时，并不能确定哪个方法一定是被优先调用到的。
 
 - 【推荐】使用**索引访问用 String 的 split 方法得到的数组时，需做最后一个分隔符后有无内容的检查**，否则会有抛 IndexOutOfBoundsException 的风险。
-说明：
-```java
-String str =  "a,b,c,,";
-String[] ary =  str.split(",");
-// 预期大于 3，结果是 3 
-System.out.println(ary.length);
-```
+  说明：
 
-- 【推荐】当一个类**有多个构造方法，或者多个同名方法，这些方法应该按顺序放置在一起**，便于阅读，此条规则优先于第 15  条规则。
+  ```java
+  String str =  "a,b,c,,";
+  String[] ary =  str.split(",");
+  // 预期大于 3，结果是 3 
+  System.out.println(ary.length);
+  ```
+
+- 【推荐】当一个类**有多个构造方法，或者多个同名方法，这些方法应该按顺序放置在一起**，便于阅读，此条规则优先于下一条规则。
 
 - 【推荐】 类内方法定义顺序依次是：**公有方法或保护方法 > 私有方法 > getter/setter方法**。
 
 - 【推荐】**setter 方法中，参数名称与类成员变量名称一致，this.成员名 = 参数名。在 getter/setter 方法中，不要增加业务逻辑**，增加排查问题的难度。
 
 - 【推荐】**循环体内，字符串的连接方式，使用 StringBuilder 的 append 方法进行扩展。**
+
 - 【推荐】final  可以声明类、成员变量、方法、以及本地变量，**下列情况使用  final 关键字**：
-  - 1） 不允许被继承的类，如：String 类。
-  - 2） 不允许修改引用的域对象，如：POJO 类的域变量。
-  - 3） 不允许被重写的方法，如：POJO 类的setter  方法。
-  - 4） 不允许运行过程中重新赋值的局部变量。
-  - 5） 避免上下文重复使用一个变量，使用 final 描述可以强制重新定义一个变量，方便更好地进行重构。
+  - 不允许被继承的类，如：String 类。
+  - 不允许修改引用的域对象，如：POJO 类的域变量。
+  - 不允许被重写的方法，如：POJO 类的setter  方法。
+  - 不允许运行过程中重新赋值的局部变量。
+  - 避免上下文重复使用一个变量，使用 final 描述可以强制重新定义一个变量，方便更好地进行重构。
 
 - 【推荐】慎用 Object 的 clone 方法来拷贝对象。
-说明：**对象的 clone 方法默认是浅拷贝**，若想实现深拷贝需要重写 clone 方法实现属性对象的拷贝。
+  说明：**对象的 clone 方法默认是浅拷贝**，若想实现深拷贝需要重写 clone 方法实现属性对象的拷贝。
 
 - 【推荐】**类成员与方法访问控制从严**：
-  - 1） 如果不允许外部直接通过 new 来创建对象，那么构造方法必须是 private。
-  - 2） 工具类不允许有 public 或 default 构造方法。
-  - 3） 类非 static 成员变量并且与子类共享，必须是 protected。
-  - 4） 类非 static 成员变量并且仅在本类使用，必须是 private。
-  - 5） 类 static 成员变量如果仅在本类使用，必须是 private。
-  - 6） 若是 static 成员变量，必须考虑是否为 final。
-  - 7） 类成员方法只供类内部调用，必须是 private。
-  - 8） 类成员方法只对继承类公开，那么限制为 protected。
+  - 如果不允许外部直接通过 new 来创建对象，那么构造方法必须是 private。
+  - 工具类不允许有 public 或 default 构造方法。
+  - 类非 static 成员变量并且与子类共享，必须是 protected。
+  - 类非 static 成员变量并且仅在本类使用，必须是 private。
+  - 类 static 成员变量如果仅在本类使用，必须是 private。
+  - 若是 static 成员变量，必须考虑是否为 final。
+  - 类成员方法只供类内部调用，必须是 private。
+  - 类成员方法只对继承类公开，那么限制为 protected。
 
-## (五) 集合处理
+## (五) 日期时间
+
+- 【强制】日期格式化时，传入 pattern 中表示**年份统一使用小写的 y**。 
+
+    说明：日期格式化时，yyyy表示当天所在的年，而大写的YYYY代表是week in which year（JDK7之后引入的概念），意思是当天所在的周属于的年份，一周从周日开始，周六结束，只要本周跨年，返回的YYYY就是下一年。 
+
+    正例：表示日期和时间的格式如下所示： `new SimpleDateFormat("yyyy-MM-dd HH:mm:ss") `
+
+- 【强制】在日期格式中分清楚大写的 M 和小写的 m，大写的 H 和小写的 h 分别指代的意义。 
+
+    说明：日期格式中的这两对字母表意如下： 1） 表示月份是大写的 M； 2） 表示分钟则是小写的m； 3） 24小时制的是大写的 H； 4） 12小时制的则是小写的 h。
+
+- 【强制】获取当前毫秒数：`System.currentTimeMillis();` 而不是 `new Date().getTime()`。 
+
+    说明：如果想获取更加精确的纳秒级时间值，使用 System.nanoTime 的方式。在 JDK8 中，针对统计时间等场景，推荐使用 Instant 类。
+
+- 【强制】不允许在程序任何地方中使用：`java.sql.Date` 和`java.sql.Time` 和 `java.sql.Timestamp`。 
+
+    说明：第 1 个不记录时间，`getHours()` 抛出异常；第 2 个不记录日期，`getYear()` 抛出异常；第 3 个在构造方法 `super((time/1000)*1000)`，在 Timestamp 属性 fastTime 和 nanos 分别存储秒和纳秒信息。
+    反例： `java.util.Date.after(Date)` 进行时间比较时，当入参是 `java.sql.Timestamp` 时，会触发JDK BUG(JDK9已修复)，可能导致比较时的意外结果。
+
+- 【强制】不要在程序中写死一年为365天，避免在公历闰年时出现日期转换错误或程序逻辑错误。
+
+    ```java
+    // 正例：
+    // 获取今年的天数 
+    int daysOfThisYear = LocalDate.now().lengthOfYear(); 
+    // 获取指定某年的天数 
+    LocalDate.of(2011, 1, 1).lengthOfYear();
+    
+    // 反例： 
+    // 第一种情况：在闰年366天时，出现数组越界异常 
+    int[] dayArray = new int[365]; 
+    // 第二种情况：一年有效期的会员制，今年1月26日注册，硬编码365返回的却是1月25日 
+    Calendar calendar = Calendar.getInstance(); calendar.set(2020, 1, 26); calendar.add(Calendar.DATE, 365);
+    ```
+
+- 【推荐】避免公历闰年2月问题。闰年的2月份有29天，一年后的那一天不可能是2月29日。
+
+- 【推荐】使用枚举值来指代月份。如果使用数字，注意Date，Calendar等日期相关类的月份month取值在0-11之间。 
+
+    说明：参考JDK原生注释，Month value is 0-based. e.g., 0 for January. 
+
+    正例： Calendar.JANUARY，Calendar.FEBRUARY，Calendar.MARCH等来指代相应月份来进行传参或比较。
+
+## (六) 集合处理
 
 - 【强制】关于 hashCode 和 equals 的处理，遵循如下规则：
-  - 1） **只要重写 equals，就必须重写 hashCode**。
-  - 2） 因为 Set 存储的是不重复的对象，依据 hashCode 和 equals 进行判断，所以 **Set 存储的对象必须重写这两个方法**。
-  - 3） 如果自定义对象做为**Map 的键，那么必须重写 hashCode 和 equals**。
+  - **只要重写 equals，就必须重写 hashCode**。
+  - 因为 Set 存储的是不重复的对象，依据 hashCode 和 equals 进行判断，所以 **Set 存储的对象必须重写这两个方法**。
+  - 如果自定义对象做为**Map 的键，那么必须重写 hashCode 和 equals**。
 说明：String 重写了hashCode 和 equals 方法，所以我们可以非常愉快地使用 String 对象作为 key 来使用。
 
-- 【强制】**ArrayList 的subList 结果不可强转成ArrayList**，否则会抛出ClassCastException异常，即 java.util.RandomAccessSubList cannot be cast to java.util.ArrayList.说明：subList 返回的是 ArrayList 的内部类 SubList，并不是 ArrayList ，而是ArrayList 的一个视图，对于 SubList 子列表的所有操作最终会反映到原列表上。
+- 【强制】判断所有集合内部的元素是否为空，使用 `isEmpty()` 方 法，而不是`size()==0` 的方式。 说明：在某些集合中，前者的时间复杂度为O(1)，而且可读性更好。
+
+- 【强制】在使用 `java.util.stream.Collectors` 类的 `toMap()` 方法转为 Map 集合时，一定要使用含有参数类型为 BinaryOperator，参数名为 mergeFunction 的方法，否则当出现相同 key 值时会抛出IllegalStateException 异常。 说明：参数 mergeFunction 的作用是当出现 key 重复时，自定义对 value 的处理策略。 
+
+  ```java
+  // 正例：
+  List<Pair<String, Double>> pairArrayList = new ArrayList<>(3);
+  pairArrayList.add(new Pair<>("version", 12.10));
+  pairArrayList.add(new Pair<>("version", 12.19));
+  pairArrayList.add(new Pair<>("version", 6.28));
+  
+  Map<String, Double> map = pairArrayList.stream().collect(
+  // 生成的map集合中只有一个键值对：{version=6.28}
+  Collectors.toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2)); 
+  
+  // 反例：
+  String[] departments = new String[] {"iERP", "iERP", "EIBU"};
+  // 抛出IllegalStateException异常
+  Map<Integer, String> map = Arrays.stream(departments)
+  .collect(Collectors.toMap(String::hashCode, str -> str)); 
+  ```
+
+- 【强制】在使用 `java.util.stream.Collectors` 类的 `toMap()` 方法转为 Map 集合时，一定要注意当 value 为 null 时会抛 NPE 异常。 
+
+    说明：在 java.util.HashMap 的 merge 方法里会进行如下的判断：
+
+    ```java
+    if (value == null || remappingFunction == null)
+    throw new NullPointerException(); 
+    
+    // 反例：
+    List<Pair<String, Double>> pairArrayList = new ArrayList<>(2);
+    pairArrayList.add(new Pair<>("version1", 8.3));
+    pairArrayList.add(new Pair<>("version2", null));
+    Map<String, Double> map = pairArrayList.stream().collect(
+    // 抛出NullPointerException异常
+    Collectors.toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2));
+    ```
+
+- 【强制】**ArrayList 的 subList 结果不可强转成ArrayList**，否则会抛出 ClassCastException 异常，即 java.util.RandomAccessSubList cannot be cast to java.util.ArrayList.说明：subList 返回的是 ArrayList 的内部类 SubList，并不是 ArrayList ，而是ArrayList 的一个视图，对于 SubList 子列表的所有操作最终会反映到原列表上。
 
 - 【强制】在 subList 场景中，高度注意对原集合元素个数的修改，会导致子列表的遍历、增加、删除均会产生 ConcurrentModificationException 异常。
 
