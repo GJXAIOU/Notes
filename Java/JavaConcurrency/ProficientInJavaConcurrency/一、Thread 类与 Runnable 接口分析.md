@@ -311,7 +311,7 @@ public interface Runnable {
 
 ### （一）使用 Thread 类
 
-首先创建一个类继承 Thread 类，然后重写其中的 run 方法，最终调用 start 方法启动该线程。当调用 start 方法启动该线程的时候，JVM 会将该线程放入就绪队列中等待被调度（不是调用 start 方法之后就一定马上执行的），当一个线程被调度的时候会执行该线程的 run 方法。
+首先创建一个类继承 Thread 类，然后重写其中的 run 方法，最终调用 start 方法启动该线程。当调用 start 方法启动该线程的时候，JVM 会将该线程放入就绪队列中等待被调度（不是调用 start 方法之后就一定马上执行的），当一个线程被调度的时候会执行该线程的 run 方法。run() 方法里面就是线程要执行的任务代码。
 
 **示例代码**
 
@@ -327,7 +327,9 @@ public class CreateThread1 extends Thread {
 
     public static void main(String[] args) {
         CreateThread1 createThread1 = new CreateThread1();
+        // 耗时比较大
         createThread1.start();
+        // 耗时比较小
         System.out.println("当前线程为：" + Thread.currentThread().getName());
     }
 }
@@ -347,7 +349,7 @@ WeChat Subscription GJXAIOU welcome you....
 
 因为CreateThread1 类继承了 Thread 类并且重写了 run 方法，所以 Thread 类中的 run 方法被覆盖了。然后调用 start 方法之后启动该线程就会执行 run 方法中的内容。
 
-调用 start() 方法之后会启动一个线程，该线程启动之后会自动调用线程对象中的 run 方法，run 方法里面的代码就是线程对象要执行的任务，是线程执行任务的入口。
+**调用 start() 方法之后会启动一个线程，该线程启动之后会自动调用线程对象中的 run() 方法，run() 方法里面的代码就是线程对象要执行的任务，是线程执行任务的入口。**
 
 因为 start()  方法执行了以下多个步骤，因此比较耗时：
 
@@ -355,6 +357,8 @@ WeChat Subscription GJXAIOU welcome you....
 - 操作系统开辟内存，并且使用系统 SDK  中的创建线程函数进行创建 Thread 线程对象。
 - 操作系统对 Thread 对象进行调度，以确定执行时机。
 - Thread 在操作系统中被成功执行。
+
+main 线程执行 start() 方法时候不必等待四步都执行完毕，而是立即继续执行 start() 方法之后的代码，这四步和后面的代码将一同执行。但是，**线程执行的顺序具有随机性**，也可能在执行完成的 start() 方法的四步之后才输出下面的语句（极少情况，通常需要在 start() 方法调用处后面加上 Thread.sleep(XX) 才能看到）。
 
 **但是，使用多线程时，代码的运行结果与代码的执行顺序或调用顺序无关**。
 
