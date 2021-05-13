@@ -8,21 +8,14 @@
 
 ### (一) Lambda 表达式
 
-在编程语言中，**Lambda 是用于表示匿名函数（anonymous functions）或者闭包（closures) 的运算符**。
-
-**为何需要Lambda表达式**
-
--  在 Java 中，我们无法将函数作为参数传递给一个方法，也无法声明返回一个函数的方法。只能传递或者返回数据。
-
--  在JavaScript（面向对象和函数式语言）中，函数参数是一个函数，返回值是另一个函数的情况是常见的；JavaScript 是一门非常典型的函数式语⾔。
+在编程语言中，**Lambda 是用于表示匿名函数（anonymous functions）或者闭包（closures) 的运算符**。其实现了将函数作为参数传递给一个方法以及声明返回一个函数的方法，即实现了「函数式编程」。
 
 #### 1.Lambda 表达式概要和作用
 
-- Java Lambda 表达式是一种匿名函数；它是没有声明的方法，即没有访问修饰符、返回值声明和名字。
+- Lambda 表达式是一种匿名函数，它是没有声明的方法，即没有访问修饰符、返回值声明和名字。
 
-- Lambda 表达式为 Java 添加了缺失的**函数式编程**特性，使我们能将函数当做一等公民看待。
-- 在将函数作为一等公民的语⾔言中（如 python、JavaScript），Lambda 表达式的类型是函数。**但在 Java 中，Lambda 表达式是对象**，他们必须依附于一类特别的对象类型——函数式接口(functional interface) 
-- Lambda 表达式主要用于传递行为，而不仅仅是值。从而提升抽象层次，使得 API 重用性更好。
+- 在 python、JavaScript 中，Lambda 表达式的类型是函数。**但在 Java 中，Lambda 表达式是对象**，他们必须依附于一类特别的对象类型——函数式接口(functional interface) 
+- **Lambda 表达式主要用于传递行为**，而不仅仅是值。从而提升抽象层次，使得 API 重用性更好。
 
 #### 2.Lambda 基本语法
 
@@ -36,14 +29,13 @@
 
 #### 3.Lambda 结构
 
-- 一个 Lambda 表达式可以有零个或多个参数
+- 一个 Lambda 表达式可以有零个或多个参数，其主体可以包含零条或者多条语句。
 - 参数的类型既可以明确声明，也可以根据上下文来推断。例如：`(int a)` 与 `(a)` 效果相同。
-- 所有参数需包含在圆括号内，参数之间用逗号相隔。例如：`(a, b)` 或 `(int a, int b)` 或 `(String a, int b, ﬂoat c)` 
+- 所有参数需包含在圆括号内，参数之间用逗号相隔。例如：`(a, b)` 或 `(int a, int b)` 或 `(String a, int b, float c)` 
 
 - 空圆括号代表参数集为空。例如：`() -> 42`
 
 - 当只有一个参数，且其类型可推导时，圆括号 `()` 可省略。例如：`a -> return a * a;`
-- Lambda 表达式的主体可包含零条或多条语句。
 - 如果 Lambda 表达式的主体只有一条语句，花括号 `{}` 可省略。匿名函数的返回类型与该主体表达式一致。
 - 如果 Lambda 表达式的主体包含一条以上语句，则表达式必须包含在花括号 `{}` 中（形成代码块）。匿名函数的返回类型与代码块的返回类型一致，若没有返回则为空。
 
@@ -130,7 +122,7 @@
           System.out.println("----------");
   
           // 方式三：使用 Consumer 函数式接口
-          // forEach() 是 Iterable 接口的默认实现方法，则其实现类就继承了该方法，List 是 Iterable 的一个实现类
+          // forEach() 是 Iterable 接口的默认实现方法，则其实现类就继承了该方法，List 是 Iterable 的一个实现类。【List 继承 Collection 接口，而 Collection 接口继承了 Iterable】
        // Consumer 函数式接口中的 JavaDoc 文档说明：接收另一个参数并且不返回结果值，可能会修改入参值。
           list.forEach(new Consumer<Integer>() {
               @Override
@@ -350,7 +342,7 @@ public class Test3 {
 
 ### (二) 函数式接口：FunctionalInterface
 
-接口里面有且只有一个实例方法的时候可以在接口上面使用 `@FunctionInterface` 注解来标注这个接口，当然该接口中**可以拥有默认实现方法和静态方法**。
+接口里面有且只有一个抽象实例方法的时候可以在接口上面使用 `@FunctionInterface` 注解来标注这个接口，当然该接口中**可以拥有默认实现方法和静态方法**。
 
 ```java
 @FunctionalInterface
@@ -443,7 +435,7 @@ Note that instances of functional interfaces can be created with  lambda express
     输出结果：
 
     ```java
-this is myTest by 匿名内部�?
+    this is myTest by 匿名内部�?
     -----------------
     this is myTest by Lambda 表达�?
     -----------------
@@ -456,26 +448,8 @@ package java.util.function;
 
 import java.util.Objects;
 
-/**
- * Represents a function that accepts one argument and produces a result.
- *
- * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #apply(Object)}.
- *
- * @param <T> the type of the input to the function
- * @param <R> the type of the result of the function
- *
- * @since 1.8
- */
 @FunctionalInterface
 public interface Function<T, R> {
-
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param t the function argument
-     * @return the function result
-     */
     R apply(T t);
 }
 ```
@@ -569,27 +543,27 @@ public class FunctionTest {
 
 - `compose()`方法（先参数后当前对象）先里面后外面
 
-```java
-default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
-    Objects.requireNonNull(before);
-    return (V v) -> apply(before.apply(v));
-}
-```
+    ```java
+    default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+        Objects.requireNonNull(before);
+        return (V v) -> apply(before.apply(v));
+    }
+    ```
 
-该方法对多个 Function 进行了组合，首先调用 before 这个 Function，就是相当于调用其 `apply()` 方法对输入进行处理，即 `before.apply(v)`，输出结果又传递给了当前对象的 `apply()` 方法，即：`apply(before.apply(v))`，从而形成两个 Function 的串联。当然可以多个 Function 形成串联调用。
+    该方法对多个 Function 进行了组合，首先调用 before 这个 Function，就是相当于调用其 `apply()` 方法对输入进行处理，即 `before.apply(v)`，输出结果又传递给了当前对象的 `apply()` 方法，即：`apply(before.apply(v))`，从而形成两个 Function 的串联。当然可以多个 Function 形成串联调用。
 
 - `andThen()` 方法（先当前对象后参数）
 
-```java
-default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
-    Objects.requireNonNull(after);
-    return (T t) -> after.apply(apply(t));
-}
-```
+    ```java
+    default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+        Objects.requireNonNull(after);
+        return (T t) -> after.apply(apply(t));
+    }
+    ```
 
-顺序正好与上面相反，首先会对输入应用当前的 Function，然后对得到的结果引用参数的 Function。
+    顺序正好与上面相反，首先会对输入应用当前的 Function，然后对得到的结果引用参数的 Function。
 
-两个方法的具体测试如下：
+    两个方法的具体测试如下：
 
 ```java
 package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
@@ -600,7 +574,7 @@ public class FunctionTest2 {
     public static void main(String[] args) {
         FunctionTest2 test = new FunctionTest2();
         // 先应用后面，然后应用前面
-        System.out.println(test.compute(1, value -> value + " world", value -> value + " hello "));
+        System.out.println(test.compute(1, value -> value + " hello", value -> value + " world"));
         // 先应用前面，然后应用后面
         System.out.println(test.compute2(2, value -> value + " hello ", value -> value + "world"));
     }
@@ -617,6 +591,9 @@ public class FunctionTest2 {
         return function1.andThen(function2).apply(a);
     }
 }
+// output：
+1 world hello
+2 hello world
 ```
 
 #### 3.函数式接口：BiFunction(Bidirectional Function)
@@ -632,63 +609,51 @@ public interface BiFunction<T, U, R> {
 
 - `andThen()` 方法
 
-```java
-default <V> BiFunction<T, U, V> andThen(Function<? super R, ? extends V> after) {
-    Objects.requireNonNull(after);
-    return (T t, U u) -> after.apply(apply(t, u));
-}
-```
-
-流程为：先应用当前的 BiFunction 的 `apply()`，然后应用参数 after 的 `apply()`，针对当前的 BiFunction 需要接收两个参数，并且只返回一个值，返回的一个值是作为 after 的输入参数。
-
-**为什么没有 Compose**，因为 BiFunction 作为输入参数，应该先执行的，返回结果是一个值，这样在执行当前的 BiFunction 的时候没有足够的输入参数用于执行。
-
-方法使用测试如下：
-
-首先定义一个集合类：
-
-```java
-package com.gjxaiou.jdk8;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class Person {
-    private String username;
-    private int age;
-
-    public Person(String username, int age) {
-        this.username = username;
-        this.age = age;
+    ```java
+    default <V> BiFunction<T, U, V> andThen(Function<? super R, ? extends V> after) {
+        Objects.requireNonNull(after);
+        return (T t, U u) -> after.apply(apply(t, u));
     }
-}
+    ```
 
-```
+    流程为：先应用当前的 BiFunction 的 `apply()`，然后应用参数 after 的 `apply()`，针对当前的 BiFunction 需要接收两个参数，并且只返回一个值，返回的一个值是作为 after 的输入参数。
 
-完整的测试程序
+    **为什么没有 Compose**，因为 BiFunction 作为输入参数，应该先执行的，返回结果是一个值，这样在执行当前的 BiFunction 的时候没有足够的输入参数用于执行。
+
+    方法使用测试如下：
+
+    首先定义一个集合类：
+
+    ```java
+    package com.gjxaiou.jdk8;
+    
+    @Getter
+    @Setter
+    public class Person {
+        private String username;
+        private int age;
+    
+        public Person(String username, int age) {
+            this.username = username;
+            this.age = age;
+        }
+    }
+    ```
+
+    完整的测试程序
 
 ```java
 package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class BiFunctionTest {
     public static void main(String[] args) {
         BiFunctionTest test = new BiFunctionTest();
 
         /**
-         * 实现加减乘除操作
+         * 实现加减操作
          */
         System.out.println(test.compute3(1, 2, (value1, value2) -> value1 + value2));
         System.out.println(test.compute3(1, 2, (value1, value2) -> value1 - value2));
-        System.out.println(test.compute3(1, 2, (value1, value2) -> value1 * value2));
-        System.out.println(test.compute3(1, 2, (value1, value2) -> value1 / value2));
 
         // 25，测试 andThen
         System.out.println(test.compute4(2, 3, (value1, value2) -> value1 + value2,
@@ -727,8 +692,6 @@ public class BiFunctionTest {
  * output:
  * 3
  * -1
- * 2
- * 0
  * 25
  * 20zhangSan
  */
@@ -765,11 +728,10 @@ public class PredicateTest {
 测试代码：
 
 ```java
-package com.shengsiyuan.jdk8;
+package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
 
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -780,23 +742,17 @@ public class PredicateTest2 {
 
     public static void main(String[] args) {
 
-        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        List<Integer> list = Arrays.asList(1, 2, 4, 5, 6);
 
         PredicateTest2 predicateTest2 = new PredicateTest2();
 
         predicateTest2.conditionFilter(list, item -> item % 2 == 0);
-        System.out.println("---------");
         predicateTest2.conditionFilter(list, item -> item % 2 != 0);
-        System.out.println("---------");
         predicateTest2.conditionFilter(list, item -> item > 5);
-        System.out.println("---------");
         predicateTest2.conditionFilter(list, item -> item < 3);
-        System.out.println("---------");
         // 打印集合中所有元素
         predicateTest2.conditionFilter(list, item -> true);
-        System.out.println("---------");
         predicateTest2.conditionFilter(list, item -> false);
-        System.out.println("---------");
     }
 
     public void conditionFilter(List<Integer> list, Predicate<Integer> predicate) {
@@ -805,6 +761,7 @@ public class PredicateTest2 {
                 System.out.println(integer);
             }
         }
+        System.out.println("---------------");
     }
 
     // 原始方式，每个判定条件都需要定义新的方法
@@ -816,9 +773,27 @@ public class PredicateTest2 {
         }
     }
 }
+// output：
+2
+4
+6
+---------------
+1
+5
+---------------
+6
+---------------
+1
+2
+---------------
+1
+2
+4
+5
+6
+---------------
+---------------
 ```
-
-
 
 该接口中其他主要方法分析：
 
@@ -865,9 +840,6 @@ public class PredicateTest2 {
                 : object -> targetRef.equals(object);
     }
     ```
-
-    
-
 
 
 测试代码：
@@ -922,7 +894,7 @@ public class PredicateTest3 {
 演示使用：
 
 ```java
-package com.shengsiyuan.jdk8;
+package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
 
 
 import java.util.function.Supplier;
@@ -934,52 +906,29 @@ public class SupplierTest {
         System.out.println(supplier.get());
     }
 }
+// output：
+hello world
 ```
 
 一般可以用作工厂
 
 ```java
-package com.shengsiyuan.jdk8;
-
+package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
 
 public class Student {
 
     private String name = "zhangsan";
 
     private int age = 20;
-
-    public Student() {
-
-    }
-
-    public Student(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
+    
+    // 省略有参、无参构造方法；get 和 set 方法
 }
-
 ```
 
 测试程序：通过 Supperlier
 
 ```java
-package com.shengsiyuan.jdk8;
+package com.gjxaiou.jdk8.lambdaAndFunctionInterface;
 
 
 import java.util.function.Supplier;
@@ -998,14 +947,13 @@ public class StudentTest {
         System.out.println(supplier2.get().getName());
     }
 }
-
 ```
 
 
 
 #### 6.函数式接口：BinaryOperator
 
-是 BiFunction 的一种具体化，即输入是两个参数，输出是一个参数，但是三个参数的类型是一样的。使用其重写上面的计算方法如下：
+是 BiFunction 的一种具体化，即输入是两个参数，输出是一个参数，**但是三个参数的类型是一样的**。使用其重写上面的计算方法如下：
 
 ```java
 package com.shengsiyuan.jdk8;
@@ -1042,8 +990,6 @@ public class BinaryOperatorTest {
 }
 
 ```
-
-
 
 ## 二、Optional
 
@@ -1134,22 +1080,7 @@ public class BinaryOperatorTest {
     public class Company {
         private String name;
         private List<Employee> employees;
-        
-        Company(String name) {
-            this.name = name;
-        }
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        public List<Employee> getEmployees() {
-            return employees;
-        }
-        public void setEmployees(List<Employee> employees) {
-            this.employees = employees;
-        }
+       // 省略有参、无参构造方法，以及 get、set 方法
     }
     
     //--------------------------------------------------------
@@ -1158,15 +1089,7 @@ public class BinaryOperatorTest {
     public class Employee {
         private String name;
         
-        Employee(String name){
-            this.name = name;
-        }
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
+        // 省略有参、无参构造方法，以及 get、set 方法
     }
     ```
     
@@ -1233,7 +1156,7 @@ public class BinaryOperatorTest {
 
 - **方法引用实际上是 Lambda 表达式的一种语法糖**（本质上没有提供新的功能，但是通过更加简洁方便的方式让使用者进行调用）。
 
-- 只有 Lambda 表达式正好是一个现有的方法的时候才可以使用方法引用来替换，并不是所有的 Lambda 表达式都可以使用方法引用来替换。
+- **只有 Lambda 表达式正好是一个现有的方法的时候才可以使用方法引用来替换**，并不是所有的 Lambda 表达式都可以使用方法引用来替换。
 
 - 可以将方法引用看作是一个「函数指针」（即指向函数的指针（Java 中实际不存在））。 即 `System.out::println` 指向 ` System.out.println(item)` 函数。
 
@@ -1283,12 +1206,7 @@ public class MethodReferenceDemo {
         private String name;
         private int score;
     
-        public Student(String name, int score) {
-            this.name = name;
-            this.score = score;
-        }
-    
-       // 省略 Getter/Setter 方法
+       // 省略 Getter/Setter 方法以及构造方法
     
         // 提供两个静态方法
         public static int compareStudentByScore(Student student1, Student student2) {
@@ -1314,8 +1232,8 @@ public class MethodReferenceDemo {
     
     public class MethodReferenceTest {
     public static void main(String[] args) {
-           Student student1 = new Student("zhangsan", 10);
-        Student student2 = new Student("lisi", 90);
+            Student student1 = new Student("zhangsan", 10);
+            Student student2 = new Student("lisi", 90);
             Student student3 = new Student("wangwu", 100);
             List<Student> students = Arrays.asList(student1, student2, student3);
     
@@ -1560,7 +1478,7 @@ public class MethodReferenceDemo {
         }
     }
     /** output:
-test
+    test
     hello
     */
     ```
@@ -1993,7 +1911,7 @@ public class StreamTest2 {
     }
     ```
     
-
+    
     
 -  知识点：中间操作和终止操作的测试
 
@@ -2052,7 +1970,7 @@ public class StreamTest2 {
     }
     ```
     
-
+    
     
     #### 内部迭代和外部迭代
     
