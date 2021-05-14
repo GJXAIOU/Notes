@@ -2,11 +2,15 @@
 
 ### 一、前言
 
-本质上，ThreadLocal 是通过空间换取时间，从而实现每个线程中都会有一个变量的副本，这样每个线程就都会操作该副本，从而**完全规避了多线程的并发问题**。
+本质上，ThreadLocal 是通过空间换取时间，从而实现每个线程访问 ThreadLocal 中的变量都会有一个属于其自身的变量副本，这样每个线程就都会操作该副本，从而**完全规避了多线程的并发问题**。
 
 使用场景：如 web 项目中，用户访问会经过 controller、service、dao 层，如果想实现三层之间的数据共享，一般就是将这个数据作为一个参数，在 controller 调用 service 时候传入，在 service 调用 dao 时候传入。也可以将该变量放入 ThreadLocal 中实现各个方法中的共享。因为 ThreadLocal 是和线程进行绑定的。
 
 **ThreadLocal 本身并不持有数据，只作为底层 Entry 对象的 key 而存在**。在 Thread 类中持有一个 ThreadLocalMap 的引用，该引用中存在一个 Entry 类型的数组，Entry 类型的数组中的每个 Entry 对象就是我们真正持有的信息，每个 Entry 对象的 key 就是一个对当前 ThreadLocal 对象的弱引用，value 就是通过 ThreadLocal 的 set 方法放入的值。
+
+> ThreadLocal 提供了线程本地的实例。它与普通变量的区别在于，每个使用该变量的线程都会初始化一个完全独立的实例副本。ThreadLocal 变量通常被`private static`修饰。当一个线程结束时，它所使用的所有 ThreadLocal 相对的实例副本都可被回收。
+
+总的来说，**ThreadLocal 适用于每个线程需要自己独立的实例且该实例需要在多个方法中被使用，也即变量在线程间隔离而在方法或类间共享的场景。**后文会通过实例详细阐述该观点。另外，该场景下，并非必须使用 ThreadLocal ，其它方式完全可以实现同样的效果，只是 ThreadLocal 使得实现更简洁。
 
 ### 二、使用示例
 
@@ -102,105 +106,7 @@ public class MyTest2 {
 }
 ```
 
-
-
-## 引言
-
-> [JavaGuide](https://github.com/Snailclimb/JavaGuide) :一份涵盖大部分Java程序员所需要掌握的核心知识。**star:45159**，替他宣传一下子
->
-> 这位大佬，总结的真好！！！我引用这位大佬的文章，因为方便自己学习和打印...
-
-<!-- more -->
-
-## ThreadLocal
-
-### ThreadLocal简介
-
-通常情况下，我们创建的变量是可以被任何一个线程访问并修改的。**如果想实现每一个线程都有自己的专属本地变量该如何解决呢？** JDK中提供的`ThreadLocal`类正是为了解决这样的问题。 **`ThreadLocal`类主要解决的就是让每个线程绑定自己的值，可以将`ThreadLocal`类形象的比喻成存放数据的盒子，盒子中可以存储每个线程的私有数据。**
-
-**如果你创建了一个`ThreadLocal`变量，那么访问这个变量的每个线程都会有这个变量的本地副本，这也是`ThreadLocal`变量名的由来。他们可以使用 `get（）` 和 `set（）` 方法来获取默认值或将其值更改为当前线程所存的副本的值，从而避免了线程安全问题。**
-
-再举个简单的例子： 
-
-比如有两个人去宝屋收集宝物，这两个共用一个袋子的话肯定会产生争执，但是给他们两个人每个人分配一个袋子的话就不会出现这样的问题。如果把这两个人比作线程的话，那么ThreadLocal就是用来这两个线程竞争的。
-
-### ThreadLocal示例
-
-```java
-import java.text.SimpleDateFormat;
-import java.util.Random;
-
-public class ThreadLocalExample implements Runnable{
-
-     // SimpleDateFormat 不是线程安全的，所以每个线程都要有自己独立的副本
-    private static final ThreadLocal<SimpleDateFormat> formatter = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyyMMdd HHmm"));
-
-    public static void main(String[] args) throws InterruptedException {
-        ThreadLocalExample obj = new ThreadLocalExample();
-        for(int i=0 ; i<10; i++){
-            Thread t = new Thread(obj, ""+i);
-            Thread.sleep(new Random().nextInt(1000));
-            t.start();
-        }
-    }
-
-    @Override
-    public void run() {
-        System.out.println("Thread Name= "+Thread.currentThread().getName()+" default Formatter = "+formatter.get().toPattern());
-        try {
-            Thread.sleep(new Random().nextInt(1000));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //formatter pattern is changed here by thread, but it won't reflect to other threads
-        formatter.set(new SimpleDateFormat());
-
-        System.out.println("Thread Name= "+Thread.currentThread().getName()+" formatter = "+formatter.get().toPattern());
-    }
-
-}
-```
-
-Output:
-
-```
-Thread Name= 0 default Formatter = yyyyMMdd HHmm
-Thread Name= 0 formatter = yy-M-d ah:mm
-Thread Name= 1 default Formatter = yyyyMMdd HHmm
-Thread Name= 2 default Formatter = yyyyMMdd HHmm
-Thread Name= 1 formatter = yy-M-d ah:mm
-Thread Name= 3 default Formatter = yyyyMMdd HHmm
-Thread Name= 2 formatter = yy-M-d ah:mm
-Thread Name= 4 default Formatter = yyyyMMdd HHmm
-Thread Name= 3 formatter = yy-M-d ah:mm
-Thread Name= 4 formatter = yy-M-d ah:mm
-Thread Name= 5 default Formatter = yyyyMMdd HHmm
-Thread Name= 5 formatter = yy-M-d ah:mm
-Thread Name= 6 default Formatter = yyyyMMdd HHmm
-Thread Name= 6 formatter = yy-M-d ah:mm
-Thread Name= 7 default Formatter = yyyyMMdd HHmm
-Thread Name= 7 formatter = yy-M-d ah:mm
-Thread Name= 8 default Formatter = yyyyMMdd HHmm
-Thread Name= 9 default Formatter = yyyyMMdd HHmm
-Thread Name= 8 formatter = yy-M-d ah:mm
-Thread Name= 9 formatter = yy-M-d ah:mm
-```
-
-从输出中可以看出，Thread-0已经改变了formatter的值，但仍然是thread-2默认格式化程序与初始化值相同，其他线程也一样。
-
-上面有一段代码用到了创建 `ThreadLocal` 变量的那段代码用到了 Java8 的知识，它等于下面这段代码，如果你写了下面这段代码的话，IDEA会提示你转换为Java8的格式(IDEA真的不错！)。因为ThreadLocal类在Java 8中扩展，使用一个新的方法`withInitial()`，将Supplier功能接口作为参数。
-
-```java
- private static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>(){
-        @Override
-        protected SimpleDateFormat initialValue()
-        {
-            return new SimpleDateFormat("yyyyMMdd HHmm");
-        }
-    };
-```
-
-### ThreadLocal原理
+### ThreadLocal 原理
 
 从 `Thread`类源代码入手。
 
