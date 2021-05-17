@@ -20,6 +20,7 @@
 在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中“RPC 协议”就指明了程序如何进行**网络传输和序列化**。
 =======
 在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中「RPC 协议」就指明了程序如何进行网络传输和序列化。
+
 >>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
 
 [![img](RPC.resource/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)](https://s3.51cto.com/oss/201906/17/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)
@@ -32,6 +33,7 @@
 - 最古老也是最有效：TCP/UDP 的二进制传输。事实上所有的通信方式归根结底都是TCP/UDP。
 =======
 - 最古老有效的使用 TCP/UDP 的二进制传输。事实上所有的通信方式归根结底都是 TCP/UDP
+
 >>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
 
 - CORBA (Common Object Request Broker Architecture)。支持面向对象的通信协议（复杂）。
@@ -226,12 +228,14 @@ RPC 序列化框架：
 
 ### （三）最基础二进制传递
 
-<<<<<<< HEAD
+
+
 这个例子使用了最原始的客户端服务器交互方式，硬编码完成功能，非常紧耦合。
-=======
+
 该例使用了最原始的客户端服务器交互方式：硬编码完成功能，非常紧耦合。
 **缺点**：需要对对象很了解，因为是对对象中所有属性都要传输接收，一旦更改属性，代码全部要变。同时传输过程和业务逻辑糅合在一起。
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
+
+
 
 **过程**：client 端直接将对象中 id 属性通过网络传输给 server，然后 server 端生成一个接口实现类来处理，并且将生成的 User 对象中的所有属性通过网络传输给 client，最后 client 得到属性组装为一个 User 对象。
 
@@ -264,14 +268,16 @@ RPC 序列化框架：
             
             // 服务端进行处理（具体见下面的服务端代码）
     
+
 <<<<<<< HEAD
             
             //接收服务端返回的结果
 =======
             // 接收服务端返回的结果
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
-            DataInputStream dis = new DataInputStream(socket.getInputStream());
-    
+
+
+DataInputStream dis = new DataInputStream(socket.getInputStream());
+
             // 读取各个属性再转换为对象
             int id = dis.readInt();
             String name = dis.readUTF();
