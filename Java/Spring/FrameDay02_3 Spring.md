@@ -336,7 +336,7 @@ public class UsersServiceImpl implements UsersService{
 
   -  SUPPORTS：如果当前有事务就在事务中执行，如果当前没有事务，就在非事务状态下执行。
 
-  - MANDATORY「强制性的」：必须在事务内部执行，如果当前有事务，就在事务中执行，如果没有事务，报错。
+  - MANDATORY「翻译：强制性的」：必须在事务内部执行，如果当前有事务，就在事务中执行，如果没有事务，报错。
 
   - REQUIRES_NEW：必须在事务中执行，如果当前没有事务，新建事务，如果当前有事务，把当前事务挂起（执行自己的事务）。
   - NOT_SUPPORTED：必须在非事务下执行，如果当前没有事务，正常执行，如果当前有事务，把当前事务挂起。
@@ -360,117 +360,103 @@ public class UsersServiceImpl implements UsersService{
   - SERIALIZABLE：排队操作，对整个表添加锁，一个事务在操作数据时，另一个事务等待事务操作完成后才能操作这个表。【最安全同时效率最低】
 
 - `rollback-for=”异常类型全限定路径”`
-  表示当出现什么异常时需要进行回滚
-  - 建议:给定该属性值.
-  - 手动抛异常一定要给该属性值.
-  
-- no-rollback-for=””
- 当出现什么异常时不滚回事务.
+  表示当出现什么异常时需要进行回滚，建议给定该属性值，特别：手动抛异常一定要给该属性值。
+
+- `no-rollback-for=””`
+ 当出现什么异常时不滚回事务。
 
 
 **补充知识**
 
-- 脏读:
-一个事务(A)读取到另一个事务(B)中未提交的数据，另一 个事务中数据可能进行了改变，此时A 事务读取的数据可能和数据库中数据是不一致的，此时认为数据是脏数据，读取脏数据过程叫做脏读.
+- 脏读
+一个事务(A)**读取到另一个事务**(B)中**未提交的数据**，另一个事务中数据可能进行了改变，此时 A 事务读取的数据可能和数据库中数据是不一致的，此时认为数据是脏数据，读取脏数据过程叫做脏读。
 
-- 幻读:
-事务 A 按照特定条件查询出结果，事务 B 新增了一条符合条件的数据.事务 A 中查询的数据和数据库中的数据不一致的，事务 A 好像出现了幻觉，这种情况称为幻读.
-  - 主要针对的操作是新增或删除
-  - 两次事务的结果.
+- 幻读
+  事务 A 按照特定条件**查询**出结果，事务 B **新增或删除**了一条符合条件的数据。事务 A 中查询的数据和数据库中的数据不一致的，事务 A 好像出现了幻觉，这种情况称为幻读。**是两次事务的结果**。
 
-- 不可重复读:
-  当事务 A 第一次读取事务后，事务 B 对事务 A 读取的数据进行修改，事务 A 中再次读取的数据和之前读取的数据不一致，这个过程称为不可重复读.
-  - 主要针对的是某行数据.(或行中某列)
-  - 主要针对的操作是修改操作.
-  -  两次读取在同一个事务内
+- 不可重复读
+  当事务 A 第一次读取事务后，事务 B 对事务 A 读取的数据进行**修改**，事务 A 中再次读取的数据和之前读取的数据不一致，这个过程称为不可重复读。
+  - 主要针对的是某行数据（或行中某列）
+  - 主要针对修改操作；
+  -  两次读取在**同一个事务内**
 
 ## 七、Spring 中常用注解
 
 - @Component 创建类对象，相当于配置 `<bean/>`
 
-- @Service 与@Component 功能相同.
- 但是@service写在 ServiceImpl 类上.
+- @Service 与 @Component 功能相同，但是用在 ServiceImpl 类上。
+ 
+- @Repository 与 @Component 功能相同，但是写在数据访问层类上。
+ 
+- @Controller 与 @Component 功能相同，但是写在控制器类上。
+ 
+- @Resource（不需要写对象的 get/set 方法），是 Java 中自带的注解，默认是按照 byName 注入，如果没有名称则按照 byType 注入。（建议对象名称和 Spring 容器中对象名相同）。
 
-- @Repository 与@Component 功能相同.
- 写在数据访问层类上.
+- @Autowired（不需要写对象的 get/set 方法），是 Spring 中的注解，默认按照 byType 注入。
 
-- @Controller 与@Component 功能相同.
- 写在控制器类上.
+- @Value() ：获取 properties 文件中内容
 
-- @Resource(不需要写对象的 get/set)
-是 java 中自带的注解
-  - 默认按照 byName 注入，如果没有名称对象，按照 byType  注入
-    -  建议把对象名称和 spring 容器中对象名相同
-
-- @Autowired(不需要写对象的 get/set)
-是 spring 的注解
-  - 默认按照 byType  注入.
-
-- @Value() 获取 properties 文件中内容
-
-* @Pointcut() 定义切点
-
-* @Aspect() 定义切面类
-
-* @Before() 前置通知
-
-* @After 后置通知
-
+* @Pointcut() ：定义切点
+* @Aspect()：定义切面类
+* @Before()： 前置通知
+* @After()： 后置通知
 * @AfterReturning 后置通知，必须切点正确执行
-
 * @AfterThrowing 异常通知
-
 * @Arround 环绕通知
 
 ## 八、Ajax
-使用Ajax绝不会有跳转语句，都是写的输出语句，即响应回来的结果是什么
+使用 Ajax 绝不会有跳转语句，都是写的输出语句，即响应回来的结果是什么
 
 - 标准请求响应时浏览器的动作(同步操作)
-  - 浏览器请求什么资源，跟随显示什么资源
 
-* ajax:异步请求.【有请求的时候，浏览器开启一个子线程进行数据请求，获取到数据之后，根据脚本对主线程中东西进行修改，主线程在子线程进行请求的过程中是不发生改变的；】
+  浏览器请求什么资源，跟随显示什么资源
 
-  - 局部刷新，通过异步请求，请求到服务器资源数据后，通过脚本修改页面中部分内容.
+* Ajax：异步请求【有请求的时候，浏览器开启一个子线程进行数据请求，获取到数据之后，根据脚本对主线程中东西进行修改，主线程在子线程进行请求的过程中是不发生改变的；】
 
-* ajax 由 javascript 推出的.
-  *  由 jquery 对 js 中 ajax 代码进行的封装，达到使用方便的效果.
+  局部刷新，通过异步请求，请求到服务器资源数据后，通过脚本修改页面中部分内容。
+
+* Ajax 是由 Javascript 推出，由 jquery 对 js 中 ajax 代码进行的封装，达到使用方便的效果。
 
 ###   jquery 中 ajax 分类
 
-*  第一层 $.ajax({ 属性名:值，属性名:值})
-  * 是 jquery 中功能最全的.代码写起来相对最麻烦的.
+- 第一层 $.ajax({ 属性名:值，属性名:值})
 
-示例代码
-url:  请求服务器地址
-data:请求参数
-dataType:服务器返回数据类型
-error 请求出错执行的功能
-success 请求成功执行的功能，表达式function(data)中的
-data是服务器返回的数据
-type:请求方式
-```index_js
-// 这里配置 script type 等等
-$(function(){
-    $("a").click(function(){
-        $.ajax({
-            url:'demo',
-            data:{"name":"张三"},
-            dataType:'html',
-            error:function(){
-                alert("请求出错.")
-            },
-            success:function(data){
-                alert("请求成功"+data)
-            },
-            type:'POST'
-        });
-        return false;
-    })
-});
-```
+    是 jquery 中功能最全的.代码写起来相对最麻烦的，常用参数如下：
+
+    - url：请求服务器地址
+    - data：请求参数
+    - dataType：服务器返回数据类型
+    - error：请求出错执行的功能
+    - success：请求成功执行的功能，表达式function(data)中的
+    - data：是服务器返回的数据
+    - type：请求方式
+
+    示例代码
+
+    ```javascript
+    // 这里配置 script type 等等
+    $(function(){
+        $("a").click(function(){
+            $.ajax({
+                url:'demo',
+                data:{"name":"张三"},
+                dataType:'html',
+                error:function(){
+                    alert("请求出错.")
+                },
+                success:function(data){
+                    alert("请求成功"+data)
+                },
+                type:'POST'
+            });
+            return false;
+        })
+    });
+    ```
 
 - 第二层(简化$.ajax)
   相当于上面的代码中 设置好了type，只有成功返回等
+
   - $.get(url,data,success,dataType))
   - $.post(url,data,success,dataType)
 
@@ -479,7 +465,8 @@ $(function(){
   -  `.getScript(url,data,success)` 相 当 于 设  置  ​`.get 中dataType=”script”`
 
 - 如果服务器返回数据是从表中取出.为了方便客户端操作返回的数据，服务器端返回的数据设置成 json
-  - 客户端把 json 当作对象或数组操作.
+
+  客户端把 json 当作对象或数组操作.
 
 - json：是一种数据格式.
   - JsonObject ： json 对象，理解成 java  中对象

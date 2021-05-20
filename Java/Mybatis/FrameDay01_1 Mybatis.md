@@ -5,19 +5,7 @@
 
 [TOC]
 
-## 一、前言：数据库 SQL命令
-
-- 创建数据库并指定编码
-`Create database 数据库名 default character set utf8`
-
- - 创建表
-
-    ```sql
-    Create table 表名(
-       列名 类型 约束 auto_increament comment "备注"
-    );
-
-## 三、MVC开发模式
+## 一、MVC开发模式
 
 作用：视图和逻辑分离 
 
@@ -33,7 +21,7 @@
 
   <img src="FrameDay01_1%20Mybatis.resource/MVC%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F.png" alt="MVC开发模式" style="zoom:50%;" />
 
-## 四、框架概述
+## 二、框架概述
 
 - 框架：软件的半成品，为解决问题制定的一套约束，在提供功能基础上进行扩充。
 - **框架中一些不能被封装的代码(变量)，需要使用框架者新建一个 xml 文件，在文件中添加变量内容**。
@@ -44,7 +32,7 @@
 - MyBatis 是数据访问层（DAO 层）框架，底层是对 JDBC 的封装。在使用 MyBatis 时不需要编写实现类，只需要写执行的 SQL 语句。
 
 
-## 六、MyBatis 使用
+## 三、MyBatis 使用
 
 ### （一）环境搭建
 
@@ -195,7 +183,7 @@
   - UNPOOLED：不使用数据库连接池，和直接使用 JDBC 一样；
   - JNDI：是 Java 命名目录接口技术；
 
-## 八、数据库连接池
+## 四、数据库连接池
 
 - 在内存中开辟一块空间，存放多个数据库连接对象；
 
@@ -262,7 +250,7 @@ public class DemoServlet extends HttpServlet {
 ```
 
 
-## 九、三种查询方式
+## 五、三种查询方式
 
 - `selectList()`  返回值为 `List<resultType  属性控制>`
 适用于查询结果都需要遍历的需求
@@ -332,8 +320,8 @@ public class Test {
 
 
 
-## 十二、Log4J
-#### （一）基本配置
+## 六、Log4J
+### （一）基本配置
 
 - 导入 log4j-xxx.jar
 - 在 src 下新建 log4j.properties(路径和名称都不允许改变)
@@ -357,7 +345,7 @@ log4j.appender.LOGFILE.Append=true log4j.appender.LOGFILE.layout=org.apache.log4
 log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
 ```
 
-#### （二） 基本使用
+### （二） 基本使用
 
 - 使用方法一：
 
@@ -379,7 +367,7 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
   - %n 换行
 
 
-# 十三、`<settings>`标签
+## 七、`<settings>`标签
 
 - 在 mybatis 全局配置文件中通过 `<settings>` 标签控制 MyBatis 全局开关，**该标签必须位于所有配置的最前面**。
 
@@ -413,7 +401,7 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
 
         使用 namespace 属性值+标签 id 属性值
 
-## 十四、 parameterType 属性（Mybatis 中参数设置）
+## 八、 parameterType 属性（Mybatis 中参数设置）
 
 **传递多个参数时候，可以使用对象或者 map，和第二部分的多参数实现方法**；
 
@@ -464,7 +452,7 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
 
 - 如果在 XML 文件中出现`<`、`>`  或者 `""` 等特殊字符时可以使用 XML 文件转义标签(XML 自身的)，格式为：`<![CDATA[ 内 容 ]]>`
 
-## 十五、MyBatis 中实现 MySQL 分页
+## 九、MyBatis 中实现 MySQL 分页
 
 不允许在关键字前后进行数学运算，需要在代码中计算完成后传递到 mapper.xml  中；
 
@@ -490,7 +478,7 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
     </select>
     ```
 
-## 十五、typeAliases 别名
+## 十、typeAliases 别名
 
 **别名配置必须在 `<environments>`标签的前面**，分为系统内置别名、给某个类的别名、给某个包下所有类的别名。
 
@@ -525,7 +513,7 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
   </select>    
   ```
 
-## 十六、MyBatis 实现新增/修改/删除
+## 十一、MyBatis 实现新增/修改/删除
 
 - **在 mybatis 中默认是关闭了 JDBC 的自动提交功能**
   -  每一个 SqlSession 默认都是不自动提交事务
