@@ -261,6 +261,33 @@ public void run() {
 }
 ```
 
+**执行 start() 方法的顺序并不代表执行 run() 的顺序**
+
+```java
+package com.gjxaiou;
+
+public class Demo2  extends Thread{
+	private int  i;
+	Demo2(int i){
+		this.i = i;
+	}
+	@Override
+	public void run() {
+		System.out.println(i);
+	}
+
+	public static void main(String[] args) {
+		new Demo2(1).start();
+		new Demo2(3).start();
+		new Demo2(2).start();
+	}
+}
+// output：
+1
+3
+2
+```
+
 ### （六）Thread 类的 sleep 方法详解
 
 **首先分析 JavaDoc 文档**
@@ -437,9 +464,11 @@ WeChat Subscription GJXAIOU welcome you....
 执行 run 的线程为：Thread-0
 ```
 
+**当然，上述在 `new Thread()` 中传入的是一个 Runnable 实例，但是因为 Thread 类是 Runnable 的实现类，如果我们自定义一个类继承 Thread 类，则自定义类也是 Runnable 的实现类，所以自定义类的实例也可以传入 `new Thread()` 中，只不过这样显得多此一举。**
+
 **执行流程**：
 
-因为 CreateThread2 类实现了 Runnable 接口，而上文提到的 Thread 类的 8 个重构的构造方法中的第二个就是在构造 Thread 实例时候传入一个 Runnable 实例。因为没有覆盖 Thread 类中的 run 方法，因此 Thread 类中的 run 方法会执行，而上述 Thread 类的 run 方法中会调用 target 的 run 方法，这里就是调用 createThread2 的 run 方法完成执行。
+因为 CreateThread2 类实现了 Runnable 接口，而上文提到的 Thread 类的 8 个重构的构造方法中的第二个就是在构造 Thread 实例时候传入一个 Runnable 实例。因为没有覆盖 Thread 类中的 run 方法，因此 Thread 类中的 run 方法会执行，而上述 Thread 类的 run 方法中会调用 target 的 run 方法，这里就是调用 createThread2 的 run 方法完成执行。同时 target 是在 init() 方法中进行赋值初始化的，而 init() 方法是在 Thread 类的构造方法中被调用的。
 
 ![image-20210331150311699](一、Thread 类与 Runnable 接口分析.resource/image-20210331150311699.png)
 
