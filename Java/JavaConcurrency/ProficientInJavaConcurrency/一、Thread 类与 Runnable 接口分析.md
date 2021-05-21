@@ -288,7 +288,100 @@ public class Demo2  extends Thread{
 2
 ```
 
-### （六）Thread 类的 sleep 方法详解
+**执行 start() 方法和执行 run() 方法区别**
+
+```java
+package com.gjxaiou.thread;
+
+public class MyTest1 {
+	public static void main(String[] args) {
+		MyThread myThread = new MyThread();
+		myThread.setName("新创建的线程 Thread - 0 ");
+		myThread.start();
+		// myThread.run();
+	}
+}
+
+class MyThread extends Thread {
+	String threadName;
+
+	MyThread() {
+		System.out.println("执行构造方法线程：" + Thread.currentThread().getName());
+	}
+
+	@Override
+	public void run() {
+		System.out.println("执行 run 方法线程： " + Thread.currentThread().getName());
+	}
+
+	public String getThreadName() {
+		return this.threadName;
+	}
+
+	public void setThreadName(String threadName) {
+		this.threadName = threadName;
+	}
+}
+```
+
+main 方法中执行 `myThread.start()` 和 `myThread.run()` 的结果分别为：
+
+```java
+// 执行 myThread.start() 方法时候输出结果。启动新的线程执行 run() 方法，同时执行 run() 方法时机不确定。
+执行构造方法线程：main
+执行 run 方法线程： 新创建的线程 Thread - 0 
+
+// 执行 myThread.run() 方法输出结果。不启动新的线程，立即执行 run() 方法。
+执行构造方法线程：main
+执行 run 方法线程： main    
+```
+
+### （六）Thread 类的 isAlive()  方法
+
+用于判断当前线程是否存活（即处于活动状态），活动状态指线程已经启动并且尚未终止的状态。
+
+示例程序：
+
+```java
+package com.gjxaiou.thread;
+
+public class MyTest2 {
+    public static void main(String[] args) throws InterruptedException {
+        MyThread1 myThread1 = new MyThread1();
+        System.out.println("begin：" + myThread1.isAlive());
+        myThread1.start();
+        // Thread.sleep(2000);
+        System.out.println("end：" + myThread1.isAlive());
+    }
+}
+
+class MyThread1 extends Thread {
+    @Override
+    public void run() {
+        System.out.println("run 方法：" + this.isAlive());
+    }
+}
+```
+
+执行结果：
+
+```java
+// 情况一：注释掉 sleep() 时输出的结果
+begin：false
+end：true
+run 方法：true
+    
+// 情况二：添加 sleep() 时输出的结果
+begin：false
+run 方法：true
+end：false    
+```
+
+情况一：线程启动之后， main 线程继续执行，则继续输出 end：true，当前因为 start() 方法还在调用 run 方法，所以线程是存活状态，所以 end 值为 true。
+
+情况二：当主线程创建新的线程并且启动之后，`Thread.sleep()` 会让主线程睡眠，但是新的线程继续执行，等主线程醒来之后新创建的线程已经执行完毕，所以 end:false。
+
+### （七）Thread 类的 sleep 方法详解
 
 **首先分析 JavaDoc 文档**
 
@@ -306,6 +399,84 @@ public static void sleep(long millis, int nanos){
   // XXXXXX 
 }
 ```
+
+注意：这里「正在执行的线程」是指 `this.currentThread()` 返回的线程，同时如果调用 sleep() 方法所在类是  Thread 类，则 `Thread.sleep()` 和 `this.sleep()` 效果等价，如果不在 Thread 类，必须使用 `Thread.sleep()`。
+
+
+
+### （八）StackTraceElement[]   getStackTrace() 方法与 static void dumpStack() 方法
+
+`getStackTrace()` 方法返回一个表示该线程堆栈跟踪元素数组。如果该线程尚未启动或者已经终止，则返回一个零长度的数组。否则返回数组的第一个元素代表堆栈顶（数组中最新的方法调用），最后一个元素表示堆栈底（数组中最旧的方法调用）。
+
+`dumpStack()` 方法是将当前线程的堆栈跟踪信息输出至标准错误流，该方法仅用于调试。
+
+```java
+package com.gjxaiou.thread;
+
+public class Mytest4 {
+	public void a() {
+		b();
+	}
+
+	public void b() {
+		c();
+	}
+
+	public void c() {
+		d();
+	}
+
+	public void d() {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		if (stackTrace != null) {
+			for (StackTraceElement stackTraceElement : stackTrace) {
+				System.out.println(stackTraceElement.getClassName() + " : " + stackTraceElement.getMethodName() + " " +
+						": " + stackTraceElement.getLineNumber());
+			}
+		}
+
+		System.out.println("当前线程的堆栈跟踪信息为：");
+		Thread.dumpStack();
+	}
+
+	public static void main(String[] args) {
+		Mytest4 mytest4 = new Mytest4();
+		mytest4.a();
+	}
+}
+```
+
+输出结果为：
+
+```java
+java.lang.Thread : getStackTrace : 1559
+com.gjxaiou.thread.Mytest4 : d : 17
+com.gjxaiou.thread.Mytest4 : c : 13
+com.gjxaiou.thread.Mytest4 : b : 9
+com.gjxaiou.thread.Mytest4 : a : 5
+com.gjxaiou.thread.Mytest4 : main : 31
+当前线程的堆栈跟踪信息为：
+java.lang.Exception: Stack trace
+	at java.lang.Thread.dumpStack(Thread.java:1336)
+	at com.gjxaiou.thread.Mytest4.d(Mytest4.java:26)
+	at com.gjxaiou.thread.Mytest4.c(Mytest4.java:13)
+	at com.gjxaiou.thread.Mytest4.b(Mytest4.java:9)
+	at com.gjxaiou.thread.Mytest4.a(Mytest4.java:5)
+	at com.gjxaiou.thread.Mytest4.main(Mytest4.java:31)
+```
+
+### （九）static Map<Thread，StackTraceElement[]> getAllStackTraces() 方法
+
+返回所有**活动线程**的堆栈跟踪的一个映射，key 为线程，value 值为 StackTraceElement 数组（即对应 Thread 的堆栈转储）。
+
+在调用该方法同时，线程可能也在执行。每个线程的堆栈跟踪仅代表一个快照，并且每个堆栈跟踪都可以在不同时间获得。没有线程的堆栈跟踪信息则返回空数组。
+
+```java
+```
+
+
+
+
 
 ## 二、Runnable 接口
 
