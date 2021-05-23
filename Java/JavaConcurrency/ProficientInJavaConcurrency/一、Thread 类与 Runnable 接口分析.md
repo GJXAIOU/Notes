@@ -93,11 +93,16 @@ public class Thread implements Runnable {
 
 **Thread 类的 JavaDoc 文档总结**：
 
-- 每个线程都有一个优先级，高优先级的线程优于低优先级的线程执行，新创建线程的优先级等同于创建该线程的线程优先级。
+- 每个线程都有一个优先级，高优先级的线程优于低优先级的线程执行，**新创建线程的优先级等同于创建该线程的线程优先级。**
+
 - 只有创建线程为守护线程，其创建的线程才是守护线程。
+
+    > 当进程中不存在非守护线程时，守护线程自动销毁（如垃圾回收线程）。
+
 - 创建线程有两种方式：
     - 继承 Thread 类，然后重写 run 方法；
     - 实现 Runnable 接口，然后实现 run 方法；
+    
 - 每个线程在创建时都可以设置名称，如未指定则会自动设置。并且多个线程可能具有相同的名称。
 
 2.**然后在 Thread 类的代码中同样含有设置了线程优先级代码，代码如下：**
@@ -472,11 +477,362 @@ java.lang.Exception: Stack trace
 在调用该方法同时，线程可能也在执行。每个线程的堆栈跟踪仅代表一个快照，并且每个堆栈跟踪都可以在不同时间获得。没有线程的堆栈跟踪信息则返回空数组。
 
 ```java
+package com.gjxaiou.thread;
+
+import java.util.Iterator;
+import java.util.Map;
+
+public class MyTest5 {
+	public static void main(String[] args) {
+		Test test = new Test();
+		test.a();
+	}
+}
+
+class Test {
+	public void a() {
+		b();
+	}
+
+	public void b() {
+		c();
+	}
+
+	public void c() {
+		d();
+	}
+
+	public void d() {
+		Map<Thread, StackTraceElement[]> allStackTraces =
+				Thread.currentThread().getAllStackTraces();
+		if (allStackTraces != null && allStackTraces.size() != 0) {
+			Iterator<Thread> iterator = allStackTraces.keySet().iterator();
+			while (iterator.hasNext()) {
+				Thread next = iterator.next();
+				StackTraceElement[] stackTraceElements = allStackTraces.get(next);
+				System.out.println("每个线程的基本信息：" + "线程名称：" + next.getName() + " 线程状态：" + next.getState());
+				if (stackTraceElements.length != 0) {
+					System.out.println("输出 stackTraceElement[] 数组具体信息：");
+					for (StackTraceElement stackTraceElement : stackTraceElements) {
+						System.out.println(stackTraceElement.getClassName() + "   " + stackTraceElement.getMethodName() + "  " + stackTraceElement.getLineNumber());
+					}
+				} else {
+					System.out.println("stackTraceElement[] 为空，因为线程" + next.getName() + " 中的 " +
+							"StackTraceElement " +
+							"数组长度为 0");
+				}
+			}
+		}
+	}
+}
 ```
 
+输出结果为：
 
+```java
+每个线程的基本信息：线程名称：Attach Listener 线程状态：RUNNABLE
+stackTraceElement[] 为空，因为线程Attach Listener 中的 StackTraceElement 数组长度为 0
+每个线程的基本信息：线程名称：Monitor Ctrl-Break 线程状态：RUNNABLE
+输出 stackTraceElement[] 数组具体信息：
+java.net.PlainSocketImpl   <init>  97
+java.net.SocksSocketImpl   <init>  55
+java.net.Socket   setImpl  503
+java.net.Socket   <init>  424
+java.net.Socket   <init>  211
+com.intellij.rt.execution.application.AppMainV2$1   run  43
+每个线程的基本信息：线程名称：Signal Dispatcher 线程状态：RUNNABLE
+stackTraceElement[] 为空，因为线程Signal Dispatcher 中的 StackTraceElement 数组长度为 0
+每个线程的基本信息：线程名称：Finalizer 线程状态：WAITING
+输出 stackTraceElement[] 数组具体信息：
+java.lang.Object   wait  -2
+java.lang.ref.ReferenceQueue   remove  144
+java.lang.ref.ReferenceQueue   remove  165
+java.lang.ref.Finalizer$FinalizerThread   run  216
+每个线程的基本信息：线程名称：Reference Handler 线程状态：WAITING
+输出 stackTraceElement[] 数组具体信息：
+java.lang.Object   wait  -2
+java.lang.Object   wait  502
+java.lang.ref.Reference   tryHandlePending  191
+java.lang.ref.Reference$ReferenceHandler   run  153
+每个线程的基本信息：线程名称：main 线程状态：RUNNABLE
+输出 stackTraceElement[] 数组具体信息：
+java.lang.Thread   dumpThreads  -2
+java.lang.Thread   getAllStackTraces  1610
+com.gjxaiou.thread.Test   d  25
+com.gjxaiou.thread.Test   c  21
+com.gjxaiou.thread.Test   b  18
+com.gjxaiou.thread.Test   a  15
+com.gjxaiou.thread.MyTest5   main  9
+```
 
+### （十）interrupt、interrupted 和 isInterrupted 方法
 
+首先后面两个是用于判断线程是否为停止状态。
+
+```java
+// 用于判断 currentThread() 是否已经中断
+public static boolean interrupted() {
+    return currentThread().isInterrupted(true);
+}
+
+// 用于判断 this 关键字所在类的对象是否已经中断
+public boolean isInterrupted() {
+    return isInterrupted(false);
+}
+private native boolean isInterrupted(boolean ClearInterrupted);
+```
+
+其中 `isInterrupted()` 用于判断当前线程是否已经中断，当前线程即运行 `this.interrupted()` 方法的线程。
+
+```java
+package com.gjxaiou.thread;
+
+public class MyTest7 {
+	public static void main(String[] args) throws InterruptedException {
+		MyThread7 myThread7 = new MyThread7();
+		myThread7.start();
+		Thread.sleep(2);
+        // 在 myThread7 对象上调用该方法来停止 myThread7 对象所代表的线程
+		myThread7.interrupt();
+        // 判断 myThread7 对象所代表的线程是否停止
+		System.out.println(myThread7.interrupted());
+		System.out.println(myThread7.interrupted());
+	}
+}
+
+class MyThread7 extends Thread {
+	@Override
+	public void run() {
+		int i = 0;
+		while (i++ < 1000) {
+			System.out.println("自定义线程执行");
+		}
+	}
+}
+```
+
+执行结果为：（部分中间结果）
+
+```java
+自定义线程执行
+自定义线程执行
+自定义线程执行
+false
+false
+自定义线程执行
+自定义线程执行
+```
+
+但是 `interrupted()` 方法是**判断当前线程是否已经中断**，当前线程为 main，但是 main 线程并没有暂停，所以输出两个 false。
+
+同时上面的 `myThread.interrupted()` 是用来判断 currentThread() 是否被中断，等价于 `Thread.interrupted()`，因为在 Thread 类中调用静态 static 方法时，大多数是针对 currentThread() 线程进行操作。
+
+**暂停 main 线程**：
+
+```java
+package com.gjxaiou.thread;
+
+public class MyTest8 {
+	public static void main(String[] args) {
+		Thread.currentThread().interrupt();
+		System.out.println(Thread.interrupted());
+		System.out.println(Thread.interrupted());
+	}
+}
+```
+
+输出结果为：
+
+```java
+true
+false
+```
+
+第二次返回 false 的原因：因为 `interrupted()` 方法不仅可以判断当前线程是否已经中断，同时还会清除中断状态。即连续调用两次这个方法，因为第一次调用已经清除了其中断状态之后，第二次返回了 false。
+
+**isInterrupted() 方法非 static 方法，作用于调用这个方法的对象**：
+
+将 MyTest7 中的输出语句替换为：
+
+```java
+System.out.println(myThread7.isInterrupted());
+System.out.println(myThread7.isInterrupted());
+```
+
+输出结果为：
+
+```java
+自定义线程执行
+自定义线程执行
+true
+true
+自定义线程执行
+自定义线程执行
+```
+
+结果可知：isInterrupted() 没有清除状态标志，所以输出两个都是 true。
+
+**总结**：
+
+- `this.interrupted()`：检测当前线程是否已经是中断状态，执行后具有清除状态标志值为 false 的功能。
+- `this.isInterrupted()`：检测线程 Thread 对象是否已经是中断状态，不清除状态标志。
+
+#### 使用 interrupt() 方法中断线程
+
+正确的方式是，如果检测到中断了则抛出异常，然后通过捕捉异常来实现中断。
+
+当然可以结合 `return` 实现同样的效果，即将 `run()` 方法中的 `throw new InterruptedException();` 替换为 `return`，然后 `run()` 方法和 `main()` 方法中的 `try-catch` 均可删除。
+
+但是当 run 中存在多种操作需要多次判断 `this.interrupted()`时，通过抛出和捕捉异常，可以将日志等统一在 catch 处输出，但结合 return 则需要在每个 return 返回前都要打印日志。
+
+```java
+package com.gjxaiou.thread;
+
+public class MyTest9 {
+	public static void main(String[] args) {
+
+		try {
+			MyThread9 myThread9 = new MyThread9();
+			myThread9.start();
+			Thread.sleep(20);
+			myThread9.interrupt();
+		} catch (InterruptedException e) {
+			System.out.println("main catch");
+			e.printStackTrace();
+		}
+		System.out.println("happy end");
+	}
+}
+
+class MyThread9 extends Thread {
+	@Override
+	public void run() {
+		System.out.println("开始执行 run.");
+		try {
+			for (int i = 0; i < 30000; i++) {
+				if (this.interrupted()) {
+					System.out.println("线程已经停止，要退出啦");
+					throw new InterruptedException();
+				}
+				System.out.println("i 的值" + i);
+			}
+			System.out.println("不会执行 for 循环外面");
+		} catch (InterruptedException e) {
+			System.out.println("进入 run 的 catch 方法");
+			e.printStackTrace();
+		}
+	}
+}
+```
+
+执行结果为：
+
+```java
+开始执行 run.
+i 的值0
+i 的值1
+i 的值2
+// 省略。。。。
+i 的值3366
+i 的值3367
+i 的值3368
+线程已经停止，要退出啦
+happy end
+进入 run 的 catch 方法
+java.lang.InterruptedException
+	at com.gjxaiou.thread.MyThread9.run(MyTest9.java:27)
+
+Process finished with exit code 0
+```
+
+#### sleep 状态下停止线程
+
+分为两种：
+
+- 在 sleep 状态下执行 interrupt() 方法会抛出异常
+
+    ```java
+    package com.gjxaiou.thread;
+    
+    public class MyTest10 {
+    	public static void main(String[] args) {
+    		MyThread10 myThread10 = new MyThread10();
+    		myThread10.start();
+    		try {
+    			// 主线程只 sleep 100ms，下面的 thread 则 sleep 20000
+    			Thread.sleep(100);
+    			myThread10.interrupt();
+    		} catch (InterruptedException e) {
+    			System.out.println("进入 main catch 中");
+    			e.printStackTrace();
+    		}
+    		System.out.println("happy end");
+    	}
+    }
+    
+    class MyThread10 extends Thread {
+    	@Override
+    	public void run() {
+    		System.out.println("run begin");
+    		try {
+    			Thread.sleep(20000);
+    		} catch (InterruptedException e) {
+    			System.out.println("sleep() 中被停止，进入 catch " + this.isInterrupted());
+    			e.printStackTrace();
+    		}
+    	}
+    }
+    ```
+
+    输出结果：
+
+    ```java
+    run begin
+    happy end
+    sleep() 中被停止，进入 catch false
+    java.lang.InterruptedException: sleep interrupted
+    	at java.lang.Thread.sleep(Native Method)
+    	at com.gjxaiou.thread.MyThread10.run(MyTest10.java:23)
+    ```
+
+- 调用 interrupted() 方法给线程打了中断标记，再执行 sleep() 方法也会抛出异常。
+
+    ```java
+    package com.gjxaiou.thread;
+    
+    public class MyTest11 {
+    	public static void main(String[] args) {
+    		MyThread11 myThread11 = new MyThread11();
+    		myThread11.start();
+    		myThread11.interrupt();
+    	}
+    
+    }
+    
+    class MyThread11 extends Thread {
+    	@Override
+    	public void run() {
+    		System.out.println("run begin");
+    		try {
+    			Thread.sleep(2000);
+    			System.out.println("run end");
+    		} catch (InterruptedException e) {
+    			System.out.println("先停止然后进入 sleep，进入了 run catch");
+    			e.printStackTrace();
+    		}
+    	}
+    }
+    ```
+
+    输出结果为：
+
+    ```java
+    run begin
+    先停止然后进入 sleep，进入了 run catch
+    java.lang.InterruptedException: sleep interrupted
+    	at java.lang.Thread.sleep(Native Method)
+    	at com.gjxaiou.thread.MyThread11.run(MyTest11.java:17)
+    ```
 
 ## 二、Runnable 接口
 
