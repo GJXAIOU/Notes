@@ -393,15 +393,15 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
       log4j.logger.com.gjxaiou.mapper=DEBUG   ## 只有这个包输出是 Debug 级别，其它都是 Error 级别
       ```
       
-      - 类级别
+    - 类级别
 
-        namespace 属性值 ，相当于namespace 类名
+      namespace 属性值 ，相当于 namespace 类名
 
-      - 方法级别
+    - 方法级别
 
-        使用 namespace 属性值+标签 id 属性值
+      使用 namespace 属性值+标签 id 属性值
 
-## 八、 parameterType 属性（Mybatis 中参数设置）
+## 八、 parameterType 属性（MyBatis 中参数设置）
 
 **传递多个参数时候，可以使用对象或者 map，和第二部分的多参数实现方法**；
 
@@ -415,21 +415,22 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
   System.out.println(p);
   ```
 
-  - 在 实例名Mapper.xml  中可以通过`#{}`获取参数
-    - `parameterType`  控制参数类型
+  在实例名Mapper.xml  中可以通过`#{}`获取参数
+  - `parameterType`  控制参数类型
 
-    - `#{}`  获取参数内容
-      - 使用索引，从 0 开始 `#{0}`表示第一个参数（尽量不使用这个方法），或者使用`#{param1}`，表示第一个参数
-      - 如果**只有一个参数(其参数应该是基本数据类型或 String)**，mybatis 对 `#{}` 里面内容没有要求只要写内容即可。
-      - 如果参数是对象`#{属性名}`
-      -  如果参数是 map， 写成`#{key}` ：当需要传递多个参数时候，目前只能使用 map 或者对象
-      
-      ```xml
-      <select id="selById"
-        resultType="com.gjxaiou.pojo.People"  parameterType="int">
-        select * from people where id=#{0}
-      </select>
-      ```
+  - `#{}`  获取参数内容
+    
+    - 使用索引，从 0 开始 `#{0}`表示第一个参数（不推荐），或者使用`#{param1}`，表示第一个参数
+    - 如果**只有一个参数（其参数应该是基本数据类型或 String）**，MyBatis 对 `#{}` 里面内容没有要求只要写内容即可。
+    - 如果参数是对象`#{属性名}`
+    -  如果参数是 map， 写成`#{key}` ：**当需要传递多个参数时候，目前只能使用 map 或者对象。**
+    
+    ```xml
+    <select id="selById"
+      resultType="com.gjxaiou.pojo.People"  parameterType="int">
+      select * from people where id=#{0}
+    </select>
+    ```
 
 - `#{}` 和 `${}` 的区别
 
@@ -454,7 +455,7 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
 
 ## 九、MyBatis 中实现 MySQL 分页
 
-不允许在关键字前后进行数学运算，需要在代码中计算完成后传递到 mapper.xml  中；
+原则上：不允许在关键字前后进行数学运算，需要在代码中计算完成后传递到 mapper.xml  中；
 
 - Java 中代码为：
 
@@ -515,9 +516,9 @@ log4j.appender.LOGFILE.layout.ConversionPattern=%C	%m %L %n
 
 ## 十一、MyBatis 实现新增/修改/删除
 
-- **在 mybatis 中默认是关闭了 JDBC 的自动提交功能**
-  -  每一个 SqlSession 默认都是不自动提交事务
-  -  可以使用 `session.commit()` 提交事务，也可以使用 `openSession(true);` 自动提交底层为：`.setAutoCommit(true);`
+- **MyBatis 中默认是关闭了 JDBC 的自动提交功能**，因此每一个 SqlSession 默认都是不自动提交事务。
+
+  可以使用 `session.commit()` 提交事务，也可以使用 `openSession(true);` 自动提交底层为：`.setAutoCommit(true);`
 - MyBatis 底层是对 JDBC 的封装
 
   JDBC 中 `executeUpdate()` 执行新增，删除，修改 SQL，方法的返回值 int，表示受影响的行数。**因此 MyBatis 中 `<insert> <delete> <update>` 标签没有 resultType 属性，认为返回值都是 int**。
@@ -532,7 +533,7 @@ mapper.xml 值为；
 
 ```xml
 <insert id="ins" parameterType="People">
-insert into people values(default,#{name},#{age})
+    insert into people values(default,#{name},#{age})
 </insert>
 ```
 

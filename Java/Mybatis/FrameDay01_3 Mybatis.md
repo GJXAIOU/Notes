@@ -1,36 +1,25 @@
 # FrameDay01_3 Mybatis
 
-**主要内容**
-* Auto Mapping 单表实现(别名方式)
-* `<resultMap>` 实现单表配置
-* 单个对象关联查询 (N+1,外连接) 集合对象关联查询
-* 注解开发
-* MyBatis 运行原理
+[TOC]
 
 
-## 一、MyBatis 实现多表查询
+## 一、MyBatis 实现多表查询方式
 
-### （一）Mybatis 实现多表查询方式
+- 方式一：业务装配：对两个表编写单表查询语句，在业务(Service)把查询的两个结果进行关联；
+- 方式二：使用`Auto  Mapping` 特性，在实现两表联合查询时通过别名完成映射；
+- 方式三：使用 MyBatis 的 `<resultMap>` 标签进行实现；
 
-一共三种方式
-- 业务装配：对两个表编写单表查询语句,在业务(Service)把查询的两个结果进行关联；
-- 使用`Auto  Mapping` 特性,在实现两表联合查询时通过别名完成映射；
-- 使用 MyBatis 的 `<resultMap>` 标签进行实现；
-
-### （二）多表查询时,类中包含另一个类的对象的分类
-
-- 单个对象
-- 集合对象
+在进行多表查询时，类中包含另一个类的对象分为单个对象和集合对象。
 
 ## 二、resultMap 标签
 
 相当于现在直接设置映射关系，进行两者（SQL 查询结果和实体类之间）的匹配。
 
-- `<resultMap>` 标签写在 `实体类Mapper.xml`  中，由程序员控制SQL 查询结果与实体类的映射关系；
+- `<resultMap>` 标签写在 `实体类Mapper.xml`  中，由程序员控制 SQL 查询结果与实体类的映射关系；
 
 - 默认 MyBatis 使用 `Auto  Mapping` 特性进行映射：即保持查询的数据库中的列名和实体类中的属性名相同即可；
 
-- 使用 `<resultMap>`标签时,<select>标签不写 resultType  属性,而是使用 resultMap 属性来引用<resultMap>标签.
+- 使用 `<resultMap>`标签时，`<select>`标签不写 resultType  属性，而是使用 resultMap 属性来引用`<resultMap>` 标签。
 
 ### （一）使用 resultMap 实现单表映射关系
 
@@ -38,44 +27,46 @@
 示例：数据库表 teacher 中两个字段： id、name
 
 - 然后进行实体类设计
-```java
-public class Teacher{
-   private int id1;
-   private String name1;
-}
-```
+
+    ```java
+    public class Teacher{
+       private int id1;
+       private String name1;
+    }
+    ```
 
 - 然后实现 TeacherMapper.xml  代码
-```xml
-<!-- 其中 type 的值为返回值类型-->
-<resultMap type="teacher" id="mymap">
-    <!-- 主键使用id 标签配置映射关系-->
-    <!-- column 值为数据库中列名； property 值为实体类中的属性名 -->
-    <id column="id" property="id1" />
-    
-    <!-- 其他列使用result 标签配置映射关系-->
-    <result column="name" property="name1"/>
-</resultMap>
 
-<select id="selAll" resultMap="mymap">
-      select * from teacher
-</select>
-```
-上面代码如果使用原来的数据库中字段的名称和实体类相同的话，代码如下：
-```xml
-<select id = "selAll" resultType = "teacher">
-    select * from teacher
-</select>
-```
+    ```xml
+    <!-- 其中 type 的值为返回值类型-->
+    <resultMap type="teacher" id="mymap">
+        <!-- 主键使用id 标签配置映射关系-->
+        <!-- column 值为数据库中列名； property 值为实体类中的属性名 -->
+        <id column="id" property="id1" />
+        
+        <!-- 其他列使用result 标签配置映射关系-->
+        <result column="name" property="name1"/>
+    </resultMap>
+    
+    <select id="selAll" resultMap="mymap">
+          select * from teacher
+    </select>
+    ```
+
+    上面代码如果使用原来的数据库中字段的名称和实体类相同的话，代码如下：
+
+    ```xml
+    <select id = "selAll" resultType = "teacher">
+        select * from teacher
+    </select>
+    ```
 
 
 ###  （二）使用 resultMap 实现关联单个对象(N+1 方式)
 
-- N+1 查询方式：先查询出某个表的全部信息，根据这个表的信息查询另一个表的信息；
-- N+1 查询方式与业务装配的区别:
-原来在 service 里面写的代码，现在由 mybatis 完成装配；
+N+1 查询方式：先查询出某个表的全部信息，根据这个表的信息查询另一个表的信息；
 
-#### 实现步骤:
+**实现步骤**
 
 - 首先在 Student 实现类中包含了一个 Teacher  对象
 ```java
@@ -269,17 +260,13 @@ mybatis 可以通过主键判断对象是否被加载过，因此不需要担心
 
 ## 四、MyBatis 注解
 
-**注解是写在类中的，不是XML中的，相当于将 实体类Mapper.xml 中的内容直接在对应的接口中实现即可，不在需要 实体类Mapper.xml 文件。**
+**注解相当于将 实体类Mapper.xml 中的内容直接在对应的接口中实现即可，简化了配置文件。**
 
-- 注解：为了简化配置文件；
-- Mybatis 的注解简化 `实体类Mapper.xml`  文件；
-  - 如果涉及动态 SQL 依然使用 mapper.xml
+如果涉及动态 SQL 依然使用 mapper.xm，而且 mapper.xml  和注解可以共存。
 
-- mapper.xml  和注解可以共存.
-
-- 使用注解时要在 mybatis.xml 中<mappers>标签中使用下面两种方式之一进行配置：
-  - `<package/>`
-  - `<mapper  class=””/>`
+使用注解时要在 mybatis.xml 中 `<mappers>` 标签中使用下面两种方式之一进行配置：
+- `<package/>`
+- `<mapper  class=””/>`
 
 可以在测试的时候使用下面：因为是接口：
 ```java
@@ -314,7 +301,7 @@ int delById(int id);
 ```
 
 - 使用注解实现<resultMap>功能
-以 N+1 举例
+  以 N+1 举例
 
   - 首先在 StudentMapper 接口添加查询
 ```java
@@ -344,18 +331,24 @@ List<Student> selByTid(int tid);
 ### （一）MyBatis 运行过程中涉及到的类
 
 - `Resources`： MyBatis 中 IO 流的工具类
-  - 作用是：加载配置文件
+
+  作用是：加载配置文件
 - `SqlSessionFactoryBuilder()` ： 构建器
-  - 作用：创建 SqlSessionFactory 接口的实现类
+
+  作用：创建 SqlSessionFactory 接口的实现类
 - `XMLConfigBuilder` ： MyBatis 全局配置文件内容构建器类
-  - 作用：负责读取流内容并转换为 JAVA  代码
+
+  作用：负责读取流内容并转换为 JAVA  代码
 - `Configuration`： 封装了全局配置文件所有配置信息
-  - 全局配置文件内容存放在 Configuration 中
+
+  全局配置文件内容存放在 Configuration 中
 - `DefaultSqlSessionFactory` ： 是SqlSessionFactory 接口的实现类
 - `Transaction` ： 事务类
-  - 每一个 SqlSession 会带有一个 Transaction 对象.
+
+  每一个 SqlSession 会带有一个 Transaction 对象.
 - `TransactionFactory`： 事务工厂
-  -  负责生产 Transaction
+
+  负责生产 Transaction
 - `Executor` ： MyBatis 执行器
   - 作用:负责执行 SQL 命令
   - 相当于 JDBC 中 statement  对象(或 PreparedStatement 或 CallableStatement)
@@ -373,16 +366,12 @@ List<Student> selByTid(int tid);
 
 ### （三）文字解释
 
-在 MyBatis 运行开始时需要先通过 Resources 加载全局配置文件.下面需要实例化 SqlSessionFactoryBuilder 构建器.帮助 SqlSessionFactory 接口实现类 DefaultSqlSessionFactory.
+在 MyBatis 运行开始时需要先通过 Resources 加载全局配置文件，然后实例化 SqlSessionFactoryBuilder 构建器，帮助 SqlSessionFactory 接口实现类 DefaultSqlSessionFactory。
 
-在实例化 DefaultSqlSessionFactory 之前需要先创建 XmlConfigBuilder 解析全局配置文件流,并把解析结果存放在 Configuration 中.之后把Configuratin 传递给 DefaultSqlSessionFactory.到此 SqlSessionFactory 工厂创建成功.
+在实例化 DefaultSqlSessionFactory 之前需要先创建 XmlConfigBuilder 解析全局配置文件流，并把解析结果存放在 Configuration 中。之后把 Configuratin 传递给 DefaultSqlSessionFactory。到此 SqlSessionFactory 工厂创建成功.
 
-由 SqlSessionFactory  工厂创建 SqlSession.
+由 SqlSessionFactory  工厂创建 SqlSession。
 
-每次创建 SqlSession 时,都需要由 TransactionFactory  创建 Transaction 对象, 同时还需要创建 SqlSession 的执行器 Excutor, 最后实例化DefaultSqlSession,传递给 SqlSession 接口.
+每次创建 SqlSession 时，都需要由 TransactionFactory  创建 Transaction 对象，同时还需要创建 SqlSession 的执行器 Excutor，最后实例化 DefaultSqlSession，传递给 SqlSession 接口。
 
-根据项目需求使用 SqlSession 接口中的 API 完成具体的事务操作. 如果事务执行失败,需要进行 rollback 回滚事务.
-
-如果事务执行成功提交给数据库.关闭 SqlSession
-
-到此就是 MyBatis 的运行原理.(面试官说的.)
+根据项目需求使用 SqlSession 接口中的 API 完成具体的事务操作。如果事务执行失败，需要进行 rollback 回滚事务。
