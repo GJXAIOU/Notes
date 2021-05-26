@@ -4,6 +4,14 @@
 
 ## Synchronized 关键字原理详解
 
+可以保证原子性、可见性和有序性。
+
+**非线程安全**：多个线程对同一个对象中的实例变量进行并发的访问（体现为通过同一个实例变量创建多个线程）；但是在方法内部的变量都是线程安全的。
+
+多个线程同时访问同一个对象中的同步方法时一定是线程安全的，因为线程进入用 synchronized 声明的方法时候需要上锁，方法执行完成之后自动解锁。
+
+如果通过多个对象创建多个线程，因为多个对象对应多个锁，线程和业务对象为一对一关系，每个线程执行自己所属业务对象中的同步方法，不存在争抢关系，所以运行结果是异步的。
+
 ### 一、引言
 
 **关于 synchronized 的一道题目**
@@ -234,6 +242,76 @@ class Thread2 extends Thread {
 ```
 
 如果一个对象中含有若干个 synchronized 方法，那么在某一个时刻只能有唯一的线程进入到其中一个 synchronized 方法。其他线程即使想访问其他 synchronized 方法也要等待。因为当一个线程想要访问其中一个 synchronized 方法的时候，要尝试着获取当前对象的锁（而当前对象只有唯一的一把锁）。
+
+#### 脏读
+
+在多个线程调用同一个方法时候为了避免数据出现交叉的情况，可以使用 synchronized 关键字来进行同步，但是如果仅仅在赋值处进行了同步，则在取值的时候出现其它情况。发生脏读的原因是在读取实例变量时，该值已经被其他线程更改过了。
+
+```java
+package com.gjxaiou.synchronize;
+
+public class MyTest6 {
+	public static void main(String[] args) throws InterruptedException {
+		Demo demo = new Demo();
+		MyThread6 myThread6 = new MyThread6(demo);
+		myThread6.start();
+		// 输出结果很大程度上受该值影响
+		Thread.sleep(20);
+		demo.getValue();
+	}
+}
+
+class MyThread6 extends Thread {
+	Demo demo;
+
+	MyThread6(Demo demo) {
+		this.demo = demo;
+	}
+
+	@Override
+	public void run() {
+		demo.setValue("B", "BB");
+	}
+}
+
+class Demo {
+	public String username = "A";
+	public String password = "AA";
+
+	synchronized public void setValue(String username, String password) {
+		try {
+			this.username = username;
+			Thread.sleep(6000);
+			this.password = password;
+
+			System.out.println("setValue-currentThreadName：" + Thread.currentThread().getName() +
+					"，username：" + username +
+					"，password：" + password);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void getValue() {
+		System.out.println("getValue-currentThreadName：" + Thread.currentThread().getName() +
+				"，username：" + username +
+				"，password：" + password);
+	}
+}
+```
+
+输出结果：
+
+```java
+getValue-currentThreadName：main，username：B，password：AA
+setValue-currentThreadName：Thread-0，username：B，password：BB
+```
+
+修正：在 `getValue()` 也使用 synchronized 同步即可。
+
+因为当 A 线程调用该对象中的 `setValue()` 方法的时候，A 线程获取该对象的锁。但是其它线程可以任何调用非 synchronized 修饰的方法。但是如果两个方法都使用 synchronized 修饰，则 A 线程调用 `setValue()` 则其他线程必须等待 A 线程执行完该方法并且释放锁之后才能调用 `getValue()`，因为 `setValue()` 已经完整执行，所以两个变量都已经同时被赋值，所以不存在脏读。
+
+
 
 ### 三、透过字节码理解 synchronized 关键字
 
@@ -1281,6 +1359,10 @@ DTRACE_MONITOR_PROBE(notify, this, object(), THREAD);
 ```
 
 
+
+### 锁重入
+
+在使用 synchronized  时，一个线程得到一个对象锁之后，再次请求此对象锁时可以得到该对象锁，即在一个 synchronized 方法/块的内部调用本类的其它 synchronized 方法/块时，永远可以得到锁。
 
 ### 八、锁升级与偏向锁深入理解
 
