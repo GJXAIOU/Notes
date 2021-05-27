@@ -12,6 +12,8 @@
 
 如果通过多个对象创建多个线程，因为多个对象对应多个锁，线程和业务对象为一对一关系，每个线程执行自己所属业务对象中的同步方法，不存在争抢关系，所以运行结果是异步的。
 
+如果重写的方法不使用 synchronized 关键字，就是非同步方法了。
+
 ### 一、引言
 
 **关于 synchronized 的一道题目**
@@ -315,23 +317,23 @@ setValue-currentThreadName：Thread-0，username：B，password：BB
 
 ### 三、透过字节码理解 synchronized 关键字
 
-- synchronized 关键字一般用于修饰一个方法或者修饰一个代码块
+synchronized 关键字一般用于修饰一个方法或者修饰一个代码块，修饰方法时是将当前对象作为锁，修饰代码块时时间任意对象作为锁。
 
-    - 修饰方法
+- 修饰方法
 
-        方法可以是静态或者非静态的，如果是修饰实例方法（不加 static 关键字），当线程去访问的该方法的时候，是给当前对象上锁。如果是修饰静态方法，线程访问该方法的的时候是给该对象对应的类的 Class 对象上锁。
+    方法可以是静态或者非静态的，如果是修饰实例方法（不加 static 关键字），当线程去访问的该方法的时候，是给当前对象上锁。如果是修饰静态方法，线程访问该方法的的时候是给该对象对应的类的 Class 对象上锁。
 
-    - 修饰代码块：
+- 修饰代码块：
 
-        synchronized 关键字 后面会跟上一个对象的名字（引用的名字），加上具体执行的代码逻辑。
-
-
+    synchronized 关键字 后面会跟上一个对象的名字（引用的名字），加上具体执行的代码逻辑。
 
 **总结**：当我们使用 synchronized 关键字来修饰代码块时候，字节码层面上是通过 monitorenter 和 monitorexit 指令来实现锁的获取与释放动作。
 
 当线程进入到 monitorenter 指令后，线程将会持有被同步的对象（就是 synchronized 关键值后面括号中的对象）的 monitor 对象，当退出 monitorenter 指令之后（即执行 monitorexit 指令），线程将会释放该 monitor 对象。
 
 #### 1. synchronized 关键字修饰代码块
+
+两种方式，一种是 `synchronized(this)` 创建同步代码块，锁的是当前对象。另一种是 `synchronized(非 this 对象，即任意对象)`，锁的是括号中的任意对象。第二种方式通过 `synchronized(非 this 对象)` 和同步方法分别锁不同的对象，实现两者的异步执行，提高效率。
 
 **测试程序1：**
 
@@ -360,8 +362,7 @@ public class MyTest1 {
 **反编译之后的结果** 更加具体的反编译：包括常量池信息
 
 ```java
-E:\Program\Java\Project\JavaConcurrency\ProficientInJavaConcurrency\target\classes\com\gjxai
-ou\synchronize>javap -v MyTest1.class
+E:\Program\Java\Project\JavaConcurrency\ProficientInJavaConcurrency\target\classes\com\gjxaiou\synchronize>javap -v MyTest1.class
 Classfile /E:/Program/Java/Project/JavaConcurrency/ProficientInJavaConcurrency/target/classe
 s/com/gjxaiou/synchronize/MyTest1.class
   Last modified 2020-2-16; size 624 bytes
@@ -415,6 +416,82 @@ Constant pool:
             0      26     0  this   Lcom/gjxaiou/synchronize/MyTest1;
 }
 SourceFile: "MyTest1.java"
+```
+
+当一个线程访问一个对象的一个 `synchronized(this)` 同步代码块时候，另一个线程仍然可以访问该对象中的非 `synchronized(this)` 同步代码块。形成在一个方法中同时存在异步和同步（在 synchronized 中就是同步执行，不在就是异步执行）。但是不能访问该对象中另一个方法中的 `synchronized(this)` 同步代码块或者 synchronized 修饰的方法，因为两者锁的都是当前对象。
+
+```java
+package com.gjxaiou.synchronize;
+
+public class MyTest8 {
+	public static void main(String[] args) {
+		Task task = new Task();
+		new MyThread1(task).start();
+		new MyThread2(task).start();
+	}
+}
+
+// 任务执行逻辑
+class Task {
+	public void doLongThing() {
+		for (int i = 0; i < 100; i++) {
+			System.out.println("noSynchronizedPart: " + Thread.currentThread().getName() + " i: " + i);
+		}
+
+		synchronized (this) {
+			for (int i = 0; i < 100; i++) {
+				System.out.println("SynchronizedPart: " + Thread.currentThread().getName() + " " +
+						"i:" +
+						" " + i);
+			}
+		}
+	}
+}
+
+// 创建两个线程
+class MyThread1 extends Thread {
+	Task task = new Task();
+
+	MyThread1(Task task) {
+		this.task = task;
+	}
+
+	@Override
+	public void run() {
+		task.doLongThing();
+	}
+}
+
+class MyThread2 extends Thread {
+	Task task = new Task();
+
+	MyThread2(Task task) {
+		this.task = task;
+	}
+
+	@Override
+	public void run() {
+		task.doLongThing();
+	}
+}
+```
+
+执行结果部分
+
+```java
+// noSyn 的两个线程交叉执行，Syn 为线程逐个执行
+noSynchronizedPart: Thread-1 i: 79
+noSynchronizedPart: Thread-0 i: 91
+noSynchronizedPart: Thread-1 i: 80
+noSynchronizedPart: Thread-0 i: 92
+noSynchronizedPart: Thread-1 i: 81
+
+SynchronizedPart: Thread-0 i: 97
+SynchronizedPart: Thread-0 i: 98
+SynchronizedPart: Thread-0 i: 99
+SynchronizedPart: Thread-1 i: 0
+SynchronizedPart: Thread-1 i: 1
+SynchronizedPart: Thread-1 i: 2
 ```
 
 **测试程序 2**：如果两个方法中都含有 synchronized 修饰的代码块
@@ -1364,6 +1441,53 @@ DTRACE_MONITOR_PROBE(notify, this, object(), THREAD);
 
 在使用 synchronized  时，一个线程得到一个对象锁之后，再次请求此对象锁时可以得到该对象锁，即在一个 synchronized 方法/块的内部调用本类的其它 synchronized 方法/块时，永远可以得到锁。
 
+当然通过在子类中通过 `super.父类方法`，子类可以通过锁重入调用父类的同步方法。
+
+```java
+package com.gjxaiou.synchronize;
+
+public class MyTest7 {
+	public static void main(String[] args) {
+		new MyThread7().start();
+	}
+}
+
+class MyThread7 extends Thread {
+	@Override
+	public void run() {
+		new Service().service1();
+	}
+}
+
+class Service {
+	synchronized public void service1() {
+		System.out.println("调用 service1 成功，尝试调用 service2");
+		service2();
+	}
+
+	synchronized public void service2() {
+		System.out.println("调用 service2 成功，尝试调用 service3");
+		service3();
+	}
+
+	synchronized public void service3() {
+		System.out.println("调用 service3 成功");
+	}
+}
+```
+
+输出结果为：
+
+```java
+调用 service1 成功，尝试调用 service2
+调用 service2 成功，尝试调用 service3
+调用 service3 成功
+```
+
+能够依次调用该方法，说明是可重入锁。
+
+
+
 ### 八、锁升级与偏向锁深入理解
 
 **分析 synchronized 关键字底层**
@@ -1743,9 +1867,91 @@ public class MyTest1 {
 
 
 
+### 方法被调用是随机的
 
+线程调用方法的顺序是无序的，即多个线程线程调用同一个方法是随机的。
 
+```java
+package com.gjxaiou.synchronize;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+public class MyTest9 {
+	public static void main(String[] args) {
+		MyList list = new MyList();
+		MyThread9 myThread9 = new MyThread9(list);
+		myThread9.setName("A");
+		myThread9.start();
+		MyThread10 myThread10 = new MyThread10(list);
+		myThread10.setName("B");
+		myThread10.start();
+	}
+}
+
+class MyList {
+	public List list = new ArrayList();
+
+	synchronized public void add(String name) {
+		System.out.println(Thread.currentThread().getName() + "执行了当前方法");
+		list.add(name);
+		System.out.println(Thread.currentThread().getName() + "退出了当前方法");
+	}
+}
+
+// 创建两个线程类
+class MyThread9 extends Thread {
+	private MyList list;
+
+	MyThread9(MyList list) {
+		this.list = list;
+	}
+
+	@Override
+	public void run() {
+		for (int i = 0; i < 1000; i++) {
+			list.add("thread A : " + (i + 1));
+		}
+	}
+}
+
+class MyThread10 extends Thread {
+	private MyList list;
+
+	MyThread10(MyList list) {
+		this.list = list;
+	}
+
+	@Override
+	public void run() {
+		for (int i = 0; i < 1000; i++) {
+			list.add("thread B : " + (i + 1));
+		}
+	}
+}
+```
+
+部分连续的输出结果为：
+
+```java
+B执行了当前方法
+B退出了当前方法
+B执行了当前方法
+B退出了当前方法
+A执行了当前方法
+A退出了当前方法
+B执行了当前方法
+B退出了当前方法
+B执行了当前方法
+B退出了当前方法
+A执行了当前方法
+A退出了当前方法
+B执行了当前方法
+B退出了当前方法
+```
+
+从结果可知，同步方法中的代码是同步输出的，即线程「进入」和「退出」是成对出现的，但是方法被调用的时机是随机的，即线程 A 和线程 B 的执行是异步的。
 
 # java 中的锁 -- 偏向锁、轻量级锁、自旋锁、重量级锁
 
