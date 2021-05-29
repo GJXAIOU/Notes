@@ -748,6 +748,143 @@ Constant pool:
 SourceFile: "MyTest1.java"
 ```
 
+**同步 synchronized(类.class) 对类的所有实例起作用**
+
+```java
+package com.gjxaiou.synchronize;
+
+
+public class MyTest11 {
+	public static void main(String[] args) {
+		MyService myService1 = new MyService();
+		MyService myService2 = new MyService();
+		new MyThread13(myService1).start();
+		new MyThread13(myService2).start();
+	}
+}
+
+class MyService {
+	public void method1() {
+		synchronized (MyService.class) {
+			System.out.println(Thread.currentThread().getName() + " 进入方法 method1");
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println(Thread.currentThread().getName() + " 离开方法 method1");
+		}
+	}
+
+	public void method2() throws InterruptedException {
+		synchronized (MyService.class) {
+			System.out.println(Thread.currentThread().getName() + " 进入方法 method2");
+			System.out.println(Thread.currentThread().getName() + " 离开方法 method2");
+		}
+	}
+
+}
+
+// 新建两个线程
+class MyThread13 extends Thread {
+	MyService myService;
+
+	MyThread13(MyService myService) {
+		this.myService = myService;
+	}
+
+	@Override
+	public void run() {
+		myService.method1();
+	}
+}
+
+class MyThread14 extends Thread {
+	MyService myService;
+
+	MyThread14(MyService myService) {
+		this.myService = myService;
+	}
+
+	@Override
+	public void run() {
+		myService.method1();
+	}
+}
+```
+
+运行结果为：
+
+```java
+Thread-0 进入方法 method1
+Thread-0 离开方法 method1
+Thread-1 进入方法 method1
+Thread-1 离开方法 method1
+```
+
+两个线程同步执行。
+
+同样如果括号中是一个 String 类型的变量，如果两个线程传入相同的字符串值，则也是同步效果。
+
+**如果该对象中的某个属性改变的，但是多个线程持有的是同一个对象，则还是同步执行。**
+
+```java
+package com.gjxaiou.synchronize;
+
+public class MyTest12 {
+	public static void main(String[] args) {
+		try {
+			UserInfo userInfo = new UserInfo();
+			DemoService demoService = new DemoService();
+			// 两个线程持有的锁对象是同一个，仅仅是对象的属性改变了，但是对象未发生改变
+			new Thread(() -> demoService.hello(userInfo)).start();
+			Thread.sleep(20);
+			new Thread(() -> demoService.hello(userInfo)).start();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
+class DemoService {
+	public void hello(UserInfo userInfo) {
+		synchronized (userInfo) {
+			try {
+				System.out.println(Thread.currentThread().getName() + " 执行开始");
+				userInfo.setName("zhangsan");
+				Thread.sleep(3000);
+				System.out.println(Thread.currentThread().getName() + " 执行结束");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+class UserInfo {
+	String name;
+	int age;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+}
+```
+
+程序执行结果：
+
+```java
+Thread-0 执行开始
+Thread-0 执行结束
+Thread-1 执行开始
+Thread-1 执行结束
+```
+
 
 
 #### 2.synchronized 关键字修饰方法
@@ -1952,6 +2089,90 @@ B退出了当前方法
 ```
 
 从结果可知，同步方法中的代码是同步输出的，即线程「进入」和「退出」是成对出现的，但是方法被调用的时机是随机的，即线程 A 和线程 B 的执行是异步的。
+
+**异步带来的逻辑错误示例**
+
+```java
+package com.gjxaiou.synchronize;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MyTest10 {
+	public static void main(String[] args) throws InterruptedException {
+		MyOneList myOneList = new MyOneList();
+		new MyThread11(myOneList).start();
+		new MyThread12(myOneList).start();
+		Thread.sleep(6000);
+		System.out.println("listSize = " + myOneList.getSize());
+	}
+}
+
+class MyOneList {
+	List list = new ArrayList();
+
+	synchronized public void add(int data) {
+		list.add(data);
+	}
+
+	synchronized public int getSize() {
+		return list.size();
+	}
+}
+
+class MyObject {
+	public MyOneList addMethod(MyOneList list, int data) {
+		try {
+		//	synchronized (list) {
+				if (list.getSize() < 1) {   // 两个线程以异步的方式获取该值
+					Thread.sleep(2000);
+					list.add(data);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+}
+
+// 创建两个线程
+class MyThread11 extends Thread {
+	MyOneList myOneList;
+
+	MyThread11(MyOneList myOneList) {
+		this.myOneList = myOneList;
+	}
+
+	@Override
+	public void run() {
+		MyObject myObject = new MyObject();
+		myObject.addMethod(myOneList, 1);
+	}
+}
+
+class MyThread12 extends Thread {
+	MyOneList myOneList;
+
+	MyThread12(MyOneList myOneList) {
+		this.myOneList = myOneList;
+	}
+
+	@Override
+	public void run() {
+		MyObject myObject = new MyObject();
+		myObject.addMethod(myOneList, 2);
+	}
+}
+```
+
+输出结果：
+
+```java
+listSize = 2
+```
+
+将注释中的 `synchronized(list)` 添加，即使用同步即可保证结果正确，因为 list 参数对象在项目中是一份实例，同时也需要对 list 参数的 `getSize()` 方法做同步的调用，所以针对 list 参数做同步处理。
 
 # java 中的锁 -- 偏向锁、轻量级锁、自旋锁、重量级锁
 
