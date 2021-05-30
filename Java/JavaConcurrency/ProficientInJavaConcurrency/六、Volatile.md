@@ -2,15 +2,13 @@
 
 [TOC]
 
-volatile 可以说是 Java 虚拟机提供的最轻量级的同步机制了
+volatile 可以说是 Java 虚拟机提供的最轻量级的同步机制了。
 
-## volatile 关键字的作用以及缺点
+## volatile 关键字的作用
 
-==volatile 不能保证原子性，为什么能实现原子操作==
+- 实现 long/double 类型变量的原子**写操作**
 
-- 实现 long/double 类型变量的原子操作
-
-    因为 JVM 中的 long 和 double 都是占 64 位，针对现在的 32 位和 64 位机器，其可能分成低 32 位和高 32 位两个步骤进行分别填充赋值。导致其非原子性。
+    因为 JVM 中的 long 和 double 都是占 64 位，针对现在的 32 位机器，其可能分成低 32 位和高 32 位两个步骤进行分别填充赋值。导致其非原子性。
 
     ![image-20210320151618677](Volatile.resource/image-20210320151618677.png)
 
@@ -22,21 +20,21 @@ volatile 可以说是 Java 虚拟机提供的最轻量级的同步机制了
     AtomicLong b = new AtomicLong(1);
     ```
 
-    关于为什么没有 AtomicFloat 和 AtomicDouble，可以查看[stackoverflow](https://stackoverflow.com/questions/5505460/java-is-there-no-atomicfloat-or-atomicdouble)。
+    > 没有 AtomicFloat 和 AtomicDouble 的原因可以查看[stackoverflow](https://stackoverflow.com/questions/5505460/java-is-there-no-atomicfloat-or-atomicdouble)。
 
 - 防止指令重排序
 
 - 实现变量的可见性
 
-    当使用 volatile 修饰变量时，应用就不会从寄存器中获取该变量的值，而是从内存（高速缓存）中获取。
+    当使用 volatile 修饰变量时，应用就不会从寄存器中获取该变量的值，而是从内存（高速缓存）中获取。这样一个线程能立刻看到另一个线程更改的数据。
 
     > 因为程序在读取一个变量值的时候不会直接从内存中进行读取，而是从 CPU 中的寄存器中读取。当使用 volatile 修饰一个变量的时候，编译器就不会将该变量放置到寄存器中进行存储。对变量的访问和修改都需要访问内存。
 
-### volatile 的缺点
+## volatile 的缺点
 
 为了实现原子性操作那么每次取数据的时候不会在寄存器上取而是在主内存或者高速缓存上取这将带来性能的损失。
 
-###  使用方式
+##  三、使用方式
 
 ```java
 volatile int a = b + 2;    // 错误示例，无法保证对 a 的原子性。这里的赋值包含两个步骤：首先实现 b + 2，然后将其结果赋值给了 a。因为第一个线程获取 b 进行了 + 2，第二个线程也获取了 b，则 b 的值都不一样。【b + 2，其实是两步，先读取 b 然后进行 + 2】因为这里是两条指令进行一个操作。
@@ -50,15 +48,15 @@ volatile boolean flag = false; // 正确示例
 volatile Date date = new Date( );// 这个如果是多线程的话也可能出现问题，因为 new Date() 首先需要在堆上创建一个 Date 对象的存储并生成一些数据，然后返回一个引用给左侧的 date。加上 volatile 仅仅能保证将引用值赋值给 date 是一个原子操作。因为通常以上操作都是在一个方法中，只能被一个线程执行，所以没有问题。
 ```
 
-如果要实现volatile写操作的原子性，那么在等号右侧的赋值变量中就不能出现被多线程所共享的变量，哪怕这个变量也是个volatile也不可以。
+如果要实现 volatile 写操作的原子性，那么在等号右侧的赋值变量中就不能出现被多线程所共享的变量，哪怕这个变量也是个 volatile 也不可以。
 
-## 实现原理
+## 四、实现原理
 
 防止指令重排序和实现变量的可见性都是通过内存屏障（Memory Barrier）进行实现的。
 
 JIT 编译器将源代码生成字节码的过程中可能会进行指令的重排序以提升执行性能。在单线程问题下没有任何问题。Volatile 可以防止指令重排序，代码示例如下：
 
-### volatile 修饰写入操作
+### （一）volatile 修饰写入操作
 
 ```java
 int a = 1;
@@ -77,7 +75,7 @@ volatile boolean v = false; // 这是一个写操作，看到 volatile 会在前
 
 - Store Barrier∶重要作用是刷新处理器缓存，结果是可以确保该存储屏障之前一切（包括 volatile 修饰和非 volatile 修饰）的操作所生成的结果对于其他处理器来说都立刻可见。
 
-### volatile 修饰读操作
+### （二）volatile 修饰读操作
 
 ```java
 内存屏障(Load Barrier，加载屏障)
@@ -166,12 +164,6 @@ happen-before 原则一方面具有传递性，同时除了第一个在单个线
 
 
 
-
-
-
-
-
-
 ## 语义一：可见性
 
 前面介绍Java内存模型的时候，我们说过可见性是指当一个线程修改了共享变量的值，其它线程能立即感知到这种变化。
@@ -240,6 +232,92 @@ public class VolatileTest {
 因为不使用volatile修饰时，checkFinished()所在的线程每次都是读取的它自己工作内存中的变量的值，这个值一直为0，所以一直都不会跳出while循环。
 
 使用volatile修饰时，checkFinished()所在的线程每次都是从主内存中加载最新的值，当finished被主线程修改为1的时候，它会立即感知到，进而会跳出while循环。
+
+
+
+## 可见性测试
+
+使用多线程可能出现死循环：
+
+```java
+package com.gjxaiou.volatileUse;
+
+public class MyTest1 {
+	public static void main(String[] args) {
+		try {
+			MyThread1 myThread1 = new MyThread1();
+			myThread1.start();
+			Thread.sleep(1000);
+			myThread1.setRunning(false);
+			System.out.println("已经设置为 false");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class MyThread1 extends Thread {
+	// private volatile boolean isRunning = true;
+	private boolean isRunning = true;
+
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	public void setRunning(boolean running) {
+		isRunning = running;
+	}
+
+	@Override
+	public void run() {
+		System.out.println("进入 run 方法");
+		// 里面不能有任何代码
+		while (isRunning == true) {
+		}
+		System.out.println("线程被终止了");
+	}
+}
+```
+
+输出结果为：
+
+```java
+进入 run 方法
+已经设置为 false
+```
+
+出现了死循环，并且线程并未销毁，同时程序一直处于执行状态。
+
+在启动 MyThread1 线程时，变量 `private boolean isRunning = true;` 存在于**公共堆栈和线程的私有栈**中，线程运行后一直在线程的是由堆栈中取得的 isRunning 的值是 true，而代码 `myThread1.setRunning(false);`执行之后更新的是公共堆栈中的 isRunning 变量，修改为 false，操作的是两块内存地址中的数据，所以线程一直处于死循环中。
+
+![image-20210530142859725](六、Volatile.resource/image-20210530142859725-1622356491491.png)
+
+本质：私有堆栈中的值和公共堆栈中的值不同步造成的，通过在该变量前面加 volatile，是的当线程访问 isRunning 变量时，强制从公共堆栈中取值。该种线程停止的方式即：使用退出标志使得线程正常退出。加上之后的输出为：
+
+```java
+进入 run 方法
+已经设置为 false
+线程被终止了
+```
+
+方式二：使用 synchronized，因为 synchronized 可以使得多个线程访问同一个资源具有同步性，同时使线程工作内存中的私有变量和公共内存中的变量同步的可见性。主要修改 run 方法，返回结果如上：
+
+```java
+@Override
+public void run() {
+    String anyString = new String();
+    System.out.println("进入 run 方法");
+    // 里面不能有任何代码
+    while (isRunning == true) {
+        synchronized (anyString){
+        }
+    }
+    System.out.println("线程被终止了");
+}
+```
+
+
 
 ## 语义二：禁止重排序
 
@@ -479,9 +557,57 @@ if (a == 1) {
 
 `a = 1;`这个赋值操作本身就是原子的，所以可以使用volatile来修饰。
 
+可以使用 Atomic 解决单个元素操作的原子性，但是在有逻辑性的情况下，原子类的输出结果具有随机性，例如下面的 `addAndGet()` 方法是原子性执行的，但是方法和方法之间的调用不是原子性的，只能通过同步解决。
+
+```java
+package com.gjxaiou.volatileUse;
+
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.IntStream;
+
+public class MyTest2 {
+	public static void main(String[] args) {
+		try {
+			MyService myService = new MyService();
+			IntStream.range(0, 4).forEach(i -> new Thread(
+					myService::addNum).start());
+			Thread.sleep(1000);
+			// 获取该 atomic 值的最终值
+			System.out.println(myService.atomicValue.get());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class MyService {
+	public AtomicLong atomicValue = new AtomicLong();
+
+	public void addNum() {
+		// 下面两个方法每个都能保证执行的原子性，但是两个之间无法保证同步性，只能通过在方法上加 synchronized 实现
+		System.out.println(Thread.currentThread().getName() + " + 100: " + atomicValue.addAndGet(100));
+		System.out.println(Thread.currentThread().getName() + " + 1  : " + atomicValue.addAndGet(1));
+	}
+}
+```
+
+输出结果为：
+
+```java
+Thread-0 + 100: 100
+Thread-3 + 100: 400
+Thread-1 + 100: 200
+Thread-1 + 1  : 403
+Thread-2 + 100: 300
+Thread-2 + 1  : 404
+Thread-3 + 1  : 402
+Thread-0 + 1  : 401
+404
+```
+
 ## 总结
 
-volatile 关键字可以保证可见性、有序性，但不能保证原子性。
+- volatile 关键字可以保证可见性、有序性，但不能保证原子性。
 
 - volatile 关键字的底层主要是通过内存屏障来实现的；
 
