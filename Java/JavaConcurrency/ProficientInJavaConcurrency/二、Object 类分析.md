@@ -289,7 +289,217 @@ public final native void notifyAll();
 - 当调用对象的 notifyAll 方法时候，他就会唤醒该对象等待集合（wait set) 中的所有线程，这些线程被唤醒之后，又会开始竞争对象的锁；
 - 在某一个时刻，只有唯一一个线程可以拥有对象的锁。
 
+wait/notify 实现了多个线程之间的通信。不采用该方案，多个线程之间也可以通信，其本质上是因为多个线程共同访问同一个变量，两个线程完全是主动式地操作同一个共享变量，但是该方式一方面划分读取时间，同时读取到的值不能确定是不是想要的。
 
+如通过 `sleep() 和 while(true)`死循环实现多个线程间通信。
+
+```java
+package com.gjxaiou.object;
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+public class MyTest1 {
+	public static void main(String[] args) {
+		MyList list = new MyList();
+		new MyThread1(list).start();
+		new MyThread2(list).start();
+	}
+
+}
+
+class MyThread1 extends Thread {
+	public MyList list;
+
+	MyThread1(MyList list) {
+		this.list = list;
+	}
+
+	@Override
+	public void run() {
+		try {
+			for (int i = 0; i < 10; i++) {
+				list.add();
+				System.out.println("添加了 " + (i + 1) + " 个元素");
+				Thread.sleep(1000);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class MyThread2 extends Thread {
+	public MyList list;
+
+	MyThread2(MyList list) {
+		this.list = list;
+	}
+
+	@Override
+	public void run() {
+		try {
+			while (true) {
+                // Thread.sleep(1500);
+				if (list.getSize() == 5) {
+					System.out.println("到达 5 个元素了，线程 MyThread2 退出");
+					throw new InterruptedException();
+				}
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+
+class MyList {
+	public volatile List list = new ArrayList();
+
+	public void add() {
+		list.add("GJXAIOU");
+	}
+
+	public int getSize() {
+		return list.size();
+	}
+}
+```
+
+执行结果：
+
+```java
+添加了 1 个元素
+添加了 2 个元素
+添加了 3 个元素
+添加了 4 个元素
+添加了 5 个元素
+到达 5 个元素了，线程 MyThread2 退出
+java.lang.InterruptedException
+	at com.gjxaiou.object.MyThread2.run(MyTest1.java:50)
+添加了 6 个元素
+添加了 7 个元素
+添加了 8 个元素
+添加了 9 个元素
+添加了 10 个元素
+```
+
+该种方式的两个线程之间的通信，缺点是 MyThread2 需要通过 while 循环轮询机制来检测某一个条件，浪费 CPU 资源，但是如果加上注释中的 sleep，会可能得不到想要数据无法退出线程。
+
+**使用 wait/notify 机制实现 `list.size()` 等于 5 时的线程销毁**
+
+```java
+package com.gjxaiou.object;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MyTest2 {
+
+	public static void main(String[] args) {
+		try {
+			Object o = new Object();
+			new MyThread3(o).start();
+			Thread.sleep(50);
+			new MyThread4(o).start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+
+
+class MyThread3 extends Thread {
+	public Object lock;
+
+	MyThread3(Object lock) {
+		this.lock = lock;
+	}
+
+	@Override
+	public void run() {
+		try {
+			synchronized (lock) {
+				if (MyList2.getSize() != 5) {
+					System.out.println("wait begin" + System.currentTimeMillis());
+					lock.wait();
+					System.out.println("wait end" + System.currentTimeMillis());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+
+class MyThread4 extends Thread {
+	private Object lock;
+
+	MyThread4(Object lock) {
+		this.lock = lock;
+	}
+
+	public void run() {
+		try {
+			synchronized (lock) {
+				for (int i = 0; i < 10; i++) {
+					MyList2.add();
+					if (MyList2.getSize() == 5) {
+						lock.notify();
+						System.out.println("发出了唤醒通知");
+					}
+					System.out.println("添加了 " + (i + 1) + "个元素");
+					Thread.sleep(1000);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+
+class MyList2 {
+	private static List list = new ArrayList();
+
+	public static void add() {
+		list.add("GJXAIOU");
+	}
+
+	public static int getSize() {
+		return list.size();
+	}
+}
+```
+
+程序输出结果：
+
+```java
+wait begin1622564798907
+添加了 1个元素
+添加了 2个元素
+添加了 3个元素
+添加了 4个元素
+发出了唤醒通知
+添加了 5个元素
+添加了 6个元素
+添加了 7个元素
+添加了 8个元素
+添加了 9个元素
+添加了 10个元素
+wait end1622564809053
+```
+
+**说明**：
+
+- wait end 最后输出，表明 notify() 方法执行后并不立刻释放锁。
+- 任意一个 Object 对象都可以作为锁，内部都有 `wait()` 和 `notify()` 方法；
+- 通过调用 `wait()` 方法可以使得临界区类的线程进入等待状态，同时释放被同步对象的锁，notify 可以唤醒一个因调用了 wait 操作而处于 wait 状态的线程，使其进入就绪状态，被重新唤醒的线程会视图重新获取临界区的控制权（锁），并继续执行临界区内 wait 之后的代码。 	
 
 ### 六、wait 和 notify 方法案例剖析和详解
 

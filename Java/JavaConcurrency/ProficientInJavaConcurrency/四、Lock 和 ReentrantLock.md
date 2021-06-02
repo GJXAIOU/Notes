@@ -2,9 +2,9 @@
 
 [TOC]
 
-## Lock 锁机制深入详解
+## 一、Lock 锁机制深入详解
 
-jdk 1.5 之前对于对象同步只能使用 synchronized 关键字，之后引入了 Lock 接口（java.util.concurrency.locks.Lock.java），可以实现对象同步。
+JDK 1.5 之前对于对象同步只能使用 Synchronized 关键字，之后引入了 Lock 接口（java.util.concurrency.locks.Lock.java），可以实现对象同步。
 
 **首先针对 Lock 类的 JavaDoc 进行分析**：
 
@@ -63,7 +63,7 @@ jdk 1.5 之前对于对象同步只能使用 synchronized 关键字，之后引�
 - 需要自行以反加锁的顺序释放锁；
 - Lock 接口的实现允许在不同的作用域中获取和释放一个锁，并允许以任何顺序获取和释放多个锁；
 - 当锁定和解锁发生在不同的作用域中时，必须注意确保在锁定期间执行的所有代码都受到 try finally 或 try catch 的保护，以确保在必要时释放锁定。
-- Lock 实现通过提供一个非阻塞的获取锁的尝试 `tryLock()`，一个获取可以中断的锁的尝试lockInterruptibly，以及试图获取可以超时的锁 `tryLock（long，TimeUnit)`
+- Lock 实现通过提供一个非阻塞的获取锁的尝试 `tryLock()`，一个获取可以中断的锁的尝试`lockInterruptibly()`，以及试图获取可以超时的锁 `tryLock（long，TimeUnit)`
 
 ```java
 
@@ -170,18 +170,18 @@ public interface Lock {
 }
 ```
 
-## ReentrantLock
+## 二、ReentrantLock
 
-是 Lock  接口下面最重要的实现，re 即再次，entrant 是进入，因此 ReentrantLock 为可重入锁。重入锁，是指一个线程获取锁之后再尝试获取锁时会自动获取锁。
+是 Lock  接口下面最重要的实现，re 即再次，entrant 是进入，因此 **ReentrantLock 为可重入锁。即指一个线程获取锁之后再尝试获取锁时会自动获取锁。**
 
-<img src="四、Lock 锁.resource/ReentrantLock.png" alt="ReentrantLock" style="zoom:80%;" />
+<img src="四、Lock 和 ReentrantLock.resource/ReentrantLock.png" alt="ReentrantLock" style="zoom:80%;" />
 
-### 主要内部类
+### （一）主要内部类
 
 ReentrantLock 中主要定义了三个内部类：Sync、NonfairSync、FairSync。
 
 ```java
-// 抽象类 Syn c实现了 AQS 的部分方法；
+// 抽象类 Sync 实现了 AQS 的部分方法；
 abstract static class Sync extends AbstractQueuedSynchronizer {}
 // NonfairSync 实现了 Sync，主要用于非公平锁的获取；
 static final class NonfairSync extends Sync {}
@@ -189,7 +189,7 @@ static final class NonfairSync extends Sync {}
 static final class FairSync extends Sync {}
 ```
 
-### 主要属性
+### （二）主要属性
 
 ```java
 private final Sync sync;
@@ -197,7 +197,7 @@ private final Sync sync;
 
 主要属性就一个 sync，它在构造方法中初始化，决定使用公平锁还是非公平锁的方式获取锁。
 
-### 主要构造方法
+### （三）主要构造方法
 
 ```java
 // 默认构造方法，使用非公平锁
@@ -210,9 +210,9 @@ public ReentrantLock(boolean fair) {
 }
 ```
 
-### lock()方法
+### （四）lock()方法
 
-#### 公平锁加锁过程
+#### 1.公平锁加锁过程
 
 公平锁的 ReentrantLock 实例需要通过上述第二个构造方法进行创建：
 
