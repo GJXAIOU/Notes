@@ -31,6 +31,8 @@ public class Object {
 
 ### 二、wait 方法详解
 
+进入 wait 的条件判断，如果是单线程可以使用 if，但是多线程必须使用 while。
+
 wait() 方法有三个重载版本，本质上最终都会调用含有时间参数的版本。
 
 #### （一）无参数 wait 方法分析
@@ -82,6 +84,8 @@ public final void wait() throws InterruptedException {
 ```
 
 #### （二）带参数 wait 方法分析
+
+等待一段时间看是否有线程对锁进行 notify() 通知唤醒，如果超过这个线程线程会自动唤醒，但是继续向下执行的前提是再次持有锁，如果没有获取锁则会一直等待，直到持有锁为止。
 
 -----
 
@@ -238,7 +242,7 @@ sleep() 方法的另一个版本和 wait() 方法类型，仅仅是加了一个�
 
 ---
 
-> **唤醒等待此对象锁的单个线程**。如果有任何（多个）线程正在等待这个对象（的锁），则选择其中一个等待的线程被唤醒。选择是**任意**的，由实现者自行决定。线程通过调用这个对象 wait 方法中的一个（因为有多个 wait）来等待对象的监视器。
+> **唤醒等待此对象锁的单个线程**。如果有任何（多个）线程正在等待这个对象（的锁），则选择其中一个等待的线程被唤醒。选择是**任意**的，由实现者自行决定【依赖于 JVM 的实现】。线程通过调用这个对象 wait 方法中的一个（因为有多个 wait）来等待对象的监视器。
 >
 > 在当前线程放弃对该对象的锁定之前，唤醒的线程将无法继续（执行）。唤醒的线程将以常规的方式与任何其他线程竞争，这些线程竞争在此对象上的同步；例如，唤醒的线程在成为下一个锁定此对象的线程时没有可靠的特权或劣势（和其它线程地位相同）。
 >
@@ -497,7 +501,7 @@ wait end1622564809053
 
 **说明**：
 
-- wait end 最后输出，表明 notify() 方法执行后并不立刻释放锁。
+- wait end 最后输出，表明 notify() 方法执行后并不立刻释放锁，即必须执行完 notify() 方法所在的同步 synchronized 代码块后才释放锁。
 - 任意一个 Object 对象都可以作为锁，内部都有 `wait()` 和 `notify()` 方法；
 - 通过调用 `wait()` 方法可以使得临界区类的线程进入等待状态，同时释放被同步对象的锁，notify 可以唤醒一个因调用了 wait 操作而处于 wait 状态的线程，使其进入就绪状态，被重新唤醒的线程会视图重新获取临界区的控制权（锁），并继续执行临界区内 wait 之后的代码。 	
 
@@ -695,3 +699,770 @@ public class Client {
 进入 wait 之后被 notify 唤醒之后也要再次争抢获取对象的锁，获取到才能继续执行。没抢到就一直在 wait 进行等待。
 
 修改 if 为 while，即当线程从 wait 被唤醒之后需要再次判断  counter 的值，因为此时 counter 值可能被其它线程修改，使得其不再是之前进入 wait 时候的值了，符合了才能继续执行。
+
+
+
+### 七、生产者和消费者模式
+
+生产者和消费者的关系有一对一、一对多、多对一、多对多。但是都是基于 wait/notify 的。
+
+#### 一对一操作值
+
+```java
+package com.gjxaiou.object.productAndConsumer;
+
+import java.lang.String;
+
+public class One2OneValue {
+
+	public static void main(String[] args) {
+		String lock = "";
+		Product product = new Product(lock);
+		Consumer consumer = new Consumer(lock);
+		new ThreadProduct(product).start();
+		new ThreadConsumer(consumer).start();
+	}
+
+}
+
+// 存储值的对象
+class ObjectValue {
+	public static String value = "";
+}
+
+// 生产者和消费者
+class Product {
+	private String lock;
+
+	public Product(String lock) {
+		this.lock = lock;
+	}
+
+	public void setValue() {
+		try {
+			synchronized (lock) {
+				if (!ObjectValue.value.equals("")) {
+					System.out.println("product 进入等待 waiting 状态," + Thread.currentThread().getName());
+					lock.wait();
+				}
+				System.out.println("product 进入 Runnable 状态，" + Thread.currentThread().getName());
+				ObjectValue.value = System.currentTimeMillis() + "--" + System.nanoTime();
+				System.out.println("product 设置值为： " + ObjectValue.value);
+				lock.notify();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+
+class Consumer {
+	private String lock;
+
+	public Consumer(String lock) {
+		this.lock = lock;
+	}
+
+	public void getValue() {
+		try {
+			synchronized (lock) {
+				if (ObjectValue.value.equals("")) {
+					System.out.println("consumer 进入等待 waiting 状态," + Thread.currentThread().getName());
+					lock.wait();
+				}
+				System.out.println("consumer 进入 Runnable 状态，" + Thread.currentThread().getName());
+				System.out.println("consumer 获取到值为： " + ObjectValue.value);
+				ObjectValue.value = "";
+				lock.notify();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+
+// 生成者和消费者线程
+class ThreadProduct extends Thread {
+	private Product product;
+
+	ThreadProduct(Product product) {
+		this.product = product;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			product.setValue();
+		}
+	}
+}
+
+class ThreadConsumer extends Thread {
+	private Consumer consumer;
+
+	ThreadConsumer(Consumer consumer) {
+		this.consumer = consumer;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			consumer.getValue();
+		}
+	}
+}
+```
+
+运行结果为：
+
+```java
+consumer 进入 Runnable 状态，Thread-1
+consumer 获取到值为： 1622887428535--1016397408781600
+consumer 进入等待 waiting 状态,Thread-1
+product 进入 Runnable 状态，Thread-0
+product 设置值为： 1622887428535--1016397408805500
+product 进入等待 waiting 状态,Thread-0
+consumer 进入 Runnable 状态，Thread-1
+consumer 获取到值为： 1622887428535--1016397408805500
+consumer 进入等待 waiting 状态,Thread-1
+product 进入 Runnable 状态，Thread-0
+product 设置值为： 1622887428535--1016397408839100
+product 进入等待 waiting 状态,Thread-0
+consumer 进入 Runnable 状态，Thread-1
+consumer 获取到值为： 1622887428535--1016397408839100
+consumer 进入等待 waiting 状态,Thread-1
+product 进入 Runnable 状态，Thread-0
+product 设置值为： 1622887428535--1016397408865900
+product 进入等待 waiting 状态,Thread-0
+。。。。。
+```
+
+#### 多对多操作值【假死】
+
+首先上面的 Product 和 Consumer 中的 wait() 条件判断应该将 if 修改为 while，然后 main 方法修改如下：
+
+```java
+public class More2MoreValue {
+	public static void main(String[] args) throws InterruptedException {
+		String lock = "";
+		Product product1 = new Product(lock);
+		Consumer consumer1 = new Consumer(lock);
+
+		ThreadProduct[] threadProduct1s = new ThreadProduct[2];
+		ThreadConsumer[] threadConsumer1s = new ThreadConsumer[2];
+
+		for (int i = 0; i < 2; i++) {
+			threadProducts[i]  = new ThreadProduct(product1);
+			threadProducts[i].setName("生产者：" + (i + 1));
+
+			threadConsumers[i]  = new ThreadConsumer(consumer1);
+			threadConsumers[i].setName("消费者：" + (i + 1));
+
+			threadProducts[i].start();
+			threadConsumers[i].start();
+		}
+
+		Thread.sleep(5000);
+		Thread[] threadArray = new Thread[Thread.currentThread().getThreadGroup().activeCount()];
+		Thread.currentThread().getThreadGroup().enumerate(threadArray);
+
+		for (int i = 0; i < threadArray.length; i++) {
+			System.out.println(threadArray[i].getName() + "----" + threadArray[i].getState());
+		}
+	}
+}
+```
+
+输出结果为：
+
+```java
+product 进入 Runnable 状态，生产者：1
+product 设置值为： 1622890226099--1019194973749900
+product 进入等待 waiting 状态,生产者：1
+consumer 进入 Runnable 状态，消费者：1
+consumer 获取到值为： 1622890226099--1019194973749900
+consumer 进入等待 waiting 状态,消费者：1
+product 进入 Runnable 状态，生产者：2
+product 设置值为： 1622890226099--1019194974155800
+product 进入等待 waiting 状态,生产者：2
+consumer 进入 Runnable 状态，消费者：2
+consumer 获取到值为： 1622890226099--1019194974155800
+consumer 进入等待 waiting 状态,消费者：2
+......
+product 进入 Runnable 状态，生产者：1
+product 设置值为： 1622890226124--1019194999256100
+product 进入等待 waiting 状态,生产者：1
+product 进入等待 waiting 状态,生产者：2
+consumer 进入 Runnable 状态，消费者：1
+consumer 获取到值为： 1622890226124--1019194999256100
+consumer 进入等待 waiting 状态,消费者：1
+consumer 进入等待 waiting 状态,消费者：2
+main----RUNNABLE
+Monitor Ctrl-Break----RUNNABLE
+生产者：1----WAITING
+消费者：1----WAITING
+生产者：2----WAITING
+消费者：2----WAITING    
+```
+
+当所有的线程都呈现 waiting 状态时候，不再执行任何任务，程序也没有退出，呈现假死状态。主要是因为 notify 唤醒可能是异类，也可能是同类，即「生产者」唤醒「生产者」、「生产者」唤醒「消费者」都可能。假死主要就是因为有可能连续的唤醒同类。
+
+**假死解决方式**：不光唤醒同类，同时唤醒异类，即将所有的 `notify()` 修改为 `notifyAll()`。
+
+#### 生产消费一对一：操作栈
+
+生产者向堆栈 List 对象中放入数据，使用消费者从 List 堆栈中取出数据，List 最大容量为 1。
+
+```java
+package com.gjxaiou.object.productAndConsumer.operateList;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class One2One {
+	public static void main(String[] args) {
+		MyStack myStack = new MyStack();
+		Product product = new Product(myStack);
+		Consumer consumer = new Consumer(myStack);
+		new ProductThread(product).start();
+		new ConsumerThread(consumer).start();
+	}
+}
+
+// 操作值
+class MyStack {
+	private List list = new ArrayList();
+
+	synchronized public void push() {
+		try {
+			if (list.size() == 1) {
+				this.wait();
+			}
+			list.add(Math.random());
+			this.notify();
+			System.out.println("push 完成，list 大小为：" + list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	synchronized public String pop() {
+		String result = "";
+		try {
+			if (list.size() == 0) {
+				System.out.println("pop 中的 " + Thread.currentThread().getName() + " 线程是 wait 状态");
+				this.wait();
+			}
+			result = list.get(0).toString();
+			list.remove(0);
+			this.notify();
+			System.out.println("pop 完成，list 大小为：" + list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+}
+
+// 生产者和消费者
+class Product {
+	private MyStack myStack;
+
+	Product(MyStack myStack) {
+		this.myStack = myStack;
+	}
+
+	public void pushService() {
+		myStack.push();
+	}
+}
+
+class Consumer {
+	private MyStack myStack;
+
+	Consumer(MyStack myStack) {
+		this.myStack = myStack;
+	}
+
+	public void popService() {
+		myStack.pop();
+	}
+}
+
+// 生产者和消费者线程
+class ProductThread extends Thread {
+	private Product product;
+
+	ProductThread(Product product) {
+		this.product = product;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			product.pushService();
+		}
+	}
+}
+
+class ConsumerThread extends Thread {
+	private Consumer consumer;
+
+	ConsumerThread(Consumer consumer) {
+		this.consumer = consumer;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			consumer.popService();
+		}
+	}
+}
+```
+
+输出结果为：
+
+```java
+
+push 完成，list 大小为：1
+pop 完成，list 大小为：0
+pop 中的 Thread-1 线程是 wait 状态
+push 完成，list 大小为：1
+pop 完成，list 大小为：0
+pop 中的 Thread-1 线程是 wait 状态
+push 完成，list 大小为：1
+pop 完成，list 大小为：0
+pop 中的 Thread-1 线程是 wait 状态
+push 完成，list 大小为：1
+pop 完成，list 大小为：0
+pop 中的 Thread-1 线程是 wait 状态
+。。。。
+```
+
+一生产多消费：一个生产者向堆栈 List 对象中放入数据，多个消费者从 List 堆栈中取出数据，List 最大数量还是 1。或者多生产一消费，或者多生成多消费。
+
+需要修改如下：
+
+- wait() 条件判断由 if 修改为 while。
+
+    使用 if 会出现条件发生改变时并没有得到及时响应，所以多个呈 wait 状态的线程被唤醒，继而执行 `list.remove(0)` 代码出现异常 `java.lang.IndexOutOfBoundsException`。
+
+- 将 `notify()` 换成 `notifyAll()` 防止假死
+
+多生产一消费 main 方法中示例如下，其他类似。
+
+```java
+package com.gjxaiou.object.productAndConsumer.operateList;
+
+
+public class More2One {
+	public static void main(String[] args) {
+		MyStack myStack = new MyStack();
+		Product product1 = new Product(myStack);
+		Product product2 = new Product(myStack);
+		Product product3 = new Product(myStack);
+
+		new ProductThread(product1).start();
+		new ProductThread(product2).start();
+		new ProductThread(product3).start();
+
+		Consumer consumer = new Consumer(myStack);
+		new ConsumerThread(consumer).start();
+	}
+}
+```
+
+#### 连续生产多个、连续消耗多个
+
+即实现「生产-生产-生产-消费-消费-生产。。」，多个生产与多个消费向一个 Box 容器中连续的放入和取出，容器的最大容量不超过 50。
+
+```java
+package com.gjxaiou.object.productAndConsumer.continueOperate;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class More2More {
+	public static void main(String[] args) throws InterruptedException {
+		Box box = new Box();
+		SetService setService = new SetService(box);
+		for (int i = 0; i < 2; i++) {
+			new SetValueThread(setService).start();
+		}
+
+		Thread.sleep(50);
+		new SetCheckThread(setService).start();
+
+		Thread.sleep(10000);
+		GetService getService = new GetService(box);
+		for (int i = 0; i < 10; i++) {
+			new GetValueThread(getService).start();
+		}
+		Thread.sleep(50);
+		new GetCheckThread(getService).start();
+	}
+}
+
+// 操作的容器
+class Box {
+	private static List list = new ArrayList();
+
+	synchronized public void add() {
+		if (size() < 50) {
+			list.add("gjxaiou");
+			System.out.println(Thread.currentThread().getName() + " 执行 add() 方法，size 大小为： " + size());
+		}
+	}
+
+	synchronized public int size() {
+		return list.size();
+	}
+
+	synchronized public Object popFirst() {
+		Object value = list.remove(0);
+		System.out.println(Thread.currentThread().getName() + " 执行 popFirst() 方法，size 大小为： " + size());
+		return value;
+	}
+}
+
+// 生产者和消费者业务代码
+class SetService {
+	private Box box;
+
+	public SetService(Box box) {
+		this.box = box;
+	}
+
+	public void setMethod() {
+		try {
+			synchronized (this) {
+				while (box.size() == 50) {
+					System.out.println("●●●●●●●●●●●●");
+					this.wait();
+				}
+			}
+			Thread.sleep(300);
+			box.add();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void checkBoxStatus() {
+		try {
+			while (true) {
+				synchronized (this) {
+					if (box.size() < 50) {
+						this.notifyAll();
+					}
+				}
+				System.out.println("set checkboxBox = " + box.size());
+				Thread.sleep(1000);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+
+class GetService {
+	private Box box;
+
+	GetService(Box box) {
+		this.box = box;
+	}
+
+	public void getMethod() {
+		try {
+			synchronized (this) {
+				while (box.size() == 0) {
+					System.out.println("○○○○○○○○○○");
+					this.wait();
+				}
+				box.popFirst();
+			}
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void checkBoxStatus() {
+		try {
+			while (true) {
+				synchronized (this) {
+					if (box.size() > 0) {
+						this.notifyAll();
+					}
+				}
+				System.out.println("get checkboxBox = " + box.size());
+				Thread.sleep(1000);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
+// 生产者和消费者线程
+class SetValueThread extends Thread {
+	private SetService setService;
+
+	SetValueThread(SetService setService) {
+		this.setService = setService;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			setService.setMethod();
+		}
+	}
+}
+
+class GetValueThread extends Thread {
+	private GetService getService;
+
+	public GetValueThread(GetService getService) {
+		this.getService = getService;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			getService.getMethod();
+		}
+	}
+}
+
+
+// 生产者和消费者容器大小测试线程
+class SetCheckThread extends Thread {
+	private SetService setService;
+
+	SetCheckThread(SetService setService) {
+		this.setService = setService;
+	}
+
+	@Override
+	public void run() {
+		setService.checkBoxStatus();
+	}
+}
+
+class GetCheckThread extends Thread {
+	private GetService getService;
+
+	GetCheckThread(GetService getService) {
+		this.getService = getService;
+	}
+
+	@Override
+	public void run() {
+		getService.checkBoxStatus();
+	}
+}
+```
+
+程序输出结果为：
+
+```java
+set checkboxBox = 0
+Thread-1 执行 add() 方法，size 大小为： 1
+Thread-0 执行 add() 方法，size 大小为： 2
+Thread-0 执行 add() 方法，size 大小为： 3
+Thread-1 执行 add() 方法，size 大小为： 4
+Thread-0 执行 add() 方法，size 大小为： 5
+Thread-1 执行 add() 方法，size 大小为： 6
+set checkboxBox = 6
+Thread-0 执行 add() 方法，size 大小为： 7
+Thread-1 执行 add() 方法，size 大小为： 8
+Thread-0 执行 add() 方法，size 大小为： 9
+Thread-1 执行 add() 方法，size 大小为： 10
+。。。。
+Thread-1 执行 add() 方法，size 大小为： 45
+Thread-0 执行 add() 方法，size 大小为： 46
+set checkboxBox = 46
+Thread-1 执行 add() 方法，size 大小为： 47
+Thread-0 执行 add() 方法，size 大小为： 48
+Thread-0 执行 add() 方法，size 大小为： 49
+Thread-1 执行 add() 方法，size 大小为： 50
+●●●●●●●●●●●●
+●●●●●●●●●●●●
+set checkboxBox = 50
+set checkboxBox = 50
+Thread-3 执行 popFirst() 方法，size 大小为： 49
+Thread-6 执行 popFirst() 方法，size 大小为： 48
+Thread-9 执行 popFirst() 方法，size 大小为： 47
+Thread-5 执行 popFirst() 方法，size 大小为： 46
+Thread-7 执行 popFirst() 方法，size 大小为： 45
+Thread-4 执行 popFirst() 方法，size 大小为： 44
+Thread-8 执行 popFirst() 方法，size 大小为： 43
+Thread-11 执行 popFirst() 方法，size 大小为： 42
+Thread-10 执行 popFirst() 方法，size 大小为： 41
+Thread-12 执行 popFirst() 方法，size 大小为： 40
+set checkboxBox = 40
+get checkboxBox = 40
+Thread-12 执行 popFirst() 方法，size 大小为： 39
+Thread-8 执行 popFirst() 方法，size 大小为： 38
+Thread-4 执行 popFirst() 方法，size 大小为： 37
+Thread-3 执行 popFirst() 方法，size 大小为： 36
+Thread-9 执行 popFirst() 方法，size 大小为： 35
+Thread-10 执行 popFirst() 方法，size 大小为： 34
+Thread-7 执行 popFirst() 方法，size 大小为： 33
+Thread-5 执行 popFirst() 方法，size 大小为： 32
+Thread-11 执行 popFirst() 方法，size 大小为： 31
+Thread-6 执行 popFirst() 方法，size 大小为： 30
+Thread-1 执行 add() 方法，size 大小为： 31
+Thread-0 执行 add() 方法，size 大小为： 32
+Thread-7 执行 popFirst() 方法，size 大小为： 31
+Thread-10 执行 popFirst() 方法，size 大小为： 30
+。。。。。
+Thread-6 执行 popFirst() 方法，size 大小为： 2
+Thread-9 执行 popFirst() 方法，size 大小为： 1
+Thread-4 执行 popFirst() 方法，size 大小为： 0
+○○○○○○○○○○
+○○○○○○○○○○
+Thread-1 执行 add() 方法，size 大小为： 1
+Thread-0 执行 add() 方法，size 大小为： 2
+Thread-7 执行 popFirst() 方法，size 大小为： 1
+Thread-5 执行 popFirst() 方法，size 大小为： 0
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+Thread-1 执行 add() 方法，size 大小为： 1
+Thread-0 执行 add() 方法，size 大小为： 2
+set checkboxBox = 2
+Thread-8 执行 popFirst() 方法，size 大小为： 1
+get checkboxBox = 2
+Thread-4 执行 popFirst() 方法，size 大小为： 0
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+○○○○○○○○○○
+Thread-0 执行 add() 方法，size 大小为： 1
+Thread-1 执行 add() 方法，size 大小为： 2
+Thread-4 执行 popFirst() 方法，size 大小为： 1
+```
+
+因为消费者数量大于生产者，所以多次输出 ○○○○○○○○，说明消费者执行了 wait() 等待。
+
+#### 线程有序交叉执行
+
+需求：4 个线程，一半执行 A 操作，一半执行 B 操作，两个操作轮流执行。
+
+```java
+package com.gjxaiou.object;
+
+public class TurnBackup {
+
+	public static void main(String[] args) {
+		BackupService backupService = new BackupService();
+		for (int i = 0; i < 4; i++) {
+			new BackupBThread(backupService).start();
+			new BackupAThread(backupService).start();
+		}
+	}
+}
+
+class BackupService {
+    // 实现两个线程轮流交替执行
+	volatile private boolean prevIsA = false;
+
+	synchronized public void backupA() {
+		try {
+			while (prevIsA == true) {
+				wait();
+			}
+			for (int i = 0; i < 2; i++) {
+				System.out.println("backupA");
+			}
+			prevIsA = true;
+			notifyAll();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	synchronized public void backupB() {
+		try {
+			while (prevIsA == false) {
+				wait();
+			}
+			for (int i = 0; i < 2; i++) {
+				System.out.println("backupB");
+			}
+			prevIsA = false;
+			notifyAll();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+// 线程工具类
+class BackupAThread extends Thread {
+	private BackupService backupService;
+
+	BackupAThread(BackupService backupService) {
+		this.backupService = backupService;
+
+	}
+
+	@Override
+	public void run() {
+		backupService.backupA();
+	}
+}
+
+class BackupBThread extends Thread {
+	private BackupService backupService;
+
+	BackupBThread(BackupService backupService) {
+		this.backupService = backupService;
+
+	}
+
+	@Override
+	public void run() {
+		backupService.backupB();
+	}
+}
+```
+
+程序输出结果：
+
+```java
+backupA
+backupA
+backupB
+backupB
+backupA
+backupA
+backupB
+backupB
+backupA
+backupA
+backupB
+backupB
+backupA
+backupA
+backupB
+backupB
+```
+
