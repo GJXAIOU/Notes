@@ -834,6 +834,178 @@ Process finished with exit code 0
     	at com.gjxaiou.thread.MyThread11.run(MyTest11.java:17)
     ```
 
+### join 方法
+
+join 方法作用：使得其所属的线程对象 X 正常执行 run() 方法里面的任务，而使当前线程 Z 进行无限期的等待，等待线程 X 销毁后再继续执行线程 Z 后面的代码，具有串行执行的效果。
+
+- 其和 synchronized 区别为：join() 方法内部使用 wait() 方法进行等待，synchronized 使用锁作为同步。
+
+- 使用 join() 方法过程中，如果当前线程对象被 interrupt() 方法中断，则当前线程出现异常。
+
+    ```java
+    package com.gjxaiou.thread;
+    
+    import java.lang.String;
+    
+    public class MyTest13 {
+    	public static void main(String[] args) {
+    		try {
+    			ThreadB threadB = new ThreadB();
+    			threadB.start();
+    
+    			Thread.sleep(500);
+    			ThreadC threadC = new ThreadC(threadB);
+    			threadC.start();
+    		} catch (InterruptedException e) {
+    			e.printStackTrace();
+    		}
+    	}
+    
+    }
+    
+    class ThreadA extends Thread {
+    	@Override
+    	public void run() {
+    		for (int i = 0; i < Integer.MAX_VALUE; i++) {
+    			String string = new String();
+    			Math.random();
+    		}
+    	}
+    }
+    
+    class ThreadB extends Thread {
+    	@Override
+    	public void run() {
+    		try {
+    			ThreadA threadA = new ThreadA();
+    			threadA.start();
+    			threadA.join();
+    			System.out.println("线程 B 在 run end 处打印");
+    		} catch (InterruptedException e) {
+    			System.out.println("线程 B 在 catch 中打印了");
+    			e.printStackTrace();
+    		}
+    	}
+    }
+    
+    class ThreadC extends Thread {
+    	private ThreadB threadB;
+    
+    	ThreadC(ThreadB threadB) {
+    		this.threadB = threadB;
+    	}
+    
+    	@Override
+    	public void run() {
+    		threadB.interrupt();
+    	}
+    }
+    ```
+
+    程序执行结果：
+
+    ```java
+    线程 B 在 catch 中打印了
+    java.lang.InterruptedException
+    	at java.lang.Object.wait(Native Method)
+    	at java.lang.Thread.join(Thread.java:1252)
+    	at java.lang.Thread.join(Thread.java:1326)
+    	at com.gjxaiou.thread.ThreadB.run(MyTest13.java:37)
+    ```
+
+    #### join(long)
+
+    x.join(long) 方法中的参数用于设定等待的时间，不管 X 线程是否执行完毕，时间到了并且重新获得了锁，则当前线程会继续向后执行。如果没有重新获得锁，则一直在尝试，直到获得锁为止。
+
+**join(long) 和 sleep(long) 区别**
+
+`join(long)` 内部使用 `wait(long)` 实现，所以 `join(long)` 会释放当前线程的锁，而 `Thread.sleep(long)` 不会释放锁。
+
+```java
+package com.gjxaiou.thread;
+
+import java.util.concurrent.SynchronousQueue;
+
+public class MyTest14 {
+	public static void main(String[] args) {
+		try {
+			Thread2 thread2 = new Thread2();
+			new Thread1(thread2).start();
+
+			Thread.sleep(1000);
+			new Thread3(thread2).start();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class Thread1 extends Thread {
+	private Thread2 thread2;
+
+	public Thread1(Thread2 thread2) {
+		this.thread2 = thread2;
+	}
+
+	@Override
+	public void run() {
+		try {
+			synchronized (thread2) {
+				thread2.start();
+				// 这里要休眠 6s
+				Thread.sleep(6000);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class Thread2 extends Thread {
+	@Override
+	public void run() {
+		try {
+			long beginTime = System.currentTimeMillis();
+			System.out.println("thread2 begin run," + beginTime);
+			Thread.sleep(5000);
+			long endTime = System.currentTimeMillis();
+			System.out.println("thread2 end run," + endTime + " -- total time = " + (endTime - beginTime)/1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	synchronized public void thread2Service() {
+		System.out.println("执行 thread2Service time = " + System.currentTimeMillis());
+	}
+}
+
+class Thread3 extends Thread {
+	private Thread2 thread2;
+
+	Thread3(Thread2 thread2) {
+		this.thread2 = thread2;
+	}
+
+	@Override
+	public void run() {
+		thread2.thread2Service();
+	}
+}
+```
+
+执行结果为：
+
+```java
+thread2 begin run,1622989218651
+thread2 end run,1622989223657 -- total time = 5
+执行 thread2Service time = 1622989224664
+```
+
+线程 Thread1 使用 `Thread.sleep(6000)` 方法一直持有 Thread2 对象的锁，时间为 6s，所以 Thread3 在 6s 后才能执行 Thread2 中的同步方法。
+
+但是如果使用 join() 方法，在执行 join() 方法的一瞬间，线程所持有的锁就释放了。
+
 ## 二、Runnable 接口
 
 **下面为 Runnable 接口的 JavaDoc 文档**
