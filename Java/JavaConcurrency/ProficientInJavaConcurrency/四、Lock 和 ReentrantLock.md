@@ -432,15 +432,11 @@ ReentrantLock#lock()
 
 - 步骤一：尝试获取锁，如果获取到了就直接返回了；
 - 步骤二：尝试获取锁失败，再调用 `addWaiter()`构建新节点并把新节点入队；
-
 - 步骤三：然后调用 `acquireQueued()` 再次尝试获取锁，如果成功了，直接返回；
-
 - 步骤四：如果再次失败，再调用 `shouldParkAfterFailedAcquire()` 将节点的等待状态置为等待唤醒（SIGNAL）；
 
 - 步骤五：调用 `parkAndCheckInterrupt()` 阻塞当前线程；
-
 - 步骤六：如果被唤醒了，会继续在 `acquireQueued()` 的 for() 循环再次尝试获取锁，如果成功了就返回；
-
 - 步骤七：如果不成功，再次阻塞，重复步骤三、四、五直到成功获取到锁。
 
 #### 非公平锁加锁过程
@@ -2333,7 +2329,7 @@ class SafeTreeMap {
 
 ## ReentrantReadWriteLock 使用
 
-#### 读读共享
+#### 读读共享（异步）
 
 ```java
 package com.gjxaiou.reentrantLock;
@@ -2394,3 +2390,146 @@ Thread-1 end act, time = 1623717657464
 两个线程几乎同时进入 `lock()` 方法后面的代码，每个线程执行大约都耗时 4s，因此使用 `lock.readLock()` 读锁可以提升效率，即允许多个线程同时执行 lock() 方法后面的代码。
 
 **使用锁的原因**：此代码完全不使用锁也可以实现异步效果，但是使用锁是为了防止存在第三个执行写操作的线程，如果存在则两个线程的读操作都必须在写操作之后执行。
+
+#### 写写互斥
+
+```java
+package com.gjxaiou.lock;
+
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class MyTest5 {
+	public static void main(String[] args) {
+		WriteService writeService = new WriteService();
+		new WriteThread(writeService).start();
+		new WriteThread(writeService).start();
+	}
+}
+
+class WriteService {
+	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+	public void write() {
+		try {
+			try {
+				lock.writeLock().lock();
+				System.out.println(Thread.currentThread().getName() + " acquire the lock,time = " + System.currentTimeMillis());
+				Thread.sleep(5000);
+			} finally {
+				lock.writeLock().unlock();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class WriteThread extends Thread {
+	WriteService writeService ;
+
+	WriteThread(WriteService writeService) {
+		this.writeService = writeService;
+	}
+
+	@Override
+	public void run() {
+		writeService.write();
+	}
+}
+```
+
+输出结果为：
+
+```java
+Thread-0 acquire the lock,time = 1623768860478
+Thread-1 acquire the lock,time = 1623768865492
+```
+
+时间相差为 5 秒，即同一时刻只允许一个线程执行 lock() 方法后面的代码。
+
+#### 读写/写读互斥
+
+```java
+package com.gjxaiou.lock;
+
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class MyTest6 {
+	public static void main(String[] args) throws InterruptedException {
+		ReadWriteService readWriteService = new ReadWriteService();
+		// 调换两个顺序实现写读和读写
+		new ReadThread(readWriteService).start();
+		Thread.sleep(1000);
+		new WriteThread(readWriteService).start();
+	}
+}
+
+class ReadWriteService {
+	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+	public void read() {
+		try {
+			try {
+				lock.readLock().lock();
+				System.out.println(Thread.currentThread().getName() + " acquire read lock,time = " + System.currentTimeMillis());
+				Thread.sleep(5000);
+			} finally {
+				lock.readLock().unlock();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void write() {
+		try {
+			try {
+				lock.writeLock().lock();
+				System.out.println(Thread.currentThread().getName() + " acquire write lock,time " +
+						"=" +
+						" " + System.currentTimeMillis());
+				Thread.sleep(5000);
+			} finally {
+				lock.writeLock().unlock();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+class ReadThread extends Thread {
+	private ReadWriteService readWriteService;
+
+	ReadThread(ReadWriteService readWriteService) {
+		this.readWriteService = readWriteService;
+	}
+
+	@Override
+	public void run() {
+		readWriteService.read();
+	}
+}
+
+class WriteThread extends Thread {
+	private ReadWriteService readWriteService;
+
+	WriteThread(ReadWriteService readWriteService) {
+		this.readWriteService = readWriteService;
+	}
+
+	@Override
+	public void run() {
+		readWriteService.write();
+	}
+}
+```
+
+程序输出结果为：
+
+```java
+ Thread-0 acquire read lock,time = 1623769880625
+Thread-1 acquire write lock,time = 1623769885629
+```
+

@@ -206,5 +206,213 @@ public boolean cancel() {
 }
 ```
 
+示例：
 
+```java
+package com.gjxaiou.timer;
 
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class MyTest2 {
+	public static void main(String[] args) {
+		long now = System.currentTimeMillis();
+		System.out.println("当前时间：" + now);
+		MyTask1 myTask1 = new MyTask1();
+		MyTask2 myTask2 = new MyTask2();
+		Timer timer = new Timer();
+		timer.schedule(myTask1, new Date(now), 4000);
+		timer.schedule(myTask2, new Date(now), 4000);
+	}
+}
+
+class MyTask1 extends TimerTask {
+	@Override
+	public void run() {
+		System.out.println("MyTask1 开始执行，时间为：" + System.currentTimeMillis());
+		this.cancel();
+		System.out.println("MyTask1 任务自己移除自己");
+	}
+}
+
+class MyTask2 extends TimerTask {
+	@Override
+	public void run() {
+		System.out.println("MyTask2 开始执行，时间为：" + System.currentTimeMillis());
+	}
+}
+```
+
+输出结果为：
+
+```java
+当前时间：1623890010346
+MyTask1 开始执行，时间为：1623890010348
+MyTask1 任务自己移除自己
+MyTask2 开始执行，时间为：1623890010348
+MyTask2 开始执行，时间为：1623890014355
+MyTask2 开始执行，时间为：1623890018370
+MyTask2 开始执行，时间为：1623890022370
+......    
+```
+
+向上面间隔执行 Task 任务的轮询方法，当队列中有多个任务时候，任务执行顺序是每次将最后一个任务放到队列头，再执行队列头中 Task 任务的 run() 方法，效果如：ABC =》 CAB  =》BCA 。。。
+
+#### Timer#cancel() 方法
+
+该方法作用是将任务队列中的全部任务清空。具体调用地方任意。
+
+```java
+public void cancel() {
+    synchronized(queue) {
+        thread.newTasksMayBeScheduled = false;
+        queue.clear();
+        queue.notify();  // In case queue was already empty.
+    }
+}
+```
+
+但是当竞争比较激烈时，Timer 类中的 cancel() 方法有时候没有争抢到 queue 锁，所有无法停止 TimerTask 类中的任务。
+
+```java
+package com.gjxaiou.timer;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class MyTest3 {
+	public static void main(String[] args) {
+		int i = 0;
+		long currentTime = System.currentTimeMillis();
+		System.out.println("当前时间即计划开始时间: " + currentTime);
+		while (true) {
+			i++;
+			Timer timer = new Timer();
+			MyTask myTask = new MyTask(i);
+			timer.schedule(myTask, new Date(currentTime));
+			timer.cancel();
+		}
+	}
+}
+
+class MyTask extends TimerTask {
+	private int i;
+
+	MyTask(int i) {
+		this.i = i;
+	}
+
+	@Override
+	public void run() {
+		System.out.println("第 " + i + " 次没有被 cancel 取消");
+	}
+}
+```
+
+运行结果为：
+
+```java
+当前时间即计划开始时间: 1624071333331
+第 12676 次没有被 cancel 取消
+第 77427 次没有被 cancel 取消
+```
+
+#### schedule(TimerTask task,long delay)
+
+以当前时间为参考时间，延迟指定的毫秒数之后**执行一次** TimerTask。
+
+#### schedule(TimerTask task, long delay, long period)
+
+以当前时间为参考时间，延迟指定的毫秒数之后开始执行 TimerTask，然后以指定的时间间隔不限次数的执行该任务。
+
+如果任务执行的时间超过了周期间隔时间，则下一个周期任务的开始执行时间是上一个延迟任务的执行结束时间。
+
+指定的延迟时间 delay 表示第一次执行时候相对当前时间的延迟，后面都是按照指定周期进行执行，和 delay 无关。
+
+#### scheduleAtFixedRate(TimerTask task, Date firstTime, long period)
+
+该方法和 schedule() 周期执行方法的区别在于：`scheduleAtFixedRate()` 方法具有追赶特性。主要用于当第一次的执行时间早于当前时间的情况。
+
+```java
+package com.gjxaiou.timer;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class MyTest4 {
+	public static void main(String[] args) {
+		long currentTime = System.currentTimeMillis();
+		System.out.println("当前时间为：" + currentTime);
+		long executeTime = currentTime - 2000;
+		System.out.println("计划执行时间：" + executeTime);
+		Timer timer = new Timer();
+		MyTask3 myTask3 = new MyTask3();
+		//	timer.schedule(myTask3, new Date(executeTime), 2000);
+		timer.scheduleAtFixedRate(myTask3, new Date(executeTime), 2000);
+	}
+}
+
+class MyTask3 extends TimerTask {
+	@Override
+	public void run() {
+		try {
+			System.out.println("begin time：" + System.currentTimeMillis());
+			Thread.sleep(1000);
+			System.out.println("end time: " + System.currentTimeMillis());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+```
+
+其中使用 `schedule()` 对应的执行结果为：
+
+```java
+当前时间为：1624073822605
+计划执行时间：1624073820605   ====》比当前时间早 2s
+begin time：1624073822607   ====》第一次任务在当前时间立即执行
+end time: 1624073823620    =====》任务执行时间约为 1s
+begin time：1624073824616  ======》任务执行周期为 2s,所以第二次开始时间为第一次开始的 2s 后
+end time: 1624073825624
+begin time：1624073826618
+end time: 1624073827623
+begin time：1624073828632
+end time: 1624073829637
+begin time：1624073830641
+end time: 1624073831653
+begin time：1624073832647
+end time: 1624073833662
+begin time：1624073834649
+end time: 1624073835658
+begin time：1624073836651
+end time: 1624073837662
+。。。。。。    
+```
+
+对应 `scheduleAtFixedRate()` 的执行结果为：
+
+```java
+当前时间为：1624073988347
+计划执行时间：1624073986347     ====》计划执行时间比当前时间早 2s
+begin time：1624073988349     ====》对流逝时间的任务追赶
+end time: 1624073989351
+begin time：1624073989351
+end time: 1624073990351
+begin time：1624073990351
+end time: 1624073991356
+begin time：1624073992352
+end time: 1624073993357
+begin time：1624073994352
+end time: 1624073995365
+begin time：1624073996362
+end time: 1624073997368
+。。。。。。   
+```
+
+将之前没有执行的任务追加执行，将比当前时间提早的 2s 之内执行任务的次数输出完，然后在按照周期执行任务。
+
+将两个时间段内的时间说对应的 Task 任务将被「弥补」执行，即**在指定的时间段内的运行次数必须运行完整**。

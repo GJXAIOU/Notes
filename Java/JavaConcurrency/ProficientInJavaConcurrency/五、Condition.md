@@ -6,7 +6,7 @@
 
 传统上，我们可以通过 synchronized 关键字 ＋ wait + notify/notifyAll 来实现多个线程之间的协调与通信，整个过程都是由 JVM 来帮助我们实现的，开发者无需(也无法)了解底层的实现细节。
 
-从 JDK5 开始，并发包提供了 lock + Condition(主要是 await 与 signal/signalAll )来实现多个线程之间的协调与通信，整个过程都是由开发者来控制的，而且相比于传统方式更加灵活，功能也更加强大。**Condition 提供了一系列阻塞和唤醒线程的方法，和 Lock 结合实现等待/通知模式。**
+从 JDK5 开始，并发包提供了 lock + Condition(主要是 await 与 signal/signalAll )来实现多个线程之间的协调与通信，整个过程都是由开发者来控制的，而且相比于传统方式更加灵活，功能也更加强大。**Condition 提供了一系列阻塞和唤醒线程的方法，和 Lock 结合实现等待/通知模式。**即 Condition 对象可以控制和处理线程的状态。
 
 **Thread.sleep 与 await(或是 Object#wait() 方法)的区别**
 
@@ -133,7 +133,7 @@ Condition 拥有首尾节点的引用，而新增节点只需要将原来的尾�
 
 调用 Condition 的 await() 方法会使当前线程进入等待状态，当从 await() 方法返回时（继续往下执行），当前线程一定重新获取了与该 Condition 相关联的锁，即保证当前线程返回的时候持有该锁。
 
-如果从队列（同步队列和等待队列）的角度看 await() 方法，**当调用 await() 方法时，相当于同步队列的首节点（获取了锁的节点）移动到 Condition 的等待队列中**。具体而言，**首先调用await()方法之前肯定是能获取到同步状态的线程，也就是同步队列中首节点，之后调用await()方法由将释放锁，进入等待队列**。
+如果从队列（同步队列和等待队列）的角度看 await() 方法，**当调用 await() 方法时，相当于同步队列的首节点（获取了锁的节点）移动到 Condition 的等待队列中**。具体而言，**首先调用 await() 方法之前肯定是能获取到同步状态的线程，也就是同步队列中首节点，之后调用 await() 方法由将释放锁，进入等待队列**。
 
 调用该方法的线程是成功获取了锁的线程，也就是同步队列中的首节点，该方法会将当前线程构造为 Node 节点并加入等待队列中，然后释放同步状态，唤醒同步队列中的后继节点，然后当前线程会进入等待状态。
 
@@ -562,3 +562,19 @@ class BoundedContainer {
     }
 }
 ```
+
+## 七、park 和 unPark
+
+执行 `await()` 方法的线程会暂停运行，因为其本质上执行了 UnSafe 类中的 `public native void park(boolean isAbolute, long time);` 让线程呈暂停状态。源码中执行 `await()` 方法时调用的 `park()` 方法如下：
+
+```java
+// 直接调用的是 LockSupport 中的 park() 方法，进一步调用 UNSAFE 类的 park() 方法
+public static void park(Object blocker) {
+    Thread t = Thread.currentThread();
+    setBlocker(t, blocker);
+    UNSAFE.park(false, 0L);
+    setBlocker(t, null);
+}
+```
+
+其中 `park()` 方法的第一个参数表示是否为绝对时间，第二个参数表示时间值。如果第一个值为 true，则第二个参数 time 的时间单位为毫秒，如果为 false，则第二个时间单位为纳秒。
