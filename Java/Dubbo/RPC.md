@@ -16,12 +16,11 @@
 
 **完整的 RPC 框架**
 
-<<<<<<< HEAD
 在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中“RPC 协议”就指明了程序如何进行**网络传输和序列化**。
-=======
+
 在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中「RPC 协议」就指明了程序如何进行网络传输和序列化。
 
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
+
 
 [![img](RPC.resource/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)](https://s3.51cto.com/oss/201906/17/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)
 
@@ -29,12 +28,7 @@
 
 从单机走向分布式产生了很多分布式的通信方式
 
-<<<<<<< HEAD
 - 最古老也是最有效：TCP/UDP 的二进制传输。事实上所有的通信方式归根结底都是TCP/UDP。
-=======
-- 最古老有效的使用 TCP/UDP 的二进制传输。事实上所有的通信方式归根结底都是 TCP/UDP
-
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
 
 - CORBA (Common Object Request Broker Architecture)。支持面向对象的通信协议（复杂）。
 
@@ -44,27 +38,18 @@
 
 - RestFul ( Representational State Transfer，表现层状态转换)
 
-<<<<<<< HEAD
-    回归简单化本源的 Web API 的事实标准：HTTP + JSON。
-=======
     回归简单化本源的 Web API 的事实标准h ttp://mashibing.com/product/java，使用 HTTP + JSON
 
 - RMI （Remote Method InvocationJava）
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
 
     内部的分布式通信协议，只支持 Java 语言，不能跨语言。
 
 - JMS (Java Message Service)
 
-<<<<<<< HEAD
-    JavaEE 中的消息框架标准，为很多 MQ 所支持
-=======
-    JavaEE 中的消息框架标准,为很多 MQ 所支持
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
+​    JavaEE 中的消息框架标准，为很多 MQ 所支持
 
 - RPC(Remote Procedure Call，远程过程调用) 
 
-<<<<<<< HEAD
     远程过程调用，是一个统称，重点在于方法调用（不支持对象的概念），具体实现甚至可以用 RMI RestFul 等去实现,但一般不用.因为 RMI 不能跨语言.而 RestFul效率太低。多用于服务器集群间的通信,因此常使用更加高效短小精悍的传输模式以提高效率。
 
 ## 二、常见协议框架
@@ -155,18 +140,14 @@ RPC 序列化框架：
 由服务的调用方与服务的提供方建立 Socket 连接，并由服务的调用方通过 Socket 将需要调用的接口名称、方法名称和参数序列化后传递给服务的提供方，服务的提供方反序列化后再利用反射调用相关的方法。
 
 ***将结果返回给服务的调用方，整个基于 TCP 协议的 RPC 调用大致如此**。
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
 
 ### （一）TCP/IP 模拟 RPC
 
 由服务的调用方与服务的提供方建立 Socket 连接，并由服务的调用方通过 Socket 将需要调用的接口名称、方法名称和参数序列化后传递给服务的提供方，服务的提供方反序列化后再利用反射调用相关的方法。
 
-<<<<<<< HEAD
 将结果返回给服务的调用方，整个基于 TCP 协议的 RPC 调用大致如此。
-=======
-## 四、项目搭建
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
 
+## 四、项目搭建
 ### （二）基本包：common
 
 主要包括**实体类** User、Product，用于后续传输，同时提供两个**接口**访问方法，就是通过 id 返回对象（这里 id 限定为 123）
@@ -268,9 +249,8 @@ RPC 序列化框架：
             
             // 服务端进行处理（具体见下面的服务端代码）
     
+                
 
-<<<<<<< HEAD
-            
             //接收服务端返回的结果
 =======
             // 接收服务端返回的结果
@@ -363,11 +343,11 @@ DataInputStream dis = new DataInputStream(socket.getInputStream());
 
 ### （四）简化客户端的流程 引入stub(客户端存根)
 
-<<<<<<< HEAD
 **改进**：通常客户端不需要知道网络连接的细节，只需要知道接口的用法就行，因此将网络部分进行封装。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
-=======
+
 客户端不需要知道网络连接的细节，只需要知道接口的用法就好了，即将网络部分进行封装。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
+
+
 **缺点**： Stub 只能代理一个方法。
 
 - Client 端
@@ -433,7 +413,6 @@ DataInputStream dis = new DataInputStream(socket.getInputStream());
 
 - Server 没有改变
 
-<<<<<<< HEAD
 ### （五）使用动态代理生成 service 类供客户端调用
 
 **作用**：彻底隐藏所有网络细节
@@ -441,7 +420,7 @@ DataInputStream dis = new DataInputStream(socket.getInputStream());
 **改进**：改动客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，即 stub 不 是 new 出来的，而是使用它的静态方法 getStub 进行创建。
 
 这个版本相对于上个版本的优点还不能直观显现，因为硬编码部分还没有改动完成，rpc4 中将通用化这个动态代理，就是不管调用什么版本，在 invoke 方法中的处理就是都是写入 123，对于 UserService 中暴露的其他方法没有处理。
-=======
+
 ## 03 使用动态代理生成 service 类供客户端调用 彻底隐藏所有网络细节
 
 **问题**：
@@ -456,7 +435,8 @@ DataInputStream dis = new DataInputStream(socket.getInputStream());
 客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，stub 不 是 new 出来的，而是使用它的静态方法getStub
 
 这个版本相对于上个版本的优点还不能直观显现，因为硬编码部分还没有改动完成，rpc4 中将通用化这个动态代理。就是不管调用什么版本，在 invoke 方法中的处理就是都是写入 123，对于 UserService 中暴露的其他方法没有处理。
->>>>>>> 229de5e160c96bc1f13a0e1f2a39797e5a28df16
+
+
 
 - Client 端
 

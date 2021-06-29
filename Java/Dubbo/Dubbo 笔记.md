@@ -4,8 +4,6 @@
 
 [视频1](https://www.bilibili.com/video/BV1ns411c7jV?from=search&seid=10412979914972996053) 和 [视频2](https://www.bilibili.com/video/BV1ns411c7jV?p=11)。
 
-### 文章目录
-
 [TOC]
 
 
@@ -22,37 +20,37 @@
 
 ![在这里插入图片描述](Dubbo 笔记.resource/20200610124652869.png)
 
-#### 1.ORM
+- ORM（Object Relational Mapping，对象关系映射）
 
-**单一应用架构**：一个项目装到一个服务器当中，也可以运行多个服务器每一个服务器当中都装一个项目。
-缺点：
+    **单一应用架构**：每个服务器中部署一个项目，通过运行多个服务器实现运行多个项目的目的。
 
-- 如果要添加某一个功能的话就要把一个项目重新打包，在分别部署到每一个服务器当中去。
-
-- 如果后期项目越来越大的话单台服务器跑一个项目压力会很大的。会不利于维护，开发和程序的性能。
     <img src="Dubbo 笔记.resource/image-20210117222950981-1610894058736.png" alt="image-20210117222950981" style="zoom:50%;" />
 
-#### 2.MVC
+    - 缺点：
+        - 如果要添加某一个功能的话就要把一个项目重新打包，在分别部署到每一个服务器当中去。
+        - 如果后期项目越来越大的话单台服务器跑一个项目压力会很大的。会不利于维护，开发和程序的性能。
 
-**垂直应用架构**：将应用切割成几个互不相干的小应用，在将每个小应用独立放到一个服务器上，如果哪一个应用的访问数量多就多加几台服务器。
+- MVC
+
+    **垂直应用架构**：将应用切割成几个互不相干的小应用，在将每个小应用独立放到一个服务器上，如果某个应用的访问量较多，可以多部署服务器。
 
 ![image-20210117223414623](Dubbo 笔记.resource/image-20210117223414623.png)
 
-#### 3.分布式服务架构
+- 分布式服务架构
 
 ![在这里插入图片描述](Dubbo 笔记.resource/20200612180812112.png)
 
 
 
-#### 4.SOA
+- SOA（Service-Oriented Architecture，面向服务的体系结构）
 
-**流动计算架构**：在分布式应用架构的基础上增加了一个**调度、治理中心**基于访问压力实时管理集群容量、提高集群的利用率，用于提高机器利用率的 资源调度和治理中心(SOA) 是关键 **(不浪费计算机资源)**
+    **流动计算架构**：在分布式应用架构的基础上增加了一个**调度、治理中心**，基于访问压力实时管理集群容量、提高集群的利用率，用于提高机器利用率的 资源调度和治理中心(SOA) 是关键 **(不浪费计算机资源)**
 
 
 
 ### （二）RPC  简介
 
-**RPC（Remote Procedure Call，远程过程调用）**，是一种进程问通信方式，是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间(通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
+**RPC（Remote Procedure Call，远程过程调用）**，是一种**进程**间通信方式，是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间(通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
 
 **分布式应用架构(远程过程调用)**：当垂直应用越来越多，应用之间交互不可避免，将核心业务抽取出来，作为独立的服务，逐渐形成稳定的服务中心，使前端应用能更快速的响应多变的市场需求。
 
@@ -119,13 +117,11 @@ Client Stub --> Client: 11.返回调用结果
 
 
 
-## Dubbo 核心概念
+## 二、Dubbo 核心概念
 
-[Dubbo官网]( http://dubbo.apache.org/en-us/index.html)
+Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，服务自动注册和发现。
 
-Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，服务自动注册和发现。分布式系统是将一个系统拆分为多个不同的服务。
-
-### Dubbo 设计架构
+### （一）Dubbo 设计架构
 
 ![在这里插入图片描述](Dubbo 笔记.resource/20200610170317960.png)
 
@@ -134,19 +130,19 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
 - **注册中心（Registry）**：注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于长连接推送变更数据给消费者。
 - **监控中心（Monitor）**：服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到监控中心。
 
-#### Dubbo 的特性
+### （二）Dubbo 的特性
 
 - 服务注册中心
   - 相比 Hessian 类 RPC 框架，Dubbo 有自己的服务中心， 写好的服务可以注册到服务中心， 客户端从服务中心寻找服务，然后再到相应的服务提供者机器获取服务。通过服务中心可以实现集群、负载均衡、高可用(容错) 等重要功能。
   - 服务中心一般使用 Zookeeper 实现，也有 Redis 和其他一些方式。以使用 Zookeeper 作为服务中心为例，服务提供者启动后会在 Zookeeper 的 /dubbo 节点下创建提供的服务节点，包含服务提供者 ip、port 等信息。服务提供者关闭时会从 Zookeeper 中移除对应的服务。
-  - 服务使用者会从注册中心 Zookeeper中寻找服务，同一个服务可能会有多个提供者，Dubbo 会帮我们找到合适的服务提供者，也就是针对服务提供者的负载均衡。
-
+  
 - 负载均衡
-  - 当同一个服务有多个提供者在提供服务时，客户端通过以下几种方案来正确的选择提供者 现负载均衡。
-  - random 随机选提供者，并可以给提供者设置权重。
-  - roundrobin 轮询选择提供者
-  - leastactive 最少活跃调用数，相同活跃数的随机，活跃数：指调用前后计数差。使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。
-  - consistenthash 一致性hash，相同参数的请求发到同一台机器上。
+
+  当在服务注册中心中，同一个服务有多个提供者在提供服务时，客户端通过以下几种方案来正确的选择提供者负载均衡。
+  - random：随机选提供者，并可以给提供者设置权重。
+  - roundrobin：轮询选择提供者
+  - leastactive：最少活跃调用数，相同活跃数的随机，活跃数：指调用前后计数差。使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。
+  - consistenthash：一致性hash，相同参数的请求发到同一台机器上。
 
 - 简化测试，允许直连提供者
   在开发阶段为了方便测试，通常系统客户端能指定调用某个服务提供者，那么可以在引用服务时加一个 url 参数去指定服务提供者。 配置如下：` <dubbo:reference id="xxxService"interface="com.alibaba.xxx.XxxService"url="dubbo://localhost:20890"/>`
@@ -154,7 +150,7 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
 - 服务版本，服务分组
   在 Dubbo 配置文件中可以通过制定版本实现连接制定提供者，也就是通过服务版本可以控制服务的不兼容升级；当同一个服务有多种实现时，可以使用服务分组进行区分。
 
-## Dubbo 环境搭建  Zookeeper  注册中心
+## 三、Dubbo 环境搭建  Zookeeper  注册中心
 
 ### 步骤一：搭建  Ｚookeeper  注册中心环境
 
@@ -165,18 +161,16 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
 在 zookeeper 的文件夹下创建 data 文件夹，打开 zoo.cfg，修改 datadir，将 dataDir 数据保存为我们自定义的文件中(此步骤可省略) 。新增 `dataDir=../data`
 
 配置完毕后，我们再次在 conf 下启动 zkServer.cmd，这次可以成功启动
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610173356318.png)
+![在这里插入图片描述](Dubbo 笔记.resource/20200610173356318.png)
 继续运行 zkCli.cmd，可以连接到 Zookeeper 的服务器。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610173644649.png)
+![在这里插入图片描述](Dubbo 笔记.resource/20200610173644649.png)
 
 ### 步骤二：Zookeeper 监控中心的配置
 
-- 首先下载 dubbo-admin
-
-  [dubbo-admin下载地址](https://github.com/apache/dubbo-admin/tree/master)
+- 首先下载 dubbo-admin，[dubbo-admin下载地址](https://github.com/apache/dubbo-admin/tree/master)。
 
 - 解压后进入目录修改指定 zookeeper 地址
-  进入如下地址：dubbo-admin-master\dubbo-admin\src\main\resources\application.properties"
+  进入如下地址：`dubbo-admin-master\dubbo-admin\src\main\resources\application.properties"`
   将 zookeeper 的监控中心的地址配置为本地端口，增加如下配置即可
 
   ```properties
@@ -184,157 +178,133 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
   dubbo.registry.address=zookeeper://127.0.0.1:2181
   ```
 
-  配置完毕后，我们在dubo-zookeeper\dubbo-admin-master\dubbo-admin文件夹下 cmd 中使用 `mvn clean package`打包测试下。
+  配置完毕后，我们在 `dubo-zookeeper\dubbo-admin-master\dubbo-admin`文件夹下 cmd 中使用 `mvn clean package`打包测试下。
 
   在 target 文件中打包完成的 jar 包
-  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610175909584.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+  ![在这里插入图片描述](Dubbo 笔记.resource/20200610175909584.png)
   cmd命令 `java -jar dubbo-admin-0.0.1-SNAPSHOT.jar`运行打包好的jar包
   启动成功后，可以看到一个7001的端口
-  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610180201513.png)
+  ![在这里插入图片描述](Dubbo 笔记.resource/20200610180201513.png)
 
-  此时我们的zookeeper的服务都为启动状态，在浏览器中访问 localhost:7001，访问到注册中心，输入账号密码root。
+  此时我们的 zookeeper 的服务都为启动状态，在浏览器中访问 localhost:7001，访问到注册中心，输入账号密码 root。
 
-  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610180358177.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+  ![在这里插入图片描述](Dubbo 笔记.resource/20200610180358177.png)
 
   此时，我们zookeeper监控中心的配置完成。注意，要访问到监控中心，一定要启动zookeeper注册中心的启动类
 
-## Dubbo环境搭建，创建提供者、消费者项目
+## 四、Dubbo 项目搭建
 
-基于以下图实现服务 提供者、消费者
+服务提供者和消费者模型：
 
-模块 1：订单服务 web 模块，进行创建订单。模块 2：用户服务 service 模块，查询用户地址，服务 1 调用服务 2。即模块 1调用模块 2。
+服务模块 1：订单服务 web 模块，进行创建订单。服务模块 2：用户服务 service 模块，查询用户地址。服务 1 调用服务 2。即模块 1调用模块 2。
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200610195718980.png)
+![image-20210520074933599](Dubbo 笔记.resource/image-20210520074933599.png)
 
-### Dubbo服务提供消费者接口搭建
+### （一）服务提供者和消费者接口搭建
 
-- 新增服务提供者模块： `user-service-provider`
+- 服务提供者模块： `user-service-provider`
 
-**UserAddress**
+    **UserAddress**
 
-```java
-package com.gjxaiou;
-
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-public class UserAddress implements Serializable {
-    private Integer id;
-    //用户地址
-    private String userAddress;
-    //用户id
-    private String userId;
-    //收货人
-    private String consignee;
-    //电话号码
-    private String phoneNum;
-    //是否为默认地址    Y-是     N-否
-    private String isDefault;
-}
-
-```
-
-**UserService**
-
-```java
-package com.gjxaiou.service;
-
-public interface UserService {
-    /**
-     * 按照用户id返回所有的收货地址
-     */
-    List<UserAddress> getUserAddressList(String userId);
-}
-```
-
-**UserServiceImpl**
-
-```java
-package com.gjxaiou.service.impl;
-
-public class UserServiceImpl implements UserService {
-    @Override
-    public List<UserAddress> getUserAddressList(String userId) {
-
-        UserAddress address1 = new UserAddress(1, "河南省郑州巩义市宋陵大厦2F", "1", "安然", "150360313x", "Y");
-        UserAddress address2 = new UserAddress(2, "北京市昌平区沙河镇沙阳路", "1", "情话", "1766666395x", "N");
-
-        return Arrays.asList(address1, address2);
+    ```java
+    package com.gjxaiou;
+    
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public class UserAddress implements Serializable {
+        private Integer id;
+        //用户地址
+        private String userAddress;
+        //用户id
+        private String userId;
+        //收货人
+        private String consignee;
+        //电话号码
+        private String phoneNum;
+        //是否为默认地址    Y-是     N-否
+        private String isDefault;
     }
-}
+    
+    ```
 
-```
+    服务提供接口和对应的实现类：UserService 和 UserServiceImpl
 
-**创建Maven项目=> `order-service-consumer` 服务消费者(订单服务)**
-
-**OrderService**
-
-```
-public interface OrderService {
-    /**
-     * 初始化订单
-     * @param userID
-     */
-    public void initOrder(String userID);
-}
-```
-
-**OrderServiceImpl**
-
-```
-public class OrderServiceImpl implements OrderService {
-    public void initOrder(String userID) {
-        //查询用户的收货地址
-
+    ```java
+    ////////////////////// UserService ////////////////////////////
+    package com.gjxaiou.service;
+    
+    public interface UserService {
+        /**
+         * 按照用户id返回所有的收货地址
+         */
+        List<UserAddress> getUserAddressList(String userId);
     }
-}
-123456
-```
-
-**因服务消费者要拿到提供者的方法**
-将 服务提供者 中的 实体类 及 UserService 复制到当前消费者同级文件中。
-
-**OrderServiceImpl**
-
-```
-public class OrderServiceImpl implements OrderService {
-    public UserService userService;
-    public void initOrder(String userID) {
-        //查询用户的收货地址
-        List<UserAddress> userAddressList = userService.getUserAddressList(userID);
-        System.out.println(userAddressList);
+    
+    /////////////////////// UserServiceImpl ///////////////////////
+    package com.gjxaiou.service.impl;
+    
+    public class UserServiceImpl implements UserService {
+        @Override
+        public List<UserAddress> getUserAddressList(String userId) {
+    
+            UserAddress address1 = new UserAddress(1, "张三", "1", "安然", "15013x", "Y");
+            UserAddress address2 = new UserAddress(2, "李四", "1", "情话", "1395x", "N");
+    
+            return Arrays.asList(address1, address2);
+        }
     }
-}
-12345678
-```
+    ```
 
-此时我们调用userservice肯定是要报错的。这种面向接口的方式，我们这里只是调到了接口，而接口实际是在另外一个项目中，如果我们两个项目工程都创建共同的实体类，太过于麻烦了，我们可以将服务接口，服务模型等单独放在一个项目中，更为方便调用。
+- 服务消费者模块： `order-service-consumer`
 
+    服务消费者接口和其实现类：OrderService 和 OrderServiceImpl
 
+    ```java
+    /////////////////////// OrderService ///////////////////////
+    public interface OrderService {
+        /**
+         * 初始化订单
+         * @param userID
+         */
+        public void initOrder(String userID);
+    }
+    
+    ///////////////////// OrderServiceImpl //////////////////////
+    public class OrderServiceImpl implements OrderService {
+        public UserService userService;
+        public void initOrder(String userID) {
+            //查询用户的收货地址
+            List<UserAddress> userAddressList = userService.getUserAddressList(userID);
+            System.out.println(userAddressList);
+        }
+    }
+    ```
 
-**创建Maven项目=> gmail-interface 用于存放共同的服务接口**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200611154037439.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-将 提供者 和 消费者 项目中的所有实体类复制到当前相关的文件包下，删除原有的实体类包及service包，也就是将实体类及service放在了当前公共的项目中。
+    **注意**：因为服务消费者要使用提供者的方法，因此将服务提供者中的实体类及 UserService 复制到当前消费者同级目录下。
 
-把服务提供者和消费者项目中引入以下依赖，引入后项目不在报错.
+    此时我们调用userservice肯定是要报错的。这种面向接口的方式，我们这里只是调到了接口，而接口实际是在另外一个项目中，如果我们两个项目工程都创建共同的实体类，太过于麻烦了，我们可以将服务接口，服务模型等单独放在一个项目中，更为方便调用。
 
-```
-	<dependency>
-		<groupId>com.lemon.gmail</groupId>
-		<artifactId>gmail-interface</artifactId>
-		<version>1.0-SNAPSHOT</version>
-	</dependency>
-12345
-```
+- 抽象独立模块
 
+    即单独创建一个模块，将上述的 UserAddress 和 OrderService 以及 UserService 移动该模块中（暂定名称为 gjxaiou-interface 模块）。
 
+- 依赖服务
 
+    把服务提供者和消费者项目中引入以下依赖，引入后项目不在报错。
 
+    ```xml
+    <dependency>
+        <groupId>com.gjxaiou.dubbo</groupId>
+        <artifactId>gjxaiou-interface</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+    ```
 
+    
 
-
-### 服务提供者配置及测试
+### （二）服务提供者配置及测试
 
 在 `user-service-provider` 服务提供者项目中引入依赖
 
@@ -371,10 +341,10 @@ public class OrderServiceImpl implements OrderService {
     <!--3、指定通信规则（通信协议? 服务端口）-->
     <dubbo:protocol name="dubbo" port="20880"></dubbo:protocol>
     <!--4、暴露服务 让别人调用 ref指向服务的真正实现对象-->
-    <dubbo:service interface="com.lemon.gmail.service.UserService" ref="userServiceImpl"></dubbo:service>
+    <dubbo:service interface="com.gjxaiou.dubbo.service.UserService" ref="userServiceImpl"></dubbo:service>
 
     <!--服务的实现-->
-    <bean id="userServiceImpl" class="com.lemon.gmail.service.impl.UserServiceImpl"></bean>
+    <bean id="userServiceImpl" class="com.gjxiaou.dubbo.service.impl.UserServiceImpl"></bean>
 </beans>
 ```
 
@@ -391,28 +361,28 @@ public class MainApplication {
 }
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200611161058593.png)启动zookeeper注册中心的的zkServer.cmd、和zkCli.cmd服务
-在dubbo-admin target中cmd运行 java -jar dubbo-admin-0.0.1-SNAPSHOT.jar
-再次启动项目，我们可以看到在zookeeper中已经发现服务提供者。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200611161736122.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)**服务提供者的配置和测试完成**
+![在这里插入图片描述](Dubbo 笔记.resource/20200611161058593.png)
 
-### 服务消费者配置及测试
+启动 zookeeper 注册中心的的 zkServer.cmd、和 zkCli.cmd 服务在 dubbo-admin target 中 cmd 运行 `java -jar dubbo-admin-0.0.1-SNAPSHOT.jar`再次启动项目，我们可以看到在zookeeper中已经发现服务提供者。
+![在这里插入图片描述](Dubbo 笔记.resource/20200611161736122.png)
+
+### （三）服务消费者配置及测试
 
 在 `order-service-consumer` 服务消费者项目中引入依赖
 
 ```xml
-  <!--dubbo-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>dubbo</artifactId>
-            <version>2.6.2</version>
-        </dependency>
-        <!--注册中心是 zookeeper，引入zookeeper客户端-->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-            <version>2.12.0</version>
-        </dependency>
+<!--dubbo-->
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>dubbo</artifactId>
+    <version>2.6.2</version>
+</dependency>
+<!--注册中心是 zookeeper，引入zookeeper客户端-->
+<dependency>
+    <groupId>org.apache.curator</groupId>
+    <artifactId>curator-framework</artifactId>
+    <version>2.12.0</version>
+</dependency>
 ```
 
 创建`consumer.xml`
@@ -428,7 +398,7 @@ public class MainApplication {
 		http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd
 		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
    <!--包扫描-->
-    <context:component-scan base-package="com.lemon.gmail.service.impl"/>
+    <context:component-scan base-package="com.gjxaiou.dubbo.service.impl"/>
 
     <!--指定当前服务/应用的名字(同样的服务名字相同，不要和别的服务同名)-->
     <dubbo:application name="order-service-consumer"></dubbo:application>
@@ -436,7 +406,7 @@ public class MainApplication {
     <dubbo:registry address="zookeeper://127.0.0.1:2181"></dubbo:registry>
 
     <!--调用远程暴露的服务，生成远程服务代理-->
-    <dubbo:reference interface="com.lemon.gmail.service.UserService" id="userService"></dubbo:reference>
+    <dubbo:reference interface="com.gjxaiou.d.service.UserService" id="userService"></dubbo:reference>
 </beans>
 ```
 
