@@ -1,3 +1,9 @@
+# AJCG 
+
+这是华山版的 Markdown 版本，正在参考嵩山版的 PDF 进行增补，已经修改到了第十章了。
+
+[TOC]
+
 
 
 # 一、编程规约
@@ -18,10 +24,11 @@
 
 - 【强制】中括号是数组类型的一部分，数组定义如下：String[] args;
 
-- 【强制】POJO 类中**布尔类型的变量，都不要加 is**，否则部分框架解析会引起序列化错误。反例：定义为基本数据类型 Boolean isDeleted；的属性，它的方法也是 isDeleted()，RPC
-  框架在反向解析的时候，“以为”对应的属性名称是 deleted，导致属性获取不到，进而抛出异常。
+- 【强制】POJO 类中**布尔类型的变量，都不要加 is**，否则部分框架解析会引起序列化错误。
 
-  说明：在本文MySQL规约中的建表约定第一条，表达是与否的变量采用 `is_xxx` 的命名方式，所以，需要在 `<resultMap>` 设置从 `is_xxx` 到 `xxx` 的映射关系。
+反例：定义为基本数据类型 Boolean isDeleted；的属性，它的方法也是 isDeleted()，RPC 框架在反向解析的时候，“以为”对应的属性名称是 deleted，导致属性获取不到，进而抛出异常。
+
+说明：在本文MySQL规约中的建表约定第一条，表达是与否的变量采用 `is_xxx` 的命名方式，所以，需要在 `<resultMap>` 设置从 `is_xxx` 到 `xxx` 的映射关系。
 
 - 【强制】**包名统一使用小写，点分隔符之间有且仅有一个自然语义的英语单词**。**包名统一使用单数形式，但是类名如果有复数含义，类名可以使用复数形式。**
 
@@ -67,7 +74,7 @@
 
 - 接口和实现类的命名有两套规则：
   - 【强制】对于 Service 和 DAO 类，基于 SOA 的理念，暴露出来的服务一定是接口，内部的实现类用 Impl 的后缀与接口区别。
-正例：`CacheServiceImpl` 实现 `CacheService` 接口。
+  正例：`CacheServiceImpl` 实现 `CacheService` 接口。
 
   - 【推荐】如果是形容能力的接口名称，取对应的形容词做接口名（通常是–able 的形式）。
 
@@ -118,11 +125,9 @@
   类 B 中：`public static final String YES = "y"; `
   
     `A.YES.equals(B.YES)`，预期是 true，但实际返回为 false，导致线上问题。
-  
 * 3） 子工程内部共享常量：即在当前子工程的 constant 目录下。
   * 4） 包内共享常量：即在当前包下单独的 constant 目录下。
   * 5） 类内共享常量：直接在类内部 private static final 定义。
-  
 - 【推荐】如果变量值仅在一个固定范围内变化用enum类型来定义。 说明：如果存在名称之外的延伸属性应使用enum类型，下面正例中的数字就是延伸信息，表示一年中的第几个季节。 正例：
 
   ```java
@@ -394,7 +399,7 @@
   - **只要重写 equals，就必须重写 hashCode**。
   - 因为 Set 存储的是不重复的对象，依据 hashCode 和 equals 进行判断，所以 **Set 存储的对象必须重写这两个方法**。
   - 如果自定义对象做为**Map 的键，那么必须重写 hashCode 和 equals**。
-说明：String 重写了hashCode 和 equals 方法，所以我们可以非常愉快地使用 String 对象作为 key 来使用。
+  说明：String 重写了hashCode 和 equals 方法，所以我们可以非常愉快地使用 String 对象作为 key 来使用。
 
 - 【强制】判断所有集合内部的元素是否为空，使用 `isEmpty()` 方 法，而不是`size()==0` 的方式。 说明：在某些集合中，前者的时间复杂度为O(1)，而且可读性更好。
 
@@ -435,254 +440,530 @@
     Collectors.toMap(Pair::getKey, Pair::getValue, (v1, v2) -> v2));
     ```
 
-- 【强制】**ArrayList 的 subList 结果不可强转成ArrayList**，否则会抛出 ClassCastException 异常，即 java.util.RandomAccessSubList cannot be cast to java.util.ArrayList.说明：subList 返回的是 ArrayList 的内部类 SubList，并不是 ArrayList ，而是ArrayList 的一个视图，对于 SubList 子列表的所有操作最终会反映到原列表上。
+- 【强制】**ArrayList 的 subList 结果不可强转成 ArrayList**，否则会抛出 ClassCastException 异常，即 `java.util.RandomAccessSubList cannot be cast to java.util.ArrayList.` 
+
+    说明：subList 返回的是 ArrayList 的内部类 SubList，并不是 ArrayList ，而是 ArrayList 的一个视图，对于 SubList 子列表的所有操作最终会反映到原列表上。
 
 - 【强制】在 subList 场景中，高度注意对原集合元素个数的修改，会导致子列表的遍历、增加、删除均会产生 ConcurrentModificationException 异常。
 
-- 【强制】**使用集合转数组的方法，必须使用集合的 toArray(T[] array)**，传入的是类型完全一样的数组，大小就是 list.size()。
-说明：使用 toArray 带参方法，入参分配的数组空间不够大时，toArray 方法内部将重新分配内存空间，并返回新数组地址；如果数组元素大于实际所需，下标为[ list.size() ]的数组元素将被置为 null，其它数组元素保持原值，因此最好将方法入参数组大小定义与集合元素个数一致。
-正例：
-```java
-List<String> list = new  ArrayList<String>(2); 
-list.add("guan");
-list.add("bao");
-String[] array = new  String[list.size()]; 
-array = list.toArray(array);
-```
-反例：直接使用 toArray 无参方法存在问题，此方法返回值只能是 Object[]类，若强转其它类型数组将出现 ClassCastException 错误。
+- 【强制】使用 Map 的方法 `keySet()/values()/entrySet()` 返回集合对象时，不可以对其进行添加元素操作，否则会抛出 UnsupportedOperationException 异常。 
 
-- 【强制】**使用工具类 Arrays.asList()把数组转换成集合时，不能使用其修改集合相关的方法**，它的 add/remove/clear 方法会抛出 UnsupportedOperationException 异常。
-说明：asList 的返回对象是一个 Arrays 内部类，并没有实现集合的修改方法。Arrays.asList体现的是适配器模式，**只是转换接口，后台的数据仍是数组**。
-```java
-String[] str = new String[] { "you", "wu" }; 
-List list = Arrays.asList(str);
-```
-第一种情况：list.add("yangguanbao"); 运行时异常。
-第二种情况：str[0] = "gujin"; 那么 list.get(0)也会随之修改。
+- 【强制】Collections 类返回的对象，如：`emptyList()/singletonList()` 等都是 immutable（不变的） list，不可对其进行添加或者删除元素的操作。 
+
+    反例：如果查询无结果，返回 `Collections.emptyList()` 空集合对象，调用方一旦进行了添加元素的操作，就会触发 UnsupportedOperationException 异常。
+
+- 【强制】使用集合转数组的方法，必须使用集合的 `toArray(T[] array)`，传入的是类型完全一致、长度为 0 的空数组。 
+
+  反例：直接使用 toArray 无参方法存在问题，此方法返回值只能是 Object[] 类，若强转其它类型数组将出现 ClassCastException 错误。 正例：
+
+  ```java
+  List<String> list = new ArrayList<>(2);
+  list.add("guan");
+  list.add("bao");
+  String[] array = list.toArray(new String[0]); 
+  ```
+
+  说明：使用 toArray 带参方法，数组空间大小的 length： 
+
+  - 等于0，动态创建与 size 相同的数组，性能最好。 
+  - 大于 0 但小于 size，重新创建大小等于 size 的数组，增加 GC 负担。 
+  - 等于 size，在高并发情况下，数组创建完成之后，size 正在变大的情况下，负面影响与 2 相同。 
+  - 大于 size，空间浪费，且在 size 处插入 null 值，存在 NPE 隐患。
+- 【强制】在使用 Collection 接口任何实现类的 addAll() 方法时，都要对输入的集合参数进行 NPE 判断。 说明：在 `ArrayList#addAll` 方法的第一行代码即 `Object[] a = c.toArray();`  其中 c 为输入集合参数，如果为 null，则直接抛出异常。
+
+- 【强制】**使用工具类 Arrays.asList() 把数组转换成集合时，不能使用其修改集合相关的方法**，它的 add/remove/clear 方法会抛出 UnsupportedOperationException 异常。
+  说明：asList 的返回对象是一个 Arrays 内部类，并没有实现集合的修改方法。Arrays.asList 体现的是适配器模式，**只是转换接口，后台的数据仍是数组**。
+
+  ```java
+  String[] str = new String[] { "you", "wu" }; 
+  List list = Arrays.asList(str);
+  ```
+
+  第一种情况：`list.add("yangguanbao");` 运行时异常。
+  第二种情况：`str[0] = "gujin";` 那么 `list.get(0)` 也会随之修改。
 
 - 【强制】泛型通配符**<? extends T>**来接收返回的数据，此写法的泛型集合**不能使用 add 方法**，而**<?  super  T>不能使用 get 方法**，做为接口调用赋值时易出错。
 说明：**扩展说一下 PECS(Producer Extends Consumer Super)原则：第一、频繁往外读取内容的，适合用<? extends T>。第二、经常往里插入的，适合用<? super T>**。
 
-- 【强制】**不要在 foreach 循环里进行元素的remove/add  操作。remove 元素请使用 Iterator方式**，如果并发操作，需要对 Iterator 对象加锁。
-```java
-// 正例
-Iterator<String> iterator =  list.iterator(); 
-while (iterator.hasNext()) {
-    String item =  iterator.next(); 
-    if (删除元素的条件) {
-        iterator.remove();
-      }
-}
+- 【强制】**在无泛型限制定义的集合赋值给泛型限制的集合时**，在使用集合元素时，需要进行 instanceof判断，避免抛出 ClassCastException 异常。 
 
-// 反例：
-List<String> list = new  ArrayList<String>(); 
-list.add("1");
-list.add("2");
-for (String item : list) { 
-    if ("1".equals(item)) {
-        list.remove(item);  
-      }
-}
-```
-说明：以上代码的执行结果肯定会出乎大家的意料，那么试一下把“1”换成“2”，会是同样的结果吗？
+  说明：毕竟泛型是在 JDK5 后才出现，考虑到向前兼容，编译器是允许非泛型集合与泛型集合互相赋值。
+
+  ```java
+  // 反例： 
+  List<String> generics = null; 
+  List notGenerics = new ArrayList(10); 
+  notGenerics.add(new Object()); 
+  notGenerics.add(new Integer(1)); 
+  generics = notGenerics; 
+  // 此处抛出 ClassCastException 异常 
+  String string = generics.get(0);
+  ```
+
+- 【强制】**不要在 foreach 循环里进行元素的remove/add  操作。remove 元素请使用 Iterator方式**，如果并发操作，需要对 Iterator 对象加锁。
+
+    ```java
+    // 正例：
+    List<String> list = new ArrayList<>();
+    list.add("1");
+    list.add("2");
+    Iterator<String> iterator = list.iterator();
+    while (iterator.hasNext()) {
+    	String item = iterator.next();
+    	if (删除元素的条件) {
+    		iterator.remove();
+    	}
+    }
+    
+    // 反例：
+    for (String item : list) {
+    	if ("1".equals(item)) {
+    		list.remove(item);
+    	}
+    }
+    ```
+
+    说明：以上代码的执行结果肯定会出乎大家的意料，那么试一下把“1”换成“2”，会是同样的结果吗？
 
 - 【强制】  在 JDK7 版本及以上，Comparator 要满足如下三个条件，不然 Arrays.sort, Collections.sort 会报 IllegalArgumentException 异常。说明：三个条件如下
-  * 1） x，y 的比较结果和 y，x 的比较结果相反。
-  * 2） x>y，y>z，则x>z。
-  * 3） x=y，则x，z  比较结果和 y，z 比较结果相同。
-反例：下例中没有处理相等的情况，实际使用中可能会出现异常：
-```java
-new Comparator<Student>() {
-@Override
-public int compare(Student o1, Student o2) {
-    return o1.getId() > o2.getId() ? 1 : -1;
-    }
-};
-```
-- 【推荐】集合初始化时，指定集合初始值大小。
-说明：HashMap 使用 HashMap(int initialCapacity) 初始化，
-正例：initialCapacity = (需要存储的元素个数 /  负载因子)  +  1。注意负载因子（即 loaderfactor）默认为 0.75，如果暂时无法确定初始值大小，请设置为 16（即默认值）。
-反例：HashMap 需要放置 1024 个元素，由于没有设置容量初始大小，随着元素不断增加，容量 7 次被迫扩大，resize 需要重建 hash 表，严重影响性能。
+  *  x，y 的比较结果和 y，x 的比较结果相反。
+  * x>y，y>z，则x>z。
+  * x=y，则x，z  比较结果和 y，z 比较结果相同。
 
--  【推荐】**使用 entrySet 遍历 Map 类集合KV，而不是  keySet 方式进行遍历**。
-说明：keySet 其实是遍历了 2 次，一次是转为 Iterator 对象，另一次是从 hashMap 中取出key 所对应的 value。而 entrySet 只是遍历了一次就把 key 和 value 都放到了 entry 中，效率更高。如果是 JDK8，使用 Map.foreach 方法。
-正例：values()返回的是 V 值集合，是一个list 集合对象；keySet()返回的是 K 值集合，是一个  Set 集合对象；entrySet()返回的是 K-V 值组合集合。
+  反例：下例中没有处理相等的情况，交换两个对象判断结果并不互反，不符合第一个条件，在实际使用中 可能会出现异常。
+  
+  ```java
+  new Comparator<Student>() {
+  @Override
+  public int compare(Student o1, Student o2) {
+      return o1.getId() > o2.getId() ? 1 : -1;
+      }
+  };
+  ```
+  
+- 【推荐】集合泛型定义时，在 JDK7 及以上，使用 diamond 语法或全省略。
+  说明：菱形泛型，即 diamond，直接使用 `<>` 来指代前边已经指定的类型。
+
+  ```java
+  // 正例：
+  // diamond 方式，即 <>
+  HashMap<String, String> userCache = new HashMap<>(16);
+  // 全省略方式
+  ArrayList<User> users = new ArrayList(10);
+  ```
+
+- 【推荐】集合初始化时，指定集合初始值大小。
+
+  - 说明：HashMap 使用 `HashMap(int initialCapacity)` 初始化，如果暂时无法确定集合大小，那么指定默认值（16）即可。
+  - 正例：`initialCapacity = (需要存储的元素个数 /  负载因子)  +  1`。注意负载因子（即 loaderfactor）默认为 0.75，如果暂时无法确定初始值大小，请设置为 16（即默认值）。
+  - 反例：HashMap 需要放置 1024 个元素，由于没有设置容量初始大小，随着元素不断增加，容量 7 次被迫扩大，resize 需要重建 hash 表，严重影响性能。
+
+- 【推荐】**使用 entrySet 遍历 Map 类集合 KV，而不是  keySet 方式进行遍历**。
+
+  - 说明：keySet 其实是遍历了 2 次，一次是转为 Iterator 对象，另一次是从 HashMap 中取出key 所对应的 value。而 entrySet 只是遍历了一次就把 key 和 value 都放到了 entry 中，效率更高。如果是 JDK8，使用 `Map.foreach` 方法。
+
+  - 正例：values() 返回的是 V 值集合，是一个 list 集合对象；keySet() 返回的是 K 值集合，是一个  Set 集合对象；entrySet() 返回的是 K-V 值组合集合。
 
 - 【推荐】高度注意 Map 类集合 K/V 能不能存储 null 值的情况，如下表格：
 
-**集合类**|**Key**|**Value**| **Super** | **说明**
----|---|---|---|---|
-Hashtable| 不允许为 null  | 不允许为 null  | Dictionary  | 线程安全  |
- ConcurrentHashMap  | 不允许为 null  |不允许为 null   | AbstractMap  | 锁分段技术（JDK8:CAS）  |
- TreeMap  | 不允许为 null  | 不允许为 null  | AbstractMap  | 线程不安全  |
- HashMap  | 不允许为 null  | 不允许为 null  | AbstractMap  | 线程不安全  |
-反例： 由于 HashMap 的干扰，很多人认为 ConcurrentHashMap 是可以置入 null 值，而事实上，存储 null 值时会抛出 NPE 异常。
+    | **集合类**        | **Key**       | **Value**     | **Super**   | **说明**               |
+    | ----------------- | ------------- | ------------- | ----------- | ---------------------- |
+    | Hashtable         | 不允许为 null | 不允许为 null | Dictionary  | 线程安全               |
+    | ConcurrentHashMap | 不允许为 null | 不允许为 null | AbstractMap | 锁分段技术（JDK8:CAS） |
+    | TreeMap           | 不允许为 null | 允许为 null   | AbstractMap | 线程不安全             |
+    | HashMap           | 允许为 null   | 允许为 null   | AbstractMap | 线程不安全             |
+
+    反例： 由于 HashMap 的干扰，很多人认为 ConcurrentHashMap 是可以置入 null 值，而事实上，存储 null 值时会抛出 NPE 异常。
 
 - 【参考】合理利用好集合的有序性(sort)和稳定性(order)，避免集合的无序性(unsort)和不稳定性(unorder)带来的负面影响。 
-说明：**有序性是指遍历的结果是按某种比较规则依次排列的。稳定性指集合每次遍历的元素次序是一定的。**如：ArrayList 是 order/unsort；HashMap 是 unorder/unsort；TreeSet order/sort。
+  说明：**有序性是指遍历的结果是按某种比较规则依次排列的。稳定性指集合每次遍历的元素次序是一定的。**如：ArrayList 是 order/unsort；HashMap 是 unorder/unsort；TreeSet order/sort。
 
 - 【参考】利用 Set 元素唯一的特性，可以快速对一个集合进行去重操作，**避免使用 List 的 contains 方法进行遍历、对比、去重操作。**
 
 ## (六) 并发处理
 
-1. 【强制】获取单例对象需要保证线程安全，其中的方法也要保证线程安全。说明：资源驱动类、工具类、单例工厂类都需要注意。
+- 【强制】获取单例对象需要保证线程安全，其中的方法也要保证线程安全。
 
-2. 【强制】**创建线程或线程池时请指定有意义的线程名称**，方便出错时回溯。正例：
-```java
-public  class  TimerTaskThread  extends  Thread  { 
-    public TimerTaskThread()  {
-        super.setName("TimerTaskThread");
-        ...
-}
-```
+    说明：资源驱动类、工具类、单例工厂类都需要注意。
 
-3. 【强制】**线程资源必须通过线程池提供**，不允许在应用中自行显式创建线程。
-说明：使用线程池的好处是减少在创建和销毁线程上所花的时间以及系统资源的开销，解决资源不足的问题。如果不使用线程池，有可能造成系统创建大量同类线程而导致消耗完内存或者“过度切换”的问题。
+- 【强制】**创建线程或线程池时请指定有意义的线程名称**，方便出错时回溯。
 
-4. 【强制】**线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式**，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
-说明：Executors 返回的线程池对象的弊端如下：
-    * 1）FixedThreadPool 和 SingleThreadPool:
-    允许的请求队列长度为 Integer.MAX_VALUE，可能会堆积大量的请求，从而导致 OOM。
-       2）CachedThreadPool 和 ScheduledThreadPool:
-    * 允许的创建线程数量为 Integer.MAX_VALUE，可能会创建大量的线程，从而导致 OOM。
+    正例：自定义线程工厂，并且根据外部特征进行分组，比如，来自同一机房的调用，把机房编号赋值给whatFeatureOfGroup
 
-5. 【强制】**SimpleDateFormat 是线程不安全的类，一般不要定义为 static 变量**，如果定义为static，必须加锁，或者使用 DateUtils 工具类。
-
-正例：注意线程安全，使用 DateUtils。亦推荐如下处理：
-```java
-private static final ThreadLocal<DateFormat> df = new ThreadLocal<DateFormat>() {
-    @Override
-    protected DateFormat initialValue()  {
-        return new SimpleDateFormat("yyyy-MM-dd");
+    ```java
+    public class UserThreadFactory implements ThreadFactory {
+    	private final String namePrefix;
+    	private final AtomicInteger nextId = new AtomicInteger(1);
+    	
+        // 定义线程组名称，在利用jstack来排查问题时，非常有帮助
+    	UserThreadFactory(String whatFeatureOfGroup) {
+    	   namePrefix = "From UserThreadFactory's " + whatFeatureOfGroup + "-Worker-";
+    	}
+    	
+        @Override
+    	public Thread newThread(Runnable task) {
+    		String name = namePrefix + nextId.getAndIncrement();
+    		Thread thread = new Thread(null, task, name, 0, false);
+    		System.out.println(thread.getName());
+    		return thread;
+    	}
     }
-};
-```
-说明：如果是 JDK8 的应用，可以**使用 Instant 代替 Date，LocalDateTime 代替 Calendar，DateTimeFormatter 代替 SimpleDateFormat**，官方给出的解释：simple beautiful strong immutable thread-safe。
+    ```
 
-6. 【强制】高并发时，同步调用应该去考量锁的性能损耗。能用无锁数据结构，就不要用锁；能锁区块，就不要锁整个方法体；能用对象锁，就不要用类锁。
-说明：尽可能使加锁的代码块工作量尽可能的小，避免在锁代码块中调用 RPC 方法。
+- 【强制】**线程资源必须通过线程池提供**，不允许在应用中自行显式创建线程。
+    说明：使用线程池的好处是减少在创建和销毁线程上所花的时间以及系统资源的开销，解决资源不足的问题。如果不使用线程池，有可能造成系统创建大量同类线程而导致消耗完内存或者「过度切换」的问题。
 
-7. 【强制】对多个资源、数据库表、对象同时加锁时，需要保持一致的加锁顺序，否则可能会造成死锁。
-说明：线程一需要对表 A、B、C 依次全部加锁后才可以进行更新操作，那么线程二的加锁顺序也必须是 A、B、C，否则可能出现死锁。
+- 【强制】**线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式**，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
 
-8. 【强制】并发修改同一记录时，避免更新丢失，需要加锁。要么在应用层加锁，要么在缓存加锁，要么在数据库层使用乐观锁，使用 version 作为更新依据。
-说明：如果每次访问冲突概率小于 20%，推荐使用乐观锁，否则使用悲观锁。乐观锁的重试次数不得小于 3 次。
+    - 说明：Executors 返回的线程池对象的弊端如下：
 
-9. 【强制】多线程并行处理定时任务时，Timer 运行多个 TimeTask 时，只要其中之一没有捕获抛出的异常，其它任务便会自动终止运行，使用 ScheduledExecutorService 则没有这个问题。
+        - FixedThreadPool 和 SingleThreadPool:
+            允许的请求队列长度为 `Integer.MAX_VALUE`，可能会堆积大量的请求，从而导致 OOM。
 
-10. 【推荐】使用 CountDownLatch 进行异步转同步操作，每个线程退出前必须调用 countDown方法，线程执行代码注意 catch 异常，确保 countDown 方法被执行到，避免主线程无法执行至 await 方法，直到超时才返回结果。
-说明：注意，子线程抛出异常堆栈，不能在主线程 try-catch 到。
+        - CachedThreadPool 和 ScheduledThreadPool:
 
-11. 【推荐】避免 Random 实例被多线程使用，虽然共享该实例是线程安全的，但会因竞争同一 seed 导致的性能下降。
-说明：Random 实例包括 java.util.Random 的实例或者 Math.random()的方式。
-正例：在 JDK7 之后，可以直接使用 API ThreadLocalRandom，而在 JDK7 之前，需要编码保证每个线程持有一个实例。
+            允许的创建线程数量为 `Integer.MAX_VALUE`，可能会创建大量的线程，从而导致 OOM。
 
-12. 【推荐】在并发场景下，通过双重检查锁（double-checked locking）实现延迟初始化的优化问题隐患(可参考 The "Double-Checked Locking is Broken" Declaration)，推荐解决方案中较为简单一种（适用于 JDK5 及以上版本），将目标属性声明为 volatile 型。
-13. 【参考】volatile 解决多线程内存不可见问题。对于一写多读，是可以解决变量同步问题，但是如果多写，同样无法解决线程安全问题。如果是 count++操作，使用如下类实现： AtomicInteger  count =  new  AtomicInteger();  count.addAndGet(1); 如果是 JDK8，推荐使用 LongAdder 对象，比 AtomicLong 性能更好（减少乐观锁的重试次数）。
+- 【强制】**SimpleDateFormat 是线程不安全的类，一般不要定义为 static 变量**，如果定义为 static，必须加锁，或者使用 DateUtils 工具类。
 
-14. 【参考】 HashMap 在容量不够进行 resize 时由于高并发可能出现死链，导致 CPU 飙升，在开发过程中可以使用其它数据结构或加锁来规避此风险。
+    正例：注意线程安全，使用 DateUtils。亦推荐如下处理：
 
-15. 【参考】ThreadLocal 无法解决共享对象的更新问题，ThreadLocal 对象建议使用 static修饰。这个变量是针对一个线程内所有操作共享的，所以设置为静态变量，所有此类实例共享此静态变量  ，也就是说在类第一次被使用时装载，只分配一块存储空间，所有此类的对象(只要是这个线程内定义的)都可以操控这个变量。
+    ```java
+    private static final ThreadLocal<DateFormat> df = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue()  {
+            return new SimpleDateFormat("yyyy-MM-dd");
+        }
+    };
+    ```
 
-## (七) 控制语句
+    说明：如果是 JDK8 的应用，可以**使用 Instant 代替 Date，LocalDateTime 代替 Calendar，DateTimeFormatter 代替 SimpleDateFormat**，官方给出的解释：simple beautiful strong immutable thread-safe。
 
-1. 【强制】在一个 switch 块内，**每个 case 要么通过 break/return 等来终止，要么注释说明程序将继续执行到哪一个 case 为止**；**在一个 switch 块内，都必须包含一个 default 语句**并且放在最后，即使它什么代码也没有。
+- 【强制】**必须回收自定义的 ThreadLocal 变量**，尤其在线程池场景下，线程经常会被复用，如果不清理自定义的 ThreadLocal 变量，可能会影响后续业务逻辑和造成内存泄露等问题。尽量在代理中使用try-finally块进行回收。 正例：
 
-2. 【强制】**在 if/else/for/while/do 语句中必须使用大括号。即使只有一行代码**。
-
-3. 【推荐】表达异常的分支时，少用 if-else 方式，这种方式可以改写成：
-```java
-if (condition) {
-  ...
-  return obj;
-}
-// 接着写 else 的业务逻辑代码;
-```
-说明：如果非得使用 if()...else if()...else...方式表达逻辑，【强制】避免后续代码维护困难，**请勿超过 3 层。**
-
-正例：超过 3 层的 if-else 的逻辑判断代码可以使用卫语句、策略模式、状态模式等来实现，其中卫语句示例如下：
-
->**卫语句**(guard clauses)就是把复杂的条件表达式拆分成多个条件表达式，比如一个很复杂的表达式，嵌套了好几层的`if-then-else`语句，转换为多个if语句，实现它的逻辑，这多条的if语句就是卫语句。
->
->有时候真正的业务代码可能在嵌套多次才执行，其他分支只是简单报错返回的情况。对于这种情况，应该单独检查报错返回的分支，当条件为真时**立即返回**，这样的单独检查就是应用了卫语句。
->
->卫语句可以把我们的视线从多层嵌套的异常处理中解放出来，集中精力处理真正的业务代码，且能够使得代码结构更为清晰可读。
-
-```java
-public void today() {
-    // 卫语句
-    if (isBusy()) {
-        System.out.println(“change time.”);
-        // 直接返回
-        return;
+    ```java
+    objectThreadLocal.set(userInfo);
+    try {
+    	// ...
+    } finally {
+    	objectThreadLocal.remove();
     }
+    ```
 
-     // 卫语句
-    if (isFree()) {
-        System.out.println(“go to travel.”); 
-        // 直接返回
-        return;
+- 【强制】高并发时，同步调用应该去考量锁的性能损耗。能用无锁数据结构，就不要用锁；能锁区块，就不要锁整个方法体；能用对象锁，就不要用类锁。
+    - 说明：尽可能使加锁的代码块工作量尽可能的小，**避免在锁代码块中调用 RPC 方法**。
+
+- 【强制】对多个资源、数据库表、对象同时加锁时，需要保持一致的加锁顺序，否则可能会造成死锁。
+    说明：线程一需要对表 A、B、C 依次全部加锁后才可以进行更新操作，那么线程二的加锁顺序也必须是 A、B、C，否则可能出现死锁。
+
+- 【强制】在使用阻塞等待获取锁的方式中，必须在 try 代码块之外，并且在加锁方法与 try 代码块之间没有任何可能抛出异常的方法调用，避免加锁成功后，在 finally 中无法解锁。 
+
+    - 说明一：如果在 lock 方法与 try 代码块之间的方法调用抛出异常，那么无法解锁，造成其它线程无法成功获取锁。 
+
+    - 说明二：如果 lock 方法在 try 代码块之内，可能由于其它方法抛出异常，导致在 finally 代码块中，unlock 对未加锁的对象解锁，它会调用 AQS 的 tryRelease 方法（取决于具体实现类），抛出IllegalMonitorStateException 异常。 
+
+    - 说明三：在 Lock 对象的 lock 方法实现中可能抛出 unchecked 异常，产生的后果与说明二相同。 
+
+    - 正例：
+
+        ```java
+        Lock lock = new XxxLock();
+        // ...
+        lock.lock();
+        try {
+        	doSomething();
+        	doOthers();
+        } finally {
+        	lock.unlock();
+        } 
+        
+        // 反例：
+        Lock lock = new XxxLock();
+        // ...
+        try {
+        	// 如果此处抛出异常，则直接执行finally代码块
+        	doSomething();
+        	// 无论加锁是否成功，finally代码块都会执行
+        	lock.lock();
+        	doOthers();
+        } finally {
+        	lock.unlock();
+        }
+        ```
+
+- 【强制】并发修改同一记录时，避免更新丢失，需要加锁。要么在应用层加锁，要么在缓存加锁，要么在数据库层使用乐观锁，使用 version 作为更新依据。
+    说明：如果每次访问冲突概率小于 20%，推荐使用乐观锁，否则使用悲观锁。乐观锁的重试次数不得小于 3 次。
+
+- 【强制】多线程并行处理定时任务时，Timer 运行多个 TimeTask 时，只要其中之一没有捕获抛出的异常，其它任务便会自动终止运行，使用 ScheduledExecutorService 则没有这个问题。
+
+- 【推荐】**资金相关的金融敏感信息，使用悲观锁策略**。 
+
+    说明：乐观锁在获得锁的同时已经完成了更新操作，校验逻辑容易出现漏洞，另外，乐观锁对冲突的解决策略有较复杂的要求，处理不当容易造成系统压力或数据异常，所以资金相关的金融敏感信息不建议使用乐观锁更新。
+    正例：悲观锁遵循一锁、二判、三更新、四释放的原则。
+
+- 【推荐】使用 CountDownLatch 进行异步转同步操作，每个线程退出前必须调用 countDown 方法，线程执行代码注意 catch 异常，确保 countDown 方法被执行到，避免主线程无法执行至 await 方法，直到超时才返回结果。
+    说明：注意，子线程抛出异常堆栈，不能在主线程 try-catch 到。
+
+- 【推荐】避免 Random 实例被多线程使用，虽然共享该实例是线程安全的，但会因竞争同一 seed 导致的性能下降。
+    - 说明：Random 实例包括 `java.util.Random` 的实例或者 `Math.random()` 的方式。
+    - 正例：在 JDK7 之后，可以直接使用 API ThreadLocalRandom，而在 JDK7 之前，需要编码保证每个线程持有一个实例。
+
+- 【推荐】通过双重检查锁（double-checked locking）（在并发场景下）存在延迟初始化的优化问题隐患（可参考 The "Double-Checked Locking is Broken" Declaration），推荐解决方案中较为简单一种（适用于JDK5 及以上版本），将目标属性声明为 volatile 型，比如将 helper 的属性声明修改为`private volatile Helper helper = null;`。 正例：
+
+    ```java
+    public class LazyInitDemo {
+    	private volatile Helper helper = null;
+    	public Helper getHelper() {
+    	if (helper == null) {
+    		synchronized (this) {
+    			if (helper == null) { 
+                    helper = new Helper(); 
+                }
+    		}
+    	}
+    	return helper;
+    	}
+    	// other methods and fields...
     }
+    ```
 
-    // 关注真正的业务代码
-    System.out.println(“stay at home to learn Alibaba Java Coding Guidelines.”);
-    return;
+- 【参考】volatile 解决多线程内存不可见问题。对于一写多读，是可以解决变量同步问题，但是如果多写，同样无法解决线程安全问题。如果是 count++操作，使用如下类实现： `AtomicInteger  count =  new  AtomicInteger();`  `count.addAndGet(1); ` 如果是 JDK8，推荐使用 LongAdder 对象，比 AtomicLong 性能更好（减少乐观锁的重试次数）。
 
-}
-```
+- 【参考】 HashMap 在容量不够进行 resize 时由于高并发可能出现死链，导致 CPU 飙升，在开发过程中可以使用其它数据结构或加锁来规避此风险。
 
-4. 【推荐】**除常用方法（如 getXxx/isXxx）等外，不要在条件判断中执行其它复杂的语句，将复杂逻辑判断的结果赋值给一个有意义的布尔变量名，以提高可读性**。
+- 【参考】ThreadLocal 无法解决共享对象的更新问题，ThreadLocal 对象建议使用 static 修饰。这个变量是针对一个线程内所有操作共享的，所以设置为静态变量，所有此类实例共享此静态变量  ，也就是说在类第一次被使用时装载，只分配一块存储空间，所有此类的对象(只要是这个线程内定义的)都可以操控这个变量。
 
-5. 【推荐】循环体中的语句要考量性能，以下操作**尽量移至循环体外处理，如定义对象、变量、获取数据库连接，进行不必要的 try-catch 操作（这个 try-catch 是否可以移至循环体外）**。
+## (八) 控制语句
 
-6. 【推荐】接口入参保护，这种场景常见的是用于做批量操作的接口。
+- 【强制】在一个 switch 块内，**每个 case 要么通过 continue/break/return 等来终止，要么注释说明程序将继续执行到哪一个 case 为止**；**在一个 switch 块内，都必须包含一个 default 语句**并且放在最后，即使它什么代码也没有。
 
-7. 【参考】下列情形，需要进行参数校验：
-  * 1） 调用频次低的方法。
-  * 2） 执行时间开销很大的方法。此情形中，参数校验时间几乎可以忽略不计，但如果因为参数错误导致中间执行回退，或者错误，那得不偿失。
-  * 3） 需要极高稳定性和可用性的方法。
-  * 4） 对外提供的开放接口，不管是 RPC/API/HTTP 接口。
-  * 5） 敏感权限入口。
+    - 说明：注意 break 是退出 switch 语句块，而 return 是退出方法体。
 
-8. 【参考】下列情形，不需要进行参数校验：
-  * 1） 极有可能被循环调用的方法。但在方法说明里必须注明外部参数检查要求。
-  * 2） 底层调用频度比较高的方法。毕竟是像纯净水过滤的最后一道，参数错误不太可能到底层才会暴露问题。一般 DAO 层与 Service 层都在同一个应用中，部署在同一台服务器中，所以 DAO 的参数校验，可以省略。
-  * 3） 被声明成 private 只会被自己代码所调用的方法，如果能够确定调用方法的代码传入参数已经做过检查或者肯定不会有问题，此时可以不校验参数。
+- 【强制】当 switch 括号内的变量类型为 String 并且此变量为外部参数时，必须先进行 null 判断。 
+
+    反例：如下的代码会抛出 NPE。
+
+    ```java
+    public class Demo4 {
+    
+    	public static void main(String[] args) {
+    		method(null);
+    	}
+    
+    	public static void method(String param) {
+    		switch (param) {
+    			// 肯定不是进入这里
+    			case "sth":
+    				System.out.println("it's sth");
+    				break;
+    			// 也不是进入这里
+    			case "null":
+    				System.out.println("it's null");
+    				break;
+    			// 也不是进入这里
+    			default:
+    				System.out.println("default");
+    		}
+    	}
+    }
+    ```
+
+- 【强制】**在 if/else/for/while/do 语句中必须使用大括号。即使只有一行代码**。
+
+    说明：即使只有一行代码，也禁止不采用大括号的编码方式：`if (condition) statements;`
+
+- 【强制】三目运算符 `condition? 表达式 1 : 表达式 2`中，高度注意表达式 1 和 2 在类型对齐时，可能抛出因自动拆箱导致的 NPE 异常。 
+
+    - 说明：以下两种场景会触发类型对齐的拆箱操作： 
+
+        - 表达式 1 或表达式 2 的值只要有一个是原始类型。
+        - 表达式 1 或表达式 2 的值的类型不一致，会强制拆箱升级成表示范围更大的那个类型。 
+
+    - 反例：
+
+        ```java
+        Integer a = 1;
+        Integer b = 2;
+        Integer c = null;
+        Boolean flag = false;
+        // a*b 的结果是 int 类型，那么 c 会强制拆箱成 int 类型，抛出 NPE 异常
+        Integer result=(flag? a*b : c);
+        ```
+
+- 【强制】在高并发场景中，避免使用「等于」判断作为中断或退出的条件。 
+
+    - 说明：如果并发控制没有处理好，容易产生等值判断被「击穿」的情况，使用大于或小于的区间判断条件来代替。
+
+    - 反例：判断剩余奖品数量等于 0 时，终止发放奖品，但因为并发处理错误导致奖品数量瞬间变成了负数，这样的话，活动无法终止。
+
+- 【推荐】当某个方法的代码总行数超过 10 行时，return / throw 等中断逻辑的右大括号后均需要加一个空行。
+
+     说明：这样做逻辑清晰，有利于代码阅读时重点关注。
+
+- 【推荐】表达异常的分支时，少用 if-else 方式，这种方式可以改写成：
+
+    ```java
+    if (condition) {
+      ...
+      return obj;
+    }
+    // 接着写 else 的业务逻辑代码;
+    ```
+
+    - 说明：如果非得使用 `if()...else if()...else...` 方式表达逻辑，【强制】避免后续代码维护困难，**请勿超过 3 层。**
+
+    - 正例：超过 3 层的 if-else 的逻辑判断代码可以使用卫语句、策略模式、状态模式等来实现，其中卫语句示例如下：
+
+        >**卫语句**(guard clauses)就是把复杂的条件表达式拆分成多个条件表达式，比如一个很复杂的表达式，嵌套了好几层的`if-then-else`语句，转换为多个if语句，实现它的逻辑，这多条的if语句就是卫语句。
+        >
+        >有时候真正的业务代码可能在嵌套多次才执行，其他分支只是简单报错返回的情况。对于这种情况，应该单独检查报错返回的分支，当条件为真时**立即返回**，这样的单独检查就是应用了卫语句。
+        >
+        >卫语句可以把我们的视线从多层嵌套的异常处理中解放出来，集中精力处理真正的业务代码，且能够使得代码结构更为清晰可读。
+
+        ```java
+        public void today() {
+            // 卫语句
+            if (isBusy()) {
+                System.out.println(“change time.”);
+                // 直接返回
+                return;
+            }
+        
+             // 卫语句
+            if (isFree()) {
+                System.out.println(“go to travel.”); 
+                // 直接返回
+                return;
+            }
+        
+            // 关注真正的业务代码
+            System.out.println(“stay at home to learn Alibaba Java Coding Guidelines.”);
+            return;
+        }
+        ```
+
+- 【推荐】**除常用方法（如 getXxx/isXxx）等外，不要在条件判断中执行其它复杂的语句，将复杂逻辑判断的结果赋值给一个有意义的布尔变量名，以提高可读性**。
+
+    - 说明：很多 if 语句内的逻辑表达式相当复杂，与、或、取反混合运算，甚至各种方法纵深调用，理解成本非常高。如果赋值一个非常好理解的布尔变量名字，则是件令人爽心悦目的事情。 
+
+    - 正例：
+
+        ```java
+        // 伪代码如下
+        final boolean existed = (file.open(fileName, "w") != null) && (...) || (...);
+        if (existed) {
+        	...
+        }
+        
+        // 反例：
+        public final void acquire ( long arg) {
+        	if (!tryAcquire(arg) &&
+        			acquireQueued(addWaiter(Node.EXCLUSIVE), arg)) {
+        		selfInterrupt();
+            }
+        }
+        ```
+
+- 【推荐】不要在其它表达式（尤其是条件表达式）中，插入赋值语句。 
+
+    - 说明：赋值点类似于人体的穴位，对于代码的理解至关重要，所以赋值语句需要清晰地单独成为一行。 
+
+    - 反例：
+
+        ```java
+        public Lock getLock(boolean fair) {
+        	// 算术表达式中出现赋值操作，容易忽略count值已经被改变
+        	threshold = (count = Integer.MAX_VALUE) - 1;
+        	// 条件表达式中出现赋值操作，容易误认为是sync==fair
+        	return (sync = fair) ? new FairSync() : new NonfairSync();
+        }
+        ```
+
+- 【推荐】循环体中的语句要考量性能，以下操作**尽量移至循环体外处理，如定义对象、变量、获取数据库连接，进行不必要的 try-catch 操作（这个 try-catch 是否可以移至循环体外）**。
+
+- 【推荐】避免采用取反逻辑运算符。 
+
+    - 说明：取反逻辑不利于快速理解，并且取反逻辑写法一般都存在对应的正向逻辑写法。 
+
+    - 正例：使用 `if (x < 628)` 来表达 x 小于 628。 
+    - 反例：使用 `if (!(x >= 628))` 来表达 x 小于 628。
+
+- 【推荐】公开接口需要进行入参保护，尤其是批量操作的接口。 
+
+    反例：某业务系统，提供一个用户批量查询的接口，API 文档上有说最多查多少个，但接口实现上没做任何保护，导致调用方传了一个 1000 的用户 id 数组过来后，查询信息后，内存爆了。
+
+- 【参考】下列情形，需要进行参数校验：
+      - 调用频次低的方法。
+      - 执行时间开销很大的方法。此情形中，参数校验时间几乎可以忽略不计，但如果因为参数错误导致中间执行回退，或者错误，那得不偿失。
+      - 需要极高稳定性和可用性的方法。
+      - 对外提供的开放接口，不管是 RPC/API/HTTP 接口。
+      - 敏感权限入口。
+
+- 【参考】下列情形，不需要进行参数校验：
+      - 极有可能被循环调用的方法。但在方法说明里必须注明外部参数检查要求。
+      - 底层调用频度比较高的方法。毕竟是像纯净水过滤的最后一道，参数错误不太可能到底层才会暴露问题。一般 DAO 层与 Service 层都在同一个应用中，部署在同一台服务器中，所以 DAO 的参数校验，可以省略。
+      - 被声明成 private 只会被自己代码所调用的方法，如果能够确定调用方法的代码传入参数已经做过检查或者肯定不会有问题，此时可以不校验参数。
 
 ## (八) 注释规约
 
-1. 【强制】 **类、类属性、类方法的注释必须使用  Javadoc 规范，使用`/**内容*/`格式，不得使用`// xxx` 方式 ;** 
-说明：在 IDE 编辑窗口中，Javadoc 方式会提示相关注释，生成 Javadoc 可以正确输出相应注释；在 IDE 中，工程调用方法时，不进入方法即可悬浮提示方法、参数、返回值的意义，提高阅读效率。
+- 【强制】 **类、类属性、类方法的注释必须使用  Javadoc 规范，使用`/**内容*/`格式，不得使用`// xxx` 方式 ;** 
+    说明：在 IDE 编辑窗口中，Javadoc 方式会提示相关注释，生成 Javadoc 可以正确输出相应注释；在 IDE 中，工程调用方法时，不进入方法即可悬浮提示方法、参数、返回值的意义，提高阅读效率。
 
-2. 【强制】**所有的抽象方法（包括接口中的方法）必须要用 Javadoc 注释、除了返回值、参数、异常说明外，还必须指出该方法做什么事情，实现什么功能。**
-说明：对子类的实现要求，或者调用注意事项，请一并说明。
+- 【强制】**所有的抽象方法（包括接口中的方法）必须要用 Javadoc 注释、除了返回值、参数、异常说明外，还必须指出该方法做什么事情，实现什么功能。**
+    说明：对子类的实现要求，或者调用注意事项，请一并说明。
 
-3. 【强制】**所有的类都必须添加创建者和创建日期**。
+- 【强制】**所有的类都必须添加创建者和创建日期**。
 
-4. 【强制】**方法内部单行注释，在被注释语句上方另起一行，使用//注释。方法内部多行注释使用/*  */注释，注意与代码对齐。**
+    - 说明：在设置模板时，注意 IDEA 的 @author 为 `${USER}`，而 eclipse 的 @author 为`${user}`，大小写有区别，而日期的设置统一为 `yyyy/MM/dd` 的格式。 
 
-5. 【强制】**所有的枚举类型字段必须要有注释，说明每个数据项的用途**。
+    - 正例：
 
-6. 【推荐】与其“半吊子”英文来注释，不如**用中文注释把问题说清楚。专有名词与关键字保持英文原文即可。**
-反例：“TCP 连接超时”解释成“传输控制协议连接超时”，理解反而费脑筋。
+        ```java
+        /**
+          * @author yangguanbao
+          * @date 2016/10/31
+          */
+        ```
 
-7. 【推荐】代码修改的同时，注释也要进行相应的修改，尤其是参数、返回值、异常、核心逻辑等的修改。
-说明：代码与注释更新不同步，就像路网与导航软件更新不同步一样，如果导航软件严重滞后，就失去了导航的意义。
+- 【强制】**方法内部单行注释，在被注释语句上方另起一行，使用 `//` 注释。方法内部多行注释使用 `/*  */` 注释，注意与代码对齐。**
 
-8. 【参考】谨慎注释掉代码。在上方详细说明，而不是简单地注释掉。如果无用，则删除。
-说明：代码被注释掉有两种可能性：1）后续会恢复此段代码逻辑。2）永久不用。前者如果没有备注信息，难以知晓注释动机。后者建议直接删掉（代码仓库保存了历史代码）。
+- 【强制】**所有的枚举类型字段必须要有注释，说明每个数据项的用途**。
+- 【推荐】与其「半吊子」英文来注释，不如**用中文注释把问题说清楚。专有名词与关键字保持英文原文即可。**
+    - 反例：“TCP 连接超时”解释成“传输控制协议连接超时”，理解反而费脑筋。 
 
-9. 【参考】对于注释的要求：第一、能够准确反应设计思想和代码逻辑；第二、能够描述业务含义，使别的程序员能够迅速了解到代码背后的信息。完全没有注释的大段代码对于阅读者形同天书，注释是给自己看的，即使隔很长时间，也能清晰理解当时的思路；注释也是给继任者看的，使其能够快速接替自己的工作。
+- 【推荐】代码修改的同时，注释也要进行相应的修改，尤其是参数、返回值、异常、核心逻辑等的修改。
+- 【推荐】在类中删除未使用的任何字段、方法、内部类；在方法中删除未使用的任何参数声明与内部变量。
 
-10. 【参考】好的命名、代码结构是自解释的，注释力求精简准确、表达到位。避免出现注释的一个极端：过多过滥的注释，代码的逻辑一旦修改，修改注释是相当大的负担。
+- 【参考】谨慎注释掉代码。在上方详细说明，而不是简单地注释掉。如果无用，则删除。
+    说明：代码被注释掉有两种可能性：
 
-11. 【参考】特殊注释标记，请注明标记人与标记时间。注意及时处理这些标记，通过标记扫描，经常清理此类标记。线上故障有时候就是来源于这些标记处的代码。
+    - 后续会恢复此段代码逻辑。
+    - 永久不用。
 
-  - 1） **待办事宜（TODO）**:（ 标记人，标记时间，[预计处理时间]）
-    表示需要实现，但目前还未实现的功能。这实际上是一个 Javadoc 的标签，目前的 Javadoc还没有实现，但已经被广泛使用。只能应用于类，接口和方法（因为它是一个 Javadoc 标签）。
-  
-  - 2） **错误，不能工作（FIXME）**:（标记人，标记时间，[预计处理时间]）
-    在注释中用 FIXME 标记某代码是错误的，而且不能工作，需要及时纠正的情况。
+    前者如果没有备注信息，难以知晓注释动机。后者建议直接删掉（代码仓库保存了历史代码）。
+
+- 【参考】对于注释的要求：
+    - 能够准确反应设计思想和代码逻辑；
+    - 能够描述业务含义，使别的程序员能够迅速了解到代码背后的信息。
+    - 完全没有注释的大段代码对于阅读者形同天书，注释是给自己看的，即使隔很长时间，也能清晰理解当时的思路；注释也是给继任者看的，使其能够快速接替自己的工作。
+
+- 【参考】好的命名、代码结构是自解释的，注释力求精简准确、表达到位。避免出现注释的一个极端：**过多过滥的注释**，代码的逻辑一旦修改，修改注释是相当大的负担。
+
+- 【参考】特殊注释标记，请注明标记人与标记时间。注意及时处理这些标记，通过标记扫描，经常清理此类标记。线上故障有时候就是来源于这些标记处的代码。
+      - **待办事宜（TODO）**:（ 标记人，标记时间，[预计处理时间]）
+        表示需要实现，但目前还未实现的功能。这实际上是一个 Javadoc 的标签，目前的 Javadoc还没有实现，但已经被广泛使用。只能应用于类，接口和方法（因为它是一个 Javadoc 标签）。
+
+      -  **错误，不能工作（FIXME）**:（标记人，标记时间，[预计处理时间]）
+        在注释中用 FIXME 标记某代码是错误的，而且不能工作，需要及时纠正的情况。
+
+
+
+==看到这里了==
+
+## (十) 前后端规约
+
+- 【强制】前后端交互的API，需要明确协议、域名、路径、请求方法、请求内容、状态码、响应体。 说明：
+    1） 协议：生产环境必须使用HTTPS。 2） 路径：每一个API需对应一个路径，表示API具体的请求地址： a） 代表一种资源，只能为名词，推荐使用复数，不能为动词，请求方法已经表达动作意义。 b） URL路径不能使用大写，单词如果需要分隔，统一使用下划线。 c） 路径禁止携带表示请求内容类型的后缀，比如".json",".xml"，通过accept头表达即可。 3） 请求方法：对具体操作的定义，常见的请求方法如下： a） GET：从服务器取出资源。 b） POST：在服务器新建一个资源。 c） PUT：在服务器更新资源。 d） DELETE：从服务器删除资源。 4） 请求内容：URL带的参数必须无敏感信息或符合安全要求；body里带参数时必须设置Content-Type。 5） 响应体：响应体body可放置多种数据类型，由Content-Type头来确定。
 
 ## (九) 其它
 
@@ -864,7 +1145,7 @@ logger.debug("Processing trade with id: {} and symbol : {} ", id, symbol);
    * SQL 注入
    * 反序列化注入
    * 正则输入源串拒绝服务 ReDoS
-说明：Java  代码用正则来验证客户端的输入，有些正则写法验证普通用户输入没有问题，但是如果攻击人员使用的是特殊构造的字符串来验证，有可能导致死循环的结果。
+   说明：Java  代码用正则来验证客户端的输入，有些正则写法验证普通用户输入没有问题，但是如果攻击人员使用的是特殊构造的字符串来验证，有可能导致死循环的结果。
 
 5. 【强制】禁止向 HTML 页面输出未经安全过滤或未正确转义的用户数据。
 
@@ -904,8 +1185,8 @@ CSRF 漏洞的应用/网站，攻击者可以事先构造好 URL，只要受害�
 
 9. 【强制】表必备三字段：`id`, `gmt_create`, `gmt_modified`。
 
-说明：其中`id`必为主键，类型为 unsigned bigint、单表时自增、步长为 1。
-`gmt_create,gmt_modified` 的类型均为 date_time 类型，前者现在时表示主动创建，后者过去分词表示被动更新。
+    说明：其中`id`必为主键，类型为 unsigned bigint、单表时自增、步长为 1。
+    `gmt_create,gmt_modified` 的类型均为 date_time 类型，前者现在时表示主动创建，后者过去分词表示被动更新。
 
 10. 【推荐】**表的命名最好是加上“业务名称_表的作用”**。正例：`alipay_task `/  `force_project `/ `trade_config`
 
@@ -916,13 +1197,13 @@ CSRF 漏洞的应用/网站，攻击者可以事先构造好 URL，只要受害�
 13. 【推荐】字段允许适当冗余，以提高查询性能，但必须考虑数据一致。冗余字段应遵循：
     1）不是频繁修改的字段。
     2）不是 varchar 超长字段，更不能是 text 字段。
-正例：商品类目名称使用频率高，字段长度短，名称基本一成不变，可在相关联的表中冗余存储类目名称，避免关联查询。
+    正例：商品类目名称使用频率高，字段长度短，名称基本一成不变，可在相关联的表中冗余存储类目名称，避免关联查询。
 
 14. 【推荐】单表行数超过 500 万行或者单表容量超过 2GB，才推荐进行分库分表。
-说明：如果预计三年后的数据量根本达不到这个级别，请不要在创建表时就分库分表。
+    说明：如果预计三年后的数据量根本达不到这个级别，请不要在创建表时就分库分表。
 
 15. 【参考】合适的字符存储长度，不但节约数据库表空间、节约索引存储，更重要的是提升检索速度。
-正例：如下表，其中无符号值可以避免误存负数，且扩大了表示范围。
+    正例：如下表，其中无符号值可以避免误存负数，且扩大了表示范围。
 
 | 对象     | 年龄区间   | 类型              | 字节 | 表示范围                       |
 | -------- | ---------- | ----------------- | ---- | ------------------------------ |
@@ -979,7 +1260,7 @@ CSRF 漏洞的应用/网站，攻击者可以事先构造好 URL，只要受害�
 
 ## (三)  SQL 语句
 
-1. 【强制】**不要使用 count(列名)或 count(常量)来替代 count(*)，count(*)**是 SQL92 定义的标准统计行数的语法，跟数据库无关，跟 NULL 和非 NULL 无关。
+1. 【强制】**不要使用 count(列名)或 count(常量)来替代 `count(*)`，`count(*)`**是 SQL92 定义的标准统计行数的语法，跟数据库无关，跟 NULL 和非 NULL 无关。
 说明：count(*)会统计值为 NULL 的行，而 count(列名)不会统计此列为 NULL 值的行。
 
 2. 【强制】count(distinct  col) 计算该列除 NULL 之外的不重复行数，注意 count(distinct col1, col2) 如果其中一列全为 NULL，那么即使另一列有不同的值，也返回为 0。
@@ -1038,7 +1319,7 @@ map.put("size", size);
 
 9. 【参考】@Transactional 事务不要滥用。事务会影响数据库的 QPS，另外使用事务的地方需要考虑各方面的回滚方案，包括缓存回滚、搜索引擎回滚、消息补偿、统计修正等。
 
-10. 【参考】<isEqual>中的 compareValue 是与属性值对比的常量，一般是数字，表示相等时带上此条件；<isNotEmpty>表示不为空且不为 null 时执行；<isNotNull>表示不为 null 值时执行。
+10. 【参考】`<isEqual>`中的 compareValue 是与属性值对比的常量，一般是数字，表示相等时带上此条件；`<isNotEmpty>`表示不为空且不为 null 时执行；`<isNotNull>`表示不为 null 值时执行。
 
 # 六、工程结构
 

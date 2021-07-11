@@ -253,24 +253,6 @@ if (printVersion || showVersion) {    PrintJavaVersion(env, showVersion);    CHE
 
 其实现如下:
 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-
 ```
 static voidPrintJavaVersion(JNIEnv *env, jboolean extraLF){    jclass ver;    jmethodID print;    // 找到指定的类    NULL_CHECK(ver = FindBootStrapClass(env, "java/lang/VersionProps"));    // 找到指定的方法    NULL_CHECK(print = (*env)->GetStaticMethodID(env,                                                 ver,                                                 (extraLF == JNI_TRUE) ? "println" : "print",                                                 "(Z)V"                                                 )              );    // 调用这个方法    (*env)->CallStaticVoidMethod(env, ver, print, printTo);}
 ```

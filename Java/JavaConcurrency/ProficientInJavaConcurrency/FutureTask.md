@@ -411,7 +411,7 @@ private void removeWaiter(WaitNode node) {
 
 ### cancel方法
 
-cancel方法用于取消任务，这里可能有两种情况，一种是任务已经执行了，另一种是还未执行，代码如下：
+cancel 方法用于取消任务，这里可能有两种情况，一种是任务已经执行了，另一种是还未执行，代码如下：
 
 ```
 public boolean cancel(boolean mayInterruptIfRunning) {

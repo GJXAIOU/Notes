@@ -794,7 +794,17 @@ testing 5ea463a trying something new
 
 
 
+### 保持项目最新
 
+步骤一：切换到 master 分支上  `git checkout master`
+
+步骤二：从原来克隆别人的仓库中拉取最新的  `git pull <remote>`
+
+步骤三：将 master 分支推动到自己的远程仓库：`git push <remote> <branch>`
+
+### 添加合作者
+
+在 setting -> Collaborators 中输入用户名，使得别人拥有提交权限。
 
 
 
