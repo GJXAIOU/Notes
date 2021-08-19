@@ -178,7 +178,7 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
 | sqrt() | 返回一个数的平方根 |
 | tan()  | 返回一个角度的正切 |
 
-## 七、汇总数据
+### 七、汇总数据
 
 聚类函数：运行在行组上，计算和返回单个值的函数
 
@@ -230,7 +230,7 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
     ```
 
 
-## 章十三： 分组计算    
+### 八、分组计算    
 
 允许将数据分为多个逻辑组，以便能对每个组进行聚集计算；
 主要有：GROUP BY 和 HAVING 子句；**WHERE 过滤行，HAVING 过滤分组 **, **WHERE 在数据分组前进行过滤，HAVING 在数据分组后进行过滤**。
@@ -253,36 +253,32 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
 - WHERE 和 HAVING 组合使用 （进行递进式查询）
     列出具有 2 个（含）以上、价格为 10（含）以上的产品的供应商
     `SELECT vend_id,COUNT(*) AS num_prods FROM products WHERE prod_price >=10 GROUP BY vend_id HAVING COUNT(*)>=2;`
-    不加 WHERE 条件，结果不同 
-    `SELECT vend_id,COUNT(*) AS num_prods FROM products GROUP BY vend_id HAVING COUNT(*) >=2;`
-
-
 
 - 分组和排序 
     检索总计订单价格大于等于50的订单的订单号和总计订单价格
     `SELECT order_num,SUM(quantity * item_price) AS ordertotal FROM orderitems GROUP BY order_num HAVING SUM(quantity * item_price) >=50;`
 
     按总计订单价格排序输出
+    
+    ```mysql
+    SELECT 
+        order_num, SUM(quantity * item_price) AS ordertotal
+    FROM
+        orderitems
+    GROUP BY order_num
+    HAVING SUM(quantity * item_price) >= 50
+    ORDER BY ordertotal;
+    ```
+    
+- ORDER BY 和 GROUP BY 区别
 
-```sql
-SELECT 
-    order_num, SUM(quantity * item_price) AS ordertotal
-FROM
-    orderitems
-GROUP BY order_num
-HAVING SUM(quantity * item_price) >= 50
-ORDER BY ordertotal;
-```
+    **一般在使用 GROUP BY 子句时，同时给出 ORDER BY 子句，保证数据正确排序；**
 
-- order by 和 GROUP BY 区别
-
-| order by                                 | GROUP BY                                               |
-| ---------------------------------------- | ------------------------------------------------------ |
-| 排序产生的输出                           | 分组行，但是输出可能不是分组的顺序                     |
-| 任意列都可以使用（甚至非选择的类也可以） | 只能使用选择列或表达式列，而且必须使用每个选择列表达式 |
-| 不一定需要                               | 如果和聚集函数一起使用列（或表达式），则必须使用       |
-
-**一般在使用 GROUP BY 子句时，同时给出 order by 子句，保证数据正确排序；**
+    | ORDER BY                                 | GROUP BY                                               |
+    | ---------------------------------------- | ------------------------------------------------------ |
+    | 排序产生的输出                           | 分组行，但是输出可能不是分组的顺序                     |
+    | 任意列都可以使用（甚至非选择的类也可以） | 只能使用选择列或表达式列，而且必须使用每个选择列表达式 |
+    | 不一定需要                               | 如果和聚集函数一起使用列（或表达式），则必须使用       |
 
 - SELECT 子句总结及顺序 
 
@@ -293,59 +289,60 @@ ORDER BY ordertotal;
     | WHERE    | 行级过滤           | 否                     |
     | GROUP BY | 分组说明           | 仅在按组计算聚集时使用 |
     | HAVING   | 组级过滤           | 否                     |
-    | order by | 输出排序顺序       | 否                     |
-    | limit    | 要检索的行数       | 否                     |
+    | ORDER BY | 输出排序顺序       | 否                     |
+    | LIMIT    | 要检索的行数       | 否                     |
 
-
-
-
-
-## 章十四：使用子查询     
+## 九、使用子查询     
 
 **子查询（subquery）即嵌套在其他查询中的查询**；
 
-- 利用子查询进行过滤
-    执行过程为从内往外执行，
-    列出订购物品 TNT2 的所有客户
-
-```sql
-SELECT cust_name, cust_contact
-FROM customers
-WHERE cust_id IN (SELECT cust_id
-                  FROM orders
-                  WHERE order_num IN (SELECT order_num
-                              FROM orderitems
-                              WHERE prod_id ='TNT2'));
-```
-
+- 利用子查询进行过滤，执行过程「通常」为从内往外执行，
+    
+    ```mysql
+    -- 列出订购物品 TNT2 的所有客户
+    SELECT cust_name, cust_contact FROM customers
+    WHERE cust_id IN (SELECT cust_id  FROM orders
+                      WHERE order_num IN (SELECT order_num
+                                  FROM orderitems
+                                  WHERE prod_id ='TNT2'));
+    ```
+    
 - 子查询不要嵌套太多；
+
 - 子查询不仅可以与 IN 操作符连用，还可以和`=`以及 `<>`等其他操作符连用；
+
 - 作为计算字段使用子查询
-    显示 customers 表中每个客户的订单总数
-    `SELECT cust_name,cust_state, (SELECT COUNT(*) FROM orders WHERE orders.cust_id = customers.cust_id) AS orders FROM customers order by cust_name;`
+
+    ```mysql
+    --显示 customers 表中每个客户的订单总数
+    SELECT cust_name,cust_state, 
+    	(SELECT COUNT(*) 
+         	FROM orders 
+         	WHERE orders.cust_id = customers.cust_id) AS orders 
+    FROM customers order by cust_name;
+    ```
 
 
-## 章十五：联结表       
+### 十、联结表       
 
-- 关系表的定义
-    关系表的设计就是要保证把信息分解成多个表，一类数据一个表，各表通过某些常用的值（即关系设计中的关系）互相连接；
+- 关系表的设计就是要保证把信息分解成多个表，一类数据一个表，各表通过某些常用的值（即关系设计中的关系）互相连接；
 - **外键(foreign key): 外键为某个表的一列，它包含另一个表的主键值，定义了两个表之间的关系**；
 - 联结：联结不是物理实体，在实际的数据库中不存在，联结仅仅存在于查询的执行中；
 
-### 创建联结 
+#### （一）创建联结 
 
 - 方式一： WHERE子句联结 （称为 等值联结，或者内部联结）
 
-```sql
-SELECT vend_name,prod_name,prod_price 
-// SELECT 语句需要联结的两个表的名字
-FROM vendors,products
-// 这里的列名必须完全限定  表名.列名
-WHERE vendors.vend_id = products.vend_id
-order by vend_name,prod_name;
-```
+    ```mysql
+    SELECT vend_name,prod_name,prod_price 
+    -- SELECT 语句需要联结的两个表的名字
+    FROM vendors,products
+    -- 这里的列名必须完全限定  表名.列名
+    WHERE vendors.vend_id = products.vend_id
+    order by vend_name,prod_name;
+    ```
 
-**在连接两个表时候，实际上是将第一个表中的每一行与第二个表中的每一行匹配，其中 WHERE 子句作为了过滤条件，只包含那些匹配给定条件的行**；
+    **在连接两个表时候，实际上是将第一个表中的每一行与第二个表中的每一行匹配，其中 WHERE 子句作为了过滤条件，只包含那些匹配给定条件的行**；
 
 - 笛卡尔积 / 叉联结 
     **由没有联结条件的表关系返回的结果为笛卡尔积。** 可以相当于不使用 WHERE 子句；
@@ -355,13 +352,13 @@ order by vend_name,prod_name;
 - 方式二：使用  INNER JOIN
     内部联结 INNER JOIN ： 表间相等测试 。相比 WHERE 子句，应该首选 INNER JOIN 语句；
     下面的语句实现的功能和上面的 WHERE 子句相同；
-
-```sql
-SELECT vend_name,prod_name,prod_price 
-FROM vendors INNER JOIN products
-on vendors.vend_id = products.vend_id;
-```
-
+    
+    ```mysql
+    SELECT vend_name,prod_name,prod_price 
+    FROM vendors INNER JOIN products
+    on vendors.vend_id = products.vend_id;
+    ```
+    
 - 连接多个表(只连接必要的表，否则性能会下降很多)
     编号为20005的订单中的物品及对应情况 
 
@@ -384,7 +381,7 @@ and prod_id = 'TNT2';
 ```
 
 
-## 章十六： 创建高级联结      
+### 十一、创建高级联结      
 
 一共三种联结方式：自联结、自然联结、外部联结；
 
