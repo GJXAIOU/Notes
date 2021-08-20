@@ -331,7 +331,7 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
 
 #### （一）创建联结 
 
-- 方式一： WHERE子句联结 （称为 等值联结，或者内部联结）
+- 方式一： WHERE子句联结 （等值/内部联结）
 
     ```mysql
     SELECT vend_name,prod_name,prod_price 
@@ -339,143 +339,105 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
     FROM vendors,products
     -- 这里的列名必须完全限定  表名.列名
     WHERE vendors.vend_id = products.vend_id
-    order by vend_name,prod_name;
+    ORDER BY vend_name,prod_name;
     ```
 
     **在连接两个表时候，实际上是将第一个表中的每一行与第二个表中的每一行匹配，其中 WHERE 子句作为了过滤条件，只包含那些匹配给定条件的行**；
 
 - 笛卡尔积 / 叉联结 
-    **由没有联结条件的表关系返回的结果为笛卡尔积。** 可以相当于不使用 WHERE 子句；
-    检索出的行的数目将是第一个表中的行数乘以第二个表的行数。
+    **由没有联结条件的表关系返回的结果为笛卡尔积。** 即相当于不使用 WHERE 子句，其检索出的行的数目将是第一个表中的行数乘以第二个表的行数。
 
 
-- 方式二：使用  INNER JOIN
-    内部联结 INNER JOIN ： 表间相等测试 。相比 WHERE 子句，应该首选 INNER JOIN 语句；
-    下面的语句实现的功能和上面的 WHERE 子句相同；
+- 方式二：INNER JOIN（内部联结）
     
     ```mysql
+    -- 等效于上面 WHERE 联结
     SELECT vend_name,prod_name,prod_price 
     FROM vendors INNER JOIN products
-    on vendors.vend_id = products.vend_id;
+    ON vendors.vend_id = products.vend_id;
     ```
     
 - 连接多个表(只连接必要的表，否则性能会下降很多)
-    编号为20005的订单中的物品及对应情况 
 
-```sql
-SELECT prod_name,vend_name,prod_price,quantity
-FROM orderitems,products,vendors
-WHERE products.vend_id = vendors.vend_id
-and orderitems.prod_id = products.prod_id
-and order_num = 20005;
-```
-
-**章 14 中列出订购物品TNT2的所有客户的子查询可以使用联结代替**
-
-```sql
-SELECT cust_name, cust_contact
-FROM customers, orders, orderitems
-WHERE customers.id = orders.cust.id
-and orderitems.order_num = orders.order_num
-and prod_id = 'TNT2';
-```
+    ```mysql
+    -- 编号为20005的订单中的物品及对应情况
+    SELECT prod_name,vend_name,prod_price,quantity
+    FROM orderitems,products,vendors
+    WHERE products.vend_id = vendors.vend_id
+    AND orderitems.prod_id = products.prod_id
+    AND order_num = 20005;
+    ```
 
 
 ### 十一、创建高级联结      
 
 一共三种联结方式：自联结、自然联结、外部联结；
 
-- 使用表别名
-    给列名或计算字段起别名 
+- 可以使用表别名
+    **注意：表的别名只能在查询执行中使用，表别名不返回客户机**；
+    
+    ```mysql
+     SELECT cust_name,cust_contact 
+     FROM customers AS c,orders AS o,orderitems AS oi
+     WHERE c.cust_id = o.cust_id
+     and oi.order_num = o.order_num
+     and prod_id = 'TNT2';
+    ```
 
-```sql
-SELECT concat(rtrim(vend_name),' (',rtrim(vend_country),')') AS vend_title
- FROM vendors order by vend_name;
-```
-
-**注意：表的别名只能在查询执行中使用，表别名不返回客户机**；
- 给表起别名 
-
-```sql
- SELECT cust_name,cust_contact 
- FROM customers AS c,orders AS o,orderitems AS oi
- WHERE c.cust_id = o.cust_id
- and oi.order_num = o.order_num
- and prod_id = 'TNT2';
-```
-
-### （一）自联结 
+#### （一）自联结 
 
 **自联结通常作为外部语句用来替代从相同表中检索数据时候使用的子查询语句；**
 
-ID为DTNTR该物品的供应商生产的其他物品
-
-  - 方法：子查询 
-
 ```sql
+-- 使用子查询实现「ID 为 DTNTR 该物品的供应商生产的其他物品」
 SELECT prod_id,prod_name FROM products
 WHERE vend_id = (SELECT vend_id FROM products WHERE prod_id = 'DTNTR');
 ```
 
-  - 方法：使用联结 
-
 ```sql
+-- 使用联结实现上述功能
 SELECT p1.prod_id,p1.prod_name
 FROM products AS p1, products AS p2
 WHERE p1.vend_id = p2.vend_id
 and p2.prod_id = 'DTNTR';
 ```
 
-### （二）自然联结
+#### （二）自然联结
 
-**自然联结排除多次出现，使每个列只返回一次**
+**自然联结排除多次出现，使每个列只返回一次**，内部联结都是自然联结；
 
-方法：通过对表使用通配符*，对所有其他表的列使用明确的子集 
+方法：通过对表使用通配符`*`，对所有其他表的列使用明确的子集 
 
 ```sql
-SELECT c.*,o.order_num,o.order_date,oi.prod_id,oi.quantity,oi.item_price
-FROM customers AS c,orders AS o,orderitems AS oi
-WHERE c.cust_id = o.cust_id
-and oi.order_num = o.order_num
-and prod_id = 'FB';
+SELECT c.*,o.num,o.date,oi.id,oi.quantity,oi.price
+FROM customers AS c, orders AS o, orderitems AS oi
+WHERE c.id = o.id
+AND oi.num = o.num
+AND prod_id = 'FB';
 ```
 
-目前建立的所有内部联结都是自然联结；
-
-
-### （三） 外部联结 
+#### （三） 外部联结 
 
 **联结包含了那些在相关表中没有关联行的行**，这种联结称为外部联结；
 
 **注：**==在使用 OUTER JOIN 语法时候，必须使用 RIGHT 或者 LEFT 关键字指定包括其所有行的表==（RIGHT 指出的是 OUTER JOIN 右边的表，而 LEFT 指出的是 OUTER JOIN 左边的表）。
 
-检索所有客户及其订单,包括那些没有订单的客户
-01 ： 左外部联结
+检索所有客户及其订单，包括那些没有订单的客户
 
 ```sql
+-- 使用左外部联结
 SELECT customers.cust_id,orders.order_num
 FROM customers LEFT OUTER JOIN orders
 on customers.cust_id = orders.cust_id;
-```
 
-02 ：若使用 右外部联结 结果不同 
-
-```sql
-SELECT customers.cust_id,orders.order_num
-FROM customers RIGHT OUTER JOIN orders
-on customers.cust_id = orders.cust_id;
-```
-
- 03： 若使用 右外部联结 调换两表位置 结果同01代码相同 
-
-```sql
+-- 或者使用右外部联结（调换两表位置）
 SELECT customers.cust_id,orders.order_num
 FROM orders RIGHT OUTER JOIN customers
 on customers.cust_id = orders.cust_id;
 ```
 
 
-### 使用带聚集函数的联结 
+#### （四）使用带聚集函数的联结 
 
 聚集函数用来汇总数据，可以和联结一起使用；
 检索所有客户分别对应的订单数，INNER JOIN 
@@ -500,12 +462,9 @@ on customers.cust_id = orders.cust_id
 GROUP BY customers.cust_id; 
 ```
 
-
-
-## 第17章 组合查询      
+### 十二、组合/复合/并查询      
 
 **使用 union 将多个 SELECT 语句组合成一个结果集**；
-同时组合查询称之为：并或者复合查询；
 
 两种基本情况下，需要使用组合查询；
 
@@ -526,17 +485,13 @@ GROUP BY customers.cust_id;
 
 价格小于等于5的所有物品的列表，而且包括供应商1001和1002生产的所有物品（不考虑价格）
 
-  - 方法1 使用union 
-
 ```sql
+--  方式一：使用 union
 SELECT vend_id,prod_id,prod_price FROM products WHERE prod_price <=5
 union
 SELECT vend_id,prod_id,prod_price FROM products WHERE vend_id in (1001,1002);
-```
 
-  - 方法2 使用WHERE 
-
-```sql
+-- 使用 WHERE 实现
 SELECT vend_id,prod_id,prod_price FROM products 
 WHERE prod_price <=5 or vend_id in (1001,1002);
 ```
@@ -563,7 +518,7 @@ ORDER BY vend_id,prod_price;
 ```
 
 
-## 第18章 全文本搜索       
+## 十三、全文本搜索       
 
 **MyISAM 引擎支持全文本搜索，InnoDB 不支持；**
 
@@ -658,22 +613,22 @@ ORDER BY vend_id,prod_price;
 - 表中行数少于 3 行则不返回结果；
 - 会忽略词中的单引号，例：`don't`索引为：`dont`
 
+### 十四、插入数据 
 
-
-## 第19章 插入数据 
-
-### （一）插入完整的行 
+#### （一）插入完整的行 
 
 **简单但不安全，如果原来表列结构调整，会有问题** 
 **自动增量的列不进行赋值的话，可以指定值为：NULL**
 
 - 插入一个新客户到customers表
-    `insert into customers values (null,'Pep E. LaPew','100 Main Street','LosAngeles','CA','90046','USA',NULL,NULL);`
-
-
- **表明括号内明确列名，更安全，稍繁琐** 
-在插入的同时明确列名：
-`insert into customers (cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country,cust_contact,cust_email)values ('Pep E. LaPew','100 Main Street','Los Angeles','CA','90046','USA',NULL,NULL);`
+    
+    ```mysql
+    -- 方式一：明确指定列名，推荐使用
+    INSERT INTO customer(name,address,city,state,zip,country,contact,email)VALUES ('Pep E. LaPew','100 Main Street','Los Angeles','CA','90046','USA',NULL,NULL);
+    
+    -- 方式二：不指定列名，不推荐使用
+    INSERT INTO customers VALUES (null,'Pep E. LaPew','100 Main Street','LosAngeles','CA','90046','USA',NULL,NULL);
+    ```
 
 **部分列可以在插入的时候进行省略**，条件是：
 
