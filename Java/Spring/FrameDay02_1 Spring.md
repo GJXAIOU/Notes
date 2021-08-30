@@ -4,71 +4,67 @@
 
 ## 一、Spring 框架简介及官方压缩包目录介绍
 
-- ==**Spring 几大核心功能**==
-  - IoC/DI：控制反转/依赖注入；
-  - AOP：面向切面编程；
-  - 声明式事务；
+**Spring 几大核心功能**：IoC/DI：控制反转/依赖注入；AOP：面向切面编程；声明式事务；
 
-  ![Spring Framework Runtime](FrameDay02_1%20Spring.resource/Spring%20Framework%20Runtime.png)
+![Spring Framework Runtime](FrameDay02_1%20Spring.resource/Spring%20Framework%20Runtime.png)
 
-  -  test： spring 提供的测试功能；
-  - Core  Container：是核心容器，里面的内容是 Spring 启动最基本的条件；
-    - Beans: **Spring 中负责创建类对象并管理对象**；
-    - Core: 核心类；
-    - Context: 上下文参数，**用于获取外部资源或者管理注解等**；
-    - SpEl: 对应于 `expression.jar`
-  - AOP：实现 aop 功能需要的依赖
-  - Aspects: 切面 AOP 依赖的包
-  - Data  Access/Integration：**Spring 封装数据访问层相关内容**
-    - JDBC：Spring 对 JDBC 封装后的代码；
-    - **ORM: 封装了持久层框架的代码，例如 Hibernate**
-    - **transactions**：对应 `spring-tx.jar`,声明式事务时使用；
-  - WEB：**需要 Spring 完成 web 相关功能时需要**；
+-  test： spring 提供的测试功能；
+- Core  Container：是核心容器，里面的内容是 Spring 启动最基本的条件；
+  - Beans: **Spring 中负责创建类对象并管理对象**；
+  - Core: 核心类；
+  - Context: 上下文参数，**用于获取外部资源或者管理注解等**；
+  - SpEl: 对应于 `expression.jar`
+- AOP：实现 aop 功能需要的依赖
+- Aspects: 切面 AOP 依赖的包
+- Data  Access/Integration：**Spring 封装数据访问层相关内容**
+  - JDBC：Spring 对 JDBC 封装后的代码；
+  - **ORM: 封装了持久层框架的代码，例如 Hibernate**
+  - **transactions**：对应 `spring-tx.jar`,声明式事务时使用；
+- WEB：**需要 Spring 完成 web 相关功能时需要**；
 
-    例如：由 tomcat 加载 spring 配置文件时需要有 spring-web 包
+  例如：由 tomcat 加载 spring 配置文件时需要有 spring-web 包
 
-  Servlet 是具体的业务功能，不能封装
+Servlet 是具体的业务功能，不能封装
 
-  #### Spring 框架中重要概念
+#### Spring 框架中重要概念
 
-  - 容器(Container): 将 Spring 当作一个大容器.
-  - 老版本中的使用 BeanFactory 接口，**==新版本中是 ApplicationContext 接口==, 是 BeanFactory 子接口，BeanFactory 的功能在 ApplicationContext 中都有**；
+- 容器(Container): 将 Spring 当作一个大容器.
+- 老版本中的使用 BeanFactory 接口，**新版本中是 ApplicationContext 接口，是 BeanFactory 子接口，BeanFactory 的功能在 ApplicationContext 中都有**；
 
-  - 从 Spring3 开始把 Spring 框架的功能拆分成多个 jar，Spring2 及以前就一个 jar
+- 从 Spring3 开始把 Spring 框架的功能拆分成多个 jar，Spring2 及以前就一个 jar
 
 ## 二、IoC：控制反转（Inversion of Control）
 
 - IoC 完成的事情：**原先由程序员主动通过 new 来实例化对象事情，现在转交给 Spring 负责**。
-- 控制反转中控制指的是：控制类的对象；
-- 控制反转中反转指的是：转交给 Spring 负责；
-- **IoC 最大的作用：解耦**
+- 控制反转中「控制」的是类的对象；反转指的是：转交给 Spring 负责；
+- IoC 最大的作用：解耦
 即程序员不需要管理对象，解除了对象管理和程序员之间的耦合。
 
 ## 三、Spring 环境搭建与使用
 
 #### （一）搭建环境
 
-- 导入 jar，包括四个核心包一个日志包(commons-logging)（对应核心容器：beans、core、context、spEL）
-```jar
-spring-beans.jar
-spring-core.jar
-spring-context.jar
-spring-expression.jar
-commons-logging.jar
-```
+- 导入 jar，包括四个核心包（对应四个核心容器）一个日志包(commons-logging)
 
-- 在 src 下新建 `applicationContext.xml` 文件
+    ```java
+    spring-beans.jar
+    spring-core.jar
+    spring-context.jar
+    spring-expression.jar
+    commons-logging.jar
+    ```
 
-  上面的文件名称和路径可以自定义，这么起名称是为了记住 Spring 容器 ApplicationContext,
-  而 `applicationContext.xml` 中配置的信息最终存储到了 AppliationContext 容器中。
+- 在 src 下新建 spring 配置文件 `applicationContext.xml` 
 
-- spring 配置文件（applicationContext.xml）是基于 schema（MyBatis 是基于 DTD）
+  上面的文件名称和路径可以自定义，而 `applicationContext.xml` 中配置的信息最终存储到了 AppliationContext 容器中。
+
+- spring 配置文件是基于 schema（MyBatis 是基于 DTD）
   - schema 文件扩展名 `.xsd`
-  
+
   - DTD 是 XML 的语法检查器。而 schema 是 DTD 的升级版，拥有更好的拓展性，主要体现在每次引入一个 xsd 文件是一个 namespace(即 xmlns)；
 
   - 配置文件中一般只需要引入基本 schema；其基本内容通常为：
-  
+
     ```java
     <?xml version="1.0" encoding="UTF-8"?> 
     <beans xmlns="http://www.springframework.org/schema/beans"
@@ -82,52 +78,57 @@ commons-logging.jar
 #### （二）使用
 
 - 首先需要一个 `People.java` 的实体类，一般对应数据库中一个表；
-- 然后新建配置文件：`applicationContext.xml`
-  - schema 通过 `<bean/>` 创建对象；
-  - 默认**配置文件被加载时就创建对象**；
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
-    <!-- id 是获取该对象的标识，目的是为了以后方便的获取使用该对象； class 表示具体创建的是哪个类对象-->
-    <bean id="people" class="com.gjxaiou.pojo.People"></bean>
 
-</beans>
-```
+- 然后新建配置文件：`applicationContext.xml`
+
+  schema 通过 `<bean/>` 创建对象；同时默认**配置文件被加载时就创建对象**；
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd">
+      
+      <!-- id 是获取该对象的标识，目的是为了以后方便的获取使用该对象； class 表示具体创建的是哪个类对象-->
+      <bean id="people" class="com.gjxaiou.pojo.People"></bean>
+  
+  </beans>
+  ```
 
 - 然后编写测试方法:Test.java，在这里可以创建对象
-  - ==`getBean(“<bean>标签的 id 值”,返回值类型);`如果没有第二个参数, 默认是 Object；==
-  -  ==`getBeanDefinitionNames()`，是 Spring 容器中目前管理的所有对象；==
-```java
-public class SpringTest {
-    public static void main(String[] args) {
-        // 加载配置文件，同时创建对应类
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
-        // 使用 getBean() 创建对象
-        People people = applicationContext.getBean("people", People.class);
-        System.out.println("创建的对象名为：" + people + "\n");
+  - `getBean(“<bean>标签的 id 值”,返回值类型);`如果没有第二个参数, 默认是 Object；
+  - `getBeanDefinitionNames()`，是 Spring 容器中目前管理的所有对象；
 
-        // 查看当前 Spring 容器中管理的所有类对象(以及数量)
-        int beanDefinitionCount = applicationContext.getBeanDefinitionCount();
-        System.out.println("当前 Spring 容器中管理的类对象数目为：" + beanDefinitionCount + "\n");
-        String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
-        for (String beanDefinitionName : beanDefinitionNames) {
-            System.out.println( "当前 Spring 容器中管理的类对象为：" + beanDefinitionName + "\n");
-        }
-    }
-}
-```
-程序运行结果为：
-```
-创建的对象名为：People(id=0, name=null, gender=null, score=0, tel=null)
+  ```java
+  public class SpringTest {
+      public static void main(String[] args) {
+          // 加载配置文件，同时创建对应类
+          ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+          // 使用 getBean() 创建对象
+          People people = applicationContext.getBean("people", People.class);
+          System.out.println("创建的对象名为：" + people + "\n");
+  
+          // 查看当前 Spring 容器中管理的所有类对象(以及数量)
+          int beanDefinitionCount = applicationContext.getBeanDefinitionCount();
+          System.out.println("当前 Spring 容器中管理的类对象数目为：" + beanDefinitionCount + "\n");
+          String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
+          for (String beanDefinitionName : beanDefinitionNames) {
+              System.out.println( "当前 Spring 容器中管理的类对象为：" + beanDefinitionName + "\n");
+          }
+      }
+  }
+  ```
 
-当前 Spring 容器中管理的类对象数目为：1
+  程序运行结果为：
 
-当前 Spring 容器中管理的类对象为：people
-```
+  ```shell
+  创建的对象名为：People(id=0, name=null, gender=null, score=0, tel=null)
+  
+  当前 Spring 容器中管理的类对象数目为：1
+  
+  当前 Spring 容器中管理的类对象为：people
+  ```
 
 ## 四、Spring 创建对象的三种方式
 
@@ -224,12 +225,13 @@ public class StaticPeopleFactory {
 
 ### Spring 容器创建对象的时机
 
-- 默认情况下：启动 spring 容器便创建对象（遇到 bean 便创建对象）
-- 可以在 spring 配置文件中的 `<bean>` 标签中设置  lazy-init 属性
-  - 如果 lazy-init 为 "default/false" 在启动 spring 容器时创建对象（默认情况）
-  - 如果 lazy-init 为 "true" ,在执行 `context.getBean` 时才要创建对象
-  注：启动 spring 容器时候，在代码上就是执行到 ：`ApplicationContext context = new ClassPathXmlApplicationContext(“applicationContext.xml”);`时候；
-  **如果配置了多个相同的 bean，则都会执行构造函数；**
+- 默认情况下：启动 spring 容器便创建对象；
+- 可以在 spring 配置文件中的 `<bean>` 标签中设置  `lazy-init` 属性
+  - 如果 `lazy-init` 为 `default/false` ，即在启动 spring 容器时创建对象（默认）；
+  - 如果 `lazy-init` 为 `true` ，则在执行 `context.getBean` 时才要创建对象
+
+注：启动 spring 容器对应于代码执行到 `ApplicationContext context = new ClassPathXmlApplicationContext(“applicationContext.xml”);`时候；
+**如果配置了多个相同的 bean，则都会执行构造函数；**
 
 代码示例：
 ```java
@@ -241,7 +243,7 @@ public void People(){
 ```
 
 ```xml
-// 在 applicationContext.xml 配置实现分别放行执行其中一个
+<!-- 在 applicationContext.xml 配置实现分别放行执行其中一个 
 <bean id="people" class="com.gjxaiou.pojo.People"></bean>
 <bean id="people" lazy-init="false" class="com.gjxaiou.pojo.People"></bean>
 <bean id="people" lazy-init="true" class="com.gjxaiou.pojo.People"></bean>
@@ -368,7 +370,7 @@ destroy...
 
 
 
-==第六和第七均属于 DI 依赖注入==
+第六和第七均属于 DI 依赖注入
 第六属于一般属性的注入，第七属于对象的注入；
 
 ## 六、如何给 Bean（对象）的属性赋值(注入)
@@ -453,7 +455,7 @@ public class People {
 ```
   -  如果属性是基本数据类型或 String 等简单的，首先创建 People 类对象，下面是给对象的属性进行赋值
  **`<property>` 标签用来描述一个类的属性，基本类型封装类、 String 等需要值的类型使用 value 赋值，引用类型使用 ref 赋值；** 
- 
+
  ```xml
  <bean id="people" class="com.gjxaiou.pojo.People">
      <property name="id" value="12"></property>
@@ -461,9 +463,9 @@ public class People {
      <property name="tel" value="123243"></property>
  </bean>
  ```
- 
+
  上面代码等效于：（一般使用上面方式）	
- 
+
  ```xml
  <bean id="peo" class="com.gjxaiou.pojo.People">
      <property name="id">
@@ -472,9 +474,9 @@ public class People {
      <!-- 。。。。。。-->
  </bean>
  ```
- 
+
   - 如果属性是 `Set<?>`
-  这里 set 里面存放的基本数据类型，如果存放的是对象，则需要将 `<value>` 标签更换为  `<ref>` 标签，中间的值设置为对象即可；
+    这里 set 里面存放的基本数据类型，如果存放的是对象，则需要将 `<value>` 标签更换为  `<ref>` 标签，中间的值设置为对象即可；
 
   ```xml
   <property name="set1">
