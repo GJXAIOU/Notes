@@ -56,7 +56,7 @@ public class People{
 ```
 
 ## 二、 Spring 中加载 properties 文件
-将一些配置写在 properties 属性文件中，然后使用 Spring 进行加载读取；
+即使用 Spring 进行加载读取 properties 属性文件中的配置。
 注意：properties 文件中的后面的值中间不能有空格
 
 - 步骤一：首先在 src 下新建 xxx.properties 文件
@@ -330,7 +330,7 @@ public class UsersServiceImpl implements UsersService{
   
 - `propagation=""` ：控制事务传播行为
 
-  当一个具有事务控制的方法被另一个有事务控制的方法调用后，需要如何管理事务(新建事务?在事务中执行?把事务挂起?报异常?)  
+  当一个具有事务控制的方法被另一个有事务控制的方法调用后，需要如何管理事务
 
   - REQUIRED (默认值): （针对被调用的）如果当前有事务，就在事务中执行，如果当前没有事务，新建一个事务。
 
@@ -352,7 +352,7 @@ public class UsersServiceImpl implements UsersService{
   - DEFAULT：默认值，由底层数据库自动判断应该使用什么隔离级别
 
   - READ_UNCOMMITTED：可以读取未提交数据。可能出现脏读，不重复读，幻读。【效率最高】
-   
+  
   - READ_COMMITTED：只能读取其他事务已提交数据。可以防止脏读，可能出现不可重复读和幻读。
 
   - REPEATABLE_READ：读取的数据会被添加锁，防止其他事务修改此数据，可以防止不可重复读，脏读，可能出现幻读。
@@ -385,11 +385,11 @@ public class UsersServiceImpl implements UsersService{
 - @Component 创建类对象，相当于配置 `<bean/>`
 
 - @Service 与 @Component 功能相同，但是用在 ServiceImpl 类上。
- 
+
 - @Repository 与 @Component 功能相同，但是写在数据访问层类上。
- 
+
 - @Controller 与 @Component 功能相同，但是写在控制器类上。
- 
+
 - @Resource（不需要写对象的 get/set 方法），是 Java 中自带的注解，默认是按照 byName 注入，如果没有名称则按照 byType 注入。（建议对象名称和 Spring 容器中对象名相同）。
 
 - @Autowired（不需要写对象的 get/set 方法），是 Spring 中的注解，默认按照 byType 注入。

@@ -709,11 +709,13 @@ public class AirportServlet extends HttpServlet{
 
 
 ## 九、使用注解
-Annotation(注解) 是 JDK1.5 及以后版本引入的。它可以用于创建文档，跟踪代码中的依赖性，甚至执行基本编译时检查。注解主要用于简化前面的 XML 配置方式。
+Annotation(注解) 是 JDK1.5 及以后版本引入，注解主要用于简化前面的 XML 配置方式。
 
 ### （一）注解的基本使用：@Component
 
-**示例**：People 实体类
+**使用 XML形式**：
+
+首先创建实体类
 
 ```java
 @Getter
@@ -726,10 +728,13 @@ public class People(){
     private String gender;
 }
 ```
-不使用注解需要在 XML 中配置：`<bean id = "people" class = "com.gjxaiou.pojo.People></bean>`
-==使用注解的步骤：==
+然后在 XML 中配置：`<bean id = "people" class = "com.gjxaiou.pojo.People></bean>`
 
-- **步骤一：在 applicationContext.xml 中导入命名空间**（用于约束 xml 文件格式的，下面的第一个标签为：xmls:context，表示下面的标签的格式为：`<context:标签名>`）
+**使用注解的步骤：**
+
+- **步骤一：在 applicationContext.xml 中导入命名空间**
+
+    > 命名空间用于约束 xml 文件格式的，下面的第一个标签为：xmls:context，表示下面的标签的格式为：`<context:标签名>`
 
     ```xml
     xmlns:context="http://www.springframework.org/schema/context"
@@ -738,18 +743,25 @@ public class People(){
     ```
 
 - **步骤二：引入组件扫描器**
-  通过组件扫描，扫描所有含有注解的类：`<context:component-scan base-package = "com.gjxaiou.annotation"></context:component-scan>`，这里使用 base-package：表示含有注解类的包名，如果需要扫描多个包，则上面的代码需要书写多行改变 base-package 里面内容即可；
+  通过组件扫描，扫描所有含有注解的类：
 
-- **步骤三：在 People 类中添加注解**：@Component
+  ```xml
+  <context:component-scan base-package = "com.gjxaiou.annotation1"/>
+  <context:component-scan base-package = "com.gjxaiou.annotation2"/>
+  ```
+  
+  这里使用 base-package：表示含有注解类的包名，可以配置扫描多个包。
+  
+- **步骤三：在实体类上添加注解**：`@Component`
 
-```java
-@Component
-public class People{
-  private Integer id;
-  private String name;
-  private String gender;
-}
-```
+    ```java
+    @Component
+    public class People{
+      private Integer id;
+      private String name;
+      private String gender;
+    }
+    ```
 
 测试程序
 ```java
@@ -762,18 +774,17 @@ public void annotationTest(){
 }
 ```
 
-**注：** 如果 @Component 后面没有参数，则 getBean();中使用该类的类型首字母小写即可；
+**注：** 如果 @Component 后面没有参数，则 `getBean()`中使用该类的类型首字母小写即可；
 即上面的等价于：`<bean id = "people" class = "com.gjxaiou.annotation.People">`
-如果后面有参数，例：@Component(“dd”)，相当于上面的 id 等于 dd；
+如果后面有参数，例：`@Component("dd")`，相当于上面的 id 等于 dd；
 
-### （二）@Component 衍生注解
+**@Component 衍生注解**
+
 下面的三个注解是 @Component 的衍生注解，功能是一样的，只是对应的层不同；
 
-- @Repository：Dao 层
-- @Service：service 层
-- @Controller：web 层
+Dao 层的 `@Repository`，service 层的 `@Service`，web 层的 `@Controller`。
 
-### （三）@Resource
+### （三）@Resource 自动装配
 该注解用于对类成员变量、方法及其构造方法进行标注，完成自动装配工作。即可以用来消除 set、get 方法；
 
 代码示例：
@@ -805,7 +816,7 @@ public class People{
     <bean id = "student" class = "com.gjxaiou.annotation.Student"></bean>
     ```
 
-- 使用注解：不需要在 applicationContext.xml 中进行配置，直接在实体类添加注解即可；只需要保证 People 中 @Resource()中 name 的值和 Student 中的 @Component 的值相同；
+- 使用注解：不需要在 applicationContext.xml 中进行配置，直接在实体类添加注解即可；只需要保证 People 中 `@Resource()`中 name 的值和 Student 中的 `@Component` 的值相同；
 
     ```java
     @Compontent("people")
@@ -825,10 +836,10 @@ public class People{
     }
     ```
 
-    @Resource 注解以后，判断该注解 name 的属性是否为""(name 没有写)
-    - 如果没有写 name 属性，则会让属性的名称的值和 spring 配置文件 bean 中 ID 的值做匹配（如果没有进行配置，也和注解 @Component 进行匹配），如果匹配成功则赋值，如果匹配不成功，则会按照 spring 配置文件 class 类型进行匹配，如果匹配不成功，则报错
+    @Resource 首先会判断其 name 值是否为空。
+    - 如果没有写 name 属性，则会让属性的名称的值和 spring 配置文件 bean 中 ID 的值做匹配（如果没有进行配置，也和注解 @Component 进行匹配），如果匹配成功则赋值，如果匹配不成功，则会按照 spring 配置文件 class 类型进行匹配，如果匹配不成功，则报错。
 
-    - 如果有 name 属性，则会按照 name 属性的值和 spring 的 bean 中 ID 进行匹配，匹配成功，则赋值，不成功则报错
+    - 如果有 name 属性，则会按照 name 属性的值和 spring 的 bean 中 ID 进行匹配，匹配成功，则赋值，不成功则报错。
 
 
 ### （四）@Autowired 自动装配

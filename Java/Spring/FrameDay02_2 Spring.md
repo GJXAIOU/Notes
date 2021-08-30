@@ -306,8 +306,6 @@ public  class  MyAdvice  {
 
 ## 六、 使用注解(基于 Aspect) 实现 AOP
 
-==这种方式更加的简单==
-
 - spring 不会自动去寻找注解,必须告诉 spring 哪些包下的类中可能有注解
 
   在 spring 配置（applicationContext.xml）文件中引入 xmlns:context 命名空间
@@ -318,10 +316,6 @@ public  class  MyAdvice  {
   http://www.springframework.org/schema/context/spring-context.xsd">
   ```
 
-- @Component
-  - 相当于 `<bean/>`
-  - 如果没有参数,把类名首字母变小写,相当于 `<bean  id=””/>`
-  - @Component(“自定义名称”)
 
  **实现步骤:**
 
