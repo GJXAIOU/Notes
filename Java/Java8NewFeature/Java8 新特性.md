@@ -1,20 +1,18 @@
 # Java 8 新特性
 
-详细课程目录见：[课程列表](#附录：Java 8 深入剖析与实战 全部课程列表)
-
 [TOC]
 
 ## 一、Lambda 表达式与函数式接口
 
 ### (一) Lambda 表达式
 
-在编程语言中，**Lambda 是用于表示匿名函数（anonymous functions）或者闭包（closures) 的运算符**。其实现了将函数作为参数传递给一个方法以及声明返回一个函数的方法，即实现了「函数式编程」。
+在编程语言中，**Lambda 是用于表示匿名函数或者闭包的运算符**。其实现了将函数作为参数传递给一个方法以及声明返回一个函数的方法，即实现了「函数式编程」。
 
 #### 1.Lambda 表达式概要和作用
 
 - Lambda 表达式是一种匿名函数，它是没有声明的方法，即没有访问修饰符、返回值声明和名字。
 
-- 在 python、JavaScript 中，Lambda 表达式的类型是函数。**但在 Java 中，Lambda 表达式是对象**，他们必须依附于一类特别的对象类型——函数式接口(functional interface) 
+- 在 python、JavaScript 中，Lambda 表达式的类型是函数。**但在 Java 中，Lambda 表达式是对象**，他们必须依附于一类特别的对象类型——函数式接口
 - **Lambda 表达式主要用于传递行为**，而不仅仅是值。从而提升抽象层次，使得 API 重用性更好。
 
 #### 2.Lambda 基本语法
@@ -317,7 +315,6 @@ public class Test3 {
           });
           System.out.println(names);
   
-  
           /**
            * 方式二：Lambda 表达式
            * sort(list 列表，Comparator 函数式接口)，该接口接收两个参数，返回一个参数
@@ -357,28 +354,20 @@ public interface Demo {
 }
 ```
 
-从 FunctionalInterface 接口的 JavaDoc 文档中可以看出：
-
-```markdown
-Note that instances of functional interfaces can be created with  lambda expressions, method references, or constructor references.
-```
-
 **函数式接口的实例可以通过 Lambda 表达式、方法引用或者构造方法引用来创建**。例如在 `Runnable` 接口上面有 `@FunctionInterface` 标识，表示该接口是函数式接口，因此可以使用 Lambda 表达式方式来创建。
 
 #### 函数式接口定义
 
-- 如果一个接口只有一个**抽象方法**，那么该接口就是一个函数式接口。
+- 如果一个接口只有一个**抽象方法**，那么该接口就是一个函数式接口。即是没有声明 `@FunctionalInterface` 注解，那么编译器依然会将该接口看作是函数式接口。
 
 - 如果我们在某个接口上声明了 `@FunctionalInterface` 注解，那么编译器就会按照函数式接口的定义来要求该接口。即如果不满足下面两个条件就是报错。
 
     - 该元素是一个接口类型并且不是一个注解类型、枚举类型、 class 类型。
     - 该注解类型满足函数式接口的要求（即只能有一个抽象的成员方法）。
 
-- 如果某个接口只有一个抽象方法，但是我们没有给该接口声明 `@FunctionalInterface` 注解，那么编译器依然会将该接口看作是函数式接口。
-
 - **函数式接口中可以有：抽象方法（有且只有一个）、默认方法、静态方法、重写 Object 类的方法**。
 
-- 如果一个接口中声明了一个抽象方法（该方法重写了 Object 类中的一个 public 方法），则该接口的抽象方法的个数不会加一（即该抽象方法不算进抽象方法判断条件中的个数）。
+    > 如果一个接口中声明了一个抽象方法（该方法重写了 Object 类中的一个 public 方法），则该接口的抽象方法的个数不会加一（即该抽象方法不算进抽象方法判断条件中的个数）。
 
     ```java
     @FunctionalInterface
@@ -431,7 +420,7 @@ Note that instances of functional interfaces can be created with  lambda express
         }
     }
     ```
-    
+
     输出结果：
 
     ```java
@@ -440,6 +429,7 @@ Note that instances of functional interfaces can be created with  lambda express
     this is myTest by Lambda 表达�?
     -----------------
     ```
+
 
 #### 函数式接口：Function
 
@@ -2867,10 +2857,6 @@ public class ConsumerTest {
 }
 ```
 
-
-
-
-
 ## 六、时间与日期 API
 
 ### 第三方库：Joda -time
@@ -2882,46 +2868,41 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 public class JodaTest2 {
-
     public static void main(String[] args) {
         // 获取今天时间
         DateTime today = new DateTime();
         // 获取明天时间
         DateTime tomorrow = today.plusDays(1);
 
+        // 输出：2021-09-02
         System.out.println(today.toString("yyyy-MM-dd"));
+        // 输出：2021-09-03
         System.out.println(tomorrow.toString("yyyy-MM-dd"));
-        System.out.println("--------");
 
         // 获取月份第一天
         DateTime d1 = today.withDayOfMonth(1);
+        // 输出：2021-09-01
         System.out.println(d1.toString("yyyy-MM-dd"));
-
-        System.out.println("--------");
 
         // 当前日期
         LocalDate localDate = new LocalDate();
+        // 输出：2021-09-02
         System.out.println(localDate);
-
-        System.out.println("--------");
 
         // 距离当前日期的后三个月的第一天时间。
         localDate = localDate.plusMonths(3).dayOfMonth().withMinimumValue();
+        // 输出：2021-12-01
         System.out.println(localDate);
-        System.out.println("--------");
 
         // 计算 2 年前第 3 个月最后 1 天的日期
         DateTime dateTime = new DateTime();
-
         DateTime dateTime2 = dateTime.minusYears(2).monthOfYear().
                 setCopy(3).dayOfMonth().withMinimumValue();
-
+        // 输出：2019-03-01
         System.out.println(dateTime2.toString("yyyy-MM-dd"));
     }
 }
 ```
-
-
 
 测试二：
 
@@ -2974,8 +2955,6 @@ public class JodaTest3 {
  * 2020-11-01 19:17:15
  */
 ```
-
-
 
 ### Java8 中时间 API
 
@@ -3092,79 +3071,268 @@ public class Java8TimeTest {
 }
 ```
 
+传统的时间日期 API 包括：Date/Calendar/DateFormat。Java 8 借鉴第三方优秀开源库 Joda-time，重新设计了一套 API。
 
+### 表示时刻的 Instant
 
+Instant 和 Date 一样，表示一个时间戳，用于描述一个时刻，只不过它较 Date 而言，可以描述更加精确的时刻。并且 Instant 是时区无关的。
 
+Date 最多可以表示毫秒级别的时刻，而 Instant 可以表示纳秒级别的时刻。例如：
 
+- public static Instant now()：根据系统当前时间创建一个 Instant 实例，表示当前时刻
+- public static Instant ofEpochSecond(long epochSecond)：通过传入一个标准时间的偏移值来构建一个 Instant 实例
+- public static Instant ofEpochMilli(long epochMilli)：通过毫秒数值直接构建一个 Instant 实例
 
+```java
+package com.gjxaiou.joda.instant;
 
+import java.time.Instant;
 
+public class InstantTest {
+	public static void main(String[] args) {
+		//创建 Instant 实例
+		Instant instant = Instant.now();
+		// 输出：2021-09-01T16:29:34.905Z
+		System.out.println(instant);
 
+		Instant instant1 = Instant.ofEpochSecond(20);
+		// 输出：1970-01-01T00:00:20Z
+		System.out.println(instant1);
 
+		Instant instant2 = Instant.ofEpochSecond(30, 100);
+		// 输出：1970-01-01T00:00:30.000000100Z
+		System.out.println(instant2);
 
+		Instant instant3 = Instant.ofEpochMilli(1000);
+		// 输出：1970-01-01T00:00:01Z
+		System.out.println(instant3);
+	}
+}
+```
 
+可以看到，Instant 和 Date 不同的是，它是时区无关的，始终是格林零时区相关的，也即是输出的结果始终格林零时区时间。
 
-## 附录：Java 8 深入剖析与实战 全部课程列表
+### 处理日期的 LocalDate
 
-- 第1讲：圣思园课程介绍
-- 第2讲：圣思园课程介绍续
-- 第3讲：Lambda表达式初步与函数式接口
-- 第4讲：深入函数式接口与方法引用
-- 第5讲：Lambda表达式深入与流初步
-- 第6讲：Function接口详解
-- 第7讲：Function与BiFunction函数式接口详解
-- 第8讲：BiFunction函数式接口实例演示
-- 第9讲：Predicate函数式接口详解
-- 第10讲：Predicate深入剖析与函数式编程本质
-- 第11讲：Supplier与函数式接口总结
-- 第12讲：Optional深入详解
-- 第13讲：方法引用详解
-- 第14讲：方法引用场景剖析与默认方法分析
-- 第15讲：Stream介绍与操作方式详解
-- 第16讲：Stream深度解析与源码实践
-- 第17讲：Stream实例剖析
-- 第18讲：Stream陷阱剖析
-- 第19讲：内部迭代与外部迭代本质剖析及流本源分析
-- 第20讲：流的短路与并发流
-- 第21讲：Stream分组与分区详解
-- 第22讲：Collector源码分析与收集器核心
-- 第23讲：Collector同一性与结合性分析
-- 第24讲：Collector复合与注意事项
-- 第25讲：收集器用法详解与多级分组和分区
-- 第26讲：比较器详解与类型推断特例
-- 第27讲：比较器深入
-- 第28讲：自定义收集器实现
-- 第29讲：自定义收集器深度剖析与并行流陷阱
-- 第30讲：收集器枚举特性深度解析与并行流原理
-- 第31讲：Collectors工厂类源码分析与实战
-- 第32讲：groupingBy源码分析
-- 第33讲：partioningBy与groupingByConcurrent源码分析
-- 第34讲：Stream源码分析
-- 第35讲：Stream与BaseStream源码分析
-- 第36讲：分割迭代器源码剖析
-- 第37讲：分割迭代器与ForkJoin详解
-- 第38讲：分割迭代器实现分析
-- 第39讲：OfPrimitive与OfInt实现原理剖析
-- 第40讲：流源构造代码分析
-- 第41讲：ReferencePipeline与AbstractPipeline源码深度解读
-- 第42讲：IteratorSpliterator与流源操作方式详解
-- 第43讲：流调用机制与原理大揭秘
-- 第44讲：Sink与opWrapSink源码剖析
-- 第45讲：TerminalOp源码分析与终止操作层次体系
-- 第46讲：流延迟求值底层分析与Sink链接机制揭秘
-- 第47讲：Stream中间操作与终止操作层次体系分析与设计思想剖析
-- 第48讲：Joda项目介绍与实战
-- 第49讲：Java 8全新日期和时间API详解与UTC介绍
-- 第50讲：Java 8全新日期与时间API实战
-- 第51讲：Java 8深入剖析与实战课程总结与展望
+不同于 Calendar 既能处理日期又能处理时间，java.time 的新式 API 分离开日期和时间，用单独的类进行处理。LocalDate 专注于处理日期相关信息。
 
+LocalDate 依然是一个不可变类，它关注时间中年月日部分，我们可以通过以下的方法构建和初始化一个 LocalDate 实例：
 
+- public static LocalDate now()：截断当前系统时间的年月日信息并初始化一个实例对象
+- public static LocalDate of(int year, int month, int dayOfMonth)：显式指定年月日信息
+- public static LocalDate ofYearDay(int year, int dayOfYear)：根据 dayOfYear 可以推出 month 和 dayOfMonth
+- public static LocalDate ofEpochDay(long epochDay)：相对于格林零时区时间的日偏移量
 
+```java
+package com.gjxaiou.joda.localDate;
 
+import java.time.LocalDate;
 
+public class LocalDateTest {
+	public static void main(String[] args) {
+		// 构建 LocalDate 实例
+		LocalDate localDate = LocalDate.now();
+		// 输出：2021-09-02
+		System.out.println(localDate);
 
+		LocalDate localDate1 = LocalDate.of(2017, 7, 22);
+		// 输出：2017-07-22
+		System.out.println(localDate1);
 
+		LocalDate localDate2 = LocalDate.ofYearDay(2018, 100);
+		// 输出：2018-04-10
+		System.out.println(localDate2);
 
+		LocalDate localDate3 = LocalDate.ofEpochDay(10);
+		// 输出：1970-01-11
+		System.out.println(localDate3);
+	}
+}
+```
 
+**需要注意一点，LocalDate 会根据系统中当前时刻和默认时区计算出年月日的信息。**
 
+除此之外，LocalDate 中还有大量关于日期的常用方法：
 
+- public int getYear()：获取年份信息
+- public int getMonthValue()：获取月份信息
+- public int getDayOfMonth()：获取当前日是这个月的第几天
+- public int getDayOfYear()：获取当前日是这一年的第几天
+- public boolean isLeapYear()：是否是闰年
+- public int lengthOfYear()：获取这一年有多少天
+- public DayOfWeek getDayOfWeek()：返回星期信息
+
+### 处理时间的 LocalTime
+
+类似于 LocalDate，LocalTime 专注于时间的处理，它提供小时，分钟，秒，毫微秒的各种处理，我们依然可以通过类似的方式创建一个 LocalTime 实例。
+
+- public static LocalTime now()：根据系统当前时刻获取其中的时间部分内容
+- public static LocalTime of(int hour, int minute)：显式传入小时和分钟来构建一个实例对象
+- public static LocalTime of(int hour, int minute, int second)：通过传入时分秒构造实例
+- public static LocalTime of(int hour, int minute, int second, int nanoOfSecond)：传入时分秒和毫微秒构建一个实例
+- public static LocalTime ofSecondOfDay(long secondOfDay)：传入一个长整型数值代表当前日已经过去的秒数
+- public static LocalTime ofNanoOfDay(long nanoOfDay)：传入一个长整型代表当前日已经过去的毫微秒数
+
+同样的，LocalTime 默认使用系统默认时区处理时间：
+
+```java
+package com.gjxaiou.joda.localTime;
+
+import java.time.LocalTime;
+
+public class LocalTimeTest {
+	public static void main(String[] a) {
+		LocalTime localTime = LocalTime.now();
+		// 输出：00:36:37.187
+		System.out.println(localTime);
+
+		LocalTime localTime1 = LocalTime.of(23, 59);
+		// 输出：23:59
+		System.out.println(localTime1);
+
+		LocalTime localTime2 = LocalTime.ofSecondOfDay(10);
+		// 输出：00:00:10
+		System.out.println(localTime2);
+	}
+}
+```
+
+当然，LocalTime 中也同样封装了很多好用的工具方法，例如：
+
+- public int getHour()
+- public int getMinute()
+- public int getSecond()
+- public int getNano()
+- public LocalTime withHour(int hour)：修改当前 LocalTime 实例中的 hour 属性并重新返回一个新的实例
+- public LocalTime withMinute(int minute)：类似
+- public LocalTime withSecond(int second)
+
+LocalDateTime 类则是集成了 LocalDate 和 LocalTime，它既能表示日期，又能表述时间信息，方法都类似，只是有一部分涉及时区的转换内容，我们待会说。
+
+### 时区相关的日期时间处理 ZonedDateTime
+
+无论是我们的 LocalDate，或是 LocalTime，甚至是 LocalDateTime，它们基本是时区无关的，内部并没有存储时区属性，而基本用的系统默认时区。往往有些场景之下，缺乏一定的灵活性。
+
+ZonedDateTime 可以被理解为 LocalDateTime 的外层封装，它的内部存储了一个 LocalDateTime 的实例，专门用于普通的日期时间处理。此外，它还定义了 ZoneId 和 ZoneOffset 来描述时区的概念。
+
+ZonedDateTime 和 LocalDateTime 的一个很大的不同点在于，后者内部并没有存储时区，所以对于系统的依赖性很强，往往换一个时区可能就会导致程序中的日期时间不一致。
+
+而后者则可以通过传入时区的名称，使用 ZoneId 进行匹配存储，也可以通过传入与零时区的偏移量，使用 ZoneOffset 存储时区信息。
+
+所以，构建一个 ZonedDateTime 实例有以下几种方式：
+
+- public static ZonedDateTime now()：系统将以默认时区计算并存储日期时间信息
+- public static ZonedDateTime now(ZoneId zone)：指定时区
+- public static ZonedDateTime of(LocalDate date, LocalTime time, ZoneId zone)：指定日期时间和时区
+- public static ZonedDateTime of(LocalDateTime localDateTime, ZoneId zone)
+- public static ZonedDateTime ofInstant(Instant instant, ZoneId zone)：通过时刻和时区构建实例对象
+
+```
+public static void main(String[] a){
+    ZonedDateTime zonedDateTime = ZonedDateTime.now();
+    System.out.println(zonedDateTime);
+
+    LocalDateTime localDateTime = LocalDateTime.now();
+    ZoneId zoneId = ZoneId.of("America/Los_Angeles");
+    ZonedDateTime zonedDateTime1 = ZonedDateTime.of(localDateTime,zoneId);
+    System.out.println(zonedDateTime1);
+
+    Instant instant = Instant.now();
+    ZoneId zoneId1 = ZoneId.of("GMT");
+    ZonedDateTime zonedDateTime2 = ZonedDateTime.ofInstant(instant,zoneId1);
+    System.out.println(zonedDateTime2);
+}
+复制代码
+```
+
+输出结果：
+
+```
+2018-04-23T16:10:29.510+08:00[Asia/Shanghai]
+2018-04-23T16:10:29.511-07:00[America/Los_Angeles]
+2018-04-23T08:10:29.532Z[GMT]
+复制代码
+```
+
+简单解释一下，首先第一个输出应该没什么问题，系统保存当前系统日期和时间以及默认的时区。
+
+第二个小例子，LocalDateTime 实例保存了时区无关的当前日期时间信息，也就是这里的年月日时分秒，接着构建一个 ZonedDateTime 实例并传入一个美国时区（西七区）。你会发现输出的日期时间为西七区的 16 点 29 分。
+
+像这种关联了时区的日期时间就很能够解决那种，换时区导致程序中时间错乱的问题。因为我关联了时区，无论你程序换到什么地方运行了，**日期+时区** 本就已经唯一确定了某个时刻，**就相当于我在存储某个时刻的时候，我说明了这是某某时区的某某时间，即便你换了一个地区，你也不至于把这个时间按自己当前的时区进行解析并直接使用了吧。**
+
+第三个小例子就更加的直接明了了，构建 ZonedDateTime 实例的时候，给定一个时刻和一个时区，而这个时刻值就是相对于给定时区的标准时间所经过的毫秒数。
+
+有关 ZonedDateTime 的其他日期时间的处理方法和 LocalDateTime 是一样的，因为 ZonedDateTime 是直接封装了一个 LocalDateTime 实例对象，所以所有相关日期时间的操作都会间接的调用 LocalDateTime 实例的方法，我们不再赘述。
+
+### 格式化日期时间
+
+Java 8 的新式日期时间 API 中，DateTimeFormatter 作为格式化日期时间的主要类，它与之前的 DateFormat 类最大的不同就在于它是线程安全的，其他的使用上的操作基本类似。我们看看：
+
+```
+public static void main(String[] a){
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
+    LocalDateTime localDateTime = LocalDateTime.now();
+    System.out.println(formatter.format(localDateTime));
+
+    String str = "2008年08月23日 23:59:59";
+    DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
+    LocalDateTime localDateTime2 = LocalDateTime.parse(str,formatter2);
+    System.out.println(localDateTime2);
+
+}
+复制代码
+```
+
+输出结果：
+
+```
+2018年04月23日 17:27:24
+2008-08-23T23:59:59
+复制代码
+```
+
+格式化主要有两种情况，一种是将日期时间格式化成字符串，另一种则是将格式化的字符串装换成日期时间对象。
+
+DateTimeFormatter 提供将 format 方法将一个日期时间对象转换成格式化的字符串，但是反过来的操作却建议使用具体的日期时间类自己的 parse 方法，这样可以省去类型转换的步骤。
+
+### 时间差
+
+现实项目中，我们也经常会遇到计算两个时间点之间的差值的情况，最粗暴的办法是，全部幻化成毫秒数并进行减法运算，最后在转换回日期时间对象。
+
+但是 java.time 包中提供了两个日期时间之间的差值的计算方法，我们一起看看。
+
+关于时间差的计算，主要涉及到两个类：
+
+- Period：处理两个日期之间的差值
+- Duration：处理两个时间之间的差值
+
+例如：
+
+```
+public static void main(String[] args){
+    LocalDate date = LocalDate.of(2017,7,22);
+    LocalDate date1 = LocalDate.now();
+    Period period = Period.between(date,date1);
+    System.out.println(period.getYears() + "年" +
+            period.getMonths() + "月" +
+            period.getDays() + "天");
+
+    LocalTime time = LocalTime.of(20,30);
+    LocalTime time1 = LocalTime.of(23,59);
+    Duration duration = Duration.between(time,time1);
+    System.out.println(duration.toMinutes() + "分钟");
+}
+复制代码
+```
+
+输出结果：
+
+```
+0年9月1天
+209分钟
+复制代码
+```
+
+显然，年月日的日期间差值的计算使用 Period 类足以，而时分秒毫秒的时间的差值计算则需要使用 Duration 类。
+
+最后，关于 java.time 包下的新式日期时间 API，我们简单的学习了下，并没有深入到源码实现层次进行介绍，因为底层涉及大量的系统接口，涉及到大量的抽象类和实现类，有兴趣的朋友可以自行阅读 jdk 的源码深入学习。
