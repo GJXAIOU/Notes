@@ -1,14 +1,5 @@
 # FrameDay03_1 SpringMVC
 
-**主要内容**
-* SpringMVC 简介
-* SpringMVC 容器和 Spring 容器介绍(源码跟踪) 
-* 使用纯配置文件方式搭建环境
-* 基于注解方式搭建环境
-* 接收参数的几种方式 
-* 视图解析器
-* @ResponseBody
-
 ## 一、SpringMVC 简介
 
 ### （一）SpringMVC 中重要组件
@@ -16,7 +7,7 @@
 - DispatcherServlet：前端控制器，**接收所有请求**(如果配置`/`就除了jsp 之外都拦截)；
 - HandlerMapping：解析请求格式的，**判断希望要执行哪个具体的方法**；
 - HandlerAdapter：负责**调用具体的方法**；
-- ViewResovler：视图解析器，**负责解析结果，准备跳转到具体的物理视图**（即页面文件），就是不需要写跳转语句了；
+- ViewResovler：视图解析器，**负责解析结果，准备跳转到具体的物理视图**（即页面文件），即无需再写跳转语句了；
 
 ### （二）SpringMVC 运行原理图
 
@@ -28,16 +19,33 @@
 ![Spring与SpringMVC](FrameDay03_1%20SpringMVC.resource/Spring%E4%B8%8ESpringMVC.jpg)
 
 - Spring 容器和 SpringMVC 容器是父子容器。
-  - **SpringMVC 容器中能够调用 Spring 容器的所有内容。**
-  -  图示
-![关系](FrameDay03_1%20SpringMVC.resource/%E5%85%B3%E7%B3%BB.png)
+
+  **SpringMVC 容器中能够调用 Spring 容器的所有内容。**
+  ![关系](FrameDay03_1%20SpringMVC.resource/%E5%85%B3%E7%B3%BB.png)
 
 
 ## 二、SpringMVC 环境搭建【使用注解方式】
 
 ### （一）导入 jar
 
-![SpringMVC jar](FrameDay03_1%20SpringMVC.resource/SpringMVC%20jar.jpg)
+```jar
+// 日志包
+commons-logging.jar
+
+// spring
+spring-aop.jar
+spring-aspects.jar
+spring-beans.jar
+spring-context.jar
+spring-core.jar
+spring-expression.jar
+spring-jdbc.jar
+spring-tx.jar
+
+// web 模块
+spring-web.jar
+spring-wermvc
+```
 
 ### （二）配置 web.xml
 
@@ -46,7 +54,7 @@
 <servlet>
 	<servlet-name>springmvc123</servlet-name>
 	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-	<!-- 修改 SpringMVC 配置文件路径和名称，value值是指在 src 目录下 -->
+	<!-- 修改 SpringMVC 配置文件路径和名称，value 值是指在 src 目录下 -->
 	<init-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:springmvc.xml</param-value>
@@ -113,6 +121,7 @@ public class DemoController {
 		System.out.println("执行demo");
 		return "main.jsp";
 	}
+    
 	@RequestMapping("demo2")
 	public String demo2(){
 		System.out.println("demo2");
@@ -145,10 +154,10 @@ public class DemoController {
 
 ## 四、传参
 
-大原则：只要把内容写到方法(HandlerMethod)参数中,SpringMVC 只要有这个对应内容,就会注入内容；
+大原则：只要把内容写到方法参数中，SpringMVC 只要有这个对应内容，就会注入内容；
 
 ### （一）传输的是基本数据类型参数
-#### **1. 默认保证参数名称和请求中传递的参数名相同**
+#### 1. 默认保证参数名称和请求中传递的参数名相同
 
 - 请求中传入的参数：在 index.jsp 配置内容为：下面传入的参数名为：name、age
 ```jsp
@@ -173,18 +182,10 @@ public class DemoController {
 ```
 然后使用 Tomcat 在页面中输入相应数据之后，页面跳转到 main.jsp，同时在控制窗口输出：`demo3 GJXAIOU 123`
 
-**2.如果请求参数名和方法参数名不对应，则使用@RequestParam()赋值**
-- index.jsp 内容为：传入的参数为：name1、age1
-```jsp
-<body>
-<form action="demo3" method="post">
-    <input type="text" name = "name1"/>
-    <input type="text" name = "age1"/>
-    <input type="submit" name = "提交">
-</form>
-</body>
-```
-- 对应的 Controller 中的内容为：参数名称为：name、age
+#### 2.如果请求参数名和方法参数名不对应，则使用@RequestParam()赋值
+
+如果 index.jsp 内容为：传入的参数为：name1、age1，但是对应的 Controller 中方法参数名称为：name、age
+
 ```java
 @Controller
 public class DemoController {
@@ -198,18 +199,10 @@ public class DemoController {
 
 如果以上**参数中的基本数据类型**（不是对应的封装类，因为封装类不会出现这种情况），例如 int，如果在页面中没有输入参数直接提交之后会报错，为了防止出现这种情况；
 
-**3.通过 @RequestParam 设置默认值**
-- index.jsp 内容为：传入的参数为：name、age
-```jsp
-<body>
-<form action="demo4" method="post">
-    <input type="text" name = "name"/>
-    <input type="text" name = "age"/>
-    <input type="submit" name = "提交">
-</form>
-</body>
-```
-- 对应的 Controller 中的内容为：参数名称为：name、age
+#### 3.通过 @RequestParam 设置默认值：defaultValue = “XXX”
+
+假设 index.jsp 中传入的参数为：name、age，对应的 Controller 中方法参数名称为：name、age
+
 ```java
 @Controller
 public class DemoController {
@@ -221,8 +214,10 @@ public class DemoController {
 }	
 ```
 
-**4.设置强制要求必须有某个参数**
-- 对应的 Controller 中的内容为：下面要求 name 属性必须进行赋值；
+#### 4.设置强制要求必须有某个参数：required = true
+
+对应的 Controller 中的内容为：下面要求 name 属性必须进行赋值；
+
 ```java
 @Controller
 public class DemoController {
@@ -236,7 +231,8 @@ public class DemoController {
 
 这里可以使用 Index.jsp 中使用输入框进行赋值，也可以在 URL 输入框中直接追加：`demo5?name=gjx&age=23`，中间不能有空格，完整路径为：`http://localhost:8080/springmvc02_war_exploded/demo3?name=GJX&age=3`，同样上面的所有都可以使用这种方式进行赋值；
 
-**5.请求的参数中包含多个同名参数的获取方式**
+#### **5.请求的参数中包含多个同名参数的获取方式**
+
 - 这里的 index.jsp 以复选框为例，所有的 name 值均为：hover
 ```jsp
 <!--对应于复选框-->
@@ -356,7 +352,7 @@ public class DemoController {
   - 在@RequestMapping 中一定要和**请求格式**对应
   - `{名称}` 中名称是自定义名称
   - @PathVariable  获取@RequestMapping 中内容，默认按照方法参数名称去寻找。
-控制器 Controller 中代码
+  控制器 Controller 中代码
 ```java
 @Controller
 public class DemoController {
@@ -371,28 +367,39 @@ public class DemoController {
 
 ## 四、跳转方式
 
-1. 默认跳转方式请求转发.
-2. 设置返回值字符串内容
-2.1 添加 redirect:资源路径 重定向
-2.2 添加 forward:资源路径  或省略 forward: 转发
+默认跳转方式请求转发。
+
+设置返回值字符串内容
+
+- 添加 redirect:资源路径 重定向
+- 添加 forward:资源路径  或省略 forward: 转发
 
 ## 五、视图解析器
 
-1. SpringMVC 会提供默认视图解析器.
+SpringMVC 会提供默认视图解析器，但是我们也可以自定义视图解析器。
 
-2. 程序员自定义视图解析器
-```springmvc_xml
+```xml
 <bean id="viewResolver"
     class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="prefix" value="/"></property>
     <property name="suffix" value=".jsp"></property>
 </bean>
-
 ```
 
-3. 如果希望不执行自定义视图解析器, 在方法返回值前面添加forward:或 redirect:
+如果希望不执行自定义视图解析器, 在方法返回值前面添加 forward: 或 redirect:
 
-![自定义视图解析器](FrameDay03_1%20SpringMVC.resource/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%86%E5%9B%BE%E8%A7%A3%E6%9E%90%E5%99%A8.jpg)
+```java
+@RequestMapping("demo10")
+public String demo10(){
+    return "forward:demo11";
+}    
+
+@RequestMapping("demo11")
+pulic String demo11(){
+	System.out.println("demo11");
+    return "main";
+}
+```
 
 ## 六、@ResponseBody
 
@@ -400,12 +407,13 @@ public class DemoController {
 - 在方法上添加@ResponseBody(恒不跳转)
   -  如果返回值满足 key-value 形式(即返回值为对象或 map)
      - 会把响应头设置为 application/json;charset=utf-8
-     -  把转换后的内容以输出流的形式响应给客户端.
-  -  如果返回值不满足 key-value,例如返回值为 String
+     -  把转换后的内容以输出流的形式响应给客户端
+  - 如果返回值不满足 key-value,例如返回值为 String
      - 把相应头设置为 text/html
-     - 把方法返回值以流的形式直接输出.
-     -  如果返回值包含中文,出现中文乱码
-        -  produces 表示设置响应头中 Content-Type 的值.
+     - 把方法返回值以流的形式直接输出
+     - 如果返回值包含中文,出现中文乱码
+
+        produces 表示设置响应头中 Content-Type 的值
 ```java
 // @ResponseBody // 将返回值转换为 json字符串 ，同时设置响应头类型为Application/json，同时不再跳转，表示该内容转化为json字符串之后以流的形式输出
 
@@ -418,8 +426,7 @@ public String demo12() throws IOException{
 }
 ```
 
-3. 底层使用Jackson 进行json 转换,在项目中一定要导入 jackson 的 jar
+底层使用 Jackson 进行 json 转换，因此需要在项目中一定要导入 jackson 的 jar。
 
-3.1 **spring4.1.6 对 jackson 不支持较高版本,jackson  2.7 无效**.
-spring5要使用jackson 2.9.X的版本，低于会报错版本不匹配
+
 
