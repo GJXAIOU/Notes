@@ -250,15 +250,12 @@ RPC 序列化框架：
             // 服务端进行处理（具体见下面的服务端代码）
     
                 
-
+    
             //接收服务端返回的结果
-=======
+    =======
             // 接收服务端返回的结果
-
-
-DataInputStream dis = new DataInputStream(socket.getInputStream());
-
-            // 读取各个属性再转换为对象
+    DataInputStream dis = new DataInputStream(socket.getInputStream());
+                    // 读取各个属性再转换为对象
             int id = dis.readInt();
             String name = dis.readUTF();
             User user = new User(id, name);
@@ -267,7 +264,6 @@ DataInputStream dis = new DataInputStream(socket.getInputStream());
             socket.close();
         }
     }
-    ```
 
 - 对应的 server 端
 
@@ -435,8 +431,6 @@ DataInputStream dis = new DataInputStream(socket.getInputStream());
 客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，stub 不 是 new 出来的，而是使用它的静态方法getStub
 
 这个版本相对于上个版本的优点还不能直观显现，因为硬编码部分还没有改动完成，rpc4 中将通用化这个动态代理。就是不管调用什么版本，在 invoke 方法中的处理就是都是写入 123，对于 UserService 中暴露的其他方法没有处理。
-
-
 
 - Client 端
 

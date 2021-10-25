@@ -1,20 +1,16 @@
-
-
 # Dubbo入门介绍及学习笔记总结
 
 [视频1](https://www.bilibili.com/video/BV1ns411c7jV?from=search&seid=10412979914972996053) 和 [视频2](https://www.bilibili.com/video/BV1ns411c7jV?p=11)。
 
 [TOC]
 
-
-
 ## 一、分布式简要说明
 
 **分布式系统是若干独立计算机的集合，这些计算机对于用户来说就像单个相关系统**。
 
-老式系统(单一应用架构)就是把一个系统，统一放到一个服务器当中然后每一个服务器上放一个系统，如果说要更新代码的话，每一个服务器上的系统都要重新去部署十分的麻烦。
+老式单一应用架构系统就是把一个系统，统一放到一个服务器当中然后每一个服务器上放一个系统，如果要更新代码的话，每一个服务器上的系统都要重新去部署十分的麻烦。
 
-而分布式系统就是将一个完整的系统拆分成多个不同的服务，然后在将每一个服务单独的放到一个服务器当中。
+而**分布式系统就是将一个完整的系统拆分成多个不同的服务，然后在将每一个服务单独的放到一个服务器当中**。
 
 ### （一）应用架构及发展演变
 
@@ -26,9 +22,9 @@
 
     <img src="Dubbo 笔记.resource/image-20210117222950981-1610894058736.png" alt="image-20210117222950981" style="zoom:50%;" />
 
-    - 缺点：
-        - 如果要添加某一个功能的话就要把一个项目重新打包，在分别部署到每一个服务器当中去。
-        - 如果后期项目越来越大的话单台服务器跑一个项目压力会很大的。会不利于维护，开发和程序的性能。
+    缺点：
+    - 如果要添加某一个功能的话就要把一个项目重新打包，在分别部署到每一个服务器当中去。
+    - 如果后期项目越来越大的话单台服务器跑一个项目压力会很大的。会不利于维护，开发和程序的性能。
 
 - MVC
 
@@ -44,13 +40,11 @@
 
 - SOA（Service-Oriented Architecture，面向服务的体系结构）
 
-    **流动计算架构**：在分布式应用架构的基础上增加了一个**调度、治理中心**，基于访问压力实时管理集群容量、提高集群的利用率，用于提高机器利用率的 资源调度和治理中心(SOA) 是关键 **(不浪费计算机资源)**
-
-
+    **流动计算架构**：在分布式应用架构的基础上增加了一个**调度、治理中心**，基于访问压力实时管理集群容量、提高集群的利用率，用于提高机器利用率的资源调度和治理中心(SOA) 是关键 **(不浪费计算机资源)**
 
 ### （二）RPC  简介
 
-**RPC（Remote Procedure Call，远程过程调用）**，是一种**进程**间通信方式，是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间(通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
+**RPC（Remote Procedure Call，远程过程调用）**，是一种**进程**间通信方式，是一种**技术的思想**，而不是规范。它允许程序调用另一个地址空间（通常是共享网络的另一台机器上）的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。
 
 **分布式应用架构(远程过程调用)**：当垂直应用越来越多，应用之间交互不可避免，将核心业务抽取出来，作为独立的服务，逐渐形成稳定的服务中心，使前端应用能更快速的响应多变的市场需求。
 
@@ -115,8 +109,6 @@ Client Stub --> Client: 11.返回调用结果
 | 数据流       | 无        | Stream       |
 | 批量任务     | 无        | Task         |
 
-
-
 ## 二、Dubbo 核心概念
 
 Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，服务自动注册和发现。
@@ -126,14 +118,14 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
 ![在这里插入图片描述](Dubbo 笔记.resource/20200610170317960.png)
 
 - **服务提供者（Provider）**：暴露服务的服务提供方，服务提供者在启动时，向注册中心注册自己提供的服务。
-- **服务消费者（Consumer）**: 调用远程服务的服务消费方，服务消费者在启动时，向注册中心订阅自己所需的服务，服务消费者，从提供者地址列表中，基于软负载均衡算法，选一台提供者进行调用，如果调用失败，再选另一台调用。
+- **服务消费者（Consumer）**: 调用远程服务的服务消费方，服务消费者在启动时，向注册中心订阅自己所需的服务，服务消费者从提供者地址列表中，基于软负载均衡算法，选一台提供者进行调用，如果调用失败，再选另一台调用。
 - **注册中心（Registry）**：注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于长连接推送变更数据给消费者。
 - **监控中心（Monitor）**：服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到监控中心。
 
 ### （二）Dubbo 的特性
 
 - 服务注册中心
-  - 相比 Hessian 类 RPC 框架，Dubbo 有自己的服务中心， 写好的服务可以注册到服务中心， 客户端从服务中心寻找服务，然后再到相应的服务提供者机器获取服务。通过服务中心可以实现集群、负载均衡、高可用(容错) 等重要功能。
+  - 相比 Hessian 类 RPC 框架，Dubbo 有自己的服务中心，写好的服务可以注册到服务中心， 客户端从服务中心寻找服务，然后再到相应的服务提供者机器获取服务。通过服务中心可以实现集群、负载均衡、高可用(容错) 等重要功能。
   - 服务中心一般使用 Zookeeper 实现，也有 Redis 和其他一些方式。以使用 Zookeeper 作为服务中心为例，服务提供者启动后会在 Zookeeper 的 /dubbo 节点下创建提供的服务节点，包含服务提供者 ip、port 等信息。服务提供者关闭时会从 Zookeeper 中移除对应的服务。
   
 - 负载均衡
@@ -152,7 +144,7 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
 
 ## 三、Dubbo 环境搭建  Zookeeper  注册中心
 
-### 步骤一：搭建  Ｚookeeper  注册中心环境
+### 步骤一：搭建  zookeeper  注册中心环境
 
 [Dubbo 官方文档]( http://dubbo.apache.org/en-us/docs/user/quick-start.html) 、官网下载安装 [Zookeeper](http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-3.4.14/)。
 
@@ -204,8 +196,6 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
 
 - 服务提供者模块： `user-service-provider`
 
-    **UserAddress**
-
     ```java
     package com.gjxaiou;
     
@@ -228,7 +218,7 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
     }
     
     ```
-
+    
     服务提供接口和对应的实现类：UserService 和 UserServiceImpl
 
     ```java
@@ -256,7 +246,7 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
         }
     }
     ```
-
+    
 - 服务消费者模块： `order-service-consumer`
 
     服务消费者接口和其实现类：OrderService 和 OrderServiceImpl
@@ -282,7 +272,7 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
     }
     ```
 
-    **注意**：因为服务消费者要使用提供者的方法，因此将服务提供者中的实体类及 UserService 复制到当前消费者同级目录下。
+    **注意**：因为服务消费者要使用提供者的方法，因此将服务提供者中的实体类及 UserService 复制到当前消费者同级目录下。或者将提供者模块打包引入消费者的项目中。
 
     此时我们调用userservice肯定是要报错的。这种面向接口的方式，我们这里只是调到了接口，而接口实际是在另外一个项目中，如果我们两个项目工程都创建共同的实体类，太过于麻烦了，我们可以将服务接口，服务模型等单独放在一个项目中，更为方便调用。
 
@@ -302,7 +292,6 @@ Dubbo 是一款高性能、轻量级的开源 Java RPC 框架，它提供了三�
     </dependency>
     ```
 
-    
 
 ### （二）服务提供者配置及测试
 
@@ -455,14 +444,16 @@ public class MainApplication {
 注意：消费者的运行测试需要先启动提供者。
 启动服务提供者、消费者。及zookeeper的和dubbo-admin，查看监控信息。
 localhost:7001
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020061208334559.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)此时可以看到一个提供者，一个消费者的信息监控信息。
+![在这里插入图片描述](Dubbo 笔记.resource/zhuce.png)
+
+此时可以看到一个提供者，一个消费者的信息监控信息。
 
 ## dubbo-monitor-simple简易监控中心
 
 进入dubbo-monitor-simple文件，执行cmd命令，mvn package打包成jar包
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612083732691.png)![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612084630745.png)将 `dubbo-monitor-simple-2.0.0-assembly.tar.gz` 压缩包解压至当前文件夹，解压后config文件查看properties的配置是否是本地的zookeeper。
+![在这里插入图片描述](Dubbo 笔记.resource/20200612083732691.png)![在这里插入图片描述](Dubbo 笔记.resource/20200612084630745.png)将 `dubbo-monitor-simple-2.0.0-assembly.tar.gz` 压缩包解压至当前文件夹，解压后config文件查看properties的配置是否是本地的zookeeper。
 打开解压后的 `assembly.bin` 文件，`start.bat` 启动`dubbo-monitor-simple监控中心`
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612085158389.png)在浏览器 `localhost:8080` ，可以看到一个监控中心。
+![在这里插入图片描述](Dubbo 笔记.resource/20200612085158389.png)在浏览器 `localhost:8080` ，可以看到一个监控中心。
 在服务提供者和消费者的xml中配置以下内容，再次启动服务提供和消费者启动类。
 
 ```
@@ -472,8 +463,8 @@ localhost:7001
 123
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612085805476.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)可以看到，这个监控中心也捕获到了服务提供和消费者信息
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612085845218.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70.png)可以看到，这个监控中心也捕获到了服务提供和消费者信息
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70.png)
 
 ## Dubbo与SpringBoot整合
 
