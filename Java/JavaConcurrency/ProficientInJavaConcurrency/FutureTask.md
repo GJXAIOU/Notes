@@ -1,5 +1,3 @@
-
-
 # FutureTask
 
 ## 一、FutureTask 介绍
@@ -65,7 +63,7 @@ public class FutureTaskTest {
 
 ### FutureTask内部结构
 
-```
+```java
 public class FutureTask<V> implements RunnableFuture<V> {
     
     private volatile int state;
@@ -116,7 +114,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
 
 FutureTask有两个构造方法：
 
-```
+```java
 public FutureTask(Callable<V> callable) {
     if (callable == null)
         throw new NullPointerException();
@@ -136,7 +134,7 @@ public FutureTask(Runnable runnable, V result) {
 
 FutureTask实现了Runnable接口，所以需要实现run方法，代码如下：
 
-```
+```java
 public void run() {
     /*
      * 首先判断状态，如果不是初始状态，说明任务已经被执行或取消；
@@ -215,7 +213,7 @@ finishCompletion方法稍后再分析。
 
 ### set方法
 
-```
+```java
 protected void set(V v) {
     if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
         outcome = v;

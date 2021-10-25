@@ -10,7 +10,7 @@
 
 ### 上篇 SpringBoot2.X版+SpringCloud H 版
 ### 下篇 SpringCloud Alibaba
-### 官网查看 cloud与boot 版本对应关系
+### 官网查看 cloud 与boot 版本对应关系
 https://spring.io/projects/spring-cloud#overflow
 ### 更加详细的cloud与boot版本对应
 https://start.spring.io/actuator/info

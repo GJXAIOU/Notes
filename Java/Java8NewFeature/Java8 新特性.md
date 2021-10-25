@@ -1901,8 +1901,6 @@ public class StreamTest2 {
     }
     ```
     
-    
-    
 -  知识点：中间操作和终止操作的测试
 
     ```java
@@ -1959,8 +1957,6 @@ public class StreamTest2 {
         }
     }
     ```
-    
-    
     
     #### 内部迭代和外部迭代
     
@@ -2384,10 +2380,6 @@ public class StreamTest1 {
     }
 }
 ```
-
-
-
-
 
 ### 比较器：Comparator
 
@@ -3242,7 +3234,7 @@ public static void main(String[] a){
     ZonedDateTime zonedDateTime2 = ZonedDateTime.ofInstant(instant,zoneId1);
     System.out.println(zonedDateTime2);
 }
-复制代码
+
 ```
 
 输出结果：
@@ -3251,7 +3243,6 @@ public static void main(String[] a){
 2018-04-23T16:10:29.510+08:00[Asia/Shanghai]
 2018-04-23T16:10:29.511-07:00[America/Los_Angeles]
 2018-04-23T08:10:29.532Z[GMT]
-复制代码
 ```
 
 简单解释一下，首先第一个输出应该没什么问题，系统保存当前系统日期和时间以及默认的时区。
@@ -3280,7 +3271,6 @@ public static void main(String[] a){
     System.out.println(localDateTime2);
 
 }
-复制代码
 ```
 
 输出结果：
@@ -3288,7 +3278,6 @@ public static void main(String[] a){
 ```
 2018年04月23日 17:27:24
 2008-08-23T23:59:59
-复制代码
 ```
 
 格式化主要有两种情况，一种是将日期时间格式化成字符串，另一种则是将格式化的字符串装换成日期时间对象。
@@ -3322,7 +3311,6 @@ public static void main(String[] args){
     Duration duration = Duration.between(time,time1);
     System.out.println(duration.toMinutes() + "分钟");
 }
-复制代码
 ```
 
 输出结果：
@@ -3330,7 +3318,6 @@ public static void main(String[] args){
 ```
 0年9月1天
 209分钟
-复制代码
 ```
 
 显然，年月日的日期间差值的计算使用 Period 类足以，而时分秒毫秒的时间的差值计算则需要使用 Duration 类。

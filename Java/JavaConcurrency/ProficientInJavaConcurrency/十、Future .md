@@ -2,11 +2,9 @@
 
 [TOC]
 
-### 一、概述
+## 一、Future
 
-简单来说就是一个线程来执行未来的任务，但是在使用 get 方法的时候主线程会出现阻塞的过程。
-
-## 二、源码分析
+简单来说就是一个线程来执行未来的任务，但是在使用 get 方法的时候主线程会出现阻塞的过程。该接口在使用过程中，常用的实现类为 FutureTask 类。
 
 ![image-20210512084035376](十、Future .resource/image-20210512084035376.png)
 
@@ -15,9 +13,8 @@
 package java.util.concurrent;
 
 /**
- * Future 表示异步计算的结果。提供了检查计算是否完成、是否等待其完成以及获取计算结果的方法。只有在计算完成时，才能使用方法 get
- *获取结果，必要时阻塞，直到它准备好为止。取消由{@code cancel}方法执行。提供了其他方法来确定任务是正常完成还是取消。一旦计算完成，就不能取消计算。如果为了可取消性而想使用
- * {@code Future}，但不提供可用的结果，那么可以使用{@code Future<？>}并返回{@code null}，作为基础任务的结果
+ * Future 表示异步计算的结果。提供了检查计算是否完成、是否等待其完成以及获取计算结果的方法。只有在计算完成时，才能使用 get 方法获取结果，必要时阻塞，直到它准备好为止。
+ 取消由 cancel 方法执行。提供了其他方法来确定任务是正常完成还是取消。一旦计算完成，就不能取消计算。如果为了可取消性而想使用 Future，但不提供可用的结果，那么可以使用 Future<？> 并返回 null，作为基础任务的结果
  */
 
 /**
@@ -156,11 +153,7 @@ public interface Future<V> {
 }
 ```
 
-该接口在使用过程中，常用的实现类为 FutureTask 类。
-
-
-
-使用示例：
+### 使用示例
 
 ```java
 package com.gjxaiou.future;
@@ -236,7 +229,7 @@ post execution
 
 主线程会抛出异常，但是不影响子线程正常执行。
 
-### CompletableFuture
+## 二、CompletableFuture
 
 保证任务执行的异步性和获取结果的异步性。
 
@@ -252,16 +245,14 @@ public class MyTest1 {
     public static void main(String[] args) {
         // 体现 CompletableFuture 的 stage 功能  => 对结果进行转换
         String result =
-                CompletableFuture.supplyAsync(() -> "hello").thenApplyAsync(value -> value +
-                        " world").join();
+                CompletableFuture.supplyAsync(() -> "hello").thenApplyAsync(value -> value +" world").join();
 
         System.out.println(result);
 
         System.out.println("================");
 
         // 对结果进行消费
-        CompletableFuture.supplyAsync(() -> "hello").thenAccept(value -> System.out.println(
-                " welcome" + value));
+        CompletableFuture.supplyAsync(() -> "hello").thenAccept(value -> System.out.println(" welcome" + value));
 
         System.out.println("=================");
 
@@ -333,4 +324,3 @@ hello world
 task finished
 执行完成
 ```
-
