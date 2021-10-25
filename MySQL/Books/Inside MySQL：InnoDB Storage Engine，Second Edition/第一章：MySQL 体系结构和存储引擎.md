@@ -84,17 +84,18 @@ mysql> select SQL_CACHE * from T where ID=10；
 查询有没有开启查询缓存命令为：
 
 ```sql
- show variables like '%query_cache%';                                                                                          
+mysql> show variables like '%query_cache%';
 +------------------------------+---------+
 | Variable_name                | Value   |
 +------------------------------+---------+
-| have_query_cache             | YES     |
-| query_cache_limit            | 1048576 |
-| query_cache_min_res_unit     | 4096    |
-| query_cache_size             | 0       |
-| query_cache_type             | ON      |
-| query_cache_wlock_invalidate | OFF     |
+| have_query_cache             | YES     |      --查询缓存是否可用
+| query_cache_limit            | 1048576 |      --可缓存具体查询结果的最大值
+| query_cache_min_res_unit     | 4096    |      --查询缓存分配的最小块的大小(字节)
+| query_cache_size             | 599040  |      --查询缓存的大小
+| query_cache_type             | ON      |      --是否支持查询缓存
+| query_cache_wlock_invalidate | OFF     |      --控制当有写锁加在表上的时候，是否先让该表相关的 Query Cache失效
 +------------------------------+---------+
+6 rows in set (0.02 sec)
 ```
 
 
@@ -219,7 +220,7 @@ ERROR 1142 (42000): SELECT command denied to user 'b'@'localhost' for table 'T'
 **连接 MySQL 操作是一个连接进程和 MySQL 数据库实例进行通信，本质上就是进程通信**。常用的进程通信方式有管道、命名管道、命名字、TCP/IP套接字、UNIX域套接字。MySQL 数据库提供的连接方式从本质上看都是上述提及的进程通信方式。
 
 - TCP/IP 套接字方式是 MySQL 数据库在任何平台下都提供的连接方式，这种方式在 TCP/IP 连接上建立一个基于网络的连接请求，一般情况下客户端(client)在一台服务器 上，而MySQL 实例(server)在另一台服务器上，这两台机器通过一个TCP/IP网络连接：`mysql -h192.168.0.1 -u XXXX -p`
-    
+  
     在通过 TCP/IP 连接到 MySQL 实例时， MySQL 数据库会先检查一张权限视图， 用来判断发起请求的客户端 IP 是否允许连接到 MySQL 实例。 该视图在 mysql 架构下， 表名为 user。里面包括可以连接的 host（IP 地址）、用户名和密码，如果想看可是 select 看一下。
     
 - 命名管道和共享内存：
