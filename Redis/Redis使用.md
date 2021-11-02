@@ -2,26 +2,21 @@
 
 ## 一、非关系型数据库
 
-### （一）NOSQL
-
 关系型数据库：MySQL 、Oracle、SQLServer
-NoSQL,泛指**非关系型的数据库**, NOSQL数据库的四大分类
 
-- **键值 (Key-value)存储数据库**:这一类数据库主要会使用到一个哈希表,这个表中有一个特定的键和一个指针指向特定的数据。如 Redis, oldemort,Oracle BDB;
+非关系型数据库（NoSQL）主要包括以下四类：
 
-- 列存储数据库:这部分数据库通常是用来应对分布式存储的海量数据。键仍然存在,但是它们的特点是指向了多个列。如 HBase,Rak
+- **键值（Key-value）存储数据库**：这一类数据库主要会使用到一个哈希表，这个表中有一个特定的键和一个指针指向特定的数据。如 Redis、oldemort、Oracle BDB；
 
-- 文档型数据库:该类型的数据模型是版本化的文档,半结构化的文档以特定的格式存储,比如JsoN。文档型数据库可以看作是键值数据库的升级版,允许之间嵌套键值。而且文档型数据库比键值数据库的查询效率更高。如：CouchDB, MongoDb
+- 列存储数据库：这部分数据库通常是用来应对分布式存储的海量数据。键仍然存在，但是它们的特点是指向了多个列。如 HBase、Rak；
 
-- 图形 (Graph)数据库:图形结构的数据库同其他行列以及刚性结构的SQL数据库不同,它是使用灵活的图形模型,并且能够扩展到多个服务器上。NoSQ 数据库没有标准的查询语言(SQL),因此进行数据库查询需要制定数据模型
+- 文档型数据库：该类型的数据模型是版本化的文档，半结构化的文档以特定的格式存储，比如 JSON。文档型数据库可以看作是键值数据库的升级版，允许之间嵌套键值。而且文档型数据库比键值数据库的查询效率更高。如：CouchDB, MongoDb；
 
-许多 NOSQL数据库都有REST式的数据接口或者查询AP。如:Neo4J,InfoGrid, Infinite Graph
-
-
+- 图形（Graph）数据库：图形结构的数据库同其他行列以及刚性结构的 SQL 数据库不同，它是使用灵活的图形模型，并且能够扩展到多个服务器上。NoSQL 数据库没有标准的查询语言（SQL）因此进行数据库查询需要制定数据模型；
 
 ## 二、Redis 简介
 
-是以 key-value形式存储,和传统的关系型数据库不一样,不一定遵循传统数据库的一些基本要求(非关系型的、分布式的、开源的。水平可扩展的)
+Redis 是以 key-value 存储数据结构服务器。键可以包含:( string)字符串,哈希,（List）链表,（Set）集合，（zset）有序集合。这些数据集合都支持 push/pop、 add/ remove及取交集和并集以及更丰富的操作，redis 支持各种不同的方式排序。
 
 - 优点:
     - 对数据高并发读写
@@ -30,18 +25,14 @@ NoSQL,泛指**非关系型的数据库**, NOSQL数据库的四大分类
     - 对数据的可扩展性和高可用性
 
 - 缺点: 
-    - redis(ACID处理非常简单）无法做到太复杂的关系数据库模型
-
-Redis是以 key-value 存储数据结构服务器。键可以包含:( string)字符串,哈希,（List）链表,（Set）集合，(zset)有序集合。这些数据集合都支持 push/pop、 add/ remove及取交集和并集以及更丰富的操作，redis 支持各种不同的方式排序。
-为了保证效率数据都是缓存在内存中它也可以周期性的把更新的数据写入磁盘或者把修改操作写入追加到文件中。上述持久化主要方式是：RDB 和 AOF、RDB 是周期性将操作写入硬盘；AOF 是在执行数据写入操作的同时将操作写入日志，如果发生掉电可以从日志中查询到之前的操作。
+    - Redis（ACID 处理非常简单）无法做到太复杂的关系数据库模型
 
 
 ### （一）Redis 安装
 
- 见 Linux -> LinuxBlogs -> CentOS 安装 Redis；
+> 详见 Linux -> LinuxBlogs -> CentOS 安装 Redis；
 
 **基本命令：**
-路径按照上面文件进行安排
 
 - 启动服务：`src/redis-server redis.conf`
 - 退出服务：`pkill redis-server`/ `kill 进程号` / `src/redis-cli shutdown`
@@ -52,11 +43,11 @@ Redis是以 key-value 存储数据结构服务器。键可以包含:( string)字
 
 ## 三、Redis 数据类型
 
-redis 一共分为五种基本数据类型： String、Hash、List（类型 Java 的 Queue）、Set（Java 中 List 增强版）、ZSet；
+Redis 一共分为五种基本数据类型： String、Hash、List（类型 Java 的 Queue）、Set（Java 中 List 增强版）、ZSet；
 
 ### （一）String 类型
 
-String 类型是包含很多种类型的特殊类型，并且**是二进制安全的**。比如序列化的对象进行存储，比如一张图片进行二进制存储，比如一个简单的字符串。数值等等。
+String 类型是包含很多种类型的特殊类型，并且**是二进制安全的**。比如序列化的对象进行存储，比如一张图片进行二进制存储，比如一个简单的字符串、数值等。
 
 
 - Set 方法：
@@ -81,7 +72,7 @@ String 类型是包含很多种类型的特殊类型，并且**是二进制安�
 
 ### （二）Hash 类型
 
- Hash 类型是 String 类型的 field 和 value 的映射表，或者说一个 String 集合，**特别适合存储对象**，相比，将一个对象类型存储在 Hash 类型中要比存储在 String 类型中占用内存空间更小同时更方便存取整个对象。
+Hash 类型是 String 类型的 field 和 value 的映射表，或者说一个 String 集合，**特别适合存储对象**，相比，将一个对象类型存储在 Hash 类型中要比存储在 String 类型中占用内存空间更小同时更方便存取整个对象。
 
 一般之前数据表中数据在 redis 中有两种方式存储
 
@@ -116,57 +107,55 @@ String 类型是包含很多种类型的特殊类型，并且**是二进制安�
 
 ### （三）List 类型
 
-List 类型是链表结构的集合，主要功能有：push、pop、获取元素等等。**List 类型是一个双端链表的结构，可以通过相关操作进行集合的头部或者尾部添加删除元素**，List 可以作为栈也可以作为队列。
-**这也导致 Redis 可以充当 消息队列（MQ）使用**
+List 类型是链表结构的集合，主要功能有：push、pop、获取元素等等。**List 类型是一个双端链表的结构，可以通过相关操作进行集合的头部或者尾部添加删除元素**，List 可以作为栈也可以作为队列。**因此 Redis 可以充当消息队列（MQ）使用**
 
 - lpush 方法：从头部加入元素，先进后出（相当于栈）
 
-```redis
-127.0.0.1:6379> lpush list1 "hello"
-(integer) 1
-127.0.0.1:6379> lpush list1 "world"
-(integer) 2
-127.0.0.1:6379> lrange list1 0 -1 // 表示从头取到末尾，就是查询栈中所有元素 
-1) "world"
-2) "hello"
-```
+    ```c
+    127.0.0.1:6379> lpush list1 "hello"
+    (integer) 1
+    127.0.0.1:6379> lpush list1 "world"
+    (integer) 2
+    127.0.0.1:6379> lrange list1 0 -1 // 表示从头取到末尾，就是查询栈中所有元素 
+    1) "world"
+    2) "hello"
+    ```
 
 - rpush 方法：从尾部添加元素，先进先出（相当于队列）
 
-```redis
-127.0.0.1:6379> rpush list2 "hello"
-(integer) 1
-127.0.0.1:6379> rpush list2 "world"
-(integer) 2
-127.0.0.1:6379> lrange list2 0 -1
-1) "hello"
-2) "world"
-```
+    ```c
+    127.0.0.1:6379> rpush list2 "hello"
+    (integer) 1
+    127.0.0.1:6379> rpush list2 "world"
+    (integer) 2
+    127.0.0.1:6379> lrange list2 0 -1
+    1) "hello"
+    2) "world"
+    ```
 
 - linsert 方法：插入元素
     `linsert hash集合名 before 集合已有的元素 插入的元素`
 
-```redis
-127.0.0.1:6379> linsert list2 before "world" "your"
-(integer) 3
-127.0.0.1:6379> lrange list2 0 -1
-1) "hello"
-2) "your"
-3) "world"
-
-```
+    ```c
+    127.0.0.1:6379> linsert list2 before "world" "your"
+    (integer) 3
+    127.0.0.1:6379> lrange list2 0 -1
+    1) "hello"
+    2) "your"
+    3) "world"
+    ```
 
 - lset 方法：将指定下标的元素替换掉
     `lset 集合名 要替换元素在集合中的位置 新的值`
 
-```redis
-127.0.0.1:6379> lset list2 1 "my"
-OK
-127.0.0.1:6379> lrange list2 0 -1
-1) "hello"
-2) "my"
-3) "world"
-```
+    ```c
+    127.0.0.1:6379> lset list2 1 "my"
+    OK
+    127.0.0.1:6379> lrange list2 0 -1
+    1) "hello"
+    2) "my"
+    3) "world"
+    ```
 
 - lrem 方法：删除元素，返回删除元素的个数
     `lrem 集合名 删除几个该名称元素  要删除的元素名称`
@@ -232,7 +221,7 @@ OK
 - lindex 方法：返回指定 list 中 Index 位置的元素：`lindex list2 3`
 - llen 方法：返回元素的个数：`lindex list2`
 
-```redis
+```c
 127.0.0.1:6379> lrange list2 0 -1
 1) "her"
 2) "my"
@@ -366,14 +355,9 @@ Set 集合是 String 类型的无序集合，set 是通过 hashTable 实现的�
 
 ## 四、Redis 实现主从复制
 
-==配置主从的时候：默认就绑定了 IP，一定要去掉：bind 127.0.0.1 ==
+配置主从的时候：默认就绑定了 IP，一定要去掉：bind 127.0.0.1
 
 ### （一）主从复制
-
-- Maste可以拥有多个slave
-- 多个 slave可以连接同一个 master外,还可以连接到其他的slave
-- 主从复制不会阻塞 master，在同步数据时 maste可以继续处理 client请求
-- 提供系统的伸缩性
 
 **主从复制过程**
 
@@ -412,33 +396,6 @@ Set 集合是 String 类型的无序集合，set 是通过 hashTable 实现的�
 使用 `multi`开启事务，使用 `exec` 执行，使用 `discard`取消事务；
 
 
-### 五、Redis 持久化
-
-**配置是修改：** redis.conf 里面设置
-redis是一个**支持持久化的内存数据**库,也就是说 redis需要经常将内存中的数据同步到硬盘来保证持久化。
-
-**redis持久化的两种方式：RDB 方式和 AOF**
-
-- snapshotting (快 照 ）默认方式,将内存中以快照的方式写入到二进制文件中,默认为 `dump.rdb` 可以通过配置设置自动做快照持久化的方式。我们可以配置redis 在n秒内如果超过m个key则修改就自动做快照。
-    - snapshotting设置
-        - save  900  1  #900秒内如果超过1个key被修改则发起快照保存
-        - save  300  10  #300秒内如果超过10个key被修改,则发起快照保存
-        - save  60   10000
-    - append- only file(缩写aof)的方式(有点类似于 oracle日志)由于快照方式是在一定时间间隔做一次,所以可能发生redis意外dowm的情况就会丢失最后一次快照后的所有修改的数据、aof比快照方式有更好的持久化性,是由于在使用aof时, redis会将每一个收到的写命令都通过 write函数追加到命令中,当redis重新启动时会重新执行文件中保存的写命令来在内存中重建这个数据库的内容,这个文件在bin目录下 `appendonly.aof`。aof不是立即写到硬盘上,可以通过配置文件修改强制写到硬盘中。
-        - aof设置:
-            - appendonly yes   #启动ao持久化方式有三种修改方式:
-            - appendfsync always  #收到写命令就立即写入到磁盘,效率最慢,但是保证完全的持久化；
-                3.0 之后使用集群，可以多个主机同时执行写的操作，效率会提升；
-            - appendfsync everysec #每秒钟写入磁盘一次,在性能和持久化方面做了很好的折中；
-                默认是这种；
-            - appendfsync no  #完全依赖os，性能最好，持久化没保证；
-
-## 六、发布和订阅消息
-
-- 使用 `subscribe 频道名` 进行订阅监听
-- 使用 `publish 频道名 发布的内容` 进行发布消息广播；
-
-
 ## 七、Redis 集群
 
 **文件目录说明**
@@ -459,7 +416,7 @@ Redis
 - 将原来的配置文件：redis.conf 分别拷贝到 7 个文件下面
 - 修改配置文件
 
-```redis
+```c
 daemonize yes
 port 700* #针对每台机器设置端口号：本实验设置顺序为：6371-6376 代替 7001 - 7006
 bind 192.168.238.147 #绑定当前机器的 IP
