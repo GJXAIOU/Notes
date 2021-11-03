@@ -209,8 +209,6 @@ d. 更优的算法（基于预测）
 
 <img src="JVM%20%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.resource/image-20191212212156641.png" alt="image-20191212212156641" style="zoom:50%;" />
 
-
-
 -----------
 
 ## 三、引用
@@ -414,7 +412,7 @@ public class FinalizeEscapeGC {
 
 ### （二）GC 回收的时机
 
-在分代模型（新生代和老年代）的基础上，GC 从时机上分为两种: Scavenge GC 和 Full GC
+在分代模型（新生代和老年代）的基础上，GC 从时机上分为两种：Scavenge GC 和 Full GC
 - Scavenge GC (Minor GC)
     -  触发时机：新对象生成时，Eden 空间满了
     - 理论上 Eden 区大多数对象会在 Scavenge GC 回收，复制算法的执行效率会很高，Scavenge GC 时间比较短。

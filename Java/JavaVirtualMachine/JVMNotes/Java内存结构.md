@@ -160,7 +160,7 @@ public void method() {
 因为堆用于存储对象实例，所以通过不断的创建对象实例，并且保证 GC Roots 到对象之间有各大路径来避免垃圾回收机制清除这些对象。
 
 ```java
-  //-Xms5m -Xmx5m -XX:+HeapDumpOnOutOfMemoryError 设置jvm 堆空间的最小和最大值（如果两值相同则堆不会自动扩展）以及遇到内存溢出异常时 Dump 出当前的内存堆转储快照，便于以后分析。
+  //-Xms5m -Xmx5m -XX:+HeapDumpOnOutOfMemoryError 设置 jvm 堆空间的最小和最大值（如果两值相同则堆不会自动扩展）以及遇到内存溢出异常时 Dump 出当前的内存堆转储快照，便于以后分析。
 package com.gjxaiou.memory;
 
 import java.util.ArrayList;
@@ -193,6 +193,8 @@ Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceede
 - 如果是内存泄漏，查看泄漏对象到 GC Roots 的引用链，就可以找到泄漏对象是通过怎样的路径与 GC Roots 相关联并且导致垃圾回收器无法回收他们，从而定位泄漏代码的位置；
 - 反之则表示内存中的对象确实必须保持存活，则应当检查虚拟机堆参数（-Xmx 和 -Xms），是否可以增大；另一方面检查代码上是否存在某些对象生命周期过长，保持状态时间过长的情况，尝试减少程序运行期的内存消耗
 
+![image-20211102232022938](Java内存结构.resource/image-20211102232022938.png)
+
 ### （一）JVisualVM 使用
 
 直接在 cmd 控制台中输入 `jvisualvm` 即可开启
@@ -210,8 +212,6 @@ Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceede
 然后可以在监视中查看，其他线程和抽样器均可以可视化的查看程序运行信息；
 
 ![image-20191211164902563](Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84.resource/image-20191211164902563.png)
-
-
 
 ## 四、虚拟机栈内存溢出测试
 
@@ -525,40 +525,40 @@ Server compiler detected.
 JVM version is 25.221-b11
 
 using thread-local object allocation.
-Parallel GC with 10 thread(s)
+Parallel GC with 10 thread(s)   //采用Parallel GC 
 
 Heap Configuration:
-   MinHeapFreeRatio         = 0
-   MaxHeapFreeRatio         = 100
-   MaxHeapSize              = 4257218560 (4060.0MB)
-   NewSize                  = 88604672 (84.5MB)
-   MaxNewSize               = 1418723328 (1353.0MB)
-   OldSize                  = 177733632 (169.5MB)
-   NewRatio                 = 2
-   SurvivorRatio            = 8
-   MetaspaceSize            = 21807104 (20.796875MB)
-   CompressedClassSpaceSize = 1073741824 (1024.0MB)
-   MaxMetaspaceSize         = 17592186044415 MB
-   G1HeapRegionSize         = 0 (0.0MB)
+   MinHeapFreeRatio         = 0  //JVM最小空闲比率 可由-XX:MinHeapFreeRatio=<n>参数设置， jvm heap 在使用率小于 n 时 ,heap 进行收缩
+   MaxHeapFreeRatio         = 100   //JVM最大空闲比率 可由-XX:MaxHeapFreeRatio=<n>参数设置， jvm heap 在使用率大于 n 时 ,heap 进行扩张 
+   MaxHeapSize              = 4257218560 (4060.0MB)  //JVM堆的最大大小 可由-XX:MaxHeapSize=<n>参数设置
+   NewSize                  = 88604672 (84.5MB)  //JVM新生代的默认大小 可由-XX:NewSize=<n>参数设置
+   MaxNewSize               = 1418723328 (1353.0MB)   //JVM新生代的最大大小 可由-XX:MaxNewSize=<n>参数设置
+   OldSize                  = 177733632 (169.5MB)  //JVM老生代的默认大小 可由-XX:OldSize=<n>参数设置 
+   NewRatio                 = 2  //新生代：老生代（的大小）=1:2 可由-XX:NewRatio=<n>参数指定New Generation与Old Generation heap size的比例。
+   SurvivorRatio            = 8 //survivor:eden = 1:8,即survivor space是新生代大小的1/(8+2)[因为有两个survivor区域] 可由-XX:SurvivorRatio=<n>参数设置
+   MetaspaceSize            = 21807104 (20.796875MB)   //元空间的默认大小，超过此值就会触发Full GC 可由-XX:MetaspaceSize=<n>参数设置
+   CompressedClassSpaceSize = 1073741824 (1024.0MB)  //类指针压缩空间的默认大小 可由-XX:CompressedClassSpaceSize=<n>参数设置
+   MaxMetaspaceSize         = 17592186044415 MB //元空间的最大大小 可由-XX:MaxMetaspaceSize=<n>参数设置
+   G1HeapRegionSize         = 0 (0.0MB)  //使用G1垃圾收集器的时候，堆被分割的大小 可由-XX:G1HeapRegionSize=<n>参数设置
 
 Heap Usage:
-PS Young Generation
-Eden Space:
+PS Young Generation  // 新生代区域分配情况
+Eden Space:  // Eden区域分配情况
    capacity = 48758784 (46.5MB)
    used     = 11702160 (11.160049438476562MB)
    free     = 37056624 (35.33995056152344MB)
    24.000106319304436% used
-From Space:
+From Space:  //其中一个Survivor区域分配情况
    capacity = 524288 (0.5MB)
    used     = 0 (0.0MB)
    free     = 524288 (0.5MB)
    0.0% used
-To Space:
+To Space:   //另一个Survivor区域分配情况
    capacity = 1572864 (1.5MB)
    used     = 0 (0.0MB)
    free     = 1572864 (1.5MB)
    0.0% used
-PS Old Generation
+PS Old Generation  //老生代区域分配情况
    capacity = 177733632 (169.5MB)
    used     = 1155216 (1.1016998291015625MB)
    free     = 176578416 (168.39830017089844MB)
