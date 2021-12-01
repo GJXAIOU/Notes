@@ -320,13 +320,14 @@ public  class  MyAdvice  {
  **实现步骤:**
 
 - 步骤一：在 spring 配置文件中设置注解在哪些包中（使用组件扫描）
-`<context:component-scan base-package="com.gjxaiou.advice,com.gjxaiou.test"></context:component-scan>`
+  `<context:component-scan base-package="com.gjxaiou.advice,com.gjxaiou.test"></context:component-scan>`
 
-同时要添加动态代理： proxy-target-class值为 true表示使用 cglib动态代理，值为 false 表示使用 jdk 动态代理；
-`<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>`
+  同时要添加动态代理： proxy-target-class值为 true表示使用 cglib动态代理，值为 false 表示使用 jdk 动态代理；
+  `<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>`
 
 - 步骤二：在 Demo.java 类中添加 @Componet,可以加参数用于别名，相当于直接替代了配置文件中的 bean 标签
-  - 在方法上添加 `@Pointcut(“”)` 定义切点（必要步骤）
+  
+  在方法上添加 `@Pointcut(“”)` 定义切点（必要步骤）
 ```java
 @Component（"dd"）
 public class Demo {

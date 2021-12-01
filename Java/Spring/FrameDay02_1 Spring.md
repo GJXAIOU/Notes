@@ -134,11 +134,10 @@ Servlet 是具体的业务功能，不能封装
 
 首先提供一个实体类：
 ```java
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 public class People {
     private Integer id;
     private String name;

@@ -112,7 +112,6 @@ public class People{
      <property name="sqlSessionFactoryBeanName" value="factory"></property> </bean>
     ```
 
-    
 
 
 ### Spring 使用注解来获取属性文件 Properties 中的值

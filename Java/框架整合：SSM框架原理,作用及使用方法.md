@@ -22,9 +22,9 @@ SSM 框架是 spring MVC ，spring 和 mybatis 框架的整合，是标准的 MV
   - 如果有请求 Tomcat **交给对应的项目**处理；
   - 客户端发送请求到 DispacherServlet（前端控制器即分发器），这里可以设置拦截器，对请求进行过滤处理；
   - 由 DispacherServlet 控制器查询 HanderMapping，通过解析请求，判断请求希望执行的具体方法，即找到处理请求的 Controller；
-这个map表由很多key:value键值对组成, key值是controller的名字(@mapping ...), value值是该controller所在类的地址和方法签名;
-(一个类中可能由很多controller)这个找到controller位置并实例化的过程叫做**反射**
-反射得到实例后通过**代理**执行相应的方法即相应controller;
+  这个map表由很多key:value键值对组成, key值是controller的名字(@mapping ...), value值是该controller所在类的地址和方法签名;
+  (一个类中可能由很多controller)这个找到controller位置并实例化的过程叫做**反射**
+  反射得到实例后通过**代理**执行相应的方法即相应controller;
   - 通过 HandlerAdapter 调用具体的 Controller 方法；
   - Controller 调用业务逻辑处理后，返回 ModelAndView，即控制器结果返回给视图解析器；
   - DispacherServlet 查询视图解析器，找到ModelAndView 指定的视图
@@ -267,7 +267,7 @@ test模块支持使用JUnit和TestNG对spring组件进行测试。
 
 *   springMVC框架
     ![这里写图片描述](%E6%A1%86%E6%9E%B6%E6%95%B4%E5%90%88%EF%BC%9ASSM%E6%A1%86%E6%9E%B6%E5%8E%9F%E7%90%86,%E4%BD%9C%E7%94%A8%E5%8F%8A%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95.resource/20180503140150984.png)
-    ==**框架执行流程（面试必问）**==
+    ==**框架执行流程（面试必问)**==
     *   1、用户发送请求至前端控制器DispatcherServlet
     *   2、DispatcherServlet收到请求调用HandlerMapping处理器映射器。
     *   3、处理器映射器根据请求url找到具体的处理器，生成处理器对象及处理器拦截器(如果有则生成)一并返回给DispatcherServlet。
