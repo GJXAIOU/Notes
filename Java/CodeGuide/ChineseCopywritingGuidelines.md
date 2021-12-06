@@ -35,15 +35,15 @@
 
 > 今天出去买菜花了5000元。
 
-### （三）数字与单位之间无需增加空格
+### （三）数字与单位之间需要增加空格
 
 正确：
 
-> 我家的光纤入户宽带有 10Gbps，SSD 一共有 10TB。
+> 我家的光纤入户宽带有 10 Gbps，SSD 一共有 10 TB。
 
 错误：
 
-> 我家的光纤入户宽带有 10 Gbps，SSD 一共有 20 TB。
+> 我家的光纤入户宽带有 10Gbps，SSD 一共有 20TB。
 
 另外，**度／百分比与数字之间不需要增加空格**：
 
@@ -68,6 +68,10 @@
 错误：
 
 > 刚刚买了一部 iPhone ，好开心！
+
+### 用 `text-spacing` 来挽救？
+
+CSS Text Module Level 4 的 [`text-spacing`](https://www.w3.org/TR/css-text-4/#text-spacing-property) 和 Microsoft 的 [`-ms-text-autospace`](https://msdn.microsoft.com/library/ms531164(v=vs.85).aspx) 可以实现自动为中英文之间增加空白。不过目前并未普及，另外在其他应用场景，例如 macOS、iOS、Windows 等用户界面目前并不存在这个特性，所以请继续保持随手加空格的习惯。
 
 ## 二、标点符号
 
