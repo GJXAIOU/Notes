@@ -20,7 +20,7 @@
 
   **需要建立特定位置和特定名称的配置文件，同样需要使用 XML 解析和反射技术**。
 
-- MyBatis 是数据访问（DAO）层框架，底层是对 JDBC 的封装。在使用 MyBatis 时不需要编写实现类，只需要写执行的 SQL 语句，全称可以理解为：MyBatis SQL Mapper Framework for Java。
+- MyBatis（MyBatis SQL Mapper Framework for Java） 是数据访问（DAO）层框架，底层是对 JDBC 的封装。在使用 MyBatis 时不需要编写实现类，只需要写执行的 SQL 语句。
 
 
 ## 二、MyBatis 使用
@@ -94,40 +94,22 @@
   
   mappers 标签下有许多 mapper 标签，每一个 mapper 标签中配置的都是一个独立的映射配置文件的路径，配置方式有以下几种。
   
-  - 第一种：使用**相对路径**进行配置。
+  - 如果单独使用 mybatis 的配置方式：
   
       ```xml
       <mappers>
+          <!--方式一：使用相对路径-->
           <mapper resource="org/mybatis/mappers/UserMapper.xml"/>
-          <mapper resource="org/mybatis/mappers/ProductMapper.xml"/>
-      </mappers>
-      ```
-  
-  - 第二种：使用**绝对路径**进行配置。
-  
-      ```xml
-      <mappers>
-          <mapper url="file:///var/mappers/UserMapper.xml"/>
-          <mapper url="file:///var/mappers/ProductMapper.xml"/>
-      </mappers>
-      ```
-  
-  - 第三种：使用**接口信息**进行配置。
-  
-      ```xml
-      <mappers>
+          <!--方式二：使用绝对路径-->
+           <mapper url="file:///var/mappers/UserMapper.xml"/>
+          <!--方式三：使用接口信息-->
           <mapper class="org.mybatis.mappers.UserMapper"/>
-          <mapper class="org.mybatis.mappers.ProductMapper"/>
-      </mappers>
-      ```
-  
-  - 第四种：使用接口所在包进行配置。
-  
-      ```xml
-      <mappers>
+          <!--方式四：使用接口所在包的形式-->
           <package name="org.mybatis.mappers"/>
       </mappers>
       ```
+  
+  - 如果使用 spring，并且有多个库，可以在 spring 的 xml 中使用 MapperScannerConfigurer 配置；
   
 - 步骤三：新建以 mapper 结尾的包，在包下新建：`实体类名+Mapper.xml`
 
@@ -150,7 +132,7 @@
   </mapper>
   ```
 
-- 步骤四：测试结果(只有在单独使用 mybatis 时使用，最后 ssm 整合时下面代码不需要编写)
+- 步骤四：测试结果（只有在单独使用 mybatis 时使用，最后 ssm 整合时下面代码不需要编写)
 
     ```java
     import com.gjxaiou.pojo.Flower;
@@ -301,7 +283,7 @@ public class Test {
 	<select id="c" resultType="com.gjxaiou.pojo.Flower">
 		select id,name name123,price,production from flower
 	</select>
-	
+
 </mapper>
 ```
 
@@ -309,6 +291,8 @@ public class Test {
 ## 七、`<settings>`标签
 
 在 mybatis 全局配置文件中通过 `<settings>` 标签控制 MyBatis 全局开关，**该标签必须位于所有配置的最前面**。
+
+所有的 setting 配置详见官方文档第四章。
 
 - 在 MyBatis 全局配置文件中开启 log4j 命令如下：
 
@@ -354,7 +338,7 @@ public class Test {
   System.out.println(p);
   ```
 
-  在实例名Mapper.xml  中可以通过`#{}`获取参数
+  在 「实例名Mapper.xml」  中可以通过`#{}`获取参数
 
   - `#{}`  获取参数内容
     
@@ -373,7 +357,7 @@ public class Test {
 - `#{}` 和 `${}` 的区别
 
   - `#{}` 获取参数的内容，支持索引获取，或者使用 param1 获取指定位置参数，并且 SQL 使用 `?` 占位符；
-  - `${}` 字符串拼接，不使用?，默认找`${内容}`内容的 get/set 方法，如果写数字，就是一个数字；
+  - `${}` 字符串拼接，不使用 ?，默认找`${内容}`内容的 get/set 方法，如果写数字，就是一个数字；
 
   ```xml
   <!------PeopleMapper.xml----->
@@ -389,7 +373,7 @@ public class Test {
   People p = session.selectOne("a.b.selById",people);
   ```
 
-- 如果在 XML 文件中出现`<`、`>`  或者 `""` 等特殊字符时可以使用 XML 自身的文件转义标签，格式为：`<![CDATA[ 内 容 ]]>`
+- **如果在 XML 文件中出现`<`、`>`  或者 `""` 等特殊字符时可以使用 XML 自身的文件转义标签，格式为：`<![CDATA[ 内 容 ]]>`**
 
 ## 九、MyBatis 中实现 MySQL 分页
 
@@ -403,7 +387,7 @@ public class Test {
     // 第几页
     int pageIndex = 2;
     // 如果希望传递多个参数，可以使用对象或 map
-    Map<String,Object> map = new HashMap<>();
+    Map<String,Object> map = new HashMap<>4();
     map.put("pageSize", pageSize);
     map.put("pageStart", pageSize*(pageIndex - 1));
     List<People> p = session.selectList("a.b.page",map);
@@ -423,34 +407,27 @@ public class Test {
 
 - 系统内置别名：就是把类型全小写
 
-- 给某个类起别名
+- 给某个类起别名或者直接给某个包下所有类起别名；
 
     ```xml
     <!--在 MyBatis 配置文件 mybatis.xml 中使用 alias="XXX" 进行自定义-->
     <typeAliases>
+        <!--给某个类起别名-->
         <typeAlias type="com.gjxaiou.pojo.People" alias="peo"/>
+        <!--给某个包下面的所有类起别名，别名就是为类名（区分大小写）-->
+        <package name = "com.gjxaiou.pojo"/>
     </typeAliases>
-    
     
     <!--在各个 mapper.xml 中可以引用，这里就是使用 peo 引用 People 类-->
     <select id="page" resultType="peo" parameterType="map">
         select * from people limit #{pageStart},#{pageSize}
     </select>
+    
+    <!--使用给包下面所有类起的别名-->
+    <select id="page" resultType="People" parameterType="map">
+        select * from people limit #{pageStart},#{pageSize}
+    </select>  
     ```
-
-- 直接给某个包下所有类起别名，别名为类名，区分大小写
-
-  ```xml
-  <!--首先在 mybatis.xml 中进行配置-->
-  <typeAliases>
-      <package name="com.gjxaiou.pojo" />
-  </typeAliases>
-      
-  <!--在各个 mapper.xml 中进行引用-->    
-  <select id="page" resultType="People" parameterType="map">
-      select * from people limit #{pageStart},#{pageSize}
-  </select>    
-  ```
 
 ## 十一、MyBatis 实现新增/修改/删除
 
@@ -537,18 +514,16 @@ session.commit();
 
 **常用实现步骤**:
 
-- 步骤一：创建一个接口 ：例如：`LogMapper`
+- **接口 Mapper 名和接口名与 mapper.xml  中`<mapper>`namespace 相同**
+    目录示例：`com.gjxaiou.mapper`包下面包含一个接口：`LogMapper` 和 `LogMapper.xml`，然后 `LogMapper.xml` 中的`<mapper>`namespace 标签格式为：
 
-    - **接口 Mapper 名和接口名与 mapper.xml  中`<mapper>`namespace 相同**
-        目录示例：`com.gjxaiou.mapper`包下面包含一个接口：`LogMapper` 和 `LogMapper.xml`，然后 `LogMapper.xml` 中的`<mapper>`namespace 标签格式为：
+    ```xml
+    <mapper namespace = "com.gjxaiou.mapper.LogMapper">   
+                         
+    </mapper>
+    ```
 
-        ```xml
-        <mapper namespace = "com.gjxaiou.mapper.LogMapper">   
-                             
-        </mapper>
-        ```
-
-    - **接口中方法名和对应 mapper.xml  标签的 id 属性相同；**
+- **接口中方法名和对应 mapper.xml  标签的 id 属性相同；**
 
 - 在 MyBatis 全局配置文件中使用`<package>`进行扫描接口和接口对应的 mapper.xml。
 
@@ -581,23 +556,23 @@ session.commit();
     </mapper>
     ```
 
-**绑定的使用：在其它 Java 类中**
+- 绑定的使用：在其它 Java 类中
 
-```java
-public class Test {
-    public static void main(String[] args) throws IOException {
-        InputStream is = Resources.getResourceAsStream("mybatis.xml");
-        SqlSessionFactory factory = new SqlSessionFactoryBuilder().build(is);
-        SqlSession session = factory.openSession();		
-
-        LogMapper logMapper = session.getMapper(LogMapper.class);
-        List<Log> list = logMapper.selAll();
-        for (Log log : list) {
-            System.out.println(log);
+    ```java
+    public class Test {
+        public static void main(String[] args) throws IOException {
+            InputStream is = Resources.getResourceAsStream("mybatis.xml");
+            SqlSessionFactory factory = new SqlSessionFactoryBuilder().build(is);
+            SqlSession session = factory.openSession();		
+    
+            LogMapper logMapper = session.getMapper(LogMapper.class);
+            List<Log> list = logMapper.selAll();
+            for (Log log : list) {
+                System.out.println(log);
+            }
         }
     }
-}
-```
+    ```
 
 ### （二）多参数实现方法
 
@@ -612,17 +587,16 @@ public class Test {
     ```
     
 - 方法二：使用注解方式
-    首先在接口中声明方法 
-
+    
     ```java
     /**
-     mybatis 把参数转换为 map 了,其中@Param("key")  参数内容就是 map 的 value
+     mybatis 把接口中方法参数转换为 map 了,其中@Param("key")  参数内容就是 map 的 value
     */
     List<Log> selByAccInAccout(@Param("accin")  String accin123,@Param("accout")  String  accout335);
     ```
-
+    
     然后在 mapper.xml  中添加
-
+    
     ```xml
     <!-- 当多参数时,不需要写 parameterType -->
     <!-- #{} 里面写 @Param(“内容”) 参数中内容 -->
@@ -630,8 +604,8 @@ public class Test {
         SELECT * FROM log WHERE accin=#{accin} AND accout=#{accout}
     </select>
     ```
-
-    **多参数的使用**
+    
+    多参数的使用
     当然 log 是存在数据库中的一个表中，同时要新建实体类的；
     
     ```java
@@ -657,18 +631,33 @@ public class Test {
 
 动态 SQL：根据不同的条件需要执行不同的 SQL 命令，MyBatis 中动态 SQL 的实现是在 `实体类mapper.xml`  中添加逻辑判断即可。
 
+**针对 test 条件的补充说明**：
+
+OGNL 表达式中，`‘a'` 是字符，`”a”` 是字符串，同时 Java 为强类型，所以 char 和 String 比较会导致不等。
+
+```xml
+<!--如果 name 是 String 类型应该使用-->
+< if test = 'name == "a"'>
+   XXXX
+</if>    
+<!--如果 name 是 Char 类型，应该使用-->
+<if test = "name == 'a'">
+    XXXX
+</if>    
+```
+
 ### （一）if 使用
 
 ```xml
 <select  id="selByAccinAccout"  resultType="log"> 
-      select  *  from  log  where  1=1
+      SELECT  *  FROM  log  WHERE  1=1
 <!--OGNL 表达式,直接写 key 或对象的属性，无需添加任何特殊符号，这里 and 执行的时候都会被转换为 & -->
       <if  test = "accin != null and accin != ''"> 
-          and  accin = #{accin}
+          AND  accin = #{accin}
       </if>
 
       <if  test= "accout != null and accout != ''"> 
-          and  accout=#{accout}
+          AND  accout=#{accout}
       </if>
 </select>
 ```
@@ -685,11 +674,11 @@ public class Test {
     SELECT  *  FROM  log
   <where>
      <if  test="accin!=null  and  accin!=''"> 
-         and  accin=#{accin}
+         AND  accin=#{accin}
      </if>
   
      <if  test="accout!=null  and  accout!=''"> 
-         and  accout=#{accout}
+         AND  accout=#{accout}
      </if>
   </where>
 </select>
@@ -698,7 +687,7 @@ public class Test {
 
 ### （三）choose、when、otherwise 使用
 
-- **只要有一个成立，其他都不执行；**
+- choose 标签是按照顺序对内部的 when 标签的 test 条件判断是否成立，如果存在成立则 choose 结束；
 
 - 代码示例
     如果 accin 和 accout 都不是 null 或不是””生成的 sql 中只有 where  accin=?
@@ -714,7 +703,7 @@ public class Test {
 
             <when test = "accout != null and accout != ''"> 
                    and accout = #{accout}
-            </when>
+            </when> 
        </choose>
     </where>
 </select>
@@ -722,11 +711,10 @@ public class Test {
 
 ###  （四）set 使用
 
-- 作用：去掉最后一个逗号
-    `<set>`用在修改 SQL 中 set 从句，如果`<set>`里面有内容则生成 set 关键字，没有就不生成
+作用：去掉最后一个逗号
+`<set>`用在修改 SQL 中 set 从句，如果`<set>`里面有内容则生成 set 关键字，没有就不生成
 
-- 示例
-    其中：`id=#{id}` 目的防止`<set>`中没有内容，mybatis 不生成 set 关键字，如果修改中没有 set 从句 SQL 语法错误。
+示例：**其中：`id=#{id}` 目的防止`<set>`中没有内容，mybatis 不生成 set 关键字，如果修改中没有 set 从句 SQL 语法错误。**
 
 ```xml
 <update  id="upd"  parameterType="log"  > 
@@ -745,16 +733,16 @@ public class Test {
 </update>
 ```
 
-### （四） Trim 使用
+### （四） trim 使用
 
 里面的主要方法如下：
 
--  prefix：在前面添加内容
 -  prefixOverrides：去掉前面内容
--  suffix：在后面添加内容
+-  prefix：在前面添加内容
 -  suffixOverrieds：去掉后面内容
+-  suffix：在后面添加内容
 
--  执行顺序：首先去掉内容然后添加内容；
+执行顺序：首先去掉内容然后添加内容；
 
 ```xml
 <update  id = "upd"  parameterType = "log"> 
@@ -783,13 +771,13 @@ public class Test {
 
 - **用于循环参数内容，还具备在内容的前后添加内容，以及添加分隔符功能**；
 
-- 适用场景：主要用于 `in` 查询以及批量新增中(但是 mybatis 中 foreach  效率比较低)
+- 适用场景：主要用于 `in` 查询以及批量新增中（但是 mybatis 中 foreach  效率比较低）
 
 **批量新增操作：**
 
 - 默认的批量新增的 SQL 语句为：`insert into log  VALUES (default,1,2,3),(default,2,3,4),(default,3,4,5)`
 
-- 在执行批处理的时候，需要将 openSession()必须指定下面命令
+- 在执行批处理的时候，需要将 openSession() 必须指定下面命令
     `factory.openSession(ExecutorType.BATCH);`，这里底层 是 JDBC 的 PreparedStatement.addBatch();
 
 - foreach 元素含义：
@@ -801,7 +789,7 @@ public class Test {
 
 ```xml
 <select  id="selIn"  parameterType="list" resultType="log">
-    select  *  from  log  where  id  in
+    SELECT  *  FROM  log  WHERE  id  IN
     <foreach  collection="list"  item="abc"  open="(" close=")" separator=",">
         #{abc}
      </foreach>
@@ -822,8 +810,8 @@ public class Test {
 
 ```xml
 <select  id="">
-    select  <include  refid="mysql"></include>
-    from  log
+    SELECT  <include  refid="mysql"/>
+    FROM  log
 </select>
 ```
 
@@ -870,13 +858,15 @@ public class Test {
 
 ## 十六、resultMap 标签
 
-相当于现在直接设置映射关系，进行两者（SQL 查询结果和实体类之间）的匹配。
+相当于现在直接设置映射关系，进行两者（SQL 查询结果和实体类之间）的匹配；
 
 - `<resultMap>` 标签写在 `实体类Mapper.xml`  中，由程序员控制 SQL 查询结果与实体类的映射关系；
-
-- 默认 MyBatis 使用 `Auto Mapping` 特性进行映射：即保持查询的数据库中的列名和实体类中的属性名相同即可；
-
-- 使用 `<resultMap>`标签时，`<select>`标签不写 resultType  属性，而是使用 resultMap 属性来引用`<resultMap>` 标签。
+- 默认 MyBatis 使用 `Auto Mapping` 特性进行映射：**即保持查询的数据库中的列名和实体类中的属性名相同即可**；
+- 使用 `<resultMap>`标签时**，`<select>`标签不写 resultType  属性，而是使用 resultMap 属性来引用`<resultMap>` 标签；**
+- `<association>`：表示当装配一个对象时使用；
+- `property`： 是对象在类中的属性名；
+- `select`：通过哪个查询查询出这个对象的信息；
+- `column`：把当前表的哪个列的值做为参数传递给另一个查询；
 
 ### （一）使用 resultMap 实现单表映射关系
 
@@ -896,7 +886,7 @@ public class Test {
 
     ```xml
     <!-- 其中 type 的值为返回值类型-->
-    <resultMap type="com.gjxaiou.Teacher" id="mymap">
+    <resultMap id = "map" type="com.gjxaiou.Teacher">
         <!-- 主键使用 id 标签配置映射关系-->
         <!-- column 值为数据库中列名； property 值为实体类中的属性名 -->
         <id column="id" property="id1" />
@@ -926,50 +916,46 @@ N+1 查询方式：先查询出某个表的全部信息，根据这个表的信�
 
 - 首先在 Student 实体类中包含了一个 Teacher  对象
 
-```java
-public class Student {
-    private int id;
-    private String name;
-    private int age;
-    private int tid;
-    private Teacher teacher;
-    // 该 POJO 类中其他信息省略
-}
-```
+    ```java
+    public class Student {
+        private int id;
+        private String name;
+        private int age;
+        private int tid;
+        private Teacher teacher;
+        // 该 POJO 类中其他信息省略
+    }
+    ```
 
 - 然后在 TeacherMapper.xml  中提供一个查询
 
-```xml
-<select id="selById" resultType="teacher" parameterType="int">
-      select * from teacher where id=#{0}
-</select>
-```
+    ```xml
+    <select id="selById" parameterType="int" resultType="teacher">
+          SELECT * FROM teacher WHERE id = #{0}
+    </select>
+    ```
 
 - 最后在下面的 StudentMapper.xml 中完成装配
 
-- `<association>` 表示当装配一个对象时使用
-- `property`: 是对象在类中的属性名
-- `select`:通过哪个查询查询出这个对象的信息
-- `column`: 把当前表的哪个列的值做为参数传递给另一个查询
-- 大前提使用 N+1 方式时：**如果列名和属性名相同可以不配置**,使用 Auto  mapping 特性.但是 mybatis 默认只会给列装配一次
+    使用 N+1 方式前提是：**如果列名和属性名相同可以不配置**，使用 Auto  mapping 特性.但是 mybatis 默认只会给列装配一次；
 
-```xml
-<resultMap type="student" id="stuMap">
-    <id property="id" column="id"/>
-    <result property="name" column="name"/>
-    <result property="age" column="age"/>
-    <result property="tid" column="tid"/>
-
-<!-- 如果关联一个对象，使用 association 标签，调用 teacher 中的查询，如果关联多个对象，使用 collection 标签 -->
-// 老师查询中需要一个 Int 类型的参数，这里要通过 column 告诉他传入哪一列的值
-    <association property="teacher" select="com.gjxaiou.mapper.TeacherMapper.selById"  column="tid">
-    </association>
-</resultMap>
-
-<select id="selAll" resultMap="stuMap">
-      select * from student
-</select>
-```
+    ```xml
+    <resultMap id="stuMap" type="student">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="tid" column="tid"/>
+    
+    <!-- 如果关联一个对象，使用 association 标签，调用 teacher 中的查询，如果关联多个对象，使用 collection 标签-->
+    <!-- 老师查询中需要一个 Int 类型的参数，这里要通过 column 告诉他传入哪一列的值-->
+        <association property="teacher" select="com.gjxaiou.mapper.TeacherMapper.selById"  column="tid">
+        </association>
+    </resultMap>
+    
+    <select id="selAll" resultMap="stuMap">
+          select * from student
+    </select>
+    ```
 
 
 - 因为这里属性名和字段名相同，因此可以把上面代码简化成
@@ -978,9 +964,7 @@ public class Student {
 <resultMap type="student" id="stuMap">
     <result column="tid" property="tid"/>
     <!-- 如果关联一个对象-->
-    <association property="teacher"
-select="com.gjxaiou.mapper.TeacherMapper.selById"
-column="tid"></association>
+    <association property="teacher" select="com.gjxaiou.mapper.TeacherMapper.selById" column="tid">	      </association>
 </resultMap>
 
 <select id="selAll" resultMap="stuMap">
@@ -989,7 +973,7 @@ column="tid"></association>
 ```
 
 
-###  （三）使用 resultMap 实现关联单个对象(联合查询方式)
+###  （三）使用 resultMap 实现关联单个对象（联合查询方式）
 
 - 实现只需要编写一个 SQL,在 StudentMapper.xml 中添加下面效果
     -  `<association/>` 只要装配 一个对象就用这个标签
@@ -1047,7 +1031,12 @@ column="tid"></association>
 - 首先在 Teacher  实体类中添加 List<Student>
 
 ```java
-public class Teacher {    private int id;    private String name;    private List<Student> list;    // 省略其他 get、set 方法}
+public class Teacher {    
+    private int id;    
+    private String name;    
+    private List<Student> list;    
+    // 省略其他 get、set 方法
+}
 ```
 
 - 然后在 StudentMapper.xml  中添加通过 tid 查询
@@ -1071,18 +1060,29 @@ public class Teacher {    private int id;    private String name;    private Lis
     mybatis 可以通过主键判断对象是否被加载过，因此不需要担心创建重复 Teacher
 
 ```xml
-<resultMap type="teacher" id="mymap1">    <id column="tid" property="id"/>    <result column="tname" property="name"/>    <collection property="list" ofType="student" >        <id column="sid" property="id"/>        <result column="sname" property="name"/>        <result column="age" property="age"/>        <result column="tid" property="tid"/>    </collection></resultMap><select id="selAll1" resultMap="mymap1">    select t.id tid,t.name tname,s.id sid,s.name sname,age,tid from teacher t LEFT JOIN student s on t.id=s.tid;</select>
+<resultMap type="teacher" id="mymap1">    
+    <id column="tid" property="id"/>    
+    <result column="tname" property="name"/>    
+    <collection property="list" ofType="student" >        
+        <id column="sid" property="id"/>        
+        <result column="sname" property="name"/>        
+        <result column="age" property="age"/>        
+        <result column="tid" property="tid"/>    
+    </collection>
+</resultMap>
+
+<select id="selAll1" resultMap="mymap1">    
+    select t.id tid,t.name tname,s.id sid,s.name sname,age,tid from teacher t LEFT JOIN student s on t.id=s.tid;
+</select>
 ```
 
 
 ## 十七、使用 Auto Mapping 结合别名实现多表查询
 
-只能查询对象，查询结合只能使用上面的方法
+**只能查询对象，查询结合只能使用上面的方法**
 
 - 只能使用多表联合查询方式，不能使用 N+1 方式
 - 要求：查询出的列名和属性名相同。
-
-**实现方式**
 
 因为`.`在 SQL 是关键字符，因此两侧添加反单引号；
 
@@ -1104,7 +1104,8 @@ public class Teacher {    private int id;    private String name;    private Lis
 可以在测试的时候使用下面：因为是接口：
 
 ```java
-TeacherMapper  tm = session.getMapper(TeachterMapper.class)List<Teacher> = tm.selAll(info)
+TeacherMapper  tm = session.getMapper(TeachterMapper.class)
+List<Teacher> = tm.selAll(info)
 ```
 
 ### 具体的使用方式
@@ -1113,47 +1114,52 @@ TeacherMapper  tm = session.getMapper(TeachterMapper.class)List<Teacher> = tm.se
 
 - 实现查询
 
-```java
-@Select("select * from teacher")
-List<Teacher> selAll();
-```
+    ```java
+    @Select("select * from teacher")
+    List<Teacher> selAll();
+    ```
 
 - 实现新增
 
-```java
-@Insert("insert into teacher values(default,#{name})")
-int insTeacher(Teacher teacher);
-```
+    ```java
+    @Insert("insert into teacher values(default,#{name})")
+    int insTeacher(Teacher teacher);
+    ```
 
 - 实现修改
 
-```java
-@Update("update teacher set name=#{name} where id=#{id}")
-int updTeacher(Teacher teacher);
-```
+    ```java
+    @Update("update teacher set name=#{name} where id=#{id}")
+    int updTeacher(Teacher teacher);
+    ```
 
 - 实现删除
 
-```java
-@Delete("delete from teacher where id=#{0}")
-int delById(int id);
-```
+    ```java
+    @Delete("delete from teacher where id=#{0}")
+    int delById(int id);
+    ```
 
 - 使用注解实现`<resultMap>`功能
     以 N+1 举例
     - 首先在 StudentMapper 接口添加查询
-
-```java
-@Select("select * from student where tid=#{0}")
-List<Student> selByTid(int tid);
-```
-
--  然后在 TeacherMapper  接口添加下面代码
-    -  @Results() 相当于<resultMap>
-    -  @Result() 相当于<id/>或<result/>
-        -  @Result(id=true) 相当与<id/>
-    -  @Many() 相当于<collection/>
-    -  @One() 相当于<association/>
+    
+        ```java
+        @Select("select * from student where tid=#{0}")
+        List<Student> selByTid(int tid);
+        ```
+    
+    -  然后在 TeacherMapper  接口添加下面代码
+        - `@Results()` 相当于 `<resultMap>`
+        
+        -  `@Result()` 相当于 `<id/>` 或 `<result/>`
+            
+            `@Result(id=true)` 相当与 `<id/>`
+            
+        - `@Many()` 相当于`<collection/>`
+        
+        -  `@One()` 相当于 `<association/>`
+    
 
 ```java
 @Results(value={
@@ -1219,4 +1225,3 @@ List<Student> selByTid(int tid);
 每次创建 SqlSession 时，都需要由 TransactionFactory  创建 Transaction 对象，同时还需要创建 SqlSession 的执行器 Excutor，最后实例化 DefaultSqlSession，传递给 SqlSession 接口。
 
 根据项目需求使用 SqlSession 接口中的 API 完成具体的事务操作。如果事务执行失败，需要进行 rollback 回滚事务。
-
