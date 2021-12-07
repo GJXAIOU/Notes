@@ -1,23 +1,18 @@
 ## 动态 SQL
 
-动态 SQL 是 MyBatis 的强大特性之一。如果你使用过 JDBC 或其它类似的框架，你应该能理解根据不同条件拼接 SQL 语句有多痛苦，例如拼接时要确保不能忘记添加必要的空格，还要注意去掉列表最后一个列名的逗号。利用动态 SQL，可以彻底摆脱这种痛苦。
-
-使用动态 SQL 并非一件易事，但借助可用于任何 SQL 映射语句中的强大的动态 SQL 语言，MyBatis 显著地提升了这一特性的易用性。
-
-如果你之前用过 JSTL 或任何基于类 XML 语言的文本处理器，你对动态 SQL 元素可能会感觉似曾相识。在 MyBatis 之前的版本中，需要花时间了解大量的元素。借助功能强大的基于 OGNL 的表达式，MyBatis 3 替换了之前的大部分元素，大大精简了元素种类，现在要学习的元素种类比原来的一半还要少。
+动态 SQL 是 MyBatis 的强大特性之一。借助功能强大的基于 OGNL 的表达式，MyBatis 3 替换了之前的大部分元素，大大精简了元素种类，现在要学习的元素种类比原来的一半还要少。
 
 - if
 - choose (when, otherwise)
 - trim (where, set)
 - foreach
 
-### 一、if
+### ~~一、if~~
 
 使用动态 SQL 最常见情景是根据条件包含 where 子句的一部分。比如：
 
 ```xml
-<select id="findActiveBlogWithTitleLike"
-     resultType="Blog">
+<select id="findActiveBlogWithTitleLike"  resultType="Blog">
   SELECT * FROM BLOG
   WHERE state = ‘ACTIVE’
   <if test="title != null">
@@ -31,8 +26,7 @@
 如果希望通过 “title” 和 “author” 两个参数进行可选搜索该怎么办呢？首先，我想先将语句名称修改成更名副其实的名称；接下来，只需要加入另一个条件即可。
 
 ```xml
-<select id="findActiveBlogLike"
-     resultType="Blog">
+<select id="findActiveBlogLike"  resultType="Blog">
   SELECT * FROM BLOG WHERE state = ‘ACTIVE’
   <if test="title != null">
     AND title like #{title}
@@ -45,13 +39,12 @@
 
 ### 二、choose、when、otherwise
 
-有时候，**我们不想使用所有的条件，而只是想从多个条件中选择一个使用**。针对这种情况，MyBatis 提供了 choose 元素，它有点像 Java 中的 switch 语句。
+有时候，**我们不想使用所有的条件，而只是想从多个条件中选择一个使用**。针对这种情况，MyBatis 提供了 choose 元素，它类似于 Java 中的 switch 语句。
 
 还是上面的例子，但是策略变为：传入了 “title” 就按 “title” 查找，传入了 “author” 就按 “author” 查找的情形。若两者都没有传入，就返回标记为 featured 的 BLOG（这可能是管理员认为，与其返回大量的无意义随机 Blog，还不如返回一些由管理员精选的 Blog）。
 
 ```xml
-<select id="findActiveBlogLike"
-     resultType="Blog">
+<select id="findActiveBlogLike"  resultType="Blog">
   SELECT * FROM BLOG WHERE state = ‘ACTIVE’
   <choose>
     <when test="title != null">
@@ -72,8 +65,7 @@
 前面几个例子已经方便地解决了一个臭名昭著的动态 SQL 问题。现在回到之前的 “if” 示例，这次我们将 “state = ‘ACTIVE’” 设置成动态条件，看看会发生什么。
 
 ```xml
-<select id="findActiveBlogLike"
-     resultType="Blog">
+<select id="findActiveBlogLike"  resultType="Blog">
   SELECT * FROM BLOG
   WHERE
   <if test="state != null">
@@ -90,26 +82,25 @@
 
 如果没有匹配的条件会怎么样？最终这条 SQL 会变成这样：
 
-```xml
+```sql
 SELECT * FROM BLOG
 WHERE
 ```
 
 这会导致查询失败。如果匹配的只是第二个条件又会怎样？这条 SQL 会是这样:
 
-```xml
+```sql
 SELECT * FROM BLOG
 WHERE
 AND title like ‘someTitle’
 ```
 
-这个查询也会失败。这个问题不能简单地用条件元素来解决。这个问题是如此的难以解决，以至于解决过的人不会再想碰到这种问题。
+这个查询也会失败。这个问题不能简单地用条件元素来解决。
 
 MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场景中，可以对其进行自定义以符合需求。而这，只需要一处简单的改动：
 
 ```xml
-<select id="findActiveBlogLike"
-     resultType="Blog">
+<select id="findActiveBlogLike"  resultType="Blog">
   SELECT * FROM BLOG
   <where>
     <if test="state != null">
@@ -127,7 +118,7 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
 
 **where 元素只会在子元素返回任何内容的情况下才插入 「WHERE」 子句。而且，若子句的开头为 `AND` 或 `OR`，where 元素也会将它们去除。**
 
-如果 where 元素与你期望的不太一样，你也可以通过自定义 trim 元素来定制 where 元素的功能。比如，和 where 元素等价的自定义 trim 元素为：
+**如果 where 元素与你期望的不太一样，你也可以通过自定义 trim 元素来定制 where 元素的功能。比如，和 where 元素等价的自定义 trim 元素为**：
 
 ```xml
 <trim prefix="WHERE" prefixOverrides="AND |OR ">
@@ -135,7 +126,7 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
 </trim>
 ```
 
-prefixOverrides 属性会忽略通过管道符分隔的文本序列（注意此例中的空格是必要的）。上述例子会移除所有 prefixOverrides 属性中指定的内容，并且插入 prefix  属性中指定的内容。
+prefixOverrides 属性会忽略通过管道符分隔的文本序列（**注意此例中的空格是必要的**）。上述例子会移除所有 prefixOverrides 属性中指定的内容，并且插入 prefix  属性中指定的内容。
 
 用于动态更新语句的类似解决方案叫做 set。set 元素可以用于动态包含需要更新的列，忽略其它不更新的列。比如：
 
@@ -179,9 +170,9 @@ prefixOverrides 属性会忽略通过管道符分隔的文本序列（注意此�
 </select>
 ```
 
-foreach 元素的功能非常强大，它允许你指定一个集合，声明可以在元素体内使用的集合项（item）和索引（index）变量。它也允许你指定开头与结尾的字符串以及集合项迭代之间的分隔符。这个元素也不会错误地添加多余的分隔符，看它多智能！
+foreach 元素的功能非常强大，它允许你指定一个集合，声明可以在元素体内使用的集合项（item）和索引（index）变量。它也允许你指定开头与结尾的字符串以及集合项迭代之间的分隔符。这个元素也不会错误地添加多余的分隔符。
 
-**提示** 你可以**将任何可迭代对象（如 List、Set 等）、Map 对象或者数组对象作为集合参数传递给 foreach**。当使用可迭代对象或者数组时，index 是当前迭代的序号，item 的值是本次迭代获取到的元素。**当使用 Map 对象（或者 Map.Entry 对象的集合）时，index 是键，item 是值。**
+**提示**：可以**将任何可迭代对象（如 List、Set 等）、Map 对象或者数组对象作为集合参数传递给 foreach**。当使用可迭代对象或者数组时，index 是当前迭代的序号，item 的值是本次迭代获取到的元素。**当使用 Map 对象（或者 Map.Entry 对象的集合）时，index 是键，item 是值。**
 
 至此，我们已经完成了与 XML 配置及映射文件相关的讨论。下一章将详细探讨 Java API，以便你能充分利用已经创建的映射配置。
 

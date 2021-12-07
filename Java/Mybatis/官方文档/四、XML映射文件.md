@@ -368,33 +368,15 @@ User userOfEmail = userMapper.findByColumn("email", "noone@nowhere.com");
 </select>
 ```
 
-上述语句只是简单地将所有的列映射到 `HashMap` 的键上，这由 `resultType` 属性指定。虽然在大部分情况下都够用，但是 HashMap 并不是一个很好的领域模型。你的程序更可能会使用 JavaBean 或 POJO（Plain Old Java Objects，普通老式 Java 对象）作为领域模型。MyBatis 对两者都提供了支持。看看下面这个 JavaBean：
+**上述语句只是简单地将所有的列映射到 `HashMap` 的键上，这由 `resultType` 属性指定**。虽然在大部分情况下都够用，但是 HashMap 并不是一个很好的领域模型。你的程序更可能会使用 JavaBean 或 POJO（Plain Old Java Objects，普通老式 Java 对象）作为领域模型。MyBatis 对两者都提供了支持。看看下面这个 JavaBean：
 
 ```java
 package com.someapp.model;
+@Data
 public class User {
   private int id;
   private String username;
   private String hashedPassword;
-
-  public int getId() {
-    return id;
-  }
-  public void setId(int id) {
-    this.id = id;
-  }
-  public String getUsername() {
-    return username;
-  }
-  public void setUsername(String username) {
-    this.username = username;
-  }
-  public String getHashedPassword() {
-    return hashedPassword;
-  }
-  public void setHashedPassword(String hashedPassword) {
-    this.hashedPassword = hashedPassword;
-  }
 }
 ```
 
@@ -424,7 +406,7 @@ public class User {
 </select>
 ```
 
-在这些情况下，MyBatis 会在幕后自动创建一个 `ResultMap`，再根据属性名来映射列到 JavaBean 的属性上。如果列名和属性名不能匹配上，可以在 SELECT 语句中设置列别名（这是一个基本的 SQL 特性）来完成匹配。比如：
+**在这些情况下，MyBatis 会在幕后自动创建一个 `ResultMap`，再根据属性名来映射列到 JavaBean 的属性上。如果列名和属性名不能匹配上，可以在 SELECT 语句中设置列别名（这是一个基本的 SQL 特性）来完成匹配。比如：**
 
 ```xml
 <select id="selectUsers" resultType="User">
@@ -437,7 +419,7 @@ public class User {
 </select>
 ```
 
-在学习了上面的知识后，你会发现上面的例子没有一个需要显式配置 `ResultMap`，这就是 `ResultMap` 的优秀之处——你完全可以不用显式地配置它们。 虽然上面的例子不用显式配置 `ResultMap`。 但为了讲解，我们来看看如果在刚刚的示例中，显式使用外部的 `resultMap` 会怎样，这也是解决列名不匹配的另外一种方式。
+上面的例子没有一个需要显式配置 `ResultMap`，这就是 `ResultMap` 的优秀之处——你完全可以不用显式地配置它们。 虽然上面的例子不用显式配置 `ResultMap`。 但为了讲解，我们来看看如果在刚刚的示例中，显式使用外部的 `resultMap` 会怎样，这也是解决列名不匹配的另外一种方式。
 
 ```xml
 <resultMap id="userResultMap" type="User">
@@ -540,57 +522,22 @@ MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所
 
 #### 结果映射（resultMap）
 
-- constructor：用于在实例化类时，注入结果到构造方法中
-
+- `constructor`：用于在实例化类时，注入结果到构造方法中
     - `idArg` - ID 参数；标记出作为 ID 的结果可以帮助提高整体性能
     - `arg` - 将被注入到构造方法的一个普通结果
-
+    
 - `id` – 一个 ID 结果；标记出作为 ID 的结果可以帮助提高整体性能
 
 - `result` – 注入到字段或 JavaBean 属性的普通结果
 
-- ```
-    association
-    ```
-
-     
-
-    – 一个复杂类型的关联；许多结果将包装成这种类型
-
+- `association`： 一个复杂类型的关联；许多结果将包装成这种类型
     - 嵌套结果映射 – 关联可以是 `resultMap` 元素，或是对其它结果映射的引用
-
-- ```
-    collection
-    ```
-
-     
-
-    – 一个复杂类型的集合
-
+    
+- `collection`：一个复杂类型的集合
     - 嵌套结果映射 – 集合可以是 `resultMap` 元素，或是对其它结果映射的引用
-
-- ```
-    discriminator
-    ```
-
-     
-
-    – 使用结果值来决定使用哪个
-
-     
-
-    ```
-    resultMap
-    ```
-
-    - ```
-        case
-        ```
-
-         
-
-        – 基于某些值的结果映射
-
+    
+- `discriminator`：使用结果值来决定使用哪个 resultMap
+    - `case`：– 基于某些值的结果映射
         - 嵌套结果映射 – `case` 也是一个结果映射，因此具有相同的结构和元素；或者引用其它的结果映射
 
 | 属性          | 描述                                                         |
@@ -599,29 +546,29 @@ MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所
 | `type`        | 类的完全限定名, 或者一个类型别名（关于内置的类型别名，可以参考上面的表格）。 |
 | `autoMapping` | 如果设置这个属性，MyBatis 将会为本结果映射开启或者关闭自动映射。 这个属性会覆盖全局的属性 autoMappingBehavior。默认值：未设置（unset）。 |
 
-**最佳实践** 最好逐步建立结果映射。单元测试可以在这个过程中起到很大帮助。 如果你尝试一次性创建像上面示例那么巨大的结果映射，不仅容易出错，难度也会直线上升。 所以，从最简单的形态开始，逐步迭代。而且别忘了单元测试！ 有时候，框架的行为像是一个黑盒子（无论是否开源）。因此，为了确保实现的行为与你的期望相一致，最好编写单元测试。 并且单元测试在提交 bug 时也能起到很大的作用。
+**最佳实践**： 最好逐步建立结果映射。单元测试可以在这个过程中起到很大帮助。 如果你尝试一次性创建像上面示例那么巨大的结果映射，不仅容易出错，难度也会直线上升。 所以，从最简单的形态开始，逐步迭代。而且别忘了单元测试！ 有时候，框架的行为像是一个黑盒子（无论是否开源）。因此，为了确保实现的行为与你的期望相一致，最好编写单元测试。 并且单元测试在提交 bug 时也能起到很大的作用。
 
 下一部分将详细说明每个元素。
 
 #### id & result
 
-```
+```xml
 <id property="id" column="post_id"/>
 <result property="subject" column="post_subject"/>
 ```
 
-这些元素是结果映射的基础。*id* 和 *result* 元素都将一个列的值映射到一个简单数据类型（String, int, double, Date 等）的属性或字段。
+这些元素是结果映射的基础。id 和 result 元素都将一个列的值映射到一个简单数据类型（String, int, double, Date 等）的属性或字段。
 
-这两者之间的唯一不同是，*id* 元素对应的属性会被标记为对象的标识符，在比较对象实例时使用。 这样可以提高整体的性能，尤其是进行缓存和嵌套结果映射（也就是连接映射）的时候。
+这两者之间的唯一不同是，**id 元素对应的属性会被标记为对象的标识符，在比较对象实例时使用。 这样可以提高整体的性能，尤其是进行缓存和嵌套结果映射（也就是连接映射）的时候。**
 
 两个元素都有一些属性：
 
 | 属性          | 描述                                                         |
 | :------------ | :----------------------------------------------------------- |
-| `property`    | 映射到列结果的字段或属性。如果 JavaBean 有这个名字的属性（property），会先使用该属性。否则 MyBatis 将会寻找给定名称的字段（field）。 无论是哪一种情形，你都可以使用常见的点式分隔形式进行复杂属性导航。 比如，你可以这样映射一些简单的东西：“username”，或者映射到一些复杂的东西上：“address.street.number”。 |
+| `property`    | **映射到列结果的字段或属性。如果 JavaBean 有这个名字的属性（property），会先使用该属性。否则 MyBatis 将会寻找给定名称的字段（field）**。 无论是哪一种情形，你都可以使用常见的点式分隔形式进行复杂属性导航。 比如，你可以这样映射一些简单的东西：“username”，或者映射到一些复杂的东西上：“address.street.number”。 |
 | `column`      | 数据库中的列名，或者是列的别名。一般情况下，这和传递给 `resultSet.getString(columnName)` 方法的参数一样。 |
-| `javaType`    | 一个 Java 类的全限定名，或一个类型别名（关于内置的类型别名，可以参考上面的表格）。 如果你映射到一个 JavaBean，MyBatis 通常可以推断类型。然而，如果你映射到的是 HashMap，那么你应该明确地指定 javaType 来保证行为与期望的相一致。 |
-| `jdbcType`    | JDBC 类型，所支持的 JDBC 类型参见这个表格之后的“支持的 JDBC 类型”。 只需要在可能执行插入、更新和删除的且允许空值的列上指定 JDBC 类型。这是 JDBC 的要求而非 MyBatis 的要求。如果你直接面向 JDBC 编程，你需要对可以为空值的列指定这个类型。 |
+| `javaType`    | **一个 Java 类的全限定名，或一个类型别名**（关于内置的类型别名，可以参考上面的表格）。 如果你映射到一个 JavaBean，MyBatis 通常可以推断类型。然而，**如果你映射到的是 HashMap，那么你应该明确地指定 javaType 来保证行为与期望的相一致。** |
+| `jdbcType`    | JDBC 类型，所支持的 JDBC 类型参见这个表格之后的“支持的 JDBC 类型”。 **只需要在可能执行插入、更新和删除的且允许空值的列上指定 JDBC 类型**。这是 JDBC 的要求而非 MyBatis 的要求。如果你直接面向 JDBC 编程，你需要对可以为空值的列指定这个类型。 |
 | `typeHandler` | 我们在前面讨论过默认的类型处理器。使用这个属性，你可以覆盖默认的类型处理器。 这个属性值是一个类型处理器实现类的全限定名，或者是类型别名。 |
 
 #### 支持的 JDBC 类型
@@ -641,7 +588,7 @@ MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所
 
 看看下面这个构造方法:
 
-```
+```java
 public class User {
    //...
    public User(Integer id, String username, int age) {
@@ -653,7 +600,7 @@ public class User {
 
 为了将结果注入构造方法，MyBatis 需要通过某种方式定位相应的构造方法。 在下面的例子中，MyBatis 搜索一个声明了三个形参的构造方法，参数类型以 `java.lang.Integer`, `java.lang.String` 和 `int` 的顺序给出。
 
-```
+```xml
 <constructor>
    <idArg column="id" javaType="int"/>
    <arg column="username" javaType="String"/>
@@ -661,9 +608,9 @@ public class User {
 </constructor>
 ```
 
-当你在处理一个带有多个形参的构造方法时，很容易搞乱 arg 元素的顺序。 从版本 3.4.3 开始，可以在指定参数名称的前提下，以任意顺序编写 arg 元素。 为了通过名称来引用构造方法参数，你可以添加 `@Param` 注解，或者使用 '-parameters' 编译选项并启用 `useActualParamName` 选项（默认开启）来编译项目。下面是一个等价的例子，尽管函数签名中第二和第三个形参的顺序与 constructor 元素中参数声明的顺序不匹配。
+当你在处理一个带有多个形参的构造方法时，很容易搞乱 arg 元素的顺序。 从版本 3.4.3 开始，**可以在指定参数名称的前提下，以任意顺序编写 arg 元素**。 为了通过名称来引用构造方法参数，你可以添加 `@Param` 注解，或者使用 '-parameters' 编译选项并启用 `useActualParamName` 选项（默认开启）来编译项目。下面是一个等价的例子，尽管函数签名中第二和第三个形参的顺序与 constructor 元素中参数声明的顺序不匹配。
 
-```
+```xml
 <constructor>
    <idArg column="id" javaType="int" name="id" />
    <arg column="age" javaType="_int" name="age" />
@@ -671,7 +618,7 @@ public class User {
 </constructor>
 ```
 
-如果存在名称和类型相同的属性，那么可以省略 `javaType` 。
+**如果存在名称和类型相同的属性，那么可以省略 `javaType`** 。
 
 剩余的属性和规则和普通的 id 和 result 元素是一样的。
 
