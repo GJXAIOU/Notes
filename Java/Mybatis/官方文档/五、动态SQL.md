@@ -259,7 +259,7 @@ public interface LanguageDriver {
 
 或者，在你的 mapper 接口上添加 `@Lang` 注解：
 
-```xml
+```java
 public interface Mapper {
   @Lang(MyLanguageDriver.class)
   @Select("SELECT * FROM BLOG")

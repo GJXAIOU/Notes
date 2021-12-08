@@ -2,7 +2,7 @@
 
 ### 一、问题
 
-Java 程序员面对的最痛苦的事情之一就是在 Java 代码中嵌入 SQL 语句。这通常是因为需要动态生成 SQL 语句，不然我们可以将它们放到外部文件或者存储过程中。如你所见，MyBatis 在 XML 映射中具备强大的 SQL 动态生成能力。但有时，我们还是需要在 Java 代码里构建 SQL 语句。此时，MyBatis 有另外一个特性可以帮到你，让你从处理典型问题中解放出来，比如加号、引号、换行、格式化问题、嵌入条件的逗号管理及 AND 连接。确实，在 Java 代码中动态生成 SQL 代码真的就是一场噩梦。例如：
+Java 程序员面对的最痛苦的事情之一就是在 Java 代码中嵌入 SQL 语句。这通常是因为需要动态生成 SQL 语句，不然我们可以将它们放到外部文件或者存储过程中。如你所见，MyBatis 在 XML 映射中具备强大的 SQL 动态生成能力。但有时，我们还是需要**在 Java 代码里构建 SQL 语句**。此时，MyBatis 有另外一个特性可以帮到你，让你从处理典型问题中解放出来，比如加号、引号、换行、格式化问题、嵌入条件的逗号管理及 AND 连接。确实，在 Java 代码中动态生成 SQL 代码真的就是一场噩梦。例如：
 
 ```java
 String sql = "SELECT P.ID, P.USERNAME, P.PASSWORD, P.FULL_NAME, "
@@ -115,9 +115,9 @@ public String updatePersonSql() {
 | 方法                                                         | 描述                                                         |
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
 | `SELECT(String)``SELECT(String...)`                          | 开始新的或追加到已有的 `SELECT`子句。可以被多次调用，参数会被追加到 `SELECT` 子句。 参数通常使用逗号分隔的列名和别名列表，但也可以是数据库驱动程序接受的任意参数。 |
-| `SELECT_DISTINCT(String)``SELECT_DISTINCT(String...)`        | 开始新的或追加到已有的 `SELECT`子句，并添加 `DISTINCT` 关键字到生成的查询中。可以被多次调用，参数会被追加到 `SELECT` 子句。 参数通常使用逗号分隔的列名和别名列表，但也可以是数据库驱动程序接受的任意参数。 |
+| `SELECT_DISTINCT(String)`<br />`SELECT_DISTINCT(String...)`  | 开始新的或追加到已有的 `SELECT`子句，并添加 `DISTINCT` 关键字到生成的查询中。可以被多次调用，参数会被追加到 `SELECT` 子句。 参数通常使用逗号分隔的列名和别名列表，但也可以是数据库驱动程序接受的任意参数。 |
 | `FROM(String)``FROM(String...)`                              | 开始新的或追加到已有的 `FROM`子句。可以被多次调用，参数会被追加到 `FROM`子句。 参数通常是一个表名或别名，也可以是数据库驱动程序接受的任意参数。 |
-| `JOIN(String)``JOIN(String...)``INNER_JOIN(String)``INNER_JOIN(String...)``LEFT_OUTER_JOIN(String)``LEFT_OUTER_JOIN(String...)``RIGHT_OUTER_JOIN(String)``RIGHT_OUTER_JOIN(String...)` | 基于调用的方法，添加新的合适类型的 `JOIN` 子句。 参数可以包含一个由列和连接条件构成的标准连接。 |
+| `JOIN(String)``JOIN(String...)`<br />`INNER_JOIN(String)``INNER_JOIN(String...)`<br />`LEFT_OUTER_JOIN(String)``LEFT_OUTER_JOIN(String...)`<br />`RIGHT_OUTER_JOIN(String)``RIGHT_OUTER_JOIN(String...)` | 基于调用的方法，添加新的合适类型的 `JOIN` 子句。 参数可以包含一个由列和连接条件构成的标准连接。 |
 | `WHERE(String)``WHERE(String...)`                            | 插入新的 `WHERE` 子句条件，并使用 `AND` 拼接。可以被多次调用，对于每一次调用产生的新条件，会使用 `AND` 拼接起来。要使用 `OR` 分隔，请使用 `OR()`。 |
 | `OR()`                                                       | 使用 `OR` 来分隔当前的 `WHERE` 子句条件。 可以被多次调用，但在一行中多次调用会生成错误的 `SQL`。 |
 | `AND()`                                                      | 使用 `AND` 来分隔当前的 `WHERE`子句条件。 可以被多次调用，但在一行中多次调用会生成错误的 `SQL`。由于 `WHERE` 和 `HAVING`都会自动使用 `AND` 拼接, 因此这个方法并不常用，只是为了完整性才被定义出来。 |
@@ -141,7 +141,7 @@ public String updatePersonSql() {
 
 从版本 3.4.2 开始，你可以像下面这样使用可变长度参数：
 
-```
+```java
 public String selectPersonSql() {
   return new SQL()
     .SELECT("P.ID", "A.USERNAME", "A.PASSWORD", "P.FULL_NAME", "D.DEPARTMENT_NAME", "C.COMPANY_NAME")
@@ -171,7 +171,7 @@ public String updatePersonSql() {
 
 从版本 3.5.2 开始，你可以像下面这样构建批量插入语句：
 
-```
+```java
 public String insertPersonsSql() {
   // INSERT INTO PERSON (ID, FULL_NAME)
   //     VALUES (#{mainPerson.id}, #{mainPerson.fullName}) , (#{subPerson.id}, #{subPerson.fullName})
@@ -187,7 +187,7 @@ public String insertPersonsSql() {
 
 从版本 3.5.2 开始，你可以像下面这样构建限制返回结果数的 SELECT 语句,：
 
-```
+```java
 public String selectPersonsWithOffsetLimitSql() {
   // SELECT id, name FROM PERSON
   //     LIMIT #{limit} OFFSET #{offset}
@@ -224,7 +224,7 @@ public String selectPersonsWithFetchFirstSql() {
 
 SelectBuilder 和 SqlBuilder 类并不神奇，但最好还是知道它们的工作原理。 SelectBuilder 以及 SqlBuilder 借助静态导入和 ThreadLocal 变量实现了对插入条件友好的简洁语法。要使用它们，只需要静态导入这个类的方法即可，就像这样（只能使用其中的一条，不能同时使用）:
 
-```
+```java
 import static org.apache.ibatis.jdbc.SelectBuilder.*;
 import static org.apache.ibatis.jdbc.SqlBuilder.*;
 ```
