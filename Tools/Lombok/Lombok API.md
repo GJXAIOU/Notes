@@ -1,10 +1,10 @@
-# val
+# 一、val
 
 ### Finally! Hassle-free final local variables.
 
 `val` was introduced in lombok 0.10.
 
-*NEW in Lombok 1.18.22:* `val` gets replaced with `final var`.
+NEW in Lombok 1.18.22: `val` gets replaced with `final var`.
 
 ### Overview
 
@@ -16,7 +16,7 @@ You can use `val` as the type of a local variable declaration instead of actuall
 
 `val`实际上是一种排序类型，在'lombok'包中作为一个实类存在。必须导入它才能使val工作（或使用'lombok.val'作为类型）。局部变量声明中存在此类型会触发添加'final'关键字以及复制初始化表达式的类型，从而覆盖'fake''val'类型。
 
-*WARNING: This feature does not currently work in NetBeans.*
+WARNING: This feature does not currently work in NetBeans.
 
 ### With Lombok
 
@@ -84,7 +84,7 @@ In ambiguous cases, such as when the initializer expression is `null`, `java.lan
 
 
 
-# var
+# 二、var
 
 ### Mutably! Hassle-free local variables.
 
@@ -108,11 +108,15 @@ For example, `var x = "Hello"; x = Color.RED;` does *not* work; the type of x wi
 
 
 
-# @NonNull
+# 三、@NonNull
 
 ### or: How I learned to stop worrying and love the NullPointerException.
 
-`@NonNull` was introduced in lombok v0.11.10.
+或者：我是如何学会停止担忧，爱上NullPointerException的。
+
+`@NonNull` was introduced in lombok v0.11.10
+
+`@NonNull`是在 lombok v0.11.10 中引入的。
 
 ### Overview
 
@@ -124,9 +128,17 @@ The null-check looks like `if (param == null) throw new NullPointerException("pa
 
 If a null-check is already present at the top, no additional null-check will be generated.
 
+您可以对记录组件或方法或构造函数的参数使用“@NonNull”。这将使得 lombok 为您生成空检查语句。
+
+Lombok 始终将字段上通常命名为“@NonNull”的各种注释视为信号，以便在 Lombok为您生成整个方法或构造函数时生成 null 检查，例如通过[`@Data`](https://projectlombok.org/features/Data).但是，使用 lombok 自己的`@lombok`。参数或记录组件上的 `NonNull`导致在该方法的顶部插入null检查。
+
+空检查类似于“如果（param==null）抛出新的NullPointerException（“param标记为@NonNull，但为null”）；”**并将插入到方法的最顶部**。对于构造函数，空检查将在任何显式 `this()` 或 `super()` 调用之后立即插入。对于记录组件，空检查将插入到“紧凑构造函数”（完全没有参数列表的构造函数）中，如果没有构造函数，将生成该构造函数。如果您以长格式编写了记录构造函数（参数与您的组件完全匹配），那么什么也不会发生——您将不得不注释这个长格式构造函数的参数。
+
+如果顶部已存在空检查，则不会生成额外的空检查。
+
 ### With Lombok
 
-```
+```java
 import lombok.NonNull;
 
 public class NonNullExample extends Something {
@@ -141,7 +153,7 @@ public class NonNullExample extends Something {
 
 ### Vanilla Java
 
-```
+```java
 import lombok.NonNull;
 
 public class NonNullExample extends Something {
@@ -166,6 +178,14 @@ public class NonNullExample extends Something {
 - `lombok.nonNull.flagUsage` = [`warning` | `error`] (default: not set)
 
     Lombok will flag any usage of `@NonNull` as a warning or error if configured.
+    
+- `lombok.nonNull.exceptionType` = [`NullPointerException` | `IllegalArgumentException` | `JDK` | `Guava` | `Assertion`] ，默认为 `NullPointerException`
+
+    当 lombok 生成一个 if 声明的空校验时，默认情况下，将抛出一个异常信息为「XXX属性名称 is marked non-null but is null」的 `java.lang.NullPointerException`，您可以在此配置键中使用非法ArgumentException，让lombok将该异常与此消息一起抛出。通过使用“断言”，将生成具有相同消息的“断言”语句。键'JDK'或'Guava'导致调用这两个框架的标准nullcheck方法：`java。util。物体！requirennull（[此处的字段名]，[此处的字段名]标记为非空，但为空）；或“com”。谷歌。普通的基地。先决条件！checkNotZero（[field name here]，[field name here]标记为非null，但为null；
+
+- `lombok.nonNull.flagUsage` = [`warning` | `error`] ，默认没有配置
+
+    Lombok 会将任何使用`@NonNull`的情况标记为警告或错误（如果已配置）
 
 ### Small print
 
@@ -179,7 +199,7 @@ A `@NonNull` on a parameter of an abstract method used to generate a warning; st
 
 
 
-# @Cleanup
+# 四、@Cleanup
 
 ### Automatic resource management: Call your `close()` methods safely with no hassle.
 
@@ -260,9 +280,7 @@ You do still need to handle any exception that the cleanup method can generate!
 
 
 
-
-
-# @Getter and @Setter
+# 五、@Getter and @Setter
 
 Never write `public int getFoo() {return foo;}` again.
 
@@ -417,7 +435,7 @@ Using the `AccessLevel.NONE` access level simply generates nothing. It's useful 
 
 
 
-# @ToString
+# 六、@ToString
 
 No need to start a debugger to see your fields: Just let lombok generate a `toString` for you!
 
@@ -560,7 +578,7 @@ If you have configured a nullity annotation flavour via [`lombok.config`](https:
 
 
 
-# @EqualsAndHashCode
+# 七、@EqualsAndHashCode
 
 ### Equality made easy: Generates `hashCode` and `equals` implementations from the fields of your object.
 
@@ -724,7 +742,7 @@ If you have configured a nullity annotation flavour via [`lombok.config`](https:
 
 
 
-# @NoArgsConstructor, @RequiredArgsConstructor, @AllArgsConstructor
+# 八、@NoArgsConstructor, @RequiredArgsConstructor, @AllArgsConstructor
 
 Constructors made to order: Generates constructors that take no arguments, one argument per final / non-null field, or one argument for every field.
 
@@ -837,36 +855,51 @@ The `flagUsage` configuration keys do not trigger when a constructor is generate
 
 
 
-# @Data
+# 九、@Data
 
 All together now: A shortcut for `@ToString`, `@EqualsAndHashCode`, `@Getter` on all fields, `@Setter` on all non-final fields, and `@RequiredArgsConstructor`!
 
+现在，所有字段上`@ToString`、`@EqualsAndHashCode`、`@Getter`，所有非最终字段上的 `@Setter` 和 `@RequiredArgsConstructor` 的快捷方式都在一起了！
+
 ### Overview
 
-`@Data` is a convenient shortcut annotation that bundles the features of [`@ToString`](https://projectlombok.org/features/ToString), [`@EqualsAndHashCode`](https://projectlombok.org/features/EqualsAndHashCode), [`@Getter` / `@Setter`](https://projectlombok.org/features/GetterSetter) and [`@RequiredArgsConstructor`](https://projectlombok.org/features/constructor) together: In other words, `@Data` generates *all* the boilerplate that is normally associated with simple POJOs (Plain Old Java Objects) and beans: getters for all fields, setters for all non-final fields, and appropriate `toString`, `equals` and `hashCode` implementations that involve the fields of the class, and a constructor that initializes all final fields, as well as all non-final fields with no initializer that have been marked with `@NonNull`, in order to ensure the field is never null.
+`@Data` is a convenient shortcut annotation that bundles the features of [`@ToString`](https://projectlombok.org/features/ToString), [`@EqualsAndHashCode`](https://projectlombok.org/features/EqualsAndHashCode), [`@Getter` / `@Setter`](https://projectlombok.org/features/GetterSetter) and [`@RequiredArgsConstructor`](https://projectlombok.org/features/constructor) together: In other words, `@Data` generates  all the boilerplate that is normally associated with simple POJOs (Plain Old Java Objects) and beans: getters for all fields, setters for all non-final fields, and appropriate `toString`, `equals` and `hashCode` implementations that involve the fields of the class, and a constructor that initializes all final fields, as well as all non-final fields with no initializer that have been marked with `@NonNull`, in order to ensure the field is never null.
+
+`@Data`是一个方便的快捷注释，它捆绑了 `@ToString`，`@EqualsAndHashCode`，`@Getter`/`@Setter`和 `@RequiredArgsConstructor`一起的功能：换句话说，`@Data`生成所有通常与简单 POJO和bean关联的样板文件：所有字段的getter，所有非 final 修饰的字段的 setter，以及涉及类字段的适当的`toString`、`equals`和`hashCode`实现，以及一个构造函数，用于初始化所有最终字段，以及所有未使用已标记为 `@NonNull` 的初始值设定项的非 final 字段，以确保字段从不为 null。
 
 `@Data` is like having implicit `@Getter`, `@Setter`, `@ToString`, `@EqualsAndHashCode` and `@RequiredArgsConstructor` annotations on the class (except that no constructor will be generated if any explicitly written constructors already exist). However, the parameters of these annotations (such as `callSuper`, `includeFieldNames` and `exclude`) cannot be set with `@Data`. If you need to set non-default values for any of these parameters, just add those annotations explicitly; `@Data` is smart enough to defer to those annotations.
+
+`@Data`类似于在类上有隐式的`@Getter`、`@Setter`、`@ToString`、`@EqualsAndHashCode`和`@RequiredArgsConstructor`注释（**除非如果已经存在任何显式编写的构造函数，则不会生成任何构造函数**）。但是，这些声明的参数（如 `callSuper`、`includefeldnames` 和 `exclude`）不能用 `@Data` 设置。**如果需要为这些参数中的任何一个设置非默认值，只需显式添加这些注释**，`@Data`足够聪明，可以遵从这些注释。
 
 All generated getters and setters will be `public`. To override the access level, annotate the field or class with an explicit `@Setter` and/or `@Getter` annotation. You can also use this annotation (by combining it with `AccessLevel.NONE`) to suppress generating a getter and/or setter altogether.
 
 All fields marked as `transient` will not be considered for `hashCode` and `equals`. All static fields will be skipped entirely (not considered for any of the generated methods, and no setter/getter will be made for them).
 
+所有生成的 getter 和 setter 都将是 `public`。要覆盖访问级别，请使用显式的 `@Setter`和/或 `@Getter`注释对字段或类进行注释。**您还可以使用此注释（通过将其与 `AccessLevel.NONE` 结合使用）来完全禁止生成 getter 和/或 setter。**
+
+**对于 `hashCode` 和 `equals` ，将不考虑标记为 `transient` 的所有字段。将完全跳过所有 static 修饰字段**（不考虑任何生成的方法，并且不会为它们生成 setter/getter）。
+
 If the class already contains a method with the same name and parameter count as any method that would normally be generated, that method is not generated, and no warning or error is emitted. For example, if you already have a method with signature `equals(AnyType param)`, no `equals` method will be generated, even though technically it might be an entirely different method due to having different parameter types. The same rule applies to the constructor (any explicit constructor will prevent `@Data` from generating one), as well as `toString`, `equals`, and all getters and setters. You can mark any constructor or method with `@lombok.experimental.Tolerate` to hide them from lombok.
 
 `@Data` can handle generics parameters for fields just fine. In order to reduce the boilerplate when constructing objects for classes with generics, you can use the `staticConstructor` parameter to generate a private constructor, as well as a static method that returns a new instance. This way, javac will infer the variable name. Thus, by declaring like so: `@Data(staticConstructor="of") class Foo<T> { private T x;}` you can create new instances of `Foo` by writing: `Foo.of(5);` instead of having to write: `new Foo<Integer>(5);`.
 
+**如果类已经包含一个与通常生成的任何方法具有相同名称和参数数目的方法，则不会生成该方法，也不会发出警告或错误。例如，如果您已经有一个签名为 `equals（AnyType param）`的方法，则不会生成 `equals`方法，即使从技术上讲，由于参数类型不同，它可能是一个完全不同的方法。同样的规则也适用于构造函数（任何显式构造函数都会阻止 `@Data` 生成构造函数），以及 `toString`、`equals` 和所有 `getter` 和 `setter`。您可以使用 `@lombok.experimental.Tolerate`标记任何构造函数或方法，以对 lombok 隐藏它们。**
+
+`@Data`可以很好地处理字段的泛型参数。为了减少使用泛型为类构造对象时的样板文件，可以使用 `staticConstructor`参数生成私有构造函数，以及返回新实例的静态方法。这样，javac 将推断变量名。因此，通过这样声明：`@Data（staticConstructor=“of”）class Foo<T>{private tx；}`您可以通过编写：`Foo.of(5)`来创建`Foo`的新实例；不必写：`newfoo<Integer>（5）`。
+
 ### With Lombok
 
 ```java
-
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.Data;
 import lombok.ToString;
 
-@Data public class DataExample {
+@Data 
+public class DataExample {
     private final String name;
-    @Setter(AccessLevel.PACKAGE) private int age;
+    @Setter(AccessLevel.PACKAGE) 
+    private int age;
     private double score;
     private String[] tags;
 
@@ -922,7 +955,8 @@ public class DataExample {
         this.tags = tags;
     }
 
-    @Override public String toString() {
+    @Override 
+    public String toString() {
         return "DataExample(" + this.getName() + ", " + this.getAge() + ", " + this.getScore() + ", " + Arrays.deepToString(this.getTags()) + ")";
     }
 
@@ -930,7 +964,8 @@ public class DataExample {
         return other instanceof DataExample;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override 
+    public boolean equals(Object o) {
         if (o == this) return true;
         if (!(o instanceof DataExample)) return false;
         DataExample other = (DataExample) o;
@@ -942,7 +977,8 @@ public class DataExample {
         return true;
     }
 
-    @Override public int hashCode() {
+    @Override 
+    public int hashCode() {
         final int PRIME = 59;
         int result = 1;
         final long temp1 = Double.doubleToLongBits(this.getScore());
@@ -974,7 +1010,8 @@ public class DataExample {
             return this.value;
         }
 
-        @Override public String toString() {
+        @Override 
+        public String toString() {
             return "Exercise(name=" + this.getName() + ", value=" + this.getValue() + ")";
         }
 
@@ -982,7 +1019,8 @@ public class DataExample {
             return other instanceof Exercise;
         }
 
-        @Override public boolean equals(Object o) {
+        @Override 
+        public boolean equals(Object o) {
             if (o == this) return true;
             if (!(o instanceof Exercise)) return false;
             Exercise<?> other = (Exercise<?>) o;
@@ -992,7 +1030,8 @@ public class DataExample {
             return true;
         }
 
-        @Override public int hashCode() {
+        @Override 
+        public int hashCode() {
             final int PRIME = 59;
             int result = 1;
             result = (result*PRIME) + (this.getName() == null ? 43 : this.getName().hashCode());
@@ -1009,21 +1048,29 @@ public class DataExample {
 
     Lombok will flag any usage of `@Data` as a warning or error if configured.
 
+    Lombok 会将任何使用`@Data`的情况标记为警告或错误（如果已配置）。
+
 - `lombok.noArgsConstructor.extraPrivate` = [`true` | `false`] (default: false)
 
     If `true`, lombok will generate a private no-args constructor for any `@Data` annotated class, which sets all fields to default values (null / 0 / false).
+    
+    如果 `true`，lombok 将为任何带 `@Data` 注释的类生成一个私有的无参数构造函数，该构造函数将所有字段设置为默认值（null/0/false）。
 
-### Small print
+### Small print 附属细则
 
-See the small print of [`@ToString`](https://projectlombok.org/features/ToString), [`@EqualsAndHashCode`](https://projectlombok.org/features/EqualsAndHashCode), [`@Getter / @Setter`](https://projectlombok.org/features/GetterSetter) and [@RequiredArgsConstructor](https://projectlombok.org/features/constructor).
+See the small print of `@ToString`, `@EqualsAndHashCode`, `@Getter / @Setter` and `@RequiredArgsConstructor`。
 
 Various well known annotations about nullity cause null checks to be inserted and will be copied to the relevant places (such as the method for getters, and the parameter for the constructor and setters). See [Getter/Setter](https://projectlombok.org/features/GetterSetter) documentation's small print for more information.
 
 By default, any variables that start with a $ symbol are excluded automatically. You can include them by specifying an explicit annotation (`@Getter` or `@ToString`, for example) and using the 'of' parameter.
 
+请参阅 `@ToString`, `@EqualsAndHashCode`, `@Getter / @Setter` and `@RequiredArgsConstructor`的附属细则。
 
+关于null性的各种众所周知的注释会导致插入null检查并将其复制到相关位置（例如getter的方法以及构造函数和setter的参数）。参见[Getter/Setter](https://projectlombok.org/features/GetterSetter)有关更多信息，请参阅文档的小附属细则。
 
-# @Value
+默认情况下，将自动排除以$符号开头的任何变量。您可以通过指定显式注释（`Getter`或`ToString`，例如）并使用'of'参数来包含它们。
+
+# 十、@Value
 
 ### Immutable classes made very easy.
 
@@ -1216,7 +1263,7 @@ It is not possible to use `@FieldDefaults` to 'undo' the private-by-default and 
 
 
 
-# @Builder
+# 十一、@Builder
 
 ### ... and Bob's your uncle: No-hassle fancy-pants APIs for object creation!
 
@@ -1509,7 +1556,7 @@ If you have configured a nullity annotation flavour via [`lombok.config`](https:
 
 
 
-# @SneakyThrows
+# 十二、@SneakyThrows
 
 ### To boldly throw checked exceptions where no one has thrown them before!
 
@@ -1589,7 +1636,7 @@ If you put `@SneakyThrows` on a constructor, any call to a sibling or super cons
 
 
 
-# @Synchronized
+# 十三、@Synchronized
 
 ### `synchronized` done right: Don't expose your locks.
 
@@ -1673,7 +1720,7 @@ If you'd like to know why a field is not automatically generated when you choose
 
 
 
-# @With
+# 十四、@With
 
 ### Immutable 'setters' - methods that create a clone but with one changed field.
 
@@ -1767,7 +1814,7 @@ If you have configured a nullity annotation flavour via [`lombok.config`](https:
 
 
 
-# @Getter(lazy=true)
+# 十五、@Getter(lazy=true)
 
 ### Laziness is a virtue!
 
@@ -1843,7 +1890,7 @@ Other Lombok annotations such as `@ToString` always call the getter even if you 
 
 
 
-# @Log (and friends)
+# 十六、@Log (and friends)
 
 ### Captain's Log, stardate 24435.7: "What was that line again?"
 
@@ -2023,7 +2070,7 @@ A future feature of lombok's diverse log annotations is to find calls to the log
 
 
 
-# Lombok experimental features
+# 十七、Lombok experimental features
 
 The [Lombok javadoc](https://projectlombok.org/api/) is available, but we advise these pages.
 
