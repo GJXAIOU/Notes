@@ -1267,6 +1267,8 @@ It is not possible to use `@FieldDefaults` to 'undo' the private-by-default and 
 
 ### ... and Bob's your uncle: No-hassle fancy-pants APIs for object creation!
 
+... 还有鲍勃的叔叔：没有麻烦的东西可以用来创建对象！
+
 `@Builder` was introduced as experimental feature in lombok v0.12.0.
 
 `@Builder` gained `@Singular` support and was promoted to the main `lombok` package since lombok v1.16.0.
@@ -1279,11 +1281,27 @@ It is not possible to use `@FieldDefaults` to 'undo' the private-by-default and 
 
 `@Builder(access = AccessLevel.PACKAGE)` is legal (and will generate the builder class, the builder method, etc with the indicated access level) starting with lombok v1.18.8.
 
+`@Builder`作为 lombok v0.12.0 中的实验特性引入。
+
+`@Builder`获得了`@Singular`支持，并从 lombok v1.16.0 起被提升为主要的 ` lombok` 包。
+
+`@Builder` 和 `@Singular`添加了一个自 lombok v1.16.8 以来的清晰方法。
+
+`@Builder.Default` 功能在 lombok v1.16.16 中引入。
+
+`@Builder(builderMethodName=“”)`从 lombok v1.18.8 开始是合法的（并且将禁止生成 Builder 方法）。
+
+`@Builder（access=AccessLevel.PACKAGE）` 从 lombok v1.18.8 开始是合法的（并且将生成具有指定访问级别的 Builder 类、Builder 方法等）。
+
 ### Overview
 
 The `@Builder` annotation produces complex builder APIs for your classes.
 
 `@Builder` lets you automatically produce the code required to have your class be instantiable with code such as:
+
+`@Builder` 注释为类生成复杂的生成器 API。
+
+`@Builder`允许您自动生成所需的代码，以使您的类具有可实例化的代码，例如：
 
 ```java
 Person.builder()
@@ -1296,21 +1314,40 @@ Person.builder()
 
 `@Builder` can be placed on a class, or on a constructor, or on a method. While the "on a class" and "on a constructor" mode are the most common use-case, `@Builder` is most easily explained with the "method" use-case.
 
-A method annotated with `@Builder` (from now on called the *target*) causes the following 7 things to be generated:
+**`@Builder`可以放在类、构造函数或方法上**。虽然「放在类上」和「放在构造器上」模式是最常见的用例，`@Builder`最容易用「方法」用例来解释。
 
-- An inner static class named `*Foo*Builder`, with the same type arguments as the static method (called the *builder*).
-- In the *builder*: One private non-static non-final field for each parameter of the *target*.
-- In the *builder*: A package private no-args empty constructor.
-- In the *builder*: A 'setter'-like method for each parameter of the *target*: It has the same type as that parameter and the same name. It returns the builder itself, so that the setter calls can be chained, as in the above example.
-- In the *builder*: A `build()` method which calls the method, passing in each field. It returns the same type that the *target* returns.
-- In the *builder*: A sensible `toString()` implementation.
-- In the class containing the *target*: A `builder()` method, which creates a new instance of the *builder*.
+A method annotated with `@Builder` (from now on called the target) causes the following 7 things to be generated:
+
+- An inner static class named `FooBuilder`, with the same type arguments as the static method (called the builder).
+- In the builder: One private non-static non-final field for each parameter of the target.
+- In the builder: A package private no-args empty constructor.
+- In the builder: A 'setter'-like method for each parameter of the target: It has the same type as that parameter and the same name. It returns the builder itself, so that the setter calls can be chained, as in the above example.
+- In the builder: A `build()` method which calls the method, passing in each field. It returns the same type that the target returns.
+- In the builder: A sensible `toString()` implementation.
+- In the class containing the target: A `builder()` method, which creates a new instance of the builder.
 
 Each listed generated element will be silently skipped if that element already exists (disregarding parameter counts and looking only at names). This includes the *builder* itself: If that class already exists, lombok will simply start injecting fields and methods inside this already existing class, unless of course the fields / methods to be injected already exist. You may not put any other method (or constructor) generating lombok annotation on a builder class though; for example, you can not put `@EqualsAndHashCode` on the builder class.
 
+用`@Builder`（从现在起称为 target）注释的方法会导致生成以下 7 项内容：
 
+- 名为 `FooBuilder` 的内部静态类，其类型参数与静态方法（称为 builder）相同。
+
+- 在 builder 中：目标的每个参数都有一个私有的非 static 非 final字段。
+
+- 在 builder 中：包级别的私有无参构造函数。
+- 在 builder 中：目标的每个参数都有一个类似 `setter` 的方法：它与该参数具有相同的类型和名称。它返回构建器本身，以便可以链接 setter 调用，如上面的示例所示。
+
+- 在 builder 中：调用该方法的 `build()`方法，传入每个字段。它返回的类型与目标返回的类型相同。
+
+- 在 builder 中：一个合理的`toString()`实现。
+
+- 在包含 target 的类中：一个`builder()`方法，该方法创建 builder 的新实例。
+
+如果每个列出的生成元素已经存在（忽略参数计数，只查看名称），则会自动跳过该元素。这包括 builder 本身：如果该类已经存在，lombok 将简单地开始在这个已经存在的类中注入字段和方法，当然，除非要注入的字段/方法已经存在。但是，您不能将生成lombok注释的任何其他方法（或构造函数）放在生成器类上；例如，不能在生成器类上放置“@EqualsAndHashCode”。
 
 `@Builder` can generate so-called 'singular' methods for collection parameters/fields. These take 1 element instead of an entire list, and add the element to the list. For example:
+
+`@Builder`可以为集合参数/字段生成所谓的 `singular`方法。它们将获取1个元素而不是整个列表，并将该元素添加到列表中。例如：
 
 ```java
 Person.builder()
@@ -1325,9 +1362,19 @@ Now that the "method" mode is clear, putting a `@Builder` annotation on a constr
 
 Finally, applying `@Builder` to a class is as if you added `@AllArgsConstructor(access = AccessLevel.PACKAGE)` to the class and applied the `@Builder` annotation to this all-args-constructor. This only works if you haven't written any explicit constructors yourself. If you do have an explicit constructor, put the `@Builder` annotation on the constructor instead of on the class. Note that if you put both `@Value` and `@Builder` on a class, the package-private constructor that `@Builder` wants to generate 'wins' and suppresses the constructor that `@Value` wants to make.
 
+将导致 `List<String>jobs` 字段中包含2个字符串。**要获得此行为，需要使用 `@Singular` 对字段/参数进行注释**。该功能具有[自己的文档](https://projectlombok.org/features/Builder#singular).
+
+现在「方法」模式已经清晰，在构造函数上添加`@Builder`注释也是如此；实际上，构造函数只是静态方法，有特殊的语法来调用它们：它们的「返回类型」是它们构造的类，它们的类型参数与类本身的类型参数相同。
+
+最后，将`@Builder`应用于类就像将`@allargsconstuctor(access=AccessLevel.PACKAGE)`添加到类中，并将`@Builder`注释应用于包含所有字段参数的构造函数。**这只有在您自己没有编写任何显式构造函数的情况下才有效。如果确实有显式构造函数，请将`@Builder`注释放在构造函数上，而不是类上**。请注意，如果将 `@Value` 和 `@Builder` 放在一个类上，则 `@Builder` 要生成的包私有构造函数将“获胜”，并抑制 `@Value` 要生成的构造函数。
+
 If using `@Builder` to generate builders to produce instances of your own class (this is always the case unless adding `@Builder` to a method that doesn't return your own type), you can use `@Builder(toBuilder = true)` to also generate an instance method in your class called `toBuilder()`; it creates a new builder that starts out with all the values of this instance. You can put the `@Builder.ObtainVia` annotation on the parameters (in case of a constructor or method) or fields (in case of `@Builder` on a type) to indicate alternative means by which the value for that field/parameter is obtained from this instance. For example, you can specify a method to be invoked: `@Builder.ObtainVia(method = "calculateFoo")`.
 
-The name of the builder class is `*Foobar*Builder`, where *Foobar* is the simplified, title-cased form of the return type of the *target* - that is, the name of your type for `@Builder` on constructors and types, and the name of the return type for `@Builder` on methods. For example, if `@Builder` is applied to a class named `com.yoyodyne.FancyList<T>`, then the builder name will be `FancyListBuilder<T>`. If `@Builder` is applied to a method that returns `void`, the builder will be named `VoidBuilder`.
+The name of the builder class is `FoobarBuilder`, where Foobar is the simplified, title-cased form of the return type of the target - that is, the name of your type for `@Builder` on constructors and types, and the name of the return type for `@Builder` on methods. For example, if `@Builder` is applied to a class named `com.yoyodyne.FancyList<T>`, then the builder name will be `FancyListBuilder<T>`. If `@Builder` is applied to a method that returns `void`, the builder will be named `VoidBuilder`.
+
+如果使用`@Builder`生成生成器以生成您自己类的实例（除非将`@Builder`添加到不返回您自己类型的方法中，否则始终是这种情况），那么您还可以使用`@Builder(toBuilder=true)`在类中生成名为` toBuilder()`的实例方法；它创建一个新的生成器，该生成器以该实例的所有值开始。您可以在参数（如果是构造函数或方法）或字段（如果是类型上的“@Builder”）上放置 `@Builder.ObtainVia`注释，以指示从该实例获取该字段/参数值的替代方法。例如，您可以指定要调用的方法：`@Builder.ObtainVia(method = "calculateFoo")`。
+
+生成器类的名称是 `FoobarBuilder`，其中 Foobar 是目标的返回类型的简化、以标题大小写的形式，也就是说，构造函数和类型上的“@builder”的类型名称，以及方法上的“@builder”的返回类型名称。例如，如果将 `@Builder` 应用于名为`com.yoyodyne.FancyList<T>`的类。则构建器名称将为 `FancyListBuilder<T>`。如果将 `@Builder` 应用于返回 `void` 的方法，则该生成器将命名为 `VoidBuilder`。
 
 The configurable aspects of builder are:
 
@@ -1342,6 +1389,26 @@ Example usage where all options are changed from their defaults:
 `@Builder(builderClassName = "HelloWorldBuilder", buildMethodName = "execute", builderMethodName = "helloWorld", toBuilder = true, access = AccessLevel.PRIVATE, setterPrefix = "set")`
 
 Looking to use your builder with [Jackson](https://github.com/FasterXML/jackson), the JSON/XML tool? We have you covered: Check out the [@Jacksonized](https://projectlombok.org/features/experimental/Jacksonized) feature.
+
+生成器的可配置方面包括：
+
+-*生成器的类名*（默认值：返回类型+'builder'）
+
+-*build（）*方法的名称（默认值：`“build”`）
+
+-*builder（）*方法的名称（默认值：`“builder”`）
+
+-如果您想要`toBuilder（）`（默认值：否）
+
+-所有生成元素的访问级别（默认值：`public`）。
+
+-（不鼓励）如果希望生成器的“set”方法具有前缀，即 `Person.builder().setName("Jane").build()` 而不是 `Person.build().name("Jane").build()` 以及它应该是什么。
+
+所有选项都从默认值更改的示例用法：
+
+`@生成器（builderClassName=“HelloWorldBuilder”，buildMethodName=“execute”，builderMethodName=“helloWorld”，toBuilder=true，access=AccessLevel.PRIVATE，setterRefix=“set”）`
+
+希望与[Jackson](https://github.com/FasterXML/jackson)一起使用您的生成器，JSON/XML工具？我们已经为您提供了保障：查看[@Jacksonized](https://projectlombok.org/features/experimental/Jacksonized)特色。
 
 ### @Builder.Default
 
