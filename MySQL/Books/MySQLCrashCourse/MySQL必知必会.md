@@ -18,13 +18,13 @@
 ### 二、过滤数据
 - `order by` 必须位于`where`之后；
 - where 子句操作符：`= `、`<>`、`!=`、`<`、`<=`、`>`、`>=`、`between A and B`；
-- MySQL 执行匹配时候默认不区分大小写；
+- **MySQL 执行匹配时候默认不区分大小写；**
 - 空值检测：使用：`is null`
 
   注：null 为空值，与字段包含 0、空字符串以及空格是不一样的；
 
 - where 子句中使用 and 和 or 连接子句时候，and 在计算次序中的优先级更高，最好使用 `()` 进行分组操作；
-- in 操作符：`where 列名 in(值 1，值 2，值 3...)`；
+- in 操作符：`where 列名 in(值 1,值 2,值 3...)`；
 - in 操作符一般比 or 操作符清单执行更快；
 - not 操作符：允许针对：`in、between、exists` 子句进行取反；
 
@@ -295,7 +295,7 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
 
 **子查询（subquery）即嵌套在其他查询中的查询**；
 
-- 利用子查询进行过滤，执行过程「通常」为从内往外执行，
+- 利用子查询进行过滤，执行过程「**通常**」为从内往外执行，
   
     ```mysql
     -- 列出订购物品 TNT2 的所有客户
@@ -1390,7 +1390,7 @@ select * from ordertotals;
 
 
      原来课本中使用的 `password()` 加密函数，在 8.0 版本中已经移除 ，password() :This function was removed in MySQL 8.0.11.
-
+    
     `set password for bforta = 'n3w p@$$w0rd';`
 
 - 如果不指定用户名，直接修改当前登录用户的口令 
