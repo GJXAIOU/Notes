@@ -10,15 +10,19 @@ Coverage of Spring’s integration with AspectJ (currently the richest — i
 
 参考文档的这一部分涵盖了Spring框架中绝对不可或缺的所有技术。
 
-其中最重要的是Spring框架的控制反转（InversionofControl，IoC）容器。在对Spring框架的IoC容器进行全面介绍之后，将全面介绍Spring的面向切面编程（AOP）技术。Spring框架有自己的AOP框架，在概念上很容易理解，它成功地解决了Java企业编程中80%的AOP需求。
+其中最重要的是 Spring 框架的控制反转（Inversion of Control，IoC）容器。在对Spring框架的IoC容器进行全面介绍之后，将全面介绍Spring的面向切面编程（AOP）技术。Spring框架有自己的AOP框架，在概念上很容易理解，它成功地解决了Java企业编程中80%的AOP需求。
 
 Spring 与 AspectJ 集成的报道（目前最丰富 — 就特征而言 — 当然，也提供了Java企业空间中最成熟的AOP实现。
 
 ## 1. The IoC Container
 
+## 1.IoC 容器
+
 This chapter covers Spring’s Inversion of Control (IoC) container.
 
 ### 1.1. Introduction to the Spring IoC Container and Beans
+
+### 1.1. Spring IoC容器和bean简介
 
 This chapter covers the Spring Framework implementation of the Inversion of Control (IoC) principle. IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies (that is, the other objects they work with) only through constructor arguments, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse (hence the name, Inversion of Control) of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes or a mechanism such as the Service Locator pattern.
 
@@ -33,20 +37,22 @@ In short, the `BeanFactory` provides the configuration framework and basic funct
 
 In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called beans. A bean is an object that is instantiated, assembled, and managed by a Spring IoC container. Otherwise, a bean is simply one of many objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.
 
-本章介绍控制反转（IoC）原则在 Spring 框架中的实现。**IoC也称为依赖注入（DI）**。**这是一个过程，对象仅通过构造函数参数、工厂方法的参数或在对象实例构造或从工厂方法返回后在对象实例上设置的属性来定义它们的依赖关系（即它们使用的其他对象）。然后，容器在创建bean时注入这些依赖项。这个过程基本上是bean本身的逆过程（因此称为控制反转），通过使用类的直接构造或服务定位器模式等机制来控制其依赖项的实例化或位置。**
+本章介绍控制反转（IoC）原则在 Spring 框架中的实现。**IoC 也称为依赖注入（DI）**。**这是一个过程，对象仅通过构造函数参数、工厂方法的参数或在对象实例构造或从工厂方法返回后在对象实例上设置的属性来定义它们的依赖关系（即它们使用的其他对象）。然后，容器在创建bean时注入这些依赖项。这个过程基本上是 bean 本身的逆过程（因此称为控制反转），通过使用类的直接构造或服务定位器模式等机制来控制其依赖项的实例化或位置。**
 
 `org.springframework.beans` 和 `org.springframework.context` 包是 Spring 框架的 IoC 容器的基础。[`BeanFactory`](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/beans/factory/BeanFactory.html)接口提供了一种高级配置机制，能够管理任何类型的对象。[`ApplicationContext`](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/ApplicationContext.html)是「BeanFactory」的子接口。它增加了以下功能：
 
 - 更容易与Spring的AOP功能集成
 - 消息资源处理（用于国际化）
 - 事件发布
-- 特定于应用层的上下文，如用于web应用程序的“WebApplicationContext”。
+- 特定于应用层的上下文，如用于web应用程序的 `WebApplicationContext`。
 
-简而言之，「BeanFactory」提供了配置框架和基本功能，「ApplicationContext」添加了更多特定于企业的功能。 **“ApplicationContext”是“BeanFactory”的完整超集**，在本章中专门用于描述Spring的IoC容器。**有关使用“BeanFactory”而不是“ApplicationContext”的详细信息，请参见[BeanFactory](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-beanfactory)。**
+简而言之，`BeanFactory`提供了配置框架和基本功能，`ApplicationContext`添加了更多特定于企业的功能。 **`ApplicationContext` 是 `BeanFactory` 的完整超集**，在本章中专门用于描述Spring的IoC容器。**有关使用 `BeanFactory` 而不是 `ApplicationContext` 的详细信息，请参见[BeanFactory](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-beanfactory)。**
 
 **在Spring中，构成应用程序主干并由 Spring IOC 容器管理的对象称为 beans。bean 是由 Spring IOC 容器实例化、组装和管理的对象**。否则，bean 只是应用程序中许多对象中的一个。**bean 以及它们之间的依赖关系反映在容器使用的配置元数据中**。
 
 ### 1.2. Container Overview
+
+### 1.2. 容器概述
 
 The `org.springframework.context.ApplicationContext` interface represents the Spring IoC container and is responsible for instantiating, configuring, and assembling the beans. The container gets its instructions on what objects to instantiate, configure, and assemble by reading configuration metadata. The configuration metadata is represented in XML, Java annotations, or Java code. It lets you express the objects that compose your application and the rich interdependencies between those objects.
 
@@ -56,15 +62,15 @@ In most application scenarios, explicit user code is not required to instantiate
 
 The following diagram shows a high-level view of how Spring works. Your application classes are combined with configuration metadata so that, after the `ApplicationContext` is created and initialized, you have a fully configured and executable system or application.
 
-`org.springframework.context.ApplicationContext`接口代表 Spring IOC 容器，负责实例化、配置和组装 bean。容器通过读取配置元数据获取关于实例化、配置和组装哪些对象的指令。配置元数据以XML、Java注释或Java代码表示。它允许您表达组成应用程序的对象以及这些对象之间丰富的相互依赖关系。
+`org.springframework.context.ApplicationContext`接口代表 Spring IOC 容器，负责实例化、配置和组装 bean。容器通过读取配置元数据获取关于实例化、配置和组装哪些对象的指令。配置元数据以 XML、Java 注释或 Java 代码表示，它允许您表达组成应用程序的对象以及这些对象之间丰富的相互依赖关系。
 
-Spring 提供了「ApplicationContext」接口的几种实现。在独立应用程序中，通常会创建[ClassPathXmlApplicationContext](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/ClassPathXmlApplicationContext.html)的实例或[FileSystemXmlApplicationContext](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/FileSystemXmlApplicationContext.html)的实例。虽然 XML 一直是定义配置元数据的传统格式，但您可以指示容器使用 Java 注释或代码作为元数据格式，方法是提供少量 XML 配置，以声明方式支持这些附加元数据格式。
+Spring 提供了`ApplicationContext`接口的几种实现。在单体应用程序中，通常会创建[ClassPathXmlApplicationContext](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/ClassPathXmlApplicationContext.html)的实例或[FileSystemXmlApplicationContext](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/FileSystemXmlApplicationContext.html)的实例。虽然 XML 一直是定义配置元数据的传统格式，但您可以指示容器使用 Java 注释或代码作为元数据格式，方法是提供少量 XML 配置，以声明方式支持这些附加元数据格式。
 
-在大多数应用程序场景中，实例化SpringIOC容器的一个或多个实例不需要显式用户代码。例如，在web应用程序场景中，`web.xml`中的一个简单的八行（大约）样板web描述符XML。应用程序的xml文件通常就足够了（请参阅 [Web应用程序的便捷应用程序上下文实例化](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#context-create)）。如果您使用[Spring Tools for Eclipse](https://spring.io/tools)（一个支持Eclipse的开发环境），只需点击几下鼠标或按键，就可以轻松创建这个样板配置。
+在大多数应用程序场景中，是不需要通过显式的用户代码来实例化 Spring IOC 容器的一个或多个实例。例如，在 web 应用程序场景中，`web.xml`中的一个简单的八行（大约）样板 web 描述符XML。应用程序的 XML文件通常就足够了（请参阅 [Web应用程序的便捷应用程序上下文实例化](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#context-create)）。如果您使用[Spring Tools for Eclipse](https://spring.io/tools)（一个支持Eclipse的开发环境），只需点击几下鼠标或按键，就可以轻松创建这个样板配置。
 
-下图显示了Spring如何工作的高级视图。您的应用程序类与配置元数据相结合，这样，在创建并初始化“ApplicationContext”之后，您就拥有了一个完全配置且可执行的系统或应用程序。
+下图显示了 Spring 如何工作的高级视图。您的应用程序类与配置元数据相结合，这样，在创建并初始化  `ApplicationContext` 之后，您就拥有了一个完全配置且可执行的系统或应用程序。
 
-![container magic](https://docs.spring.io/spring-framework/docs/current/reference/html/images/container-magic.png)
+![container magic](二、Core.resource/container-magic.png)
 
 Figure 1. The Spring IoC container
 
@@ -78,11 +84,11 @@ Configuration metadata is traditionally supplied in a simple and intuitive XML f
 
 > XML-based metadata is not the only allowed form of configuration metadata. The Spring IoC container itself is totally decoupled from the format in which this configuration metadata is actually written. These days, many developers choose [Java-based configuration](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java) for their Spring applications.
 
-如上图所示，SpringIOC容器使用一种形式的配置元数据。此配置元数据表示作为应用程序开发人员，您如何告知Spring容器实例化、配置和组装应用程序中的对象。
+如上图所示，Spring IOC 容器使用一种形式的配置元数据。此配置元数据表示作为应用程序开发人员，您如何告知 Spring 容器实例化、配置和组装应用程序中的对象。
 
-配置元数据传统上是以简单直观的XML格式提供的，这是本章大部分内容用来传达 Spring IOC容器的关键概念和特性的。
+配置元数据传统上是以简单直观的 XML 格式提供的，这是本章大部分内容用来传达 Spring IOC 容器的关键概念和特性的。
 
->基于XML的元数据不是唯一允许的配置元数据形式。SpringIOC容器本身与实际写入此配置元数据的格式完全解耦。如今，许多开发人员选择[基于Java的配置](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java)的Spring应用程序。
+>基于XML的元数据不是唯一允许的配置元数据形式。**Spring IOC 容器本身与实际写入此配置元数据的格式完全解耦**。如今，许多开发人员选择[基于Java的配置](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java)的 Spring 应用程序。
 
 For information about using other forms of metadata with the Spring container, see:
 
@@ -95,13 +101,13 @@ These bean definitions correspond to the actual objects that make up your applic
 
 有关在 Spring 容器中使用其他形式元数据的信息，请参阅：
 
-- [基于注释的配置](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-annotation-config)：Spring2.5 引入了对基于注释的配置元数据的支持。
+- [基于注释的配置](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-annotation-config)：Spring 2.5 引入了对基于注释的配置元数据的支持。
 
-- [基于Java的配置](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java)：从Spring3.0开始，Spring JavaConfig 项目提供的许多特性成为核心Spring框架的一部分。因此，您可以使用 Java 而不是 XML 文件来**定义应用程序类外部的 bean**。要使用这些新功能，请参阅[`@Configuration`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)，[`@Bean`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)，[`@Import`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Import.html)，和[`DependsOn`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/DependsOn.html)注释。
+- [基于Java的配置](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java)：从 Spring 3.0 开始，Spring Java Config 项目提供的许多特性成为核心 Spring 框架的一部分。因此，您可以使用 Java 而不是 XML 文件来**定义应用程序类外部的 bean**。要使用这些新功能，请参阅[`@Configuration`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)，[`@Bean`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)，[`@Import`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Import.html)，和[`DependsOn`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/DependsOn.html)注释。
 
-Spring 配置由容器必须管理的至少一个且通常不止一个bean定义组成。基于XML的配置元数据将这些 bean 配置为顶级 `<beans/>`元素中的`<bean/>`元素。Java 配置通常在`@configuration`类中使用带 `@Bean` 注释的方法。
+Spring 配置由容器必须管理的至少一个且通常不止一个 bean 定义组成。基于 XML 的配置元数据将这些 bean 配置为顶级 `<beans/>`元素中的`<bean/>`元素。Java 配置通常在`@configuration`类中使用带 `@Bean` 注释的方法。
 
-这些 bean 定义对应于构成应用程序的实际对象。通常，您定义服务层对象、数据访问对象（DAO）、展示对象（如Struts`Action`实例）、基础结构对象（如 Hibernate 的 `SessionFactorys`、JMS的`Queues`）等等。通常，不在容器中配置细粒度域对象，因为创建和加载域对象通常是 DAO 和业务逻辑的责任。但是，您可以使用Spring与AspectJ的集成来配置在IoC容器控制之外创建的对象。请参阅[使用AspectJ向Spring注入依赖项域对象](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-atconfigurable)。
+这些 bean 定义对应于构成应用程序的实际对象。通常，您定义服务层对象、数据访问对象（DAO）、展示对象（如Struts`Action`实例）、基础结构对象（如 Hibernate 的 `SessionFactorys`、JMS的`Queues`）等等。通常，不在容器中配置细粒度域对象，因为创建和加载域对象通常是 DAO 和业务逻辑的责任。但是，您**可以使用 Spring 与 AspectJ 的集成来配置在 IoC 容器控制之外创建的对象**。请参阅[使用AspectJ向Spring注入依赖项域对象](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-atconfigurable)。
 
 The following example shows the basic structure of XML-based configuration metadata:
 
@@ -131,11 +137,11 @@ The following example shows the basic structure of XML-based configuration metad
 
 The value of the `id` attribute refers to collaborating objects. The XML for referring to collaborating objects is not shown in this example. See [Dependencies](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-dependencies) for more information.
 
-- 注解一：'id'属性是标识单个 bean 定义的字符串。
+- 注解一：`id` 属性是标识单个 bean 定义的字符串。
 
-- 注解二：'class' 属性定义 bean 的类型并使用完全限定的类名。
+- 注解二：`class` 属性定义 bean 的类型并使用完全限定的类名。
 
-'id' 属性的值引用协作对象。本例中未显示用于引用协作对象的 XML。参见[依赖关系](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-dependencies)以获取更多信息。
+`id` 属性的值引用协作对象。本例中未显示用于引用协作对象的 XML。参见[依赖关系](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-dependencies)以获取更多信息。
 
 #### 1.2.2. Instantiating a Container 
 
@@ -151,7 +157,7 @@ ApplicationContext context = new ClassPathXmlApplicationContext("services.xml", 
 
 >After you learn about Spring’s IoC container, you may want to know more about Spring’s `Resource` abstraction (as described in [Resources](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources)), which provides a convenient mechanism for reading an InputStream from locations defined in a URI syntax. In particular, `Resource` paths are used to construct applications contexts, as described in [Application Contexts and Resource Paths](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-app-ctx).
 >
->在了解了Spring的IoC容器之后，您可能想进一步了解Spring的“资源”抽象（如[Resources](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources)中所述），它提供了一种方便的机制，用于从 URI 语法中定义的位置读取 InputStream。特别是，`Resource`路径用于构造应用程序上下文，如[应用程序上下文和资源路径](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-app-ctx)中所述。
+>在了解了 Spring 的 IoC 容器之后，您可能想进一步了解 Spring 的`Resource`抽象（如[Resources](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources)中所述），它提供了一种方便的机制，用于从 URI 语法中定义的位置读取 InputStream。特别是，`Resource`路径用于构造应用程序上下文，如 [Application Contexts and Resource Paths](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-app-ctx)中所述。
 
 The following example shows the service layer objects `(services.xml)` configuration file:
 
@@ -201,11 +207,11 @@ The following example shows the data access objects `daos.xml` file:
 
 In the preceding example, the service layer consists of the `PetStoreServiceImpl` class and two data access objects of the types `JpaAccountDao` and `JpaItemDao` (based on the JPA Object-Relational Mapping standard). The `property name` element refers to the name of the JavaBean property, and the `ref` element refers to the name of another bean definition. This linkage between `id` and `ref` elements expresses the dependency between collaborating objects. For details of configuring an object’s dependencies, see [Dependencies](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-dependencies).
 
-在前面的示例中，服务层由 `PetStoreServiceImpl` 类和两个类型为 `JPAAAccountDao` 和 `JpaItemDao` 的数据访问对象（基于 JPA 对象关系映射标准）组成。**`property name`元素引用 JavaBean 属性的名称，`ref` 元素引用另一个 bean 定义的名称。“id”和“ref”元素之间的这种链接表示协作对象之间的依赖关系。有关配置对象依赖项的详细信息，**请参阅[依赖项](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-dependencies)。
+在前面的示例中，服务层由 `PetStoreServiceImpl` 类和两个类型为 `JPAAAccountDao` 和 `JpaItemDao` 的数据访问对象（基于 JPA 对象关系映射标准）组成。**`property name`元素引用 JavaBean 属性的名称，`ref` 元素引用另一个 bean 定义的名称。`id`和 `ref`元素之间的这种链接表示协作对象之间的依赖关系。有关配置对象依赖项的详细信息，**请参阅[Dependencies](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-dependencies)。
 
 ##### Composing XML-based Configuration Metadata
 
-##### 组合基于XML的配置元数据
+##### 组合基于 XML 的配置元数据
 
 It can be useful to have bean definitions span multiple XML files. Often, each individual XML configuration file represents a logical layer or module in your architecture.
 
@@ -213,7 +219,7 @@ You can use the application context constructor to load bean definitions from al
 
 让 bean 定义跨越多个 XML 文件可能很有用。通常，每个单独的 XML 配置文件都表示体系结构中的一个逻辑层或模块。
 
-您**可以使用应用程序上下文构造函数从所有这些 XML 片段加载 bean 定义。此构造函数接受多个“资源”位置，如[上一节](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-instantiation)所示。或者，使用一个或多个出现的 `<import/>`元素从另一个或多个文件加载 bean 定义**。以下示例显示了如何执行此操作：
+您**可以使用应用程序上下文构造函数从所有这些 XML 片段加载 bean 定义。此构造函数接受多个`Resource`位置，如[上一节](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-instantiation)所示。或者，使用一个或多个出现的 `<import/>`元素从另一个或多个文件加载 bean 定义**。以下示例显示了如何执行此操作：
 
 ```xml
 <beans>
@@ -228,19 +234,19 @@ You can use the application context constructor to load bean definitions from al
 
 In the preceding example, external bean definitions are loaded from three files: `services.xml`, `messageSource.xml`, and `themeSource.xml`. All location paths are relative to the definition file doing the importing, so `services.xml` must be in the same directory or classpath location as the file doing the importing, while `messageSource.xml` and `themeSource.xml` must be in a `resources` location below the location of the importing file. As you can see, a leading slash is ignored. However, given that these paths are relative, it is better form not to use the slash at all. The contents of the files being imported, including the top level `<beans/>` element, must be valid XML bean definitions, according to the Spring Schema.
 
-在前面的示例中，外部 bean 定义是从三个文件加载的：`services.xml`，`messageSource.xml`，和`themeSource.xml`。所有位置路径都是相对于执行导入的定义文件的，因此`service.xml`必须与执行导入的文件位于同一目录或类路径位置，而`messageSource.xml`和`themeSource.xml`必须位于导入文件位置下方的'resources'位置。如您所见，前导斜杠被忽略。然而，**考虑到这些路径是相对的，最好不要使用斜杠**。根据Spring模式，要导入的文件的内容，包括顶级的 `<beans/>` 元素，必须是有效的 XML Bean 定义。
+在前面的示例中，外部 bean 定义是从三个文件加载的：`services.xml`，`messageSource.xml`，和`themeSource.xml`。**所有位置路径都是相对于执行导入的定义文件的**，因此`service.xml`必须与执行导入的文件位于同一目录或类路径位置，而`messageSource.xml`和`themeSource.xml`必须位于导入文件位置下方的 `resources` 位置。如您所见，前导斜杠被忽略。然而，**考虑到这些路径是相对的，最好不要使用斜杠**。根据 Spring 模式，要导入的文件的内容，包括顶级的 `<beans/>` 元素，必须是有效的 XML Bean 定义。
 
 >  It is possible, but not recommended, to reference files in parent directories using a relative "../" path. Doing so creates a dependency on a file that is outside the current application. In particular, this reference is not recommended for `classpath:` URLs (for example, `classpath:../services.xml`), where the runtime resolution process chooses the “nearest” classpath root and then looks into its parent directory. Classpath configuration changes may lead to the choice of a different, incorrect directory.You can always use fully qualified resource locations instead of relative paths: for example, `file:C:/config/services.xml` or `classpath:/config/services.xml`. However, be aware that you are coupling your application’s configuration to specific absolute locations. It is generally preferable to keep an indirection for such absolute locations — for example, through "${…}" placeholders that are resolved against JVM system properties at runtime.
 >
-> 可以（但不建议）使用相对“./”路径引用父目录中的文件。这样做**会创建对当前应用程序之外的文件的依赖关系**。特别是，不建议对`classpath:`URL（例如，`classpath:../services.xml`）使用此引用，其中运行时解析过程选择“最近的”类路径根，然后查找其父目录。类路径配置更改可能会导致选择不同的、不正确的目录。您始终可以使用完全限定的资源位置而不是相对路径：例如，`file:C:/config/services。xml`或`classpath:/config/services。xml`。但是，请注意，您正在将应用程序的配置耦合到特定的绝对位置。通常，最好为此类绝对位置保留一个间接方向 — 例如，通过在运行时根据JVM系统属性解析的“${…}”占位符。
+> 可以（但不建议）使用相对`./`路径引用父目录中的文件。这样做**会创建对当前应用程序之外的文件的依赖关系**。特别是，不建议对`classpath:`URL（例如，`classpath:../services.xml`）使用此引用，其中运行时解析过程选择“最近的”类路径根，然后查找其父目录。类路径配置更改可能会导致选择不同的、不正确的目录。您始终可以使用完全限定的资源位置而不是相对路径：例如，`file:C:/config/services。xml`或`classpath:/config/services。xml`。但是，请注意，您正在将应用程序的配置耦合到特定的绝对位置。通常，最好为此类绝对位置保留一个间接方向 — 例如，通过在运行时根据JVM系统属性解析的“${…}”占位符。
 
 The namespace itself provides the import directive feature. Further configuration features beyond plain bean definitions are available in a selection of XML namespaces provided by Spring — for example, the `context` and `util` namespaces.
 
-命名空间本身提供导入指令功能。Spring 提供的一系列 XML 名称空间中提供了普通 bean 定义之外的更多配置特性，例如，`context`和`util`命名空间。
+命名空间本身提供导入指令功能。Spring 提供的一系列 XML 命名空间中提供了普通 bean 定义之外的更多配置特性，例如，`context`和`util`命名空间。
 
 ##### The Groovy Bean Definition DSL
 
-groovy bean 定义 DSL
+##### Groovy bean 定义 DSL
 
 As a further example for externalized configuration metadata, bean definitions can also be expressed in Spring’s Groovy Bean Definition DSL, as known from the Grails framework. Typically, such configuration live in a ".groovy" file with the structure shown in the following example:
 
@@ -278,7 +284,7 @@ The `ApplicationContext` is the interface for an advanced factory capable of mai
 
 The `ApplicationContext` lets you read bean definitions and access them, as the following example shows:
 
-`ApplicationContext`是高级工厂的接口，能够维护不同 bean 及其依赖项的注册表。通过使用方法`T getBean（String name,Class<T> requiredType）`，您可以检索 bean 的实例。
+`ApplicationContext`是高级工厂的接口，能够维护不同 bean 及其依赖项的注册表。通过使用方法`T getBean(String name,Class<T> requiredType)`，您可以检索 bean 的实例。
 
 `ApplicationContext`允许您读取 bean 定义并访问它们，如下例所示：
 
@@ -295,7 +301,7 @@ List<String> userList = service.getUsernameList();
 
 With Groovy configuration, bootstrapping looks very similar. It has a different context implementation class which is Groovy-aware (but also understands XML bean definitions). The following example shows Groovy configuration:
 
-对于 Groovy 配置，引导看起来非常相似。它有一个不同的上下文实现类，它是 Groovy 感知的（但也理解 XML Bean 定义）。以下示例显示Groovy配置：
+对于 Groovy 配置，引导看起来非常相似。它有一个不同的上下文实现类，它是 Groovy 感知的（但也理解 XML Bean 定义）。以下示例显示 Groovy 配置：
 
 ```java
 ApplicationContext context = new GenericGroovyApplicationContext("services.groovy", "daos.groovy");
@@ -303,7 +309,7 @@ ApplicationContext context = new GenericGroovyApplicationContext("services.groov
 
 The most flexible variant is `GenericApplicationContext` in combination with reader delegates — for example, with `XmlBeanDefinitionReader` for XML files, as the following example shows:
 
-最灵活的变体是 `GenericApplicationContext`，它与读者委托相结合 — 例如，对于 XML 文件使用 `XmlBeanDefinitionReader`，如下例所示：
+最灵活的变体是 `GenericApplicationContext`，它与读者委托相结合—例如，对于 XML 文件使用 `XmlBeanDefinitionReader`，如下例所示：
 
 ```java
 GenericApplicationContext context = new GenericApplicationContext();
@@ -325,7 +331,7 @@ You can mix and match such reader delegates on the same `ApplicationContext`, re
 
 You can then use `getBean` to retrieve instances of your beans. The `ApplicationContext` interface has a few other methods for retrieving beans, but, ideally, your application code should never use them. Indeed, your application code should have no calls to the `getBean()` method at all and thus have no dependency on Spring APIs at all. For example, Spring’s integration with web frameworks provides dependency injection for various web framework components such as controllers and JSF-managed beans, letting you declare a dependency on a specific bean through metadata (such as an autowiring annotation).
 
-您可以在同一个 `ApplicationContext`上混合和匹配这样的读卡器委托，从不同的配置源读取 bean 定义。
+**您可以在同一个 `ApplicationContext`上混合和匹配这样的读卡器委托，从不同的配置源读取 bean 定义**。
 
 然后可以使用 `getBean` 检索 bean 的实例。`ApplicationContext` 接口有一些其他方法用于检索 bean，但理想情况下，应用程序代码不应使用它们。实际上，您的应用程序代码根本不应该调用`getBean()`方法，因此完全不依赖于Spring API。例如，Spring 与 web 框架的集成为各种 web 框架组件（如控制器和 JSF 托管 bean）提供了依赖项注入，允许您通过元数据（如自动连接注释）声明对特定bean的依赖项。
 
@@ -346,17 +352,17 @@ This metadata translates to a set of properties that make up each bean definitio
 
 Spring IOC 容器管理一个或多个 bean。这些 bean 是使用您提供给容器的配置元数据创建的（例如，以 XML`<bean/>`定义的形式）。
 
-在容器本身中，这些 bean 定义表示为 `BeanDefinition` 对象，其中包含（除其他信息外）以下元数据：
+**在容器本身中，这些 bean 定义表示为 `BeanDefinition` 对象，其中包含（除其他信息外）以下元数据：**
 
--包限定类名：通常是定义的bean的实际实现类。
+- 包限定类名：通常是定义的 bean 的实际**实现类**。
 
--Bean行为配置元素，它说明Bean在容器中的行为（范围、生命周期回调等）。
+- Bean 行为配置元素，它说明 Bean 在容器中的行为（范围、生命周期回调等）。
 
--引用bean执行其工作所需的其他bean。这些引用也称为协作者或依赖项。
+- 引用 bean 执行其工作所需的其他 bean。这些引用也称为协作者或依赖项。
 
--要在新创建的对象中设置的其他配置设置 — 例如，池的大小限制或管理连接池的bean中要使用的连接数。
+- 要在新创建的对象中设置的其他配置设置 — 例如，池的大小限制或管理连接池的 bean 中要使用的连接数。
 
-此元数据转换为组成每个bean定义的一组属性。下表介绍了这些属性：
+此元数据转换为组成每个 bean 定义的一组属性。下表介绍了这些属性：
 
 | Property                 | Explained in…                                                |
 | :----------------------- | :----------------------------------------------------------- |
@@ -372,13 +378,15 @@ Spring IOC 容器管理一个或多个 bean。这些 bean 是使用您提供给�
 
 In addition to bean definitions that contain information on how to create a specific bean, the `ApplicationContext` implementations also permit the registration of existing objects that are created outside the container (by users). This is done by accessing the ApplicationContext’s BeanFactory through the `getBeanFactory()` method, which returns the BeanFactory `DefaultListableBeanFactory` implementation. `DefaultListableBeanFactory` supports this registration through the `registerSingleton(..)` and `registerBeanDefinition(..)` methods. However, typical applications work solely with beans defined through regular bean definition metadata.
 
-除了包含关于如何创建特定bean的信息的bean定义外，`ApplicationContext`实现还允许注册（由用户）在容器外部创建的现有对象。这是通过通过`getBeanFactory（）`方法访问ApplicationContext的BeanFactory来实现的，该方法返回BeanFactory`DefaultListableBeanFactory`实现`DefaultListableBeanFactory`通过` registerSingleton（..）`支持此注册和“registerBeanDefinition（..）”方法。然而，典型的应用程序只使用通过常规bean定义元数据定义的bean。
+除了包含关于如何创建特定 bean 的信息的 bean definitions 之外，`ApplicationContext`实现还允许注册（由用户）在容器外部创建的现有对象。这是通过`getBeanFactory()`方法访问 ApplicationContext 的 BeanFactory 来实现的，该方法返回BeanFactory 的`DefaultListableBeanFactory`实现，`DefaultListableBeanFactory`通过` registerSingleton(..)`支持此注册和 `registerBeanDefinition(..)` 方法。然而，典型的应用程序只使用通过常规 bean 定义元数据定义的 bean。
 
 >Bean metadata and manually supplied singleton instances need to be registered as early as possible, in order for the container to properly reason about them during autowiring and other introspection steps. While overriding existing metadata and existing singleton instances is supported to some degree, the registration of new beans at runtime (concurrently with live access to the factory) is not officially supported and may lead to concurrent access exceptions, inconsistent state in the bean container, or both.
 >
->Bean元数据和手动提供的单例实例需要尽早注册，以便容器在自动连接和其他自省步骤中正确地对它们进行推理。虽然在某种程度上支持覆盖现有元数据和现有单例实例，但官方不支持在运行时注册新bean（与对工厂的实时访问同时进行），这可能导致并发访问异常、bean容器中的状态不一致，或两者兼而有之。
+>Bean 元数据和手动提供的单例实例需要尽早注册，以便容器在自动连接和其他自省步骤中正确地对它们进行推理。**虽然在某种程度上支持覆盖现有元数据和现有单例实例，但官方不支持在运行时注册新 bean（与对工厂的实时访问同时进行），这可能导致并发访问异常、bean容器中的状态不一致，或两者兼而有之。**
 
 #### 1.3.1. Naming Beans
+
+#### 1.3.1. Beans 命名
 
 Every bean has one or more identifiers. These identifiers must be unique within the container that hosts the bean. A bean usually has only one identifier. However, if it requires more than one, the extra ones can be considered aliases.
 
@@ -386,11 +394,11 @@ In XML-based configuration metadata, you use the `id` attribute, the `name` attr
 
 You are not required to supply a `name` or an `id` for a bean. If you do not supply a `name` or `id` explicitly, the container generates a unique name for that bean. However, if you want to refer to that bean by name, through the use of the `ref` element or a Service Locator style lookup, you must provide a name. Motivations for not supplying a name are related to using [inner beans](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-inner-beans) and [autowiring collaborators](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-autowire).
 
-每个bean都有一个或多个标识符。这些标识符在承载bean的容器中必须是唯一的。bean通常只有一个标识符。但是，如果需要多个别名，则可以将额外的别名视为别名。
+**每个 bean 都有一个或多个标识符。这些标识符在承载 bean 的容器中必须是唯一的。一个 bean 通常只有一个标识符。 但是，如果它需要多个，则可以将多余的视为别名。**
 
-在基于XML的配置元数据中，可以使用'id'属性、'name'属性或两者来指定bean标识符。“id”属性允许您只指定一个id。按照惯例，这些名称是字母数字的（“myBean”、“someService”等），但也可以包含特殊字符。如果要为bean引入其他别名，还可以在“name”属性中指定它们，用逗号（`、`）、分号（`；`）或空格分隔。历史上，在Spring3.1之前的版本中，“id”属性被定义为“xsd:id”类型，它限制了可能的字符。从3.1开始，它被定义为`xsd:string`类型。注意，bean`id`唯一性仍然由容器强制执行，但不再由XML解析器强制执行。
+在基于 XML 的配置元数据中，可以使用 `id`属性、`name`属性或两者来指定 bean 标识符。`id`属性允许您只指定一个 id。按照惯例，这些名称由字母数字组成（“myBean”、“someService”等），但也可以包含特殊字符。如果要为 bean 引入其他别名，还可以在`name`属性中指定它们，用逗号（`,`）、分号（`;`）或空格分隔。历史上，在 Spring 3.1 之前的版本中，`id` 属性被定义为 `xsd:ID` 类型，它限制了可能的字符。从 3.1 开始，它被定义为 `xsd:string`类型。注意，**bean `id` 唯一性仍然由容器强制执行，但不再由 XML 解析器强制执行。**
 
-您不需要为bean提供'name'或'id'。如果不显式提供'name'或'id'，容器将为该bean生成一个唯一的名称。但是，如果希望通过使用'ref'元素或服务定位器样式的查找按名称引用该bean，则必须提供名称。不提供名称的动机与使用[内部bean]有关(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-内部bean）和[autowiring collaborators](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂自动连线）。
+**您不需要为 bean 提供 `name` 或 `id`。如果不显式提供 `name` 或 `id`，容器将为该 bean 生成一个唯一的名称。但是，如果希望通过使用 `ref` 元素或服务定位器样式的查找按名称引用该 bean，则必须提供名称。**不提供名称的动机与使用[内部bean](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-inner-beans)和[autowiring collaborators](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-autowire)有关。
 
 > Bean Naming Conventions
 >
@@ -398,31 +406,27 @@ You are not required to supply a `name` or an `id` for a bean. If you do not sup
 >
 > Naming beans consistently makes your configuration easier to read and understand. Also, if you use Spring AOP, it helps a lot when applying advice to a set of beans related by name.
 >
-> Bean命名约定
+> Bean 命名约定
 >
-> 
+> 约定是在命名 bean 时使用标准 Java 约定作为实例字段名。也就是说**，bean 名称以小写字母开头，然后用驼峰大小写**。此类名称的示例包括“accountManager”、“accountService”、“userDao”、“loginController”等。
 >
-> 约定是在命名bean时使用标准Java约定作为实例字段名。也就是说，bean名称以小写字母开头，然后用驼峰大小写。此类名称的示例包括“accountManager”、“accountService”、“userDao”、“loginController”等。
->
-> 
->
-> 命名bean会使您的配置更易于阅读和理解。此外，如果您使用SpringAOP，那么在将建议应用于一组按名称相关的bean时，它会有很大帮助。
+> 命名 bean 会使您的配置更易于阅读和理解。此外，如果您使用 Spring AOP，那么在将建议应用于一组按名称相关的 bean时，它会有很大帮助。
 
 > With component scanning in the classpath, Spring generates bean names for unnamed components, following the rules described earlier: essentially, taking the simple class name and turning its initial character to lower-case. However, in the (unusual) special case when there is more than one character and both the first and second characters are upper case, the original casing gets preserved. These are the same rules as defined by `java.beans.Introspector.decapitalize` (which Spring uses here).
 >
-> 通过类路径中的组件扫描，Spring为未命名的组件生成bean名称，遵循前面描述的规则：本质上，采用简单的类名并将其初始字符转换为小写。但是，在（不常见的）特殊情况下，当有多个字符且第一个和第二个字符都是大写时，原始大小写将被保留。这些规则与“java”定义的规则相同。豆。内省者。将`（Spring在此处使用的名称）斩首。
+> **通过类路径中的组件扫描，Spring 为未命名的组件生成 bean 名称，遵循前面描述的规则：本质上，采用简单的类名并将其初始字符转换为小写。但是，在（不常见的）特殊情况下，当有多个字符且第一个和第二个字符都是大写时，原始大小写将被保留。这些规则与 `java.beans.Introspector.decapitalize`（Spring在这里使用）定义的规则相同。**
 
 ##### Aliasing a Bean outside the Bean Definition
+
+##### 在Bean定义之外给Bean添加别名
 
 In a bean definition itself, you can supply more than one name for the bean, by using a combination of up to one name specified by the `id` attribute and any number of other names in the `name` attribute. These names can be equivalent aliases to the same bean and are useful for some situations, such as letting each component in an application refer to a common dependency by using a bean name that is specific to that component itself.
 
 Specifying all aliases where the bean is actually defined is not always adequate, however. It is sometimes desirable to introduce an alias for a bean that is defined elsewhere. This is commonly the case in large systems where configuration is split amongst each subsystem, with each subsystem having its own set of object definitions. In XML-based configuration metadata, you can use the `<alias/>` element to accomplish this. The following example shows how to do so:
 
-##### 在Bean定义之外给Bean添加别名
+在 bean 定义本身中，您可以为 bean 提供多个名称，方法是使用 `id` 属性指定的最多一个名称和 `name`属性中任意数量的其他名称的组合。这些名称可以是同一 bean 的等效别名，在某些情况下非常有用，例如，通过使用特定于该组件本身的 bean 名称，让应用程序中的每个组件引用公共依赖项。
 
-在bean定义本身中，您可以为bean提供多个名称，方法是使用“id”属性指定的最多一个名称和“name”属性中任意数量的其他名称的组合。这些名称可以是同一bean的等效别名，在某些情况下非常有用，例如，通过使用特定于该组件本身的bean名称，让应用程序中的每个组件引用公共依赖项。
-
-但是，指定实际定义bean的所有别名并不总是足够的。有时需要为在别处定义的bean引入别名。在大型系统中，配置通常在每个子系统之间分割，每个子系统都有自己的对象定义集。在基于XML的配置元数据中，可以使用`<alias/>`元素来完成这一任务。以下示例显示了如何执行此操作：
+但是，指定实际定义 bean 的所有别名并不总是足够的。有时需要为在别处定义的 bean 引入别名。在大型系统中，配置通常在每个子系统之间分割，每个子系统都有自己的对象定义集。在基于 XML 的配置元数据中，可以使用`<alias/>`元素来完成这一任务。以下示例显示了如何执行此操作：
 
 ```xml
 <alias name="fromName" alias="toName"/>
@@ -432,9 +436,9 @@ In this case, a bean (in the same container) named `fromName` may also, after th
 
 For example, the configuration metadata for subsystem A may refer to a DataSource by the name of `subsystemA-dataSource`. The configuration metadata for subsystem B may refer to a DataSource by the name of `subsystemB-dataSource`. When composing the main application that uses both these subsystems, the main application refers to the DataSource by the name of `myApp-dataSource`. To have all three names refer to the same object, you can add the following alias definitions to the configuration metadata:
 
-在这种情况下，在使用此别名定义后，名为“fromName”的bean（在同一容器中）也可以称为“toName”。
+在这种情况下，在使用此别名定义后，名为 `fromName` 的 bean（在同一容器中）也可以称为 `toName`。
 
-例如，子系统A的配置元数据可能引用名为“subsystemma DataSource”的数据源。子系统B的配置元数据可能引用名为“subsystemB DataSource”的数据源。在编写使用这两个子系统的主应用程序时，主应用程序以“myApp DataSource”的名称引用数据源。要使所有三个名称都引用同一对象，可以将以下别名定义添加到配置元数据中：
+例如，子系统 A 的配置元数据可能引用名为 `subsystemA-dataSource`的数据源。子系统 B 的配置元数据可能引用名为`subsystemB-dataSource`的数据源。在编写使用这两个子系统的主应用程序时，主应用程序以 `myApp-DataSource`的名称引用数据源。**要使所有三个名称都引用同一对象，可以将以下别名定义添加到配置元数据中**：
 
 ```xml
 <alias name="myApp-dataSource" alias="subsystemA-dataSource"/>
@@ -443,17 +447,19 @@ For example, the configuration metadata for subsystem A may refer to a DataSourc
 
 Now each component and the main application can refer to the dataSource through a name that is unique and guaranteed not to clash with any other definition (effectively creating a namespace), yet they refer to the same bean.
 
-Java-configuration
+现在，每个组件和主应用程序都可以通过一个唯一的名称引用数据源，并保证不会与任何其他定义冲突（有效地创建名称空间），但它们引用的是同一个 bean。
 
-If you use Javaconfiguration, the `@Bean` annotation can be used to provide aliases. See [Using the `@Bean` Annotation](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java-bean-annotation) for details.
-
-现在，每个组件和主应用程序都可以通过一个唯一的名称引用数据源，并保证不会与任何其他定义冲突（有效地创建名称空间），但它们引用的是同一个bean。
-
-Java配置
-
-如果使用Javaconfiguration，`@Bean`注释可用于提供别名。请参阅[使用`@Bean`注释](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-JavaBean注释）获取详细信息。
+> Java-configuration
+>
+> If you use Javaconfiguration, the `@Bean` annotation can be used to provide aliases. See [Using the `@Bean` Annotation](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java-bean-annotation) for details.
+>
+> Java配置
+>
+> 如果使用Javaconfiguration，`@Bean`注释可用于提供别名。请参阅[使用`@Bean`注释](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java-bean-annotation)获取详细信息。
 
 #### 1.3.2. Instantiating Beans
+
+#### 1.3.2.实例化bean
 
 A bean definition is essentially a recipe for creating one or more objects. The container looks at the recipe for a named bean when asked and uses the configuration metadata encapsulated by that bean definition to create (or acquire) an actual object.
 
@@ -468,21 +474,23 @@ If you want to configure a bean definition for a nested class, you may use eithe
 
 For example, if you have a class called `SomeThing` in the `com.example` package, and this `SomeThing` class has a `static` nested class called `OtherThing`, they can be separated by a dollar sign (`$`) or a dot (`.`). So the value of the `class` attribute in a bean definition would be `com.example.SomeThing$OtherThing` or `com.example.SomeThing.OtherThing`.
 
-bean定义本质上是创建一个或多个对象的方法。容器在被询问时查看命名bean的配方，并使用该bean定义封装的配置元数据创建（或获取）实际对象。
+**bean 定义本质上是创建一个或多个对象的方法。容器在被询问时查看命名 bean 的配方，并使用该 bean 定义封装的配置元数据创建（或获取）实际对象。**
 
-如果使用基于XML的配置元数据，则指定要在“<bean/>”元素的“class”属性中实例化的对象的类型（或类）。此“class”属性（在内部，它是“BeanDefinition”实例上的“class”属性）通常是必需的。（有关例外情况，请参阅[使用实例工厂方法实例化](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂类实例（工厂方法）和[Bean定义继承](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-子bean定义）可以通过以下两种方式之一使用'Class'属性：
+如果使用基于 XML 的配置元数据，则指定要在 `<bean/>`元素的 `class`属性中实例化的对象的类型（或类）。此 `class` 属性（在内部，它是 `BeanDefinition` 实例上的 `Class` 属性）通常是必需的。（有关例外情况，请参阅[使用实例工厂方法实例化](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-instance-factory-method)和[Bean定义继承](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions)，你可以通过以下两种方式之一使用 `Class` 属性：
 
--通常，在容器本身通过反射式调用其构造函数直接创建bean的情况下，指定要构造的bean类，这在某种程度上相当于带有“new”操作符的Java代码。
+- **通常，在容器本身通过反射式调用其构造函数直接创建 bean 的情况下，指定要构造的 bean 类，这在某种程度上相当于带有 `new` 操作符的Java代码。**
 
--指定包含被调用以创建对象的“static”工厂方法的实际类，在不太常见的情况下，容器调用类上的“static”工厂方法以创建bean。调用“static”工厂方法返回的对象类型可能是同一个类，也可能是另一个类。
+- 指定包含被调用以创建对象的`static` 工厂方法的实际类，在不太常见的情况下，容器调用类上的 `static` 工厂方法以创建bean。调用 `static` 工厂方法返回的对象类型可能是同一个类，也可能是另一个类。
 
-嵌套类名
+**嵌套类名**
 
-如果要为嵌套类配置bean定义，可以使用嵌套类的二进制名称或源名称。
+如果要为嵌套类配置 bean 定义，可以使用嵌套类的二进制名称或源名称。
 
-例如，如果在'com'中有一个名为'SomeThing'的类。例如`package，而这个`SomeThing`类有一个名为`OtherThing`的`static`嵌套类，它们可以用一个美元符号（`$`）或一个点（`.`）分隔。因此，bean定义中的'class'属性的值应该是'com'。实例某物$OtherThing`或'com。实例某物另一件事`。
+例如，如果在 `com.example` 包中有一个名`SomeThing`的类。而这个`SomeThing`类有一个名为`OtherThing`的`static`嵌套类，它们可以用一个美元符号（`$`）或一个点（`.`）分隔。因此，bean 定义中的 `class`属性的值应该是 `com.example.SomeThing$OtherThing`或者 `com.example.SomeThing.OtherThing`。
 
 ##### Instantiation with a Constructor
+
+##### 用构造函数实例化
 
 When you create a bean by the constructor approach, all normal classes are usable by and compatible with Spring. That is, the class being developed does not need to implement any specific interfaces or to be coded in a specific fashion. Simply specifying the bean class should suffice. However, depending on what type of IoC you use for that specific bean, you may need a default (empty) constructor.
 
@@ -490,13 +498,11 @@ The Spring IoC container can manage virtually any class you want it to manage. I
 
 With XML-based configuration metadata you can specify your bean class as follows:
 
-##### 用构造函数实例化
+当您通过构造函数方法创建 bean 时，所有普通类都可以由 Spring 使用，并且与 Spring 兼容。也就是说，正在开发的类不需要实现任何特定的接口，也不需要以特定的方式进行编码。只需指定 bean 类就足够了。但是，根据您对特定 bean 使用的 IoC 类型，您可能需要一个默认（空）构造函数。
 
-当您通过构造函数方法创建bean时，所有普通类都可以由Spring使用，并且与Spring兼容。也就是说，正在开发的类不需要实现任何特定的接口，也不需要以特定的方式进行编码。只需指定bean类就足够了。但是，根据您对特定bean使用的IoC类型，您可能需要一个默认（空）构造函数。
+Spring IOC 容器实际上可以管理您希望它管理的任何类。它不仅限于管理真正的 JavaBeans。大多数 Spring 用户更喜欢实际的JavaBean，它只有一个默认（无参数）构造函数，并根据容器中的属性建模适当的 setter 和 getter。您的容器中还可以有更多异国情调的非 bean 样式的类。例如，如果您需要使用一个完全不符合 JavaBean 规范的遗留连接池，Spring 也可以管理它。
 
-SpringIOC容器实际上可以管理您希望它管理的任何类。它不仅限于管理真正的JavaBeans。大多数Spring用户更喜欢实际的JavaBean，它只有一个默认（无参数）构造函数，并根据容器中的属性建模适当的setter和getter。您的容器中还可以有更多异国情调的非bean样式的类。例如，如果您需要使用一个完全不符合JavaBean规范的遗留连接池，Spring也可以管理它。
-
-使用基于XML的配置元数据，您可以按如下方式指定bean类：
+使用基于 XML 的配置元数据，您可以按如下方式指定 bean 类：
 
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean"/>
@@ -506,17 +512,19 @@ SpringIOC容器实际上可以管理您希望它管理的任何类。它不仅�
 
 For details about the mechanism for supplying arguments to the constructor (if required) and setting object instance properties after the object is constructed, see [Injecting Dependencies](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators).
 
-有关构造对象后向构造函数提供参数（如果需要）和设置对象实例属性的机制的详细信息，请参阅[注入依赖项](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂合作伙伴）。
+有关构造对象后向构造函数提供参数（如果需要）和设置对象实例属性的机制的详细信息，请参阅[注入依赖项](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators)。
 
 ##### Instantiation with a Static Factory Method
+
+##### 使用静态工厂方法进行实例化
 
 When defining a bean that you create with a static factory method, use the `class` attribute to specify the class that contains the `static` factory method and an attribute named `factory-method` to specify the name of the factory method itself. You should be able to call this method (with optional arguments, as described later) and return a live object, which subsequently is treated as if it had been created through a constructor. One use for such a bean definition is to call `static` factories in legacy code.
 
 The following bean definition specifies that the bean be created by calling a factory method. The definition does not specify the type (class) of the returned object, only the class containing the factory method. In this example, the `createInstance()` method must be a static method. The following example shows how to specify a factory method:
 
-定义使用静态工厂方法创建的bean时，请使用'class'属性指定包含'static'工厂方法的类，并使用名为'factory method'的属性指定工厂方法本身的名称。您应该能够调用此方法（使用可选参数，如下文所述）并返回一个活动对象，该对象随后将被视为是通过构造函数创建的。这种bean定义的一个用途是在遗留代码中调用'static'工厂。
+定义使用静态工厂方法创建的 bean 时，请使用 `class` 属性指定包含 `static` 工厂方法的类，并使用名为 `factory-method`的属性指定工厂方法本身的名称。您应该能够调用此方法（使用可选参数，如下文所述）并返回一个活动对象，该对象随后将被视为是通过构造函数创建的。这种 bean 定义的一个用途是在遗留代码中调用 `static`工厂。
 
-下面的bean定义指定通过调用工厂方法来创建bean。该定义不指定返回对象的类型（类），只指定包含工厂方法的类。在本例中，`createInstance（）`方法必须是静态方法。以下示例显示如何指定工厂方法：
+**下面的 bean 定义指定通过调用工厂方法来创建 bean。该定义不指定返回对象的类型（类），只指定包含工厂方法的类。在本例中，`createInstance()`方法必须是静态方法。**以下示例显示如何指定工厂方法：
 
 ```xml
 <bean id="clientService"
@@ -526,7 +534,7 @@ The following bean definition specifies that the bean be created by calling a fa
 
 The following example shows a class that would work with the preceding bean definition:
 
-以下示例显示了一个可与前面的bean定义一起使用的类：
+以下示例显示了一个可与前面的 bean 定义一起使用的类：
 
 ```java
 public class ClientService {
@@ -541,15 +549,15 @@ public class ClientService {
 
 For details about the mechanism for supplying (optional) arguments to the factory method and setting object instance properties after the object is returned from the factory, see [Dependencies and Configuration in Detail](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-properties-detailed).
 
-有关在对象从工厂返回后向工厂方法提供（可选）参数和设置对象实例属性的机制的详细信息，请参阅[依赖项和配置详细信息](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂属性（详细信息）。
+有关在对象从工厂返回后向工厂方法提供（可选）参数和设置对象实例属性的机制的详细信息，请参阅[依赖项和配置详细信息](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-properties-detailed)。
 
 ##### Instantiation by Using an Instance Factory Method
 
-Similar to instantiation through a [static factory method](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-static-factory-method), instantiation with an instance factory method invokes a non-static method of an existing bean from the container to create a new bean. To use this mechanism, leave the `class` attribute empty and, in the `factory-bean` attribute, specify the name of a bean in the current (or parent or ancestor) container that contains the instance method that is to be invoked to create the object. Set the name of the factory method itself with the `factory-method` attribute. The following example shows how to configure such a bean:
-
 ##### 使用实例工厂方法进行实例化
 
-类似于通过[静态工厂方法]实例化(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂类（静态工厂方法），使用实例工厂方法实例化从容器中调用现有bean的非静态方法来创建新bean。要使用此机制，请将'class'属性保留为空，并在'factory bean'属性中，指定当前（或父级或祖先级）容器中包含要调用以创建对象的实例方法的bean的名称。使用“factory method”属性设置工厂方法本身的名称。下面的示例演示如何配置这样的bean：
+Similar to instantiation through a [static factory method](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-static-factory-method), instantiation with an instance factory method invokes a non-static method of an existing bean from the container to create a new bean. To use this mechanism, leave the `class` attribute empty and, in the `factory-bean` attribute, specify the name of a bean in the current (or parent or ancestor) container that contains the instance method that is to be invoked to create the object. Set the name of the factory method itself with the `factory-method` attribute. The following example shows how to configure such a bean:
+
+类似于通过[静态工厂方法](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-static-factory-method)，使用实例工厂方法实例化从容器中调用现有 bean 的非静态方法来创建新 bean。要使用此机制，请将 `class` 属性保留为空，并在 `factory-bean` 属性中，指定当前（或父级或祖先级）容器中包含要调用以创建对象的实例方法的bean 的名称。使用 `factory-method`属性设置工厂方法本身的名称。下面的示例演示如何配置这样的 bean：
 
 ```xml
 <!-- the factory bean, which contains a method called createInstance() -->
@@ -619,31 +627,35 @@ public class DefaultServiceLocator {
 
 This approach shows that the factory bean itself can be managed and configured through dependency injection (DI). See [Dependencies and Configuration in Detail](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-properties-detailed).
 
-这种方法表明，工厂bean本身可以通过依赖注入（DI）进行管理和配置。请参阅[依赖项和配置详细信息](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂属性（详细信息）。
+这种方法表明，工厂 bean 本身可以通过依赖注入（DI）进行管理和配置。请参阅[依赖项和配置详细信息](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-properties-detailed)。
 
 > In Spring documentation, "factory bean" refers to a bean that is configured in the Spring container and that creates objects through an [instance](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-instance-factory-method) or [static](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-static-factory-method) factory method. By contrast, `FactoryBean` (notice the capitalization) refers to a Spring-specific [`FactoryBean`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-extension-factorybean) implementation class.
 >
-> 在Spring文档中，“工厂bean”指的是在Spring容器中配置的bean，它通过[instance]创建对象(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂类实例（工厂方法）或[静态](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂类静态工厂方法）工厂方法。相比之下，`FactoryBean`（注意大写）指的是特定于Spring的[`FactoryBean`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂扩展factorybean）实现类。
+> 在 Spring 文档中，“factory bean”指的是在 Spring 容器中配置的 bean，它通过[实例](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-instance-factory-method)或者[静态](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-static-factory-method) 工厂方法来创建对象。相比之下，`FactoryBean`（注意大写）指的是特定于Spring的[`FactoryBean`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-extension-factorybean) 实现类。
 
 ##### Determining a Bean’s Runtime Type
+
+##### 确定 Bean 的运行时类型
 
 The runtime type of a specific bean is non-trivial to determine. A specified class in the bean metadata definition is just an initial class reference, potentially combined with a declared factory method or being a `FactoryBean` class which may lead to a different runtime type of the bean, or not being set at all in case of an instance-level factory method (which is resolved via the specified `factory-bean` name instead). Additionally, AOP proxying may wrap a bean instance with an interface-based proxy with limited exposure of the target bean’s actual type (just its implemented interfaces).
 
 The recommended way to find out about the actual runtime type of a particular bean is a `BeanFactory.getType` call for the specified bean name. This takes all of the above cases into account and returns the type of object that a `BeanFactory.getBean` call is going to return for the same bean name.
 
-##### 确定Bean的运行时类型
+特定 bean 的运行时类型很难确定。bean 元数据定义中的指定类只是一个初始类引用，可能与声明的工厂方法组合，或者 `FactoryBean` 类，这可能导致 bean 的不同运行时类型，或者在实例级工厂方法的情况下根本不设置（这是通过指定的 `factory- bean`名称来解决的）。此外，AOP 代理可以使用基于接口的代理来包装 bean 实例，并有限地公开目标 bean 的实际类型（仅其实现的接口）。
 
-特定bean的运行时类型很难确定。bean元数据定义中的指定类只是一个初始类引用，可能与声明的工厂方法组合，或者是“FactoryBean”类，这可能导致bean的不同运行时类型，或者在实例级工厂方法的情况下根本不设置（这是通过指定的'factory bean'名称来解决的）。此外，AOP代理可以使用基于接口的代理来包装bean实例，并有限地公开目标bean的实际类型（仅其实现的接口）。
-
-查找特定bean的实际运行时类型的推荐方法是对指定的bean名称进行`BeanFactory.getType`调用。这将考虑上述所有情况，并返回`BeanFactory.getBean`调用将为相同的bean名称返回的对象类型。
+**查找特定 bean 的实际运行时类型的推荐方法是对指定的 bean 名称进行`BeanFactory.getType`调用。这将考虑上述所有情况，并返回`BeanFactory.getBean`调用将为相同的 bean 名称返回的对象类型。**
 
 ### 1.4. Dependencies
 
+### 1.4. 依赖
+
 A typical enterprise application does not consist of a single object (or bean in the Spring parlance). Even the simplest application has a few objects that work together to present what the end-user sees as a coherent application. This next section explains how you go from defining a number of bean definitions that stand alone to a fully realized application where objects collaborate to achieve a goal.
 
-典型的企业应用程序不是由单个对象（或Spring术语中的bean）组成的。即使是最简单的应用程序，也有几个对象一起工作，以呈现最终用户认为是一致的应用程序。下一节将解释如何从定义大量独立的bean定义过渡到一个完全实现的应用程序，在这个应用程序中，对象协作以实现一个目标。
+典型的企业应用程序不是由单个对象（或 Spring 术语中的 bean）组成的。即使是最简单的应用程序，也有几个对象一起工作，以呈现最终用户认为是一致的应用程序。下一节将解释如何从定义大量独立的 bean 定义过渡到一个完全实现的应用程序，在这个应用程序中，对象协作以实现一个目标。
 
 #### 1.4.1. Dependency Injection
+
+#### 1.4.1 依赖注入
 
 Dependency injection (DI) is a process whereby objects define their dependencies (that is, the other objects with which they work) only through constructor arguments, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse (hence the name, Inversion of Control) of the bean itself controlling the instantiation or location of its dependencies on its own by using direct construction of classes or the Service Locator pattern.
 
@@ -651,17 +663,19 @@ Code is cleaner with the DI principle, and decoupling is more effective when obj
 
 DI exists in two major variants: [Constructor-based dependency injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-constructor-injection) and [Setter-based dependency injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-setter-injection).
 
-依赖项注入（DI）是一个过程，对象仅通过构造函数参数、工厂方法的参数或在对象实例构造或从工厂方法返回后在对象实例上设置的属性来定义其依赖项（即与之一起工作的其他对象）。然后，容器在创建bean时注入这些依赖项。这个过程基本上是bean本身的逆过程（因此称为控制反转），通过使用类的直接构造或服务定位器模式来控制其依赖项的实例化或位置。
+**依赖项注入（DI）是一个过程，对象仅通过构造函数参数、工厂方法的参数或在对象实例构造或从工厂方法返回后在对象实例上设置的属性来定义其依赖项（即与之一起工作的其他对象）。然后，容器在创建 bean 时注入这些依赖项。这个过程基本上是bean 本身的逆过程（因此称为控制反转），通过使用类的直接构造或服务定位器模式来控制其依赖项的实例化或位置。**
 
-使用DI原则，代码更干净，当对象具有依赖关系时，解耦更有效。对象不查找其依赖项，也不知道依赖项的位置或类别。因此，您的类变得更容易测试，特别是当依赖项位于接口或抽象基类上时，这允许在单元测试中使用存根或模拟实现。
+使用 DI 原则，代码更干净，当对象具有依赖关系时，解耦更有效。对象不查找其依赖项，也不知道依赖项的位置或类别。因此，您的类变得更容易测试，特别是当依赖项位于接口或抽象基类上时，这允许在单元测试中使用存根或模拟实现。
 
-DI存在于两个主要变体中：[基于构造函数的依赖项注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-构造函数注入）和[基于Setter的依赖项注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-塞特注射）。
+DI 存在于两个主要变体中：[基于构造函数的依赖项注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-constructor-injection)和[基于Setter的依赖项注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-setter-injection)。
 
 ##### Constructor-based Dependency Injection
 
+##### 基于构造函数的依赖注入
+
 Constructor-based DI is accomplished by the container invoking a constructor with a number of arguments, each representing a dependency. Calling a `static` factory method with specific arguments to construct the bean is nearly equivalent, and this discussion treats arguments to a constructor and to a `static` factory method similarly. The following example shows a class that can only be dependency-injected with constructor injection:
 
-基于构造函数的DI是通过容器调用具有多个参数的构造函数来完成的，每个参数表示一个依赖项。调用带有特定参数的'static'工厂方法来构造bean几乎是等效的，本讨论类似地处理构造函数和'static'工厂方法的参数。以下示例显示了一个类，该类只能通过构造函数注入进行依赖项注入：
+基于构造函数的 DI 是通过容器调用具有多个参数的构造函数来完成的，每个参数表示一个依赖项。调用带有特定参数的静态工厂方法来构造 bean 几乎是等效的，本讨论类似地处理构造函数和静态工厂方法的参数。以下示例显示了一个类，该类只能通过构造函数注入进行依赖项注入：
 
 ```java
 public class SimpleMovieLister {
@@ -680,15 +694,15 @@ public class SimpleMovieLister {
 
 Notice that there is nothing special about this class. It is a POJO that has no dependencies on container specific interfaces, base classes, or annotations.
 
-请注意，这个类没有什么特别之处。它是一个POJO，不依赖于特定于容器的接口、基类或注释。
+请注意，这个类没有什么特别之处。它是一个 POJO，不依赖于特定于容器的接口、基类或注释。
 
 ###### Constructor Argument Resolution
 
-Constructor argument resolution matching occurs by using the argument’s type. If no potential ambiguity exists in the constructor arguments of a bean definition, the order in which the constructor arguments are defined in a bean definition is the order in which those arguments are supplied to the appropriate constructor when the bean is being instantiated. Consider the following class:
-
 ###### 构造函数参数解析
 
-构造函数参数解析匹配通过使用参数的类型进行。如果bean定义的构造函数参数中不存在潜在的歧义，那么在bean定义中定义构造函数参数的顺序就是在实例化bean时将这些参数提供给相应构造函数的顺序。考虑下面的类：
+Constructor argument resolution matching occurs by using the argument’s type. If no potential ambiguity exists in the constructor arguments of a bean definition, the order in which the constructor arguments are defined in a bean definition is the order in which those arguments are supplied to the appropriate constructor when the bean is being instantiated. Consider the following class:
+
+**构造函数参数解析匹配通过使用参数的类型进行。如果 bean 定义的构造函数参数中不存在潜在的歧义，那么在 bean 定义中定义构造函数参数的顺序就是在实例化 bean 时将这些参数提供给相应构造函数的顺序。**考虑下面的类：
 
 ```java
 package x.y;
@@ -703,7 +717,7 @@ public class ThingOne {
 
 Assuming that the `ThingTwo` and `ThingThree` classes are not related by inheritance, no potential ambiguity exists. Thus, the following configuration works fine, and you do not need to specify the constructor argument indexes or types explicitly in the `<constructor-arg/>` element.
 
-假设'ThingTwo'和'ThingTree'类没有继承关系，则不存在潜在的歧义。因此，以下配置工作正常，您不需要在`<constructor arg/>`元素中显式指定构造函数参数索引或类型。
+假设 `ThingTwo` 和 ` ThingTree` 类没有继承关系，则不存在潜在的歧义。因此，以下配置工作正常，您不需要在`<constructor arg/>`元素中显式指定构造函数参数索引或类型。
 
 ```xml
 <beans>
@@ -720,7 +734,7 @@ Assuming that the `ThingTwo` and `ThingThree` classes are not related by inherit
 
 When another bean is referenced, the type is known, and matching can occur (as was the case with the preceding example). When a simple type is used, such as `<value>true</value>`, Spring cannot determine the type of the value, and so cannot match by type without help. Consider the following class:
 
-当引用另一个bean时，类型是已知的，并且可以进行匹配（如前一个示例所示）。当使用简单类型时，例如`<value>true</value>`，Spring无法确定值的类型，因此在没有帮助的情况下无法按类型进行匹配。考虑下面的类：
+当引用另一个 bean 时，类型是已知的，并且可以进行匹配（如前一个示例所示）。**当使用简单类型时，例如`<value>true</value>`，Spring 无法确定值的类型，因此在没有帮助的情况下无法按类型进行匹配**。考虑下面的类：
 
 ```java
 package examples;
@@ -742,11 +756,11 @@ public class ExampleBean {
 
 Constructor argument type matching
 
-In the preceding scenario, the container can use type matching with simple types if you explicitly specify the type of the constructor argument by using the `type` attribute, as the following example shows:
-
 构造函数参数类型匹配
 
-在前面的场景中，如果使用`type`属性显式指定构造函数参数的类型，则容器可以使用简单类型的类型匹配，如下例所示：
+In the preceding scenario, the container can use type matching with simple types if you explicitly specify the type of the constructor argument by using the `type` attribute, as the following example shows:
+
+在前面的场景中，**如果使用`type`属性显式指定构造函数参数的类型，则容器可以使用简单类型的类型匹配**，如下例所示：
 
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
@@ -757,11 +771,11 @@ In the preceding scenario, the container can use type matching with simple types
 
 Constructor argument index
 
-You can use the `index` attribute to specify explicitly the index of constructor arguments, as the following example shows:
-
 构造函数参数索引
 
-可以使用'index'属性显式指定构造函数参数的索引，如下例所示：
+You can use the `index` attribute to specify explicitly the index of constructor arguments, as the following example shows:
+
+**可以使用 `index`属性显式指定构造函数参数的索引**，如下例所示：
 
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
@@ -772,17 +786,17 @@ You can use the `index` attribute to specify explicitly the index of constructor
 
 In addition to resolving the ambiguity of multiple simple values, specifying an index resolves ambiguity where a constructor has two arguments of the same type.
 
-除了解决多个简单值的歧义外，如果构造函数有两个相同类型的参数，则指定索引可以解决歧义。
+**除了解决多个简单值的歧义外，如果构造函数有两个相同类型的参数，则指定索引可以解决歧义。**
 
 > The index is 0-based.
 >
-> 该索引以0为基础。
+> 该索引以 0 为基础。
 
 Constructor argument name
 
-You can also use the constructor parameter name for value disambiguation, as the following example shows:
-
 构造函数参数名
+
+You can also use the constructor parameter name for value disambiguation, as the following example shows:
 
 您还可以使用构造函数参数名称来消除值歧义，如下例所示：
 
@@ -795,7 +809,7 @@ You can also use the constructor parameter name for value disambiguation, as the
 
 Keep in mind that, to make this work out of the box, your code must be compiled with the debug flag enabled so that Spring can look up the parameter name from the constructor. If you cannot or do not want to compile your code with the debug flag, you can use the [@ConstructorProperties](https://download.oracle.com/javase/8/docs/api/java/beans/ConstructorProperties.html) JDK annotation to explicitly name your constructor arguments. The sample class would then have to look as follows:
 
-请记住，要使这项工作开箱即用，必须在编译代码时启用调试标志，以便Spring可以从构造函数中查找参数名。如果不能或不希望使用调试标志编译代码，则可以使用[@constructorproperty](https://download.oracle.com/javase/8/docs/api/java/beans/ConstructorProperties.html)JDK注释来显式命名构造函数参数。然后，示例类必须如下所示：
+请记住，要使这项工作开箱即用，必须在编译代码时启用调试标志，以便 Spring 可以从构造函数中查找参数名。如果不能或不希望使用调试标志编译代码，则可以使用[@constructorproperty](https://download.oracle.com/javase/8/docs/api/java/beans/ConstructorProperties.html)JDK 注释来显式命名构造函数参数。然后，示例类必须如下所示：
 
 ```java
 package examples;
@@ -814,15 +828,15 @@ public class ExampleBean {
 
 ##### Setter-based Dependency Injection
 
+##### 基于 Setter 的依赖注入
+
 Setter-based DI is accomplished by the container calling setter methods on your beans after invoking a no-argument constructor or a no-argument `static` factory method to instantiate your bean.
 
 The following example shows a class that can only be dependency-injected by using pure setter injection. This class is conventional Java. It is a POJO that has no dependencies on container specific interfaces, base classes, or annotations.
 
-##### 基于Setter的依赖注入
+**基于 Setter 的 DI 是由容器在调用无参数构造函数或无参数静态工厂方法实例化 bean 后，在 bean 上调用 Setter 方法来完成的。**
 
-基于Setter的DI是由容器在调用无参数构造函数或无参数“static”工厂方法实例化bean后，在bean上调用Setter方法来完成的。
-
-下面的示例显示了一个只能使用纯setter注入进行依赖注入的类。这个类是传统的Java。它是一个POJO，不依赖于特定于容器的接口、基类或注释。
+下面的示例显示了一个只能使用纯 setter 注入进行依赖注入的类。这个类是传统的 Java。它是一个 POJO，不依赖于特定于容器的接口、基类或注释。
 
 ```java
 public class SimpleMovieLister {
@@ -841,7 +855,7 @@ public class SimpleMovieLister {
 
 The `ApplicationContext` supports constructor-based and setter-based DI for the beans it manages. It also supports setter-based DI after some dependencies have already been injected through the constructor approach. You configure the dependencies in the form of a `BeanDefinition`, which you use in conjunction with `PropertyEditor` instances to convert properties from one format to another. However, most Spring users do not work with these classes directly (that is, programmatically) but rather with XML `bean` definitions, annotated components (that is, classes annotated with `@Component`, `@Controller`, and so forth), or `@Bean` methods in Java-based `@Configuration` classes. These sources are then converted internally into instances of `BeanDefinition` and used to load an entire Spring IoC container instance.
 
-'ApplicationContext'为其管理的bean支持基于构造函数和基于setter的DI。在通过构造函数方法注入一些依赖项之后，它还支持基于setter的DI。您可以以“BeanDefinition”的形式配置依赖项，将其与“PropertyEdit”实例结合使用，以将属性从一种格式转换为另一种格式。然而，大多数Spring用户并不直接使用这些类（即编程），而是使用XML`bean`定义、带注释的组件（即，用`Component`、`Controller`等注释的类）或基于Java的`Configuration`类中的`bean`方法。然后将这些源在内部转换为“BeanDefinition”的实例，并用于加载整个Spring IoC容器实例。
+`ApplicationContext`为其管理的 bean 支持基于构造函数和基于 setter 的 DI。在通过构造函数方法注入一些依赖项之后，它还支持基于 setter 的 DI。您可以以 `BeanDefinition` 的形式配置依赖项，将其与 `PropertyEditor` 实例结合使用，以将属性从一种格式转换为另一种格式。然而，大多数 Spring 用户并不直接使用这些类（即编程），而是使用 XML `bean`定义、带注释的组件（即，用`@Component`、`@Controller`等注释的类）或基于 Java 的`@Configuration`类中的`@bean`方法。然后将这些源在内部转换为 `BeanDefinition` 的实例，并用于加载整个 Spring IoC 容器实例。
 
 > Constructor-based or setter-based DI?
 >
@@ -852,18 +866,20 @@ The `ApplicationContext` supports constructor-based and setter-based DI for the 
 > Setter injection should primarily only be used for optional dependencies that can be assigned reasonable default values within the class. Otherwise, not-null checks must be performed everywhere the code uses the dependency. One benefit of setter injection is that setter methods make objects of that class amenable to reconfiguration or re-injection later. Management through [JMX MBeans](https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#jmx) is therefore a compelling use case for setter injection.
 >
 > Use the DI style that makes the most sense for a particular class. Sometimes, when dealing with third-party classes for which you do not have the source, the choice is made for you. For example, if a third-party class does not expose any setter methods, then constructor injection may be the only available form of DI.
-
-基于构造函数还是基于setter的DI？
-
-因为您可以混合使用基于构造函数和基于setter的DI，所以对于强制依赖项使用构造函数，对于可选依赖项使用setter方法或配置方法是一个很好的经验法则。请注意，使用[@Required](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-必需的注释）setter方法上的注释可用于使属性成为必需的依赖项；但是，构造函数注入和参数的编程验证更可取。
-
-Spring团队通常提倡构造函数注入，因为它允许您将应用程序组件实现为不可变对象，并确保所需的依赖项不为“null”。此外，构造函数注入的组件总是以完全初始化的状态返回给客户机（调用）代码。作为旁注，大量构造函数参数是一种糟糕的代码味道，这意味着类可能有太多的责任，应该进行重构以更好地解决问题的适当分离。
-
-Setter注入应该主要用于可选的依赖项，这些依赖项可以在类中分配合理的默认值。否则，必须在代码使用依赖项的任何地方执行非空检查。setter注入的一个好处是setter方法使该类的对象易于以后重新配置或重新注入。通过[JMX MBeans]进行管理(https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#jmx)因此，是setter注入的一个引人注目的用例。
-
-使用对特定类最有意义的DI样式。有时，在处理您没有源代码的第三方类时，会为您做出选择。例如，如果第三方类不公开任何setter方法，那么构造函数注入可能是唯一可用的DI形式。
+>
+> 基于构造函数还是基于 setter 的 DI？
+>
+> **因为您可以混合使用基于构造函数和基于 setter 的 DI，所以对于强制依赖项使用构造函数，对于可选依赖项使用 setter 方法或配置方法是一个很好的经验法则**。请注意， setter方法上使用[@Required](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-required-annotation)的注释可用于使属性成为必需的依赖项；但是，构造函数注入和参数的编程验证更可取。
+>
+> **Spring 团队通常提倡构造函数注入**，因为它允许您将应用程序组件实现为不可变对象，并确保所需的依赖项不为“null”。此外，构造函数注入的组件总是以完全初始化的状态返回给客户机（调用）代码。作为旁注，大量构造函数参数是一种糟糕的代码味道，这意味着类可能有太多的责任，应该进行重构以更好地解决问题的适当分离。
+>
+> **Setter 注入应该主要用于可选的依赖项，这些依赖项可以在类中分配合理的默认值**。否则，必须在代码使用依赖项的任何地方执行非空检查。setter注入的一个好处是setter方法使该类的对象易于以后重新配置或重新注入。通过[JMX MBeans](https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#jmx)进行管理，因此，是 setter 注入的一个引人注目的用例。
+>
+> 使用对特定类最有意义的 DI 样式。有时，在处理您没有源代码的第三方类时，会为您做出选择。例如，如果第三方类不公开任何setter方法，那么构造函数注入可能是唯一可用的DI形式。
 
 ##### Dependency Resolution Process
+
+##### 依赖项解析过程
 
 The container performs bean dependency resolution as follows:
 
@@ -874,23 +890,50 @@ The container performs bean dependency resolution as follows:
 
 The Spring container validates the configuration of each bean as the container is created. However, the bean properties themselves are not set until the bean is actually created. Beans that are singleton-scoped and set to be pre-instantiated (the default) are created when the container is created. Scopes are defined in [Bean Scopes](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes). Otherwise, the bean is created only when it is requested. Creation of a bean potentially causes a graph of beans to be created, as the bean’s dependencies and its dependencies' dependencies (and so on) are created and assigned. Note that resolution mismatches among those dependencies may show up late — that is, on first creation of the affected bean.
 
-Circular dependencies
+**容器执行 bean 依赖项解析，如下所示：**
 
-If you use predominantly constructor injection, it is possible to create an unresolvable circular dependency scenario.
+- 使用描述所有 bean 的配置元数据创建并初始化 `ApplicationContext`。配置元数据可以由 XML、Java 代码或注释指定。
+- 对于每个 bean，其依赖关系都以属性、构造函数参数或静态工厂方法的参数的形式表示（如果您使用静态工厂方法而不是普通构造函数）。这些依赖关系在 bean 实际创建时提供给 bean。
+- 每个属性或构造函数参数都是要设置的值的实际定义，或者是对容器中另一个 bean 的引用。
+- 作为值的每个属性或构造函数参数都将从其指定格式转换为该属性或构造函数参数的实际类型。默认情况下，Spring 可以将以字符串格式提供的值转换为所有内置类型，如“int”、“long”、“string”、“boolean”等。
 
-For example: Class A requires an instance of class B through constructor injection, and class B requires an instance of class A through constructor injection. If you configure beans for classes A and B to be injected into each other, the Spring IoC container detects this circular reference at runtime, and throws a `BeanCurrentlyInCreationException`.
+**Spring 容器在创建容器时验证每个 bean 的配置。但是，在实际创建 bean 之前，不会设置 bean 属性本身**。**创建容器时，将创建单例作用域并设置为预实例化（默认）的 bean。作用域在[Bean作用域](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes)中定义。否则，仅当请求时才创建 bean**。创建bean可能会导致创建 bean 图，因为 bean 的依赖项及其依赖项的依赖项（等等）是创建和分配的。请注意，这些依赖项之间的分辨率不匹配可能会延迟显示 — 也就是说，在第一次创建受影响的 bean 时。
 
-One possible solution is to edit the source code of some classes to be configured by setters rather than constructors. Alternatively, avoid constructor injection and use setter injection only. In other words, although it is not recommended, you can configure circular dependencies with setter injection.
-
-Unlike the typical case (with no circular dependencies), a circular dependency between bean A and bean B forces one of the beans to be injected into the other prior to being fully initialized itself (a classic chicken-and-egg scenario).
+> Circular dependencies
+>
+> 循环依赖
+>
+> If you use predominantly constructor injection, it is possible to create an unresolvable circular dependency scenario.
+>
+> For example: Class A requires an instance of class B through constructor injection, and class B requires an instance of class A through constructor injection. If you configure beans for classes A and B to be injected into each other, the Spring IoC container detects this circular reference at runtime, and throws a `BeanCurrentlyInCreationException`.
+>
+> One possible solution is to edit the source code of some classes to be configured by setters rather than constructors. Alternatively, avoid constructor injection and use setter injection only. In other words, although it is not recommended, you can configure circular dependencies with setter injection.
+>
+> Unlike the typical case (with no circular dependencies), a circular dependency between bean A and bean B forces one of the beans to be injected into the other prior to being fully initialized itself (a classic chicken-and-egg scenario).
+>
+> **如果主要使用构造函数注入，则有可能创建无法解决的循环依赖场景**。
+>
+> 例如：类 A 通过构造函数注入需要类 B 的实例，类 B 通过构造函数注入需要类 A 的实例。如果为类 A 和类 B 配置 bean 以相互注入，Spring IoC 容器将在运行时检测此循环引用，并抛出 `BeanCurrentlyIncrementationException`。
+>
+> **一种可能的解决方案是编辑某些类的源代码，由 setter 而不是构造函数进行配置。或者，避免构造函数注入，只使用 setter 注入。换句话说，虽然不推荐，但是可以使用 setter 注入来配置循环依赖项。**
+>
+> 与典型情况（没有循环依赖）不同，bean A 和 bean B 之间的循环依赖迫使一个 bean 在完全初始化之前注入另一个 bean（典型的鸡和蛋场景）。
 
 You can generally trust Spring to do the right thing. It detects configuration problems, such as references to non-existent beans and circular dependencies, at container load-time. Spring sets properties and resolves dependencies as late as possible, when the bean is actually created. This means that a Spring container that has loaded correctly can later generate an exception when you request an object if there is a problem creating that object or one of its dependencies — for example, the bean throws an exception as a result of a missing or invalid property. This potentially delayed visibility of some configuration issues is why `ApplicationContext` implementations by default pre-instantiate singleton beans. At the cost of some upfront time and memory to create these beans before they are actually needed, you discover configuration issues when the `ApplicationContext` is created, not later. You can still override this default behavior so that singleton beans initialize lazily, rather than being eagerly pre-instantiated.
 
 If no circular dependencies exist, when one or more collaborating beans are being injected into a dependent bean, each collaborating bean is totally configured prior to being injected into the dependent bean. This means that, if bean A has a dependency on bean B, the Spring IoC container completely configures bean B prior to invoking the setter method on bean A. In other words, the bean is instantiated (if it is not a pre-instantiated singleton), its dependencies are set, and the relevant lifecycle methods (such as a [configured init method](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-initializingbean) or the [InitializingBean callback method](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-initializingbean)) are invoked.
 
+您通常可以相信 Spring 会做正确的事情。它在容器加载时检测配置问题，例如对不存在的 bean 的引用和循环依赖项。Spring 在bean 实际创建时尽可能晚地设置属性并解析依赖项。这意味着，如果创建对象或其依赖项时出现问题，则正确加载的 Spring 容器稍后可以在请求对象时生成异常 — 例如，bean由于缺少或无效属性而引发异常。这可能会延迟某些配置问题的可见性，这就是为什么默认情况下，`ApplicationContext`实现会预实例化单例 bean。在实际需要这些 bean 之前，您需要花费一些前期时间和内存来创建这些 bean，但在创建 `ApplicationContext`时，您会发现配置问题，而不是在以后。您仍然可以覆盖此默认行为，以便单例 bean 可以延迟初始化，而不是急切地预实例化。
+
+如果不存在循环依赖关系，那么当一个或多个协作 bean 被注入到依赖 bean 中时，每个协作 bean 在被注入到依赖 bean 中之前都会被完全配置。这意味着，如果 bean A 对 bean B 有依赖关系，Spring IoC 容器在调用 bean A 上的 setter 方法之前完全配置 bean B。换句话说，bean 被实例化（如果它不是预实例化的单例），它的依赖项被设置，相关的生命周期方法（例如[configured init method](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-initializingbean) 或[InitializingBean callback method](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-initializingbean)）被调用。
+
 ##### Examples of Dependency Injection
 
+##### 依赖注入示例
+
 The following example uses XML-based configuration metadata for setter-based DI. A small part of a Spring XML configuration file specifies some bean definitions as follows:
+
+以下示例将基于 XML 的配置元数据用于**基于 setter 的 DI**。Spring XML 配置文件的一小部分指定了一些 bean 定义，如下所示：
 
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
@@ -901,6 +944,7 @@ The following example uses XML-based configuration metadata for setter-based DI.
 
     <!-- setter injection using the neater ref attribute -->
     <property name="beanTwo" ref="yetAnotherBean"/>
+    <!--注意这里的属性名称不为 i-->
     <property name="integerProperty" value="1"/>
 </bean>
 
@@ -910,9 +954,7 @@ The following example uses XML-based configuration metadata for setter-based DI.
 
 The following example shows the corresponding `ExampleBean` class:
 
-Java
-
-Kotlin
+以下示例显示了相应的 `ExampleBean` 类：
 
 ```java
 public class ExampleBean {
@@ -939,6 +981,8 @@ public class ExampleBean {
 
 In the preceding example, setters are declared to match against the properties specified in the XML file. The following example uses constructor-based DI:
 
+在前面的示例中，setter 被声明为与 XML 文件中指定的属性相匹配。以下示例使用**基于构造函数的 DI**：
+
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
     <!-- constructor injection using the nested ref element -->
@@ -958,9 +1002,7 @@ In the preceding example, setters are declared to match against the properties s
 
 The following example shows the corresponding `ExampleBean` class:
 
-Java
-
-Kotlin
+以下示例显示了相应的 `ExampleBean` 类：
 
 ```java
 public class ExampleBean {
@@ -984,6 +1026,9 @@ The constructor arguments specified in the bean definition are used as arguments
 
 Now consider a variant of this example, where, instead of using a constructor, Spring is told to call a `static` factory method to return an instance of the object:
 
+bean 定义中指定的构造函数参数用作`ExampleBean`构造函数的参数。
+现在考虑这个例子的一个变体，在这里，Spring 不是使用构造函数，而是调用一个静态工厂方法来返回对象的实例：
+
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean" factory-method="createInstance">
     <constructor-arg ref="anotherExampleBean"/>
@@ -997,9 +1042,7 @@ Now consider a variant of this example, where, instead of using a constructor, S
 
 The following example shows the corresponding `ExampleBean` class:
 
-Java
-
-Kotlin
+以下示例显示了相应的 `ExampleBean` 类：
 
 ```java
 public class ExampleBean {
@@ -1024,13 +1067,23 @@ public class ExampleBean {
 
 Arguments to the `static` factory method are supplied by `<constructor-arg/>` elements, exactly the same as if a constructor had actually been used. The type of the class being returned by the factory method does not have to be of the same type as the class that contains the `static` factory method (although, in this example, it is). An instance (non-static) factory method can be used in an essentially identical fashion (aside from the use of the `factory-bean` attribute instead of the `class` attribute), so we do not discuss those details here.
 
+静态工厂方法的参数由`<constructor-arg/>`元素提供，与实际使用的构造函数完全相同。工厂方法返回的类的类型不必与包含静态工厂方法的类的类型相同（尽管在本例中是这样）。实例（非静态）工厂方法可以以基本相同的方式使用（除了使用 `factory-bean`属性而不是 `class` 属性之外），因此我们在这里不讨论这些细节。
+
 #### 1.4.2. Dependencies and Configuration in Detail
+
+#### 1.4.2.详细的依赖关系和配置
 
 As mentioned in the [previous section](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators), you can define bean properties and constructor arguments as references to other managed beans (collaborators) or as values defined inline. Spring’s XML-based configuration metadata supports sub-element types within its `<property/>` and `<constructor-arg/>` elements for this purpose.
 
+如[上一节](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators)所述，您可以将 bean 属性和构造函数参数定义为对其他托管 bean（协作者）的引用或内联定义的值。为此，Spring 基于 XML 的配置元数据支持其`<property/>`和`<constructor-arg/>`元素中的子元素类型。
+
 ##### Straight Values (Primitives, Strings, and so on)
 
+##### 直线值（基本体、字符串等）
+
 The `value` attribute of the `<property/>` element specifies a property or constructor argument as a human-readable string representation. Spring’s [conversion service](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert-ConversionService-API) is used to convert these values from a `String` to the actual type of the property or argument. The following example shows various values being set:
+
+“<property/>”元素的“value”属性将属性或构造函数参数指定为人类可读的字符串表示形式。Spring的[转换服务](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert ConversionService API）用于将这些值从“字符串”转换为属性或参数的实际类型。以下示例显示了正在设置的各种值：
 
 ```xml
 <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -1043,6 +1096,8 @@ The `value` attribute of the `<property/>` element specifies a property or const
 ```
 
 The following example uses the [p-namespace](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace) for even more succinct XML configuration:
+
+下面的示例使用[p-名称空间](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace）更简洁的XML配置：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1065,6 +1120,9 @@ The preceding XML is more succinct. However, typos are discovered at runtime rat
 
 You can also configure a `java.util.Properties` instance, as follows:
 
+前面的XML更简洁。但是，除非您使用IDE（如[IntelliJ IDEA]），否则打字错误是在运行时而不是在设计时发现的(https://www.jetbrains.com/idea/)或[用于Eclipse的Spring工具](https://spring.io/tools))它支持在创建bean定义时自动完成属性。强烈建议您提供此类IDE帮助。
+您还可以配置一个“java”。util。属性实例，如下所示：
+
 ```xml
 <bean id="mappings"
     class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
@@ -1081,9 +1139,15 @@ You can also configure a `java.util.Properties` instance, as follows:
 
 The Spring container converts the text inside the `<value/>` element into a `java.util.Properties` instance by using the JavaBeans `PropertyEditor` mechanism. This is a nice shortcut, and is one of a few places where the Spring team do favor the use of the nested `<value/>` element over the `value` attribute style.
 
+Spring容器将`<value/>`元素中的文本转换为`java。util。使用JavaBeans`PropertyEditor`机制创建Properties`实例。这是一个很好的快捷方式，也是Spring团队支持使用嵌套的`<value/>`元素而不是`value`属性样式的少数地方之一。
+
 ###### The `idref` element
 
+###### “idref”元素
+
 The `idref` element is simply an error-proof way to pass the `id` (a string value - not a reference) of another bean in the container to a `<constructor-arg/>` or `<property/>` element. The following example shows how to use it:
+
+“idref”元素只是一种防错的方法，用于将容器中另一个bean的“id”（字符串值-不是引用）传递给“<constructor arg/>”或“<property/>”元素。以下示例显示了如何使用它：
 
 ```xml
 <bean id="theTargetBean" class="..."/>
@@ -1097,6 +1161,8 @@ The `idref` element is simply an error-proof way to pass the `id` (a string valu
 
 The preceding bean definition snippet is exactly equivalent (at runtime) to the following snippet:
 
+前面的bean定义片段（在运行时）与下面的片段完全等效：
+
 ```xml
 <bean id="theTargetBean" class="..." />
 
@@ -1107,23 +1173,35 @@ The preceding bean definition snippet is exactly equivalent (at runtime) to the 
 
 The first form is preferable to the second, because using the `idref` tag lets the container validate at deployment time that the referenced, named bean actually exists. In the second variation, no validation is performed on the value that is passed to the `targetName` property of the `client` bean. Typos are only discovered (with most likely fatal results) when the `client` bean is actually instantiated. If the `client` bean is a [prototype](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes) bean, this typo and the resulting exception may only be discovered long after the container is deployed.
 
-|      | The `local` attribute on the `idref` element is no longer supported in the 4.0 beans XSD, since it does not provide value over a regular `bean` reference any more. Change your existing `idref local` references to `idref bean` when upgrading to the 4.0 schema. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+第一种形式比第二种形式更可取，因为使用`idref`标记可以让容器在部署时验证引用的命名bean是否确实存在。在第二个变体中，没有对传递给`client`bean的`targetName`属性的值执行任何验证。只有在实际实例化'client'bean时，才会发现输入错误（很可能是致命的结果）。如果'client'bean是[原型](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂范围）bean，只有在部署容器后很长一段时间才能发现此输入错误和由此产生的异常。
+
+> The `local` attribute on the `idref` element is no longer supported in the 4.0 beans XSD, since it does not provide value over a regular `bean` reference any more. Change your existing `idref local` references to `idref bean` when upgrading to the 4.0 schema.
+>
+> 4.0 beans XSD中不再支持'idref'元素上的'local'属性，因为它不再提供常规'bean'引用上的值。升级到4.0架构时，将现有的“idref local”引用更改为“idref bean”。
 
 A common place (at least in versions earlier than Spring 2.0) where the `<idref/>` element brings value is in the configuration of [AOP interceptors](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-pfb-1) in a `ProxyFactoryBean` bean definition. Using `<idref/>` elements when you specify the interceptor names prevents you from misspelling an interceptor ID.
 
+“<idref/>”元素带来价值的一个常见位置（至少在Spring2.0之前的版本中）是在[AOP拦截器]的配置中(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-pfb-1）在'ProxyFactoryBean'bean定义中。在指定拦截器名称时使用`<idref/>`元素可以防止拼写错误拦截器ID。
+
 ##### References to Other Beans (Collaborators)
+
+##### 对其他bean（协作者）的引用
 
 The `ref` element is the final element inside a `<constructor-arg/>` or `<property/>` definition element. Here, you set the value of the specified property of a bean to be a reference to another bean (a collaborator) managed by the container. The referenced bean is a dependency of the bean whose property is to be set, and it is initialized on demand as needed before the property is set. (If the collaborator is a singleton bean, it may already be initialized by the container.) All references are ultimately a reference to another object. Scoping and validation depend on whether you specify the ID or name of the other object through the `bean` or `parent` attribute.
 
 Specifying the target bean through the `bean` attribute of the `<ref/>` tag is the most general form and allows creation of a reference to any bean in the same container or parent container, regardless of whether it is in the same XML file. The value of the `bean` attribute may be the same as the `id` attribute of the target bean or be the same as one of the values in the `name` attribute of the target bean. The following example shows how to use a `ref` element:
+
+“ref”元素是“<constructor arg/>”或“<property/>”定义元素中的最后一个元素。这里，您将bean的指定属性的值设置为对容器管理的另一个bean（协作者）的引用。被引用的bean是要设置其属性的bean的依赖项，并且在设置属性之前根据需要对其进行初始化。（如果协作者是单例bean，那么它可能已经被容器初始化了。）所有引用最终都是对另一个对象的引用。作用域和验证取决于是否通过“bean”或“parent”属性指定其他对象的ID或名称。
+
+通过“<ref/>”标记的“bean”属性指定目标bean是最通用的形式，它允许创建对同一容器或父容器中任何bean的引用，而不管它是否在同一XML文件中。'bean'属性的值可能与目标bean的'id'属性相同，或者与目标bean的'name'属性中的一个值相同。以下示例显示如何使用'ref'元素：
 
 ```xml
 <ref bean="someBean"/>
 ```
 
 Specifying the target bean through the `parent` attribute creates a reference to a bean that is in a parent container of the current container. The value of the `parent` attribute may be the same as either the `id` attribute of the target bean or one of the values in the `name` attribute of the target bean. The target bean must be in a parent container of the current one. You should use this bean reference variant mainly when you have a hierarchy of containers and you want to wrap an existing bean in a parent container with a proxy that has the same name as the parent bean. The following pair of listings shows how to use the `parent` attribute:
+
+通过'parent'属性指定目标bean将创建对当前容器的父容器中的bean的引用。'parent'属性的值可以与目标bean的'id'属性相同，也可以与目标bean的'name'属性中的一个值相同。目标bean必须位于当前bean的父容器中。当您有容器的层次结构，并且希望使用与父bean同名的代理将现有bean包装到父容器中时，应该主要使用这个bean引用变量。以下两个清单显示了如何使用“parent”属性：
 
 ```xml
 <!-- in the parent context -->
@@ -1140,13 +1218,13 @@ Specifying the target bean through the `parent` attribute creates a reference to
 </bean>
 ```
 
-|      | The `local` attribute on the `ref` element is no longer supported in the 4.0 beans XSD, since it does not provide value over a regular `bean` reference any more. Change your existing `ref local` references to `ref bean` when upgrading to the 4.0 schema. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+> The `local` attribute on the `ref` element is no longer supported in the 4.0 beans XSD, since it does not provide value over a regular `bean` reference any more. Change your existing `ref local` references to `ref bean` when upgrading to the 4.0 schema.
 
 ##### Inner Beans
 
 A `<bean/>` element inside the `<property/>` or `<constructor-arg/>` elements defines an inner bean, as the following example shows:
+
+“<property/>”或“<constructor arg/>”元素中的“<bean/>”元素定义了一个内部bean，如下例所示：
 
 ```xml
 <bean id="outer" class="...">
@@ -1164,9 +1242,14 @@ An inner bean definition does not require a defined ID or name. If specified, th
 
 As a corner case, it is possible to receive destruction callbacks from a custom scope — for example, for a request-scoped inner bean contained within a singleton bean. The creation of the inner bean instance is tied to its containing bean, but destruction callbacks let it participate in the request scope’s lifecycle. This is not a common scenario. Inner beans typically simply share their containing bean’s scope.
 
+内部bean定义不需要定义的ID或名称。如果指定，则容器不使用此类值作为标识符。容器在创建时也会忽略'scope'标志，因为内部bean总是匿名的，并且总是使用外部bean创建的。不可能单独访问内部bean，也不可能将它们注入到协作bean中，而不是封闭bean中。
+作为一种特殊情况，可以从自定义范围接收销毁回调 — 例如，对于单例bean中包含的请求范围的内部bean。内部bean实例的创建与其包含的bean相关联，但销毁回调允许它参与请求范围的生命周期。这不是常见的情况。内部bean通常只是共享其包含bean的范围。
+
 ##### Collections
 
 The `<list/>`, `<set/>`, `<map/>`, and `<props/>` elements set the properties and arguments of the Java `Collection` types `List`, `Set`, `Map`, and `Properties`, respectively. The following example shows how to use them:
+
+“<list/>”、“set/>”、“map/>”和“<props/>”元素分别设置Java`Collection`types`list`、`set`、`map`和`properties`的属性和参数。以下示例显示了如何使用它们：
 
 ```xml
 <bean id="moreComplexObject" class="example.ComplexObject">
@@ -1204,6 +1287,8 @@ The `<list/>`, `<set/>`, `<map/>`, and `<props/>` elements set the properties an
 
 The value of a map key or value, or a set value, can also be any of the following elements:
 
+映射键或值或集合值的值也可以是以下任意元素：
+
 ```xml
 bean | ref | idref | list | set | map | props | value | null
 ```
@@ -1215,6 +1300,10 @@ The Spring container also supports merging collections. An application developer
 This section on merging discusses the parent-child bean mechanism. Readers unfamiliar with parent and child bean definitions may wish to read the [relevant section](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions) before continuing.
 
 The following example demonstrates collection merging:
+
+Spring容器还支持合并集合。应用程序开发人员可以定义父级<list/>、<map/>、<set/>或<props/>元素，并让子级<list/>、<map/>、<set/>或<props/>元素继承和重写父集合中的值。也就是说，子集合的值是合并父集合和子集合的元素的结果，子集合的元素覆盖父集合中指定的值。
+关于合并的这一节讨论父子bean机制。不熟悉父bean和子bean定义的读者可能希望阅读[相关部分](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-子bean定义），然后继续。
+以下示例演示集合合并：
 
 ```xml
 <beans>
@@ -1240,6 +1329,8 @@ The following example demonstrates collection merging:
 
 Notice the use of the `merge=true` attribute on the `<props/>` element of the `adminEmails` property of the `child` bean definition. When the `child` bean is resolved and instantiated by the container, the resulting instance has an `adminEmails` `Properties` collection that contains the result of merging the child’s `adminEmails` collection with the parent’s `adminEmails` collection. The following listing shows the result:
 
+注意，在`child`bean定义的`adminEmails`属性的`props/>`元素上使用了`merge=true`属性。当容器解析并实例化'child'bean时，生成的实例具有一个'admineals``Properties`集合，该集合包含将子级的'admineals`集合与父级的'admineals`集合合并的结果。下面的列表显示了结果：
+
 ```
 administrator=administrator@example.com
 sales=sales@example.com
@@ -1250,17 +1341,20 @@ The child `Properties` collection’s value set inherits all property elements f
 
 This merging behavior applies similarly to the `<list/>`, `<map/>`, and `<set/>` collection types. In the specific case of the `<list/>` element, the semantics associated with the `List` collection type (that is, the notion of an `ordered` collection of values) is maintained. The parent’s values precede all of the child list’s values. In the case of the `Map`, `Set`, and `Properties` collection types, no ordering exists. Hence, no ordering semantics are in effect for the collection types that underlie the associated `Map`, `Set`, and `Properties` implementation types that the container uses internally.
 
+子“Properties”集合的值集继承父“props/>”集合中的所有属性元素，“support”值的子值覆盖父集合中的值。
+此合并行为类似于`<list/>`、`<map/>`和`<set/>`集合类型。在“<list/>”元素的特定情况下，与“list”集合类型相关联的语义（即值的“有序”集合的概念）将得到维护。父列表的值位于子列表的所有值之前。对于“Map”、“Set”和“Properties”集合类型，不存在排序。因此，对于容器内部使用的关联“Map”、“Set”和“Properties”实现类型下的集合类型，没有有效的排序语义。
+
 ###### Limitations of Collection Merging
 
 You cannot merge different collection types (such as a `Map` and a `List`). If you do attempt to do so, an appropriate `Exception` is thrown. The `merge` attribute must be specified on the lower, inherited, child definition. Specifying the `merge` attribute on a parent collection definition is redundant and does not result in the desired merging.
+
+不能合并不同的集合类型（例如“映射”和“列表”）。如果您确实尝试这样做，将抛出一个适当的“异常”。必须在较低的继承子定义上指定“merge”属性。在父集合定义上指定“merge”属性是多余的，不会导致所需的合并。
 
 ###### Strongly-typed collection
 
 With the introduction of generic types in Java 5, you can use strongly typed collections. That is, it is possible to declare a `Collection` type such that it can only contain (for example) `String` elements. If you use Spring to dependency-inject a strongly-typed `Collection` into a bean, you can take advantage of Spring’s type-conversion support such that the elements of your strongly-typed `Collection` instances are converted to the appropriate type prior to being added to the `Collection`. The following Java class and bean definition show how to do so:
 
-Java
-
-Kotlin
+随着Java5中泛型类型的引入，您可以使用强类型集合。也就是说，可以声明一个`Collection`类型，使其只能包含（例如）`String`元素。如果使用Spring将强类型的“Collection”依赖项注入bean中，那么可以利用Spring的类型转换支持，以便在将强类型的“Collection”实例的元素添加到“Collection”之前将其转换为适当的类型。以下Java类和bean定义说明了如何执行此操作：
 
 ```java
 public class SomeClass {
@@ -1271,6 +1365,9 @@ public class SomeClass {
         this.accounts = accounts;
     }
 }
+```
+
+```xml
 <beans>
     <bean id="something" class="x.y.SomeClass">
         <property name="accounts">
@@ -1286,9 +1383,13 @@ public class SomeClass {
 
 When the `accounts` property of the `something` bean is prepared for injection, the generics information about the element type of the strongly-typed `Map<String, Float>` is available by reflection. Thus, Spring’s type conversion infrastructure recognizes the various value elements as being of type `Float`, and the string values (`9.99`, `2.75`, and `3.99`) are converted into an actual `Float` type.
 
+当'something'bean的'accounts'属性准备好注入时，关于强类型'Map<String，Float>`的元素类型的泛型信息可以通过反射获得。因此，Spring的类型转换基础结构将各种值元素识别为“Float”类型，字符串值（`9.99`、`2.75`、`3.99`）被转换为实际的“Float”类型。
+
 ##### Null and Empty String Values
 
 Spring treats empty arguments for properties and the like as empty `Strings`. The following XML-based configuration metadata snippet sets the `email` property to the empty `String` value ("").
+
+Spring将属性等的空参数视为空的“字符串”。以下基于XML的配置元数据片段将'email'属性设置为空的'String'值（“”）。
 
 ```xml
 <bean class="ExampleBean">
@@ -1298,15 +1399,15 @@ Spring treats empty arguments for properties and the like as empty `Strings`. Th
 
 The preceding example is equivalent to the following Java code:
 
-Java
-
-Kotlin
+前面的示例相当于以下Java代码：
 
 ```java
 exampleBean.setEmail("");
 ```
 
 The `<null/>` element handles `null` values. The following listing shows an example:
+
+`<null/>`元素处理`null`值。下面的列表显示了一个示例：
 
 ```xml
 <bean class="ExampleBean">
@@ -1318,9 +1419,7 @@ The `<null/>` element handles `null` values. The following listing shows an exam
 
 The preceding configuration is equivalent to the following Java code:
 
-Java
-
-Kotlin
+上述配置相当于以下Java代码：
 
 ```java
 exampleBean.setEmail(null);
@@ -1328,11 +1427,17 @@ exampleBean.setEmail(null);
 
 ##### XML Shortcut with the p-namespace
 
+##### 带有p名称空间的XML快捷方式
+
 The p-namespace lets you use the `bean` element’s attributes (instead of nested `<property/>` elements) to describe your property values collaborating beans, or both.
 
 Spring supports extensible configuration formats [with namespaces](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#xsd-schemas), which are based on an XML Schema definition. The `beans` configuration format discussed in this chapter is defined in an XML Schema document. However, the p-namespace is not defined in an XSD file and exists only in the core of Spring.
 
 The following example shows two XML snippets (the first uses standard XML format and the second uses the p-namespace) that resolve to the same result:
+
+p-namespace允许您使用`bean`元素的属性（而不是嵌套的`property/>`元素）来描述您的属性值，或者同时使用这两种属性。
+Spring支持可扩展配置格式[使用名称空间](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#xsd-模式），它们基于XML模式定义。本章讨论的“beans”配置格式是在XML模式文档中定义的。但是，p名称空间没有在XSD文件中定义，只存在于Spring的核心中。
+以下示例显示了两个解析为相同结果的XML片段（第一个使用标准XML格式，第二个使用p命名空间）：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1353,6 +1458,9 @@ The following example shows two XML snippets (the first uses standard XML format
 The example shows an attribute in the p-namespace called `email` in the bean definition. This tells Spring to include a property declaration. As previously mentioned, the p-namespace does not have a schema definition, so you can set the name of the attribute to the property name.
 
 This next example includes two more bean definitions that both have a reference to another bean:
+
+该示例显示了bean定义中名为“email”的p名称空间中的一个属性。这告诉Spring包含一个属性声明。如前所述，p-namespace没有模式定义，因此可以将属性名设置为属性名。
+下一个示例包括另外两个bean定义，它们都引用了另一个bean：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1379,15 +1487,20 @@ This next example includes two more bean definitions that both have a reference 
 
 This example includes not only a property value using the p-namespace but also uses a special format to declare property references. Whereas the first bean definition uses `<property name="spouse" ref="jane"/>` to create a reference from bean `john` to bean `jane`, the second bean definition uses `p:spouse-ref="jane"` as an attribute to do the exact same thing. In this case, `spouse` is the property name, whereas the `-ref` part indicates that this is not a straight value but rather a reference to another bean.
 
-|      | The p-namespace is not as flexible as the standard XML format. For example, the format for declaring property references clashes with properties that end in `Ref`, whereas the standard XML format does not. We recommend that you choose your approach carefully and communicate this to your team members to avoid producing XML documents that use all three approaches at the same time. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+此示例不仅包括使用p命名空间的属性值，还使用特殊格式声明属性引用。第一个bean定义使用“<property name=“party”ref=“jane”/>”来创建从bean`john`到bean`jane`的引用，而第二个bean定义使用`p:party ref=“jane”`作为属性来完成完全相同的操作。在本例中，`party`是属性名，`-ref`部分表示这不是一个直接值，而是对另一个bean的引用。
+
+> The p-namespace is not as flexible as the standard XML format. For example, the format for declaring property references clashes with properties that end in `Ref`, whereas the standard XML format does not. We recommend that you choose your approach carefully and communicate this to your team members to avoid producing XML documents that use all three approaches at the same time.
+>
+> p命名空间不如标准XML格式灵活。例如，用于声明属性引用的格式与以“Ref”结尾的属性冲突，而标准XML格式则不冲突。我们建议您仔细选择您的方法，并将此告知您的团队成员，以避免生成同时使用这三种方法的XML文档。
 
 ##### XML Shortcut with the c-namespace
 
 Similar to the [XML Shortcut with the p-namespace](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace), the c-namespace, introduced in Spring 3.1, allows inlined attributes for configuring the constructor arguments rather then nested `constructor-arg` elements.
 
 The following example uses the `c:` namespace to do the same thing as the from [Constructor-based Dependency Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-constructor-injection):
+
+类似于[p名称空间的XML快捷方式](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-（p-namespace），Spring3.1中引入的c-namespace允许内联属性来配置构造函数参数，而不是嵌套的“constructor arg”元素。
+下面的示例使用`c:`名称空间执行与from[Constructor-based-Dependency-Injection]相同的操作(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-构造函数注入）：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1417,21 +1530,30 @@ The `c:` namespace uses the same conventions as the `p:` one (a trailing `-ref` 
 
 For the rare cases where the constructor argument names are not available (usually if the bytecode was compiled without debugging information), you can use fallback to the argument indexes, as follows:
 
+`c:`名称空间使用与`p:`one（bean引用的尾部'-ref'）相同的约定来按名称设置构造函数参数。类似地，它需要在XML文件中声明，即使它没有在XSD模式中定义（它存在于Spring内核中）。
+对于构造函数参数名称不可用的罕见情况（通常是在字节码编译时没有调试信息），可以使用参数索引的回退，如下所示：
+
 ```xml
 <!-- c-namespace index declaration -->
 <bean id="beanOne" class="x.y.ThingOne" c:_0-ref="beanTwo" c:_1-ref="beanThree"
     c:_2="something@somewhere.com"/>
 ```
 
-|      | Due to the XML grammar, the index notation requires the presence of the leading `_`, as XML attribute names cannot start with a number (even though some IDEs allow it). A corresponding index notation is also available for `<constructor-arg>` elements but not commonly used since the plain order of declaration is usually sufficient there. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+> Due to the XML grammar, the index notation requires the presence of the leading `_`, as XML attribute names cannot start with a number (even though some IDEs allow it). A corresponding index notation is also available for `<constructor-arg>` elements but not commonly used since the plain order of declaration is usually sufficient there.
+>
+> 由于XML语法的原因，索引表示法要求出现前导的```，因为XML属性名不能以数字开头（即使某些IDE允许）。对于`<constructor arg>`元素也有相应的索引表示法，但并不常用，因为声明的简单顺序通常就足够了。
 
 In practice, the constructor resolution [mechanism](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-ctor-arguments-resolution) is quite efficient in matching arguments, so unless you really need to, we recommend using the name notation throughout your configuration.
 
+实际上，构造函数解析[机制](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory（参数解析）在匹配参数方面非常有效，因此除非您确实需要，否则我们建议在整个配置中使用名称表示法。
+
 ##### Compound Property Names
 
+##### 复合属性名
+
 You can use compound or nested property names when you set bean properties, as long as all components of the path except the final property name are not `null`. Consider the following bean definition:
+
+设置bean属性时，可以使用复合属性名或嵌套属性名，只要路径的所有组件（最终属性名除外）都不为“null”。考虑下面的bean定义：
 
 ```xml
 <bean id="something" class="things.ThingOne">
@@ -1441,9 +1563,13 @@ You can use compound or nested property names when you set bean properties, as l
 
 The `something` bean has a `fred` property, which has a `bob` property, which has a `sammy` property, and that final `sammy` property is being set to a value of `123`. In order for this to work, the `fred` property of `something` and the `bob` property of `fred` must not be `null` after the bean is constructed. Otherwise, a `NullPointerException` is thrown.
 
+'something'bean有一个'fred'属性，它有一个'bob'属性，它有一个'sammy'属性，最后的'sammy'属性被设置为值'123'。为了使其工作，“something”的“fred”属性和“fred”的“bob”属性在构造bean后不能为“null”。否则，将抛出“NullPointerException”。
+
 #### 1.4.3. Using `depends-on`
 
-If a bean is a dependency of another bean, that usually means that one bean is set as a property of another. Typically you accomplish this with the [`` element](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-ref-element) in XML-based configuration metadata. However, sometimes dependencies between beans are less direct. An example is when a static initializer in a class needs to be triggered, such as for database driver registration. The `depends-on` attribute can explicitly force one or more beans to be initialized before the bean using this element is initialized. The following example uses the `depends-on` attribute to express a dependency on a single bean:
+If a bean is a dependency of another bean, that usually means that one bean is set as a property of another. Typically you accomplish this with the [`<ref/> element`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-ref-element) in XML-based configuration metadata. However, sometimes dependencies between beans are less direct. An example is when a static initializer in a class needs to be triggered, such as for database driver registration. The `depends-on` attribute can explicitly force one or more beans to be initialized before the bean using this element is initialized. The following example uses the `depends-on` attribute to express a dependency on a single bean:
+
+如果一个bean是另一个bean的依赖项，这通常意味着一个bean被设置为另一个bean的属性。通常使用[`<ref/>元素`]来完成此操作(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-ref元素），在基于XML的配置元数据中。然而，有时候bean之间的依赖关系不那么直接。例如，需要触发类中的静态初始值设定项，例如数据库驱动程序注册。`depends-on`属性可以显式地强制在初始化使用此元素的bean之前初始化一个或多个bean。以下示例使用“depends-on”属性表示对单个bean的依赖关系：
 
 ```xml
 <bean id="beanOne" class="ExampleBean" depends-on="manager"/>
@@ -1451,6 +1577,8 @@ If a bean is a dependency of another bean, that usually means that one bean is s
 ```
 
 To express a dependency on multiple beans, supply a list of bean names as the value of the `depends-on` attribute (commas, whitespace, and semicolons are valid delimiters):
+
+要表示对多个bean的依赖关系，请提供一个bean名称列表，作为`depends-on`属性的值（逗号、空格和分号是有效的分隔符）：
 
 ```xml
 <bean id="beanOne" class="ExampleBean" depends-on="manager,accountDao">
@@ -1461,15 +1589,19 @@ To express a dependency on multiple beans, supply a list of bean names as the va
 <bean id="accountDao" class="x.y.jdbc.JdbcAccountDao" />
 ```
 
-|      | The `depends-on` attribute can specify both an initialization-time dependency and, in the case of [singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) beans only, a corresponding destruction-time dependency. Dependent beans that define a `depends-on` relationship with a given bean are destroyed first, prior to the given bean itself being destroyed. Thus, `depends-on` can also control shutdown order. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+> The `depends-on` attribute can specify both an initialization-time dependency and, in the case of [singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) beans only, a corresponding destruction-time dependency. Dependent beans that define a `depends-on` relationship with a given bean are destroyed first, prior to the given bean itself being destroyed. Thus, `depends-on` can also control shutdown order.
+>
+> `depends-on`属性可以指定初始化时间依赖项，对于[singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂范围（单例）bean，对应的销毁时间依赖关系。在销毁给定bean之前，首先销毁定义与给定bean的“dependen-on”关系的依赖bean。因此，`dependen`也可以控制关机顺序。
 
 #### 1.4.4. Lazy-initialized Beans
 
 By default, `ApplicationContext` implementations eagerly create and configure all [singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) beans as part of the initialization process. Generally, this pre-instantiation is desirable, because errors in the configuration or surrounding environment are discovered immediately, as opposed to hours or even days later. When this behavior is not desirable, you can prevent pre-instantiation of a singleton bean by marking the bean definition as being lazy-initialized. A lazy-initialized bean tells the IoC container to create a bean instance when it is first requested, rather than at startup.
 
 In XML, this behavior is controlled by the `lazy-init` attribute on the `<bean/>` element, as the following example shows:
+
+默认情况下，`ApplicationContext`实现急切地创建和配置所有[singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-作为初始化过程的一部分，factory作用域为（单例）bean。通常，这种预实例化是可取的，因为配置或周围环境中的错误会立即被发现，而不是数小时甚至数天之后。当这种行为不可取时，可以通过将bean定义标记为延迟初始化来防止单例bean的预实例化。惰性初始化bean告诉IoC容器在第一次请求时而不是在启动时创建bean实例。
+
+在XML中，此行为由“<bean/>”元素上的“lazy init”属性控制，如下例所示：
 
 ```xml
 <bean id="lazy" class="com.something.ExpensiveToCreateBean" lazy-init="true"/>
@@ -1481,6 +1613,12 @@ When the preceding configuration is consumed by an `ApplicationContext`, the `la
 However, when a lazy-initialized bean is a dependency of a singleton bean that is not lazy-initialized, the `ApplicationContext` creates the lazy-initialized bean at startup, because it must satisfy the singleton’s dependencies. The lazy-initialized bean is injected into a singleton bean elsewhere that is not lazy-initialized.
 
 You can also control lazy-initialization at the container level by using the `default-lazy-init` attribute on the `<beans/>` element, as the following example shows:
+
+当前面的配置被“ApplicationContext”使用时，“lazy”bean不会在“ApplicationContext”启动时被急切地预实例化，而“lazy”bean则不会。`lazy`bean急切地被预先实例化。
+
+但是，当惰性初始化bean是未惰性初始化的单例bean的依赖项时，`ApplicationContext`在启动时创建惰性初始化bean，因为它必须满足单例的依赖项。惰性初始化bean被注入到非惰性初始化的其他地方的单例bean中。
+
+您还可以在`<beans/>`元素上使用`default lazy init`属性在容器级别控制延迟初始化，如下例所示：
 
 ```xml
 <beans default-lazy-init="true">
@@ -1497,6 +1635,13 @@ The Spring container can autowire relationships between collaborating beans. You
 
 When using XML-based configuration metadata (see [Dependency Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators)), you can specify the autowire mode for a bean definition with the `autowire` attribute of the `<bean/>` element. The autowiring functionality has four modes. You specify autowiring per bean and can thus choose which ones to autowire. The following table describes the four autowiring modes:
 
+Spring容器可以自动连接协作bean之间的关系。通过检查“ApplicationContext”的内容，您可以让Spring为您的bean自动解析协作者（其他bean）。自动布线具有以下优点：
+
+- 自动关联可以显著减少指定属性或构造函数参数的需要。（其他机制，如bean模板[本章其他部分讨论](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-子bean定义）在这方面也很有价值。）
+- 自动关联可以随着对象的发展而更新配置。例如，如果您需要向类添加依赖项，则可以自动满足该依赖项，而无需修改配置。因此，在开发过程中，自动连接特别有用，而不会在代码库变得更稳定时取消切换到显式连接的选项。
+
+使用基于XML的配置元数据时（请参阅[依赖项注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory collaborators）），您可以使用`<bean/>`元素的`autowire`属性为bean定义指定autowire模式。自动布线功能有四种模式。您可以为每个bean指定自动连线，从而可以选择要自动连线的bean。下表介绍了四种自动布线模式：
+
 | Mode          | Explanation                                                  |
 | :------------ | :----------------------------------------------------------- |
 | `no`          | (Default) No autowiring. Bean references must be defined by `ref` elements. Changing the default setting is not recommended for larger deployments, because specifying collaborators explicitly gives greater control and clarity. To some extent, it documents the structure of a system. |
@@ -1506,7 +1651,11 @@ When using XML-based configuration metadata (see [Dependency Injection](https://
 
 With `byType` or `constructor` autowiring mode, you can wire arrays and typed collections. In such cases, all autowire candidates within the container that match the expected type are provided to satisfy the dependency. You can autowire strongly-typed `Map` instances if the expected key type is `String`. An autowired `Map` instance’s values consist of all bean instances that match the expected type, and the `Map` instance’s keys contain the corresponding bean names.
 
+使用“byType”或“constructor”自动连接模式，可以连接数组和类型化集合。在这种情况下，将提供容器中与预期类型匹配的所有autowire候选项以满足依赖关系。如果所需的键类型为“String”，则可以自动关联强类型的“Map”实例。自动连线的'Map'实例的值由与预期类型匹配的所有bean实例组成，'Map'实例的键包含相应的bean名称。
+
 ##### Limitations and Disadvantages of Autowiring
+
+##### 自动布线的局限性和缺点
 
 Autowiring works best when it is used consistently across a project. If autowiring is not used in general, it might be confusing to developers to use it to wire only one or two bean definitions.
 
@@ -1524,13 +1673,25 @@ In the latter scenario, you have several options:
 - Designate a single bean definition as the primary candidate by setting the `primary` attribute of its `<bean/>` element to `true`.
 - Implement the more fine-grained control available with annotation-based configuration, as described in [Annotation-based Container Configuration](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-annotation-config).
 
+自动布线在整个项目中一致使用时效果最佳。如果通常不使用自动连接，那么使用它仅连接一个或两个bean定义可能会让开发人员感到困惑。
+考虑自动取款的局限性和缺点：
+-“property”和“constructor arg”设置中的显式依赖项始终覆盖自动关联。您不能自动关联简单属性，如原语、`Strings`和`Classes`（以及此类简单属性的数组）。这一限制是故意造成的。
+-自动布线不如显式布线精确。尽管如此，如前表所述，Spring小心避免在可能产生意外结果的歧义情况下进行猜测。Spring托管对象之间的关系不再明确记录。
+-布线信息可能不适用于可能从Spring容器生成文档的工具。
+-容器中的多个bean定义可能与要自动连接的setter方法或构造函数参数指定的类型匹配。对于数组、集合或“Map”实例，这不一定是问题。然而，对于期望单个值的依赖项，这种模糊性并不是任意解决的。如果没有唯一的bean定义可用，将引发异常。
+在后一种情况下，您有几个选项：
+-放弃自动布线，支持显式布线。
+-如[下一节]中所述，通过将bean定义的“autowire-candidate”属性设置为“false”，避免bean定义的自动关联(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂自动连线（候选）。
+-通过将其`<bean/>`元素的`primary`属性设置为`true`，将单个bean定义指定为主要候选项。
+-如[annotation-based Container configuration]中所述，使用基于注释的配置实现更细粒度的控制(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-注释配置）。
+
 ##### Excluding a Bean from Autowiring
+
+##### 从自动连线中排除Bean
 
 On a per-bean basis, you can exclude a bean from autowiring. In Spring’s XML format, set the `autowire-candidate` attribute of the `<bean/>` element to `false`. The container makes that specific bean definition unavailable to the autowiring infrastructure (including annotation style configurations such as [`@Autowired`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-autowired-annotation)).
 
-|      | The `autowire-candidate` attribute is designed to only affect type-based autowiring. It does not affect explicit references by name, which get resolved even if the specified bean is not marked as an autowire candidate. As a consequence, autowiring by name nevertheless injects a bean if the name matches. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+> The `autowire-candidate` attribute is designed to only affect type-based autowiring. It does not affect explicit references by name, which get resolved even if the specified bean is not marked as an autowire candidate. As a consequence, autowiring by name nevertheless injects a bean if the name matches.
 
 You can also limit autowire candidates based on pattern-matching against bean names. The top-level `<beans/>` element accepts one or more patterns within its `default-autowire-candidates` attribute. For example, to limit autowire candidate status to any bean whose name ends with `Repository`, provide a value of `*Repository`. To provide multiple patterns, define them in a comma-separated list. An explicit value of `true` or `false` for a bean definition’s `autowire-candidate` attribute always takes precedence. For such beans, the pattern matching rules do not apply.
 
