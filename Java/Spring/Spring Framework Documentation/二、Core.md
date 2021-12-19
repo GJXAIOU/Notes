@@ -22,7 +22,7 @@ This chapter covers Spring’s Inversion of Control (IoC) container.
 
 ### 1.1. Introduction to the Spring IoC Container and Beans
 
-### 1.1. Spring IoC容器和bean简介
+### 1.1. Spring IoC 容器和 bean 简介
 
 This chapter covers the Spring Framework implementation of the Inversion of Control (IoC) principle. IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies (that is, the other objects they work with) only through constructor arguments, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse (hence the name, Inversion of Control) of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes or a mechanism such as the Service Locator pattern.
 
@@ -1083,7 +1083,7 @@ As mentioned in the [previous section](https://docs.spring.io/spring-framework/d
 
 The `value` attribute of the `<property/>` element specifies a property or constructor argument as a human-readable string representation. Spring’s [conversion service](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert-ConversionService-API) is used to convert these values from a `String` to the actual type of the property or argument. The following example shows various values being set:
 
-“<property/>”元素的“value”属性将属性或构造函数参数指定为人类可读的字符串表示形式。Spring的[转换服务](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert ConversionService API）用于将这些值从“字符串”转换为属性或参数的实际类型。以下示例显示了正在设置的各种值：
+`<property/>`元素的 `value` 属性将属性或构造函数参数指定为人类可读的字符串表示形式。Spring的[转换服务](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert-ConversionService-API)用于将这些值从`String`转换为属性或参数的实际类型。以下示例显示了正在设置的各种值：
 
 ```xml
 <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -1097,7 +1097,7 @@ The `value` attribute of the `<property/>` element specifies a property or const
 
 The following example uses the [p-namespace](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace) for even more succinct XML configuration:
 
-下面的示例使用[p-名称空间](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace）更简洁的XML配置：
+下面的示例使用[p-命名空间](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace) 更简洁的XML配置：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1120,8 +1120,8 @@ The preceding XML is more succinct. However, typos are discovered at runtime rat
 
 You can also configure a `java.util.Properties` instance, as follows:
 
-前面的XML更简洁。但是，除非您使用IDE（如[IntelliJ IDEA]），否则打字错误是在运行时而不是在设计时发现的(https://www.jetbrains.com/idea/)或[用于Eclipse的Spring工具](https://spring.io/tools))它支持在创建bean定义时自动完成属性。强烈建议您提供此类IDE帮助。
-您还可以配置一个“java”。util。属性实例，如下所示：
+前面的 XML 更简洁。但是，除非您使用 IDE（如[IntelliJ IDEA](https://www.jetbrains.com/idea/) 或 [Spring Tools for Eclipse](https://spring.io/tools)），否则打字错误是在运行时而不是在设计时发现的，它支持在创建bean定义时自动完成属性。强烈建议您提供此类 IDE 帮助。
+您还可以配置一个`java.util.Properties`属性实例，如下所示：
 
 ```xml
 <bean id="mappings"
@@ -1139,15 +1139,15 @@ You can also configure a `java.util.Properties` instance, as follows:
 
 The Spring container converts the text inside the `<value/>` element into a `java.util.Properties` instance by using the JavaBeans `PropertyEditor` mechanism. This is a nice shortcut, and is one of a few places where the Spring team do favor the use of the nested `<value/>` element over the `value` attribute style.
 
-Spring容器将`<value/>`元素中的文本转换为`java。util。使用JavaBeans`PropertyEditor`机制创建Properties`实例。这是一个很好的快捷方式，也是Spring团队支持使用嵌套的`<value/>`元素而不是`value`属性样式的少数地方之一。
+**Spring 容器使用 JavaBeans 的 `PropertyEdit` 机制将 `<value/>` 元素中的文本转换为 `java.util.Properties` 实例**。这是一个很好的快捷方式，也是 Spring 团队支持使用嵌套的 `<value/>` 元素而不是 `value` 属性样式的少数地方之一。
 
 ###### The `idref` element
 
-###### “idref”元素
+###### `idref` 元素
 
 The `idref` element is simply an error-proof way to pass the `id` (a string value - not a reference) of another bean in the container to a `<constructor-arg/>` or `<property/>` element. The following example shows how to use it:
 
-“idref”元素只是一种防错的方法，用于将容器中另一个bean的“id”（字符串值-不是引用）传递给“<constructor arg/>”或“<property/>”元素。以下示例显示了如何使用它：
+`idref` 元素只是一种防错的方法，用于将容器中另一个 bean 的 `id`（字符串值-不是引用）传递给 `<constructor arg/>` 或 `<property/>` 元素。以下示例显示了如何使用它：
 
 ```xml
 <bean id="theTargetBean" class="..."/>
@@ -1161,7 +1161,7 @@ The `idref` element is simply an error-proof way to pass the `id` (a string valu
 
 The preceding bean definition snippet is exactly equivalent (at runtime) to the following snippet:
 
-前面的bean定义片段（在运行时）与下面的片段完全等效：
+前面的 bean 定义片段（在运行时）与下面的片段完全等效：
 
 ```xml
 <bean id="theTargetBean" class="..." />
@@ -1173,27 +1173,26 @@ The preceding bean definition snippet is exactly equivalent (at runtime) to the 
 
 The first form is preferable to the second, because using the `idref` tag lets the container validate at deployment time that the referenced, named bean actually exists. In the second variation, no validation is performed on the value that is passed to the `targetName` property of the `client` bean. Typos are only discovered (with most likely fatal results) when the `client` bean is actually instantiated. If the `client` bean is a [prototype](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes) bean, this typo and the resulting exception may only be discovered long after the container is deployed.
 
-第一种形式比第二种形式更可取，因为使用`idref`标记可以让容器在部署时验证引用的命名bean是否确实存在。在第二个变体中，没有对传递给`client`bean的`targetName`属性的值执行任何验证。只有在实际实例化'client'bean时，才会发现输入错误（很可能是致命的结果）。如果'client'bean是[原型](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂范围）bean，只有在部署容器后很长一段时间才能发现此输入错误和由此产生的异常。
+第一种形式比第二种形式更可取，因为**使用`idref`标记可以让容器在部署时验证引用的命名 bean 是否确实存在**。在第二个变体中，没有对传递给`client`bean的`targetName`属性的值执行任何验证。只有在实际实例化`client` bean 时，才会发现输入错误（很可能是致命的结果）。如果`client` bean是[原型](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes) bean，只有在部署容器后很长一段时间才能发现此输入错误和由此产生的异常。
 
 > The `local` attribute on the `idref` element is no longer supported in the 4.0 beans XSD, since it does not provide value over a regular `bean` reference any more. Change your existing `idref local` references to `idref bean` when upgrading to the 4.0 schema.
 >
 > 4.0 beans XSD中不再支持'idref'元素上的'local'属性，因为它不再提供常规'bean'引用上的值。升级到4.0架构时，将现有的“idref local”引用更改为“idref bean”。
 
 A common place (at least in versions earlier than Spring 2.0) where the `<idref/>` element brings value is in the configuration of [AOP interceptors](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-pfb-1) in a `ProxyFactoryBean` bean definition. Using `<idref/>` elements when you specify the interceptor names prevents you from misspelling an interceptor ID.
-
-“<idref/>”元素带来价值的一个常见位置（至少在Spring2.0之前的版本中）是在[AOP拦截器]的配置中(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-pfb-1）在'ProxyFactoryBean'bean定义中。在指定拦截器名称时使用`<idref/>`元素可以防止拼写错误拦截器ID。
+`<idref/>`元素带来价值的一个常见位置（至少在 Spring 2.0 之前的版本中）是在 `ProxyFactoryBean` bean 定义中的 [AOP拦截器](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-pfb-1)配置中。在指定拦截器名称时使用`<idref/>`元素可以防止拼写错误拦截器 ID。
 
 ##### References to Other Beans (Collaborators)
 
-##### 对其他bean（协作者）的引用
+##### 对其他 bean（协作者）的引用
 
 The `ref` element is the final element inside a `<constructor-arg/>` or `<property/>` definition element. Here, you set the value of the specified property of a bean to be a reference to another bean (a collaborator) managed by the container. The referenced bean is a dependency of the bean whose property is to be set, and it is initialized on demand as needed before the property is set. (If the collaborator is a singleton bean, it may already be initialized by the container.) All references are ultimately a reference to another object. Scoping and validation depend on whether you specify the ID or name of the other object through the `bean` or `parent` attribute.
 
 Specifying the target bean through the `bean` attribute of the `<ref/>` tag is the most general form and allows creation of a reference to any bean in the same container or parent container, regardless of whether it is in the same XML file. The value of the `bean` attribute may be the same as the `id` attribute of the target bean or be the same as one of the values in the `name` attribute of the target bean. The following example shows how to use a `ref` element:
 
-“ref”元素是“<constructor arg/>”或“<property/>”定义元素中的最后一个元素。这里，您将bean的指定属性的值设置为对容器管理的另一个bean（协作者）的引用。被引用的bean是要设置其属性的bean的依赖项，并且在设置属性之前根据需要对其进行初始化。（如果协作者是单例bean，那么它可能已经被容器初始化了。）所有引用最终都是对另一个对象的引用。作用域和验证取决于是否通过“bean”或“parent”属性指定其他对象的ID或名称。
+`ref`元素是`<constructor arg/>`或 `<property/>`定义元素中的最后一个元素。这里，您将 bean 的指定属性的值设置为对容器管理的另一个 bean（协作者）的引用。被引用的 bean 是要设置其属性的 bean 的依赖项，并且在设置属性之前根据需要对其进行初始化。（如果协作者是单例 bean，那么它可能已经被容器初始化了。）所有引用最终都是对另一个对象的引用。作用域和验证取决于是否通过 `bean` 或 `parent`属性指定其他对象的 ID 或名称。
 
-通过“<ref/>”标记的“bean”属性指定目标bean是最通用的形式，它允许创建对同一容器或父容器中任何bean的引用，而不管它是否在同一XML文件中。'bean'属性的值可能与目标bean的'id'属性相同，或者与目标bean的'name'属性中的一个值相同。以下示例显示如何使用'ref'元素：
+通过 `<ref/>` 标记的 `bean` 属性指定目标 bean 是最通用的形式，它**允许创建对同一容器或父容器中任何 bean 的引用**，而不管它是否在同一 XML 文件中。`bean` 属性的值可能与目标 bean 的 `id` 属性相同，或者与目标 bean 的 `name`属性中的一个值相同。以下示例显示如何使用 `ref`  元素：
 
 ```xml
 <ref bean="someBean"/>
@@ -1201,13 +1200,14 @@ Specifying the target bean through the `bean` attribute of the `<ref/>` tag is t
 
 Specifying the target bean through the `parent` attribute creates a reference to a bean that is in a parent container of the current container. The value of the `parent` attribute may be the same as either the `id` attribute of the target bean or one of the values in the `name` attribute of the target bean. The target bean must be in a parent container of the current one. You should use this bean reference variant mainly when you have a hierarchy of containers and you want to wrap an existing bean in a parent container with a proxy that has the same name as the parent bean. The following pair of listings shows how to use the `parent` attribute:
 
-通过'parent'属性指定目标bean将创建对当前容器的父容器中的bean的引用。'parent'属性的值可以与目标bean的'id'属性相同，也可以与目标bean的'name'属性中的一个值相同。目标bean必须位于当前bean的父容器中。当您有容器的层次结构，并且希望使用与父bean同名的代理将现有bean包装到父容器中时，应该主要使用这个bean引用变量。以下两个清单显示了如何使用“parent”属性：
+通过 `parent` 属性指定目标 bean 将创建对当前容器的父容器中的 bean 的引用。`parent` 属性的值可以与目标 bean 的 `id` 属性相同，也可以与目标 bean 的 `name` 属性中的一个值相同。目标 bean 必须位于当前 bean 的父容器中。当您有容器的层次结构，并且希望使用与父 bean 同名的代理将现有 bean 包装到父容器中时，应该主要使用这个 bean 引用变量。以下两个清单显示了如何使用 `parent`属性：
 
 ```xml
 <!-- in the parent context -->
 <bean id="accountService" class="com.something.SimpleAccountService">
     <!-- insert dependencies as required here -->
 </bean>
+
 <!-- in the child (descendant) context -->
 <bean id="accountService" <!-- bean name is the same as the parent bean -->
     class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -1219,12 +1219,16 @@ Specifying the target bean through the `parent` attribute creates a reference to
 ```
 
 > The `local` attribute on the `ref` element is no longer supported in the 4.0 beans XSD, since it does not provide value over a regular `bean` reference any more. Change your existing `ref local` references to `ref bean` when upgrading to the 4.0 schema.
+>
+> 4.0 beans XSD不再支持'ref'元素上的'local'属性，因为它不再提供常规'bean'引用上的值。升级到4.0架构时，将现有的“ref local”引用更改为“ref bean”。
 
 ##### Inner Beans
 
+##### 内部 Bean
+
 A `<bean/>` element inside the `<property/>` or `<constructor-arg/>` elements defines an inner bean, as the following example shows:
 
-“<property/>”或“<constructor arg/>”元素中的“<bean/>”元素定义了一个内部bean，如下例所示：
+`<property/>` 或 `<constructor arg/>` 元素中的 `<bean/>` 元素定义了一个内部 bean，如下例所示：
 
 ```xml
 <bean id="outer" class="...">
@@ -1242,14 +1246,16 @@ An inner bean definition does not require a defined ID or name. If specified, th
 
 As a corner case, it is possible to receive destruction callbacks from a custom scope — for example, for a request-scoped inner bean contained within a singleton bean. The creation of the inner bean instance is tied to its containing bean, but destruction callbacks let it participate in the request scope’s lifecycle. This is not a common scenario. Inner beans typically simply share their containing bean’s scope.
 
-内部bean定义不需要定义的ID或名称。如果指定，则容器不使用此类值作为标识符。容器在创建时也会忽略'scope'标志，因为内部bean总是匿名的，并且总是使用外部bean创建的。不可能单独访问内部bean，也不可能将它们注入到协作bean中，而不是封闭bean中。
-作为一种特殊情况，可以从自定义范围接收销毁回调 — 例如，对于单例bean中包含的请求范围的内部bean。内部bean实例的创建与其包含的bean相关联，但销毁回调允许它参与请求范围的生命周期。这不是常见的情况。内部bean通常只是共享其包含bean的范围。
+**内部 bean 定义不需要定义的 ID 或名称**。如果指定，则容器不使用此类值作为标识符。容器在创建时也会忽略 `scope` 标志，因为内部 bean 总是匿名的，并且总是使用外部 bean 创建的。不可能单独访问内部 bean，也不可能将它们注入到协作 bean 中，而不是封闭 bean 中。
+作为一种特殊情况，可以从自定义范围接收销毁回调 — 例如，对于单例 bean 中包含的请求范围的内部 bean。内部 bean 实例的创建与其包含的 bean 相关联，但销毁回调允许它参与请求范围的生命周期。这不是常见的情况。内部 bean 通常只是共享其包含bean 的范围。
 
 ##### Collections
 
+##### 集合
+
 The `<list/>`, `<set/>`, `<map/>`, and `<props/>` elements set the properties and arguments of the Java `Collection` types `List`, `Set`, `Map`, and `Properties`, respectively. The following example shows how to use them:
 
-“<list/>”、“set/>”、“map/>”和“<props/>”元素分别设置Java`Collection`types`list`、`set`、`map`和`properties`的属性和参数。以下示例显示了如何使用它们：
+`<list/>`、`<set/>`、`<map/>`和 `<props/>` 元素分别设置Java `Collection` 类型 `list`、`set`、`map`和`properties`的属性和参数。以下示例显示了如何使用它们：
 
 ```xml
 <bean id="moreComplexObject" class="example.ComplexObject">
@@ -1295,14 +1301,16 @@ bean | ref | idref | list | set | map | props | value | null
 
 ###### Collection Merging
 
+###### 集合合并
+
 The Spring container also supports merging collections. An application developer can define a parent <list/>, <map/>, <set/> or <props/> element and have child <list/>, <map/>, <set/> or <props/> elements inherit and override values from the parent collection. That is, the child collection’s values are the result of merging the elements of the parent and child collections, with the child’s collection elements overriding values specified in the parent collection.
 
 This section on merging discusses the parent-child bean mechanism. Readers unfamiliar with parent and child bean definitions may wish to read the [relevant section](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions) before continuing.
 
 The following example demonstrates collection merging:
 
-Spring容器还支持合并集合。应用程序开发人员可以定义父级<list/>、<map/>、<set/>或<props/>元素，并让子级<list/>、<map/>、<set/>或<props/>元素继承和重写父集合中的值。也就是说，子集合的值是合并父集合和子集合的元素的结果，子集合的元素覆盖父集合中指定的值。
-关于合并的这一节讨论父子bean机制。不熟悉父bean和子bean定义的读者可能希望阅读[相关部分](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-子bean定义），然后继续。
+Spring容器还支持合并集合。应用程序开发人员可以定义父级 `<list/>`、`<map/>`、`<set/>` 或 `<props/>` 元素，并让子级`<list/>`、`<map/>`、`<set/>` 或 `<props/>` 元素继承和重写父集合中的值。也就是说，**子集合的值是合并父集合和子集合的元素的结果，子集合的元素覆盖父集合中指定的值。**
+关于合并的这一节讨论父子 bean 机制。不熟悉父bean和子bean定义的读者可能希望阅读[相关部分](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions) ，然后继续。
 以下示例演示集合合并：
 
 ```xml
@@ -1329,7 +1337,7 @@ Spring容器还支持合并集合。应用程序开发人员可以定义父级<l
 
 Notice the use of the `merge=true` attribute on the `<props/>` element of the `adminEmails` property of the `child` bean definition. When the `child` bean is resolved and instantiated by the container, the resulting instance has an `adminEmails` `Properties` collection that contains the result of merging the child’s `adminEmails` collection with the parent’s `adminEmails` collection. The following listing shows the result:
 
-注意，在`child`bean定义的`adminEmails`属性的`props/>`元素上使用了`merge=true`属性。当容器解析并实例化'child'bean时，生成的实例具有一个'admineals``Properties`集合，该集合包含将子级的'admineals`集合与父级的'admineals`集合合并的结果。下面的列表显示了结果：
+注意，在`child`bean定义的`adminEmails`属性的`<props/>`元素上使用了`merge=true`属性。当容器解析并实例化 `child` bean 时，生成的实例具有一个 `adminEmails Properties`集合，该集合包含将子级的 `adminEmails`集合与父级的 `adminEmails` 集合合并的结果。下面的列表显示了结果：
 
 ```
 administrator=administrator@example.com
@@ -1341,20 +1349,24 @@ The child `Properties` collection’s value set inherits all property elements f
 
 This merging behavior applies similarly to the `<list/>`, `<map/>`, and `<set/>` collection types. In the specific case of the `<list/>` element, the semantics associated with the `List` collection type (that is, the notion of an `ordered` collection of values) is maintained. The parent’s values precede all of the child list’s values. In the case of the `Map`, `Set`, and `Properties` collection types, no ordering exists. Hence, no ordering semantics are in effect for the collection types that underlie the associated `Map`, `Set`, and `Properties` implementation types that the container uses internally.
 
-子“Properties”集合的值集继承父“props/>”集合中的所有属性元素，“support”值的子值覆盖父集合中的值。
-此合并行为类似于`<list/>`、`<map/>`和`<set/>`集合类型。在“<list/>”元素的特定情况下，与“list”集合类型相关联的语义（即值的“有序”集合的概念）将得到维护。父列表的值位于子列表的所有值之前。对于“Map”、“Set”和“Properties”集合类型，不存在排序。因此，对于容器内部使用的关联“Map”、“Set”和“Properties”实现类型下的集合类型，没有有效的排序语义。
+子 `Properties` 集合的值集继承父`<props/>` 集合中的所有属性元素，`support`值的子值覆盖父集合中的值。
+此合并行为类似于`<list/>`、`<map/>`和`<set/>`集合类型。在`<list/>`元素的特定情况下，与 `List`集合类型相关联的语义（即值的“有序”集合的概念）将得到维护。**父列表的值位于子列表的所有值之前**。对于 `Map`、`Set` 和 `Properties` 集合类型，不存在排序。因此，对于容器内部使用的关联 `Map`、`Set`和 `Properties`实现类型下的集合类型，没有有效的排序语义。
 
 ###### Limitations of Collection Merging
 
+###### 集合合并的局限性
+
 You cannot merge different collection types (such as a `Map` and a `List`). If you do attempt to do so, an appropriate `Exception` is thrown. The `merge` attribute must be specified on the lower, inherited, child definition. Specifying the `merge` attribute on a parent collection definition is redundant and does not result in the desired merging.
 
-不能合并不同的集合类型（例如“映射”和“列表”）。如果您确实尝试这样做，将抛出一个适当的“异常”。必须在较低的继承子定义上指定“merge”属性。在父集合定义上指定“merge”属性是多余的，不会导致所需的合并。
+不能合并不同的集合类型（例如 `Map`和 `List`）。如果您确实尝试这样做，将抛出一个适当的异常。**必须在较低的继承子定义上指定 `merge`属性。在父集合定义上指定 `merge` 属性是多余的，不会导致所需的合并**。
 
 ###### Strongly-typed collection
 
+###### 强类型集合
+
 With the introduction of generic types in Java 5, you can use strongly typed collections. That is, it is possible to declare a `Collection` type such that it can only contain (for example) `String` elements. If you use Spring to dependency-inject a strongly-typed `Collection` into a bean, you can take advantage of Spring’s type-conversion support such that the elements of your strongly-typed `Collection` instances are converted to the appropriate type prior to being added to the `Collection`. The following Java class and bean definition show how to do so:
 
-随着Java5中泛型类型的引入，您可以使用强类型集合。也就是说，可以声明一个`Collection`类型，使其只能包含（例如）`String`元素。如果使用Spring将强类型的“Collection”依赖项注入bean中，那么可以利用Spring的类型转换支持，以便在将强类型的“Collection”实例的元素添加到“Collection”之前将其转换为适当的类型。以下Java类和bean定义说明了如何执行此操作：
+随着 Java5 中泛型类型的引入，您可以使用强类型集合。也就是说，可以声明一个`Collection`类型，使其只能包含（例如）`String`元素。如果使用 Spring 将强类型的 `Collection` 依赖项注入 bean 中，那么可以利用 Spring 的类型转换支持，以便在将强类型的 `Collection` 实例的元素添加到 `Collection` 之前将其转换为适当的类型。以下 Java 类和 bean 定义说明了如何执行此操作：
 
 ```java
 public class SomeClass {
@@ -1383,13 +1395,15 @@ public class SomeClass {
 
 When the `accounts` property of the `something` bean is prepared for injection, the generics information about the element type of the strongly-typed `Map<String, Float>` is available by reflection. Thus, Spring’s type conversion infrastructure recognizes the various value elements as being of type `Float`, and the string values (`9.99`, `2.75`, and `3.99`) are converted into an actual `Float` type.
 
-当'something'bean的'accounts'属性准备好注入时，关于强类型'Map<String，Float>`的元素类型的泛型信息可以通过反射获得。因此，Spring的类型转换基础结构将各种值元素识别为“Float”类型，字符串值（`9.99`、`2.75`、`3.99`）被转换为实际的“Float”类型。
+当 `something` bean 的 `accounts` 属性准备好注入时，关于强类型 `Map<String，Float>`的元素类型的泛型信息可以通过反射获得。因此，Spring 的类型转换基础结构将各种值元素识别为 `Float` 类型，字符串值（`9.99`、`2.75`、`3.99`）被转换为实际的 `Float` 类型。
 
 ##### Null and Empty String Values
 
+##### Null 值和空字符串值
+
 Spring treats empty arguments for properties and the like as empty `Strings`. The following XML-based configuration metadata snippet sets the `email` property to the empty `String` value ("").
 
-Spring将属性等的空参数视为空的“字符串”。以下基于XML的配置元数据片段将'email'属性设置为空的'String'值（“”）。
+Spring 将属性等的空参数视为空的“字符串”。以下基于 XML 的配置元数据片段将 `email` 属性设置为空的 `String`值("")。
 
 ```xml
 <bean class="ExampleBean">
@@ -1399,7 +1413,7 @@ Spring将属性等的空参数视为空的“字符串”。以下基于XML的�
 
 The preceding example is equivalent to the following Java code:
 
-前面的示例相当于以下Java代码：
+前面的示例相当于以下 Java 代码：
 
 ```java
 exampleBean.setEmail("");
@@ -1419,7 +1433,7 @@ The `<null/>` element handles `null` values. The following listing shows an exam
 
 The preceding configuration is equivalent to the following Java code:
 
-上述配置相当于以下Java代码：
+上述配置相当于以下 Java 代码：
 
 ```java
 exampleBean.setEmail(null);
@@ -1427,7 +1441,7 @@ exampleBean.setEmail(null);
 
 ##### XML Shortcut with the p-namespace
 
-##### 带有p名称空间的XML快捷方式
+##### 带有 p-命名空间的 XML 快捷方式
 
 The p-namespace lets you use the `bean` element’s attributes (instead of nested `<property/>` elements) to describe your property values collaborating beans, or both.
 
@@ -1435,9 +1449,9 @@ Spring supports extensible configuration formats [with namespaces](https://docs.
 
 The following example shows two XML snippets (the first uses standard XML format and the second uses the p-namespace) that resolve to the same result:
 
-p-namespace允许您使用`bean`元素的属性（而不是嵌套的`property/>`元素）来描述您的属性值，或者同时使用这两种属性。
-Spring支持可扩展配置格式[使用名称空间](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#xsd-模式），它们基于XML模式定义。本章讨论的“beans”配置格式是在XML模式文档中定义的。但是，p名称空间没有在XSD文件中定义，只存在于Spring的核心中。
-以下示例显示了两个解析为相同结果的XML片段（第一个使用标准XML格式，第二个使用p命名空间）：
+p-命名空间 允许您使用 `bean` 元素的属性（而不是嵌套的`<property/>`元素）来描述您的属性值，或者**同时使用这两种属性**。
+Spring 支持可扩展配置格式[使用名称空间](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#xsd-schemas)，它们基于 XML 模式定义。本章讨论的 `beans` 配置格式是在 XML 模式文档中定义的。但是，**p-命名空间没有在 XSD 文件中定义，只存在于 Spring 的核心中**。
+以下示例显示了两个解析为相同结果的 XML 片段（第一个使用标准 XML 格式，第二个使用 p-命名空间）：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1459,8 +1473,8 @@ The example shows an attribute in the p-namespace called `email` in the bean def
 
 This next example includes two more bean definitions that both have a reference to another bean:
 
-该示例显示了bean定义中名为“email”的p名称空间中的一个属性。这告诉Spring包含一个属性声明。如前所述，p-namespace没有模式定义，因此可以将属性名设置为属性名。
-下一个示例包括另外两个bean定义，它们都引用了另一个bean：
+该示例显示了 bean 定义中名为 `email` 的 p-名称空间中的一个属性。这告诉 Spring 包含一个属性声明。如前所述，p-namespace没有模式定义，因此可以将属性名设置为属性名。
+下一个示例包括另外两个 bean 定义，它们都引用了另一个 bean：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1487,20 +1501,22 @@ This next example includes two more bean definitions that both have a reference 
 
 This example includes not only a property value using the p-namespace but also uses a special format to declare property references. Whereas the first bean definition uses `<property name="spouse" ref="jane"/>` to create a reference from bean `john` to bean `jane`, the second bean definition uses `p:spouse-ref="jane"` as an attribute to do the exact same thing. In this case, `spouse` is the property name, whereas the `-ref` part indicates that this is not a straight value but rather a reference to another bean.
 
-此示例不仅包括使用p命名空间的属性值，还使用特殊格式声明属性引用。第一个bean定义使用“<property name=“party”ref=“jane”/>”来创建从bean`john`到bean`jane`的引用，而第二个bean定义使用`p:party ref=“jane”`作为属性来完成完全相同的操作。在本例中，`party`是属性名，`-ref`部分表示这不是一个直接值，而是对另一个bean的引用。
+此示例不仅包括**使用 p-命名空间的属性值，还使用特殊格式声明属性引用**。第一个 bean 定义使用 `<property name=“party”ref=“jane”/>` 来创建从 bean`john`到bean`jane`的引用，而第二个 bean 定义使用 `p:spouse-ref=“jane”`作为属性来完成完全相同的操作。在本例中，`party`是属性名，`-ref`部分表示这不是一个直接值，而是对另一个 bean 的引用。
 
 > The p-namespace is not as flexible as the standard XML format. For example, the format for declaring property references clashes with properties that end in `Ref`, whereas the standard XML format does not. We recommend that you choose your approach carefully and communicate this to your team members to avoid producing XML documents that use all three approaches at the same time.
 >
-> p命名空间不如标准XML格式灵活。例如，用于声明属性引用的格式与以“Ref”结尾的属性冲突，而标准XML格式则不冲突。我们建议您仔细选择您的方法，并将此告知您的团队成员，以避免生成同时使用这三种方法的XML文档。
+> **p命名空间不如标准XML格式灵活。例如，用于声明属性引用的格式与以“Ref”结尾的属性冲突，而标准XML格式则不冲突。我们建议您仔细选择您的方法，并将此告知您的团队成员，以避免生成同时使用这三种方法的XML文档。**
 
 ##### XML Shortcut with the c-namespace
+
+##### 带有 c-名称空间的 XML 快捷方式
 
 Similar to the [XML Shortcut with the p-namespace](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace), the c-namespace, introduced in Spring 3.1, allows inlined attributes for configuring the constructor arguments rather then nested `constructor-arg` elements.
 
 The following example uses the `c:` namespace to do the same thing as the from [Constructor-based Dependency Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-constructor-injection):
 
-类似于[p名称空间的XML快捷方式](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-（p-namespace），Spring3.1中引入的c-namespace允许内联属性来配置构造函数参数，而不是嵌套的“constructor arg”元素。
-下面的示例使用`c:`名称空间执行与from[Constructor-based-Dependency-Injection]相同的操作(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-构造函数注入）：
+类似于[p-名称空间的XML快捷方式](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-p-namespace)，Spring 3.1中引入的 c-命名空间 允许内联属性来配置构造函数参数，而不是嵌套的 `constructor-arg` 元素。
+下面的示例使用`c:`名称空间执行与 [Constructor-based-Dependency-Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-constructor-injection)相同的操作：
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -1520,8 +1536,11 @@ The following example uses the `c:` namespace to do the same thing as the from [
     </bean>
 
     <!-- c-namespace declaration with argument names -->
-    <bean id="beanOne" class="x.y.ThingOne" c:thingTwo-ref="beanTwo"
-        c:thingThree-ref="beanThree" c:email="something@somewhere.com"/>
+    <bean id="beanOne" class="x.y.ThingOne" 
+        c:thingTwo-ref="beanTwo"
+        c:thingThree-ref="beanThree" 
+        c:email="something@somewhere.com"
+    />
 
 </beans>
 ```
@@ -1530,22 +1549,24 @@ The `c:` namespace uses the same conventions as the `p:` one (a trailing `-ref` 
 
 For the rare cases where the constructor argument names are not available (usually if the bytecode was compiled without debugging information), you can use fallback to the argument indexes, as follows:
 
-`c:`名称空间使用与`p:`one（bean引用的尾部'-ref'）相同的约定来按名称设置构造函数参数。类似地，它需要在XML文件中声明，即使它没有在XSD模式中定义（它存在于Spring内核中）。
-对于构造函数参数名称不可用的罕见情况（通常是在字节码编译时没有调试信息），可以使用参数索引的回退，如下所示：
+`c:`名称空间使用与`p:`one（bean 引用的尾部'-ref'）相同的约定来按名称设置构造函数参数。类似地，它需要在 XML 文件中声明，即使它没有在 XSD 模式中定义（它存在于Spring内核中）。
+**对于构造函数参数名称不可用的罕见情况（通常是在字节码编译时没有调试信息），可以使用参数索引的回退**，如下所示：
 
 ```xml
 <!-- c-namespace index declaration -->
-<bean id="beanOne" class="x.y.ThingOne" c:_0-ref="beanTwo" c:_1-ref="beanThree"
-    c:_2="something@somewhere.com"/>
+<bean id="beanOne" class="x.y.ThingOne" 
+      c:_0-ref="beanTwo" 
+      c:_1-ref="beanThree"
+      `c:_2="something@somewhere.com"/>
 ```
 
 > Due to the XML grammar, the index notation requires the presence of the leading `_`, as XML attribute names cannot start with a number (even though some IDEs allow it). A corresponding index notation is also available for `<constructor-arg>` elements but not commonly used since the plain order of declaration is usually sufficient there.
 >
-> 由于XML语法的原因，索引表示法要求出现前导的```，因为XML属性名不能以数字开头（即使某些IDE允许）。对于`<constructor arg>`元素也有相应的索引表示法，但并不常用，因为声明的简单顺序通常就足够了。
+> 由于 XML 语法的原因，索引表示法要求出现前导的`_`，因为 XML 属性名不能以数字开头（即使某些 IDE 允许）。对于`<constructor-arg>`元素也有相应的索引表示法，但并不常用，因为声明的简单顺序通常就足够了。
 
 In practice, the constructor resolution [mechanism](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-ctor-arguments-resolution) is quite efficient in matching arguments, so unless you really need to, we recommend using the name notation throughout your configuration.
 
-实际上，构造函数解析[机制](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory（参数解析）在匹配参数方面非常有效，因此除非您确实需要，否则我们建议在整个配置中使用名称表示法。
+实际上，构造函数解析[机制](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-ctor-arguments-resolution)在匹配参数方面非常有效，因此除非您确实需要，否则我们建议在整个配置中使用名称表示法。
 
 ##### Compound Property Names
 
@@ -1553,7 +1574,7 @@ In practice, the constructor resolution [mechanism](https://docs.spring.io/sprin
 
 You can use compound or nested property names when you set bean properties, as long as all components of the path except the final property name are not `null`. Consider the following bean definition:
 
-设置bean属性时，可以使用复合属性名或嵌套属性名，只要路径的所有组件（最终属性名除外）都不为“null”。考虑下面的bean定义：
+设置 bean 属性时，可以使用复合属性名或嵌套属性名，**只要路径的所有组件（最终属性名除外）都不为 `null`**。考虑下面的bean 定义：
 
 ```xml
 <bean id="something" class="things.ThingOne">
@@ -1563,13 +1584,15 @@ You can use compound or nested property names when you set bean properties, as l
 
 The `something` bean has a `fred` property, which has a `bob` property, which has a `sammy` property, and that final `sammy` property is being set to a value of `123`. In order for this to work, the `fred` property of `something` and the `bob` property of `fred` must not be `null` after the bean is constructed. Otherwise, a `NullPointerException` is thrown.
 
-'something'bean有一个'fred'属性，它有一个'bob'属性，它有一个'sammy'属性，最后的'sammy'属性被设置为值'123'。为了使其工作，“something”的“fred”属性和“fred”的“bob”属性在构造bean后不能为“null”。否则，将抛出“NullPointerException”。
+`something` bean 有一个 `fred` 属性，它有一个 `bob`属性，它有一个`sammy` 属性，最后的 `sammy` 属性被设置为值 `123`。为了使其工作，`something` 的 `fred` 属性和 `fred` 的 `bob` 属性在构造 bean 后不能为 `null`。否则，将抛出 `NullPointerException`。
 
 #### 1.4.3. Using `depends-on`
 
+#### 1.4.3 使用 `depends-on`
+
 If a bean is a dependency of another bean, that usually means that one bean is set as a property of another. Typically you accomplish this with the [`<ref/> element`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-ref-element) in XML-based configuration metadata. However, sometimes dependencies between beans are less direct. An example is when a static initializer in a class needs to be triggered, such as for database driver registration. The `depends-on` attribute can explicitly force one or more beans to be initialized before the bean using this element is initialized. The following example uses the `depends-on` attribute to express a dependency on a single bean:
 
-如果一个bean是另一个bean的依赖项，这通常意味着一个bean被设置为另一个bean的属性。通常使用[`<ref/>元素`]来完成此操作(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-ref元素），在基于XML的配置元数据中。然而，有时候bean之间的依赖关系不那么直接。例如，需要触发类中的静态初始值设定项，例如数据库驱动程序注册。`depends-on`属性可以显式地强制在初始化使用此元素的bean之前初始化一个或多个bean。以下示例使用“depends-on”属性表示对单个bean的依赖关系：
+如果一个 bean 是另一个 bean 的依赖项，这通常意味着一个 bean 被设置为另一个 bean 的属性。通常使用[`<ref/> element`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-ref-element)来完成此操作，在基于 XML 的配置元数据中。然而，有时候 bean 之间的依赖关系不那么直接。例如，需要触发类中的静态初始值设定项，例如数据库驱动程序注册。**`depends-on` 属性可以显式地强制在初始化使用此元素的 bean 之前初始化一个或多个bean**。以下示例使用 `depends-on` 属性表示对单个 bean 的依赖关系：
 
 ```xml
 <bean id="beanOne" class="ExampleBean" depends-on="manager"/>
@@ -1578,7 +1601,7 @@ If a bean is a dependency of another bean, that usually means that one bean is s
 
 To express a dependency on multiple beans, supply a list of bean names as the value of the `depends-on` attribute (commas, whitespace, and semicolons are valid delimiters):
 
-要表示对多个bean的依赖关系，请提供一个bean名称列表，作为`depends-on`属性的值（逗号、空格和分号是有效的分隔符）：
+**要表示对多个 bean 的依赖关系，请提供一个 bean 名称列表，作为`depends-on`属性的值（逗号、空格和分号是有效的分隔符）**：
 
 ```xml
 <bean id="beanOne" class="ExampleBean" depends-on="manager,accountDao">
@@ -1591,17 +1614,19 @@ To express a dependency on multiple beans, supply a list of bean names as the va
 
 > The `depends-on` attribute can specify both an initialization-time dependency and, in the case of [singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) beans only, a corresponding destruction-time dependency. Dependent beans that define a `depends-on` relationship with a given bean are destroyed first, prior to the given bean itself being destroyed. Thus, `depends-on` can also control shutdown order.
 >
-> `depends-on`属性可以指定初始化时间依赖项，对于[singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂范围（单例）bean，对应的销毁时间依赖关系。在销毁给定bean之前，首先销毁定义与给定bean的“dependen-on”关系的依赖bean。因此，`dependen`也可以控制关机顺序。
+> `depends-on` 属性既可以指定初始化时间依赖，也可以指定对应的销毁时间依赖（仅在[singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) bean 的情况下）。在销毁给定 bean 之前，首先销毁定义与给定 bean 的 `dependen-on` 关系的依赖 bean。因此，`dependen`也可以控制关机顺序。
 
 #### 1.4.4. Lazy-initialized Beans
+
+#### 1.4.4. 延迟初始化 Bean
 
 By default, `ApplicationContext` implementations eagerly create and configure all [singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) beans as part of the initialization process. Generally, this pre-instantiation is desirable, because errors in the configuration or surrounding environment are discovered immediately, as opposed to hours or even days later. When this behavior is not desirable, you can prevent pre-instantiation of a singleton bean by marking the bean definition as being lazy-initialized. A lazy-initialized bean tells the IoC container to create a bean instance when it is first requested, rather than at startup.
 
 In XML, this behavior is controlled by the `lazy-init` attribute on the `<bean/>` element, as the following example shows:
 
-默认情况下，`ApplicationContext`实现急切地创建和配置所有[singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-作为初始化过程的一部分，factory作用域为（单例）bean。通常，这种预实例化是可取的，因为配置或周围环境中的错误会立即被发现，而不是数小时甚至数天之后。当这种行为不可取时，可以通过将bean定义标记为延迟初始化来防止单例bean的预实例化。惰性初始化bean告诉IoC容器在第一次请求时而不是在启动时创建bean实例。
+默认情况下，`ApplicationContext`实现在初始化过程中急切地创建和配置所有[singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) bean。通常，这种预实例化是可取的，因为配置或周围环境中的错误会立即被发现，而不是数小时甚至数天之后。当这种行为不可取时，可以通过将 bean 定义标记为延迟初始化来防止单例 bean 的预实例化。**延迟初始化 bean 告诉 IoC 容器在第一次请求时而不是在启动时创建 bean 实例**。
 
-在XML中，此行为由“<bean/>”元素上的“lazy init”属性控制，如下例所示：
+在 XML 中，此行为由 `<bean/>` 元素上的 `lazy-init` 属性控制，如下例所示：
 
 ```xml
 <bean id="lazy" class="com.something.ExpensiveToCreateBean" lazy-init="true"/>
@@ -1614,11 +1639,11 @@ However, when a lazy-initialized bean is a dependency of a singleton bean that i
 
 You can also control lazy-initialization at the container level by using the `default-lazy-init` attribute on the `<beans/>` element, as the following example shows:
 
-当前面的配置被“ApplicationContext”使用时，“lazy”bean不会在“ApplicationContext”启动时被急切地预实例化，而“lazy”bean则不会。`lazy`bean急切地被预先实例化。
+当前面的配置被 `ApplicationContext` 使用时，`lazy` bean 不会在 `ApplicationContext` 启动时被急切地预实例化，而`not.lazy`bean 会急切地被预先实例化。
 
-但是，当惰性初始化bean是未惰性初始化的单例bean的依赖项时，`ApplicationContext`在启动时创建惰性初始化bean，因为它必须满足单例的依赖项。惰性初始化bean被注入到非惰性初始化的其他地方的单例bean中。
+**但是，当延迟初始化 bean 是未延迟初始化的单例 bean 的依赖项时，`ApplicationContext`在启动时会创建延迟初始化bean，因为它必须满足单例的依赖项。延迟初始化 bean 被注入到非延迟初始化的其他地方的单例 bean 中。**
 
-您还可以在`<beans/>`元素上使用`default lazy init`属性在容器级别控制延迟初始化，如下例所示：
+您还可以在`<beans/>`元素上使用`default-lazy-init`属性在容器级别控制延迟初始化，如下例所示：
 
 ```xml
 <beans default-lazy-init="true">
@@ -1628,6 +1653,8 @@ You can also control lazy-initialization at the container level by using the `de
 
 #### 1.4.5. Autowiring Collaborators
 
+#### 1.4.5 自动装配集合
+
 The Spring container can autowire relationships between collaborating beans. You can let Spring resolve collaborators (other beans) automatically for your bean by inspecting the contents of the `ApplicationContext`. Autowiring has the following advantages:
 
 - Autowiring can significantly reduce the need to specify properties or constructor arguments. (Other mechanisms such as a bean template [discussed elsewhere in this chapter](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions) are also valuable in this regard.)
@@ -1635,27 +1662,27 @@ The Spring container can autowire relationships between collaborating beans. You
 
 When using XML-based configuration metadata (see [Dependency Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators)), you can specify the autowire mode for a bean definition with the `autowire` attribute of the `<bean/>` element. The autowiring functionality has four modes. You specify autowiring per bean and can thus choose which ones to autowire. The following table describes the four autowiring modes:
 
-Spring容器可以自动连接协作bean之间的关系。通过检查“ApplicationContext”的内容，您可以让Spring为您的bean自动解析协作者（其他bean）。自动布线具有以下优点：
+Spring 容器可以自动连接协作 bean 之间的关系。通过检查 `ApplicationContext` 的内容，您可以让 Spring 为您的 bean 自动解析协作者（其他 bean）。自动装配具有以下优点：
 
-- 自动关联可以显著减少指定属性或构造函数参数的需要。（其他机制，如bean模板[本章其他部分讨论](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-子bean定义）在这方面也很有价值。）
-- 自动关联可以随着对象的发展而更新配置。例如，如果您需要向类添加依赖项，则可以自动满足该依赖项，而无需修改配置。因此，在开发过程中，自动连接特别有用，而不会在代码库变得更稳定时取消切换到显式连接的选项。
+- 自动装配可以显著减少指定属性或构造函数参数的需要。（在这方面，其他机制（如 bean 模板[在本章其他部分讨论](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions)也很有价值。）
+- **自动装配可以随着对象的发展而更新配置**。例如，如果您需要向类添加依赖项，则可以自动满足该依赖项，而无需修改配置。因此，在开发过程中，自动装配特别有用，而不会在代码库变得更稳定时取消切换到显式连接的选项。
 
-使用基于XML的配置元数据时（请参阅[依赖项注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory collaborators）），您可以使用`<bean/>`元素的`autowire`属性为bean定义指定autowire模式。自动布线功能有四种模式。您可以为每个bean指定自动连线，从而可以选择要自动连线的bean。下表介绍了四种自动布线模式：
+使用基于 XML 的配置元数据时（请参阅[依赖项注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators)），您可以使用`<bean/>`元素的`autowire`属性为 bean 定义指定 autowire 模式。自动装配功能有四种模式。您可以为每个 bean 指定自动装配，从而可以选择要自动装配的 bean。下表介绍了四种自动装配模式：
 
 | Mode          | Explanation                                                  |
 | :------------ | :----------------------------------------------------------- |
-| `no`          | (Default) No autowiring. Bean references must be defined by `ref` elements. Changing the default setting is not recommended for larger deployments, because specifying collaborators explicitly gives greater control and clarity. To some extent, it documents the structure of a system. |
-| `byName`      | Autowiring by property name. Spring looks for a bean with the same name as the property that needs to be autowired. For example, if a bean definition is set to autowire by name and it contains a `master` property (that is, it has a `setMaster(..)` method), Spring looks for a bean definition named `master` and uses it to set the property. |
-| `byType`      | Lets a property be autowired if exactly one bean of the property type exists in the container. If more than one exists, a fatal exception is thrown, which indicates that you may not use `byType` autowiring for that bean. If there are no matching beans, nothing happens (the property is not set). |
-| `constructor` | Analogous to `byType` but applies to constructor arguments. If there is not exactly one bean of the constructor argument type in the container, a fatal error is raised. |
+| `no`          | (Default) No autowiring. Bean references must be defined by `ref` elements. Changing the default setting is not recommended for larger deployments, because specifying collaborators explicitly gives greater control and clarity. To some extent, it documents the structure of a system.<br />（默认）无自动装配。Bean 引用必须由 `ref` 元素定义。**对于较大的部署，不建议更改默认设置，因为明确指定协作者可以提供更大的控制和清晰度。在某种程度上，它记录了一个系统的结构。** |
+| `byName`      | Autowiring by property name. Spring looks for a bean with the same name as the property that needs to be autowired. For example, if a bean definition is set to autowire by name and it contains a `master` property (that is, it has a `setMaster(..)` method), Spring looks for a bean definition named `master` and uses it to set the property.<br />按属性名称自动装配。Spring 查找与需要自动装配的属性同名的 bean。例如，如果一个 bean 定义按名称设置为 autowire，并且它包含一个`master`属性（即，它有一个`setMaster(..)`方法），Spring 查找名为 `master` 的 bean 定义并使用它设置属性。 |
+| `byType`      | Lets a property be autowired if exactly one bean of the property type exists in the container. If more than one exists, a fatal exception is thrown, which indicates that you may not use `byType` autowiring for that bean. If there are no matching beans, nothing happens (the property is not set).<br />如果容器中正好存在一个属性类型的 bean，则允许自动装配属性。如果存在多个，将抛出一个致命异常，这表示您可能不会对该 bean 使用 `byType` 自动连接。**如果没有匹配的 bean，则不会发生任何事情（未设置属性）。** |
+| `constructor` | Analogous to `byType` but applies to constructor arguments. If there is not exactly one bean of the constructor argument type in the container, a fatal error is raised.<br />类似于 `byType`，但适用于构造函数参数。如果容器中没有一个构造函数参数类型的 bean，则会引发致命错误。 |
 
 With `byType` or `constructor` autowiring mode, you can wire arrays and typed collections. In such cases, all autowire candidates within the container that match the expected type are provided to satisfy the dependency. You can autowire strongly-typed `Map` instances if the expected key type is `String`. An autowired `Map` instance’s values consist of all bean instances that match the expected type, and the `Map` instance’s keys contain the corresponding bean names.
 
-使用“byType”或“constructor”自动连接模式，可以连接数组和类型化集合。在这种情况下，将提供容器中与预期类型匹配的所有autowire候选项以满足依赖关系。如果所需的键类型为“String”，则可以自动关联强类型的“Map”实例。自动连线的'Map'实例的值由与预期类型匹配的所有bean实例组成，'Map'实例的键包含相应的bean名称。
+使用 `byType` 或 `constructor` 自动配置模式，可以连接数组和类型化集合。在这种情况下，将提供容器中与预期类型匹配的所有 autowire 候选项以满足依赖关系。如果所需的键类型为“String”，则可以自动关联强类型的“Map”实例。自动连线的'Map'实例的值由与预期类型匹配的所有bean实例组成，'Map'实例的键包含相应的bean名称。
 
 ##### Limitations and Disadvantages of Autowiring
 
-##### 自动布线的局限性和缺点
+##### 自动装配的局限性和缺点
 
 Autowiring works best when it is used consistently across a project. If autowiring is not used in general, it might be confusing to developers to use it to wire only one or two bean definitions.
 
@@ -1673,29 +1700,39 @@ In the latter scenario, you have several options:
 - Designate a single bean definition as the primary candidate by setting the `primary` attribute of its `<bean/>` element to `true`.
 - Implement the more fine-grained control available with annotation-based configuration, as described in [Annotation-based Container Configuration](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-annotation-config).
 
-自动布线在整个项目中一致使用时效果最佳。如果通常不使用自动连接，那么使用它仅连接一个或两个bean定义可能会让开发人员感到困惑。
-考虑自动取款的局限性和缺点：
--“property”和“constructor arg”设置中的显式依赖项始终覆盖自动关联。您不能自动关联简单属性，如原语、`Strings`和`Classes`（以及此类简单属性的数组）。这一限制是故意造成的。
--自动布线不如显式布线精确。尽管如此，如前表所述，Spring小心避免在可能产生意外结果的歧义情况下进行猜测。Spring托管对象之间的关系不再明确记录。
--布线信息可能不适用于可能从Spring容器生成文档的工具。
--容器中的多个bean定义可能与要自动连接的setter方法或构造函数参数指定的类型匹配。对于数组、集合或“Map”实例，这不一定是问题。然而，对于期望单个值的依赖项，这种模糊性并不是任意解决的。如果没有唯一的bean定义可用，将引发异常。
+自动装配在整个项目中一致使用时效果最佳。如果通常不使用自动装配，那么使用它仅连接一个或两个 bean 定义可能会让开发人员感到困惑。
+考虑自动装配的局限性和缺点：
+
+- `property` 和 `constructor-arg`设置中的显式依赖项始终覆盖自动关联。**您不能自动关联简单属性**，如基本数据类型、`Strings`和`Classes`（以及此类简单属性的数组）。这一限制是故意造成的。
+- 自动装配不如显式装配精确。尽管如此，如前表所述，Spring 小心避免在可能产生意外结果的歧义情况下进行猜测。Spring 托管对象之间的关系不再明确记录。
+- 装配信息可能不适用于可能从 Spring 容器生成文档的工具。
+- 容器中的多个 bean 定义可能与要自动装配的 setter 方法或构造函数参数指定的类型匹配。对于数组、集合或“Map”实例，这不一定是问题。然而，对于期望单个值的依赖项，这种模糊性并不是任意解决的。如果没有唯一的 bean 定义可用，将引发异常。
+
 在后一种情况下，您有几个选项：
--放弃自动布线，支持显式布线。
--如[下一节]中所述，通过将bean定义的“autowire-candidate”属性设置为“false”，避免bean定义的自动关联(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂自动连线（候选）。
--通过将其`<bean/>`元素的`primary`属性设置为`true`，将单个bean定义指定为主要候选项。
--如[annotation-based Container configuration]中所述，使用基于注释的配置实现更细粒度的控制(https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-注释配置）。
+
+- 放弃自动装配，支持显式装配。
+- 如[下一节](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-autowire-candidate)中所述，通过将 bean 定义的 `autowire-candidate` 属性设置为 `false`，避免 bean 定义的自动关联。
+- 通过将其`<bean/>`元素的`primary`属性设置为`true`，将单个 bean 定义指定为主要候选项。
+- 如[annotation-based Container configuration](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-annotation-config)中所述，使用基于注释的配置实现更细粒度的控制。
 
 ##### Excluding a Bean from Autowiring
 
-##### 从自动连线中排除Bean
+##### 从自动装配中排除Bean
 
 On a per-bean basis, you can exclude a bean from autowiring. In Spring’s XML format, set the `autowire-candidate` attribute of the `<bean/>` element to `false`. The container makes that specific bean definition unavailable to the autowiring infrastructure (including annotation style configurations such as [`@Autowired`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-autowired-annotation)).
 
+在每个bean的基础上，您可以将bean从自动连接中排除。在Spring的XML格式中，将`<bean/>`元素的`autowire-candidate`属性设置为`false`。该容器使特定的bean定义对自动布线基础结构不可用（包括注释样式配置，如[`@Autowired`]）。
+
 > The `autowire-candidate` attribute is designed to only affect type-based autowiring. It does not affect explicit references by name, which get resolved even if the specified bean is not marked as an autowire candidate. As a consequence, autowiring by name nevertheless injects a bean if the name matches.
+>
+> “autowire候选者”属性设计为仅影响基于类型的自动关联。它不会按名称影响显式引用，即使指定的bean未标记为autowire候选，也会解析显式引用。因此，如果名称匹配，按名称自动连接将注入bean。
 
 You can also limit autowire candidates based on pattern-matching against bean names. The top-level `<beans/>` element accepts one or more patterns within its `default-autowire-candidates` attribute. For example, to limit autowire candidate status to any bean whose name ends with `Repository`, provide a value of `*Repository`. To provide multiple patterns, define them in a comma-separated list. An explicit value of `true` or `false` for a bean definition’s `autowire-candidate` attribute always takes precedence. For such beans, the pattern matching rules do not apply.
 
 These techniques are useful for beans that you never want to be injected into other beans by autowiring. It does not mean that an excluded bean cannot itself be configured by using autowiring. Rather, the bean itself is not a candidate for autowiring other beans.
+
+您还可以基于对bean名称的模式匹配来限制autowire候选项。顶级“<beans/>”元素在其“default autowire候选者”属性中接受一个或多个模式。例如，要将autowire候选状态限制为名称以“Repository”结尾的任何bean，请提供值“*Repository”。要提供多个模式，请在逗号分隔的列表中定义它们。bean定义的“autowire-candidate”属性的显式值“true”或“false”始终优先。对于这样的bean，模式匹配规则不适用。
+这些技术对于您永远不希望通过自动连接注入其他bean的bean非常有用。这并不意味着排除的bean本身不能通过使用自动连接进行配置。相反，bean本身不是自动连接其他bean的候选对象。
 
 #### 1.4.6. Method Injection
 
@@ -1703,9 +1740,8 @@ In most application scenarios, most beans in the container are [singletons](http
 
 A solution is to forego some inversion of control. You can [make bean A aware of the container](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-aware) by implementing the `ApplicationContextAware` interface, and by [making a `getBean("B")` call to the container](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-client) ask for (a typically new) bean B instance every time bean A needs it. The following example shows this approach:
 
-Java
-
-Kotlin
+在大多数应用程序场景中，容器中的大多数bean都是[Singleton]。当一个单例bean需要与另一个单例bean协作，或者一个非单例bean需要与另一个非单例bean协作时，通常通过将一个bean定义为另一个bean的属性来处理依赖关系。当bean的生命周期不同时，就会出现问题。假设单例bean A需要使用非单例（原型）bean B，可能是在A上的每个方法调用上。容器只创建单例bean A一次，因此只有一次机会设置属性。容器不能在每次需要时为bean A提供bean B的新实例。
+一个解决办法是放弃一些控制反转。您可以通过实现`ApplicationContextAware`接口[使bean A意识到容器]，并通过[使`getBean（“B”）`调用容器]在每次bean A需要时请求（通常是新的）bean B实例。以下示例显示了此方法：
 
 ```java
 // a class that uses a stateful Command-style class to perform some processing
@@ -1744,19 +1780,28 @@ The preceding is not desirable, because the business code is aware of and couple
 
 You can read more about the motivation for Method Injection in [this blog entry](https://spring.io/blog/2004/08/06/method-injection/).
 
+前面的内容是不可取的，因为业务代码知道Spring框架并与之耦合。方法注入是SpringIoC容器的一个稍微高级的特性，它允许您干净地处理这个用例。
+你可以在[这篇博客文章]中阅读更多关于方法注入动机的信息(https://spring.io/blog/2004/08/06/method-injection/).
+
 ##### Lookup Method Injection
 
 Lookup method injection is the ability of the container to override methods on container-managed beans and return the lookup result for another named bean in the container. The lookup typically involves a prototype bean, as in the scenario described in [the preceding section](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-method-injection). The Spring Framework implements this method injection by using bytecode generation from the CGLIB library to dynamically generate a subclass that overrides the method.
 
-|      | For this dynamic subclassing to work, the class that the Spring bean container subclasses cannot be `final`, and the method to be overridden cannot be `final`, either.Unit-testing a class that has an `abstract` method requires you to subclass the class yourself and to supply a stub implementation of the `abstract` method.Concrete methods are also necessary for component scanning, which requires concrete classes to pick up.A further key limitation is that lookup methods do not work with factory methods and in particular not with `@Bean` methods in configuration classes, since, in that case, the container is not in charge of creating the instance and therefore cannot create a runtime-generated subclass on the fly. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+查找方法注入是容器重写容器管理bean上的方法并返回容器中另一个命名bean的查找结果的能力。查找通常涉及一个原型bean，如[上一节]中描述的场景。Spring框架通过使用CGLIB库中的字节码生成来动态生成重写该方法的子类，从而实现这种方法注入。
+
+> - For this dynamic subclassing to work, the class that the Spring bean container subclasses cannot be `final`, and the method to be overridden cannot be `final`, either.
+> - Unit-testing a class that has an `abstract` method requires you to subclass the class yourself and to supply a stub implementation of the `abstract` method.
+> - Concrete methods are also necessary for component scanning, which requires concrete classes to pick up.
+> - A further key limitation is that lookup methods do not work with factory methods and in particular not with `@Bean` methods in configuration classes, since, in that case, the container is not in charge of creating the instance and therefore cannot create a runtime-generated subclass on the fly.
+>
+> - 为了使这个动态子类能够工作，springbean容器子类的类不能是'final'，要重写的方法也不能是'final'。
+> - 对具有“abstract”方法的类进行单元测试需要您自己对该类进行子类化，并提供“abstract”方法的存根实现。
+> - 组件扫描还需要具体的方法，这需要具体的类来拾取。
+> - 另一个关键限制是，查找方法不适用于工厂方法，特别是配置类中的“@Bean”方法，因为在这种情况下，容器不负责创建实例，因此无法动态创建运行时生成的子类。
 
 In the case of the `CommandManager` class in the previous code snippet, the Spring container dynamically overrides the implementation of the `createCommand()` method. The `CommandManager` class does not have any Spring dependencies, as the reworked example shows:
 
-Java
-
-Kotlin
+对于前面代码段中的`CommandManager`类，Spring容器动态重写`createCommand（）`方法的实现。“CommandManager”类没有任何Spring依赖项，如修改后的示例所示：
 
 ```java
 package fiona.apple;
@@ -1780,11 +1825,15 @@ public abstract class CommandManager {
 
 In the client class that contains the method to be injected (the `CommandManager` in this case), the method to be injected requires a signature of the following form:
 
+在包含要注入的方法的客户端类（本例中为“CommandManager”）中，要注入的方法需要以下形式的签名：
+
 ```xml
 <public|protected> [abstract] <return-type> theMethodName(no-arguments);
 ```
 
 If the method is `abstract`, the dynamically-generated subclass implements the method. Otherwise, the dynamically-generated subclass overrides the concrete method defined in the original class. Consider the following example:
+
+如果方法为“抽象”，则动态生成的子类将实现该方法。否则，动态生成的子类将重写在原始类中定义的具体方法。考虑下面的例子：
 
 ```xml
 <!-- a stateful bean deployed as a prototype (non-singleton) -->
@@ -1802,9 +1851,8 @@ The bean identified as `commandManager` calls its own `createCommand()` method w
 
 Alternatively, within the annotation-based component model, you can declare a lookup method through the `@Lookup` annotation, as the following example shows:
 
-Java
-
-Kotlin
+标识为`commandManager`的bean在需要`myCommand` bean的新实例时调用自己的`createCommand（）`方法。如果实际需要的话，您必须小心地将'myCommand'bean部署为原型。如果它是一个[单身](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂作用域（单例），每次都返回相同的'myCommand'bean实例。
+或者，在基于注释的组件模型中，可以通过“@lookup”注释声明查找方法，如下例所示：
 
 ```java
 public abstract class CommandManager {
@@ -1822,9 +1870,7 @@ public abstract class CommandManager {
 
 Or, more idiomatically, you can rely on the target bean getting resolved against the declared return type of the lookup method:
 
-Java
-
-Kotlin
+或者，更习惯地说，您可以依靠目标bean根据查找方法的声明返回类型进行解析：
 
 ```java
 public abstract class CommandManager {
@@ -1842,9 +1888,11 @@ public abstract class CommandManager {
 
 Note that you should typically declare such annotated lookup methods with a concrete stub implementation, in order for them to be compatible with Spring’s component scanning rules where abstract classes get ignored by default. This limitation does not apply to explicitly registered or explicitly imported bean classes.
 
-|      | Another way of accessing differently scoped target beans is an `ObjectFactory`/ `Provider` injection point. See [Scoped Beans as Dependencies](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-other-injection).You may also find the `ServiceLocatorFactoryBean` (in the `org.springframework.beans.factory.config` package) to be useful. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+请注意，您通常应该使用具体的存根实现声明此类带注释的查找方法，以便它们与Spring的组件扫描规则兼容，默认情况下抽象类会被忽略。此限制不适用于显式注册或显式导入的bean类。
+
+>   Another way of accessing differently scoped target beans is an `ObjectFactory`/ `Provider` injection point. See [Scoped Beans as Dependencies](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-other-injection).You may also find the `ServiceLocatorFactoryBean` (in the `org.springframework.beans.factory.config` package) to be useful.
+>
+>   访问不同范围的目标bean的另一种方法是`ObjectFactory`/`Provider`注入点。请参阅[作用域bean作为依赖项](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂范围（其他注射）。您可能还会发现“ServiceLocatoryFactoryBean”（在“org.springframework.beans.factory.config”包中）很有用。
 
 ##### Arbitrary Method Replacement
 
@@ -1852,9 +1900,8 @@ A less useful form of method injection than lookup method injection is the abili
 
 With XML-based configuration metadata, you can use the `replaced-method` element to replace an existing method implementation with another, for a deployed bean. Consider the following class, which has a method called `computeValue` that we want to override:
 
-Java
-
-Kotlin
+与查找方法注入相比，方法注入的一种不太有用的形式是能够用另一种方法实现替换托管bean中的任意方法。在实际需要此功能之前，您可以安全地跳过本节的其余部分。
+对于基于XML的配置元数据，您可以使用'replaced method'元素将已部署bean的现有方法实现替换为另一个方法实现。考虑下面的类，它有一个我们想重写的叫做“CtudioValueValue:”的方法：
 
 ```java
 public class MyValueCalculator {
@@ -1869,9 +1916,7 @@ public class MyValueCalculator {
 
 A class that implements the `org.springframework.beans.factory.support.MethodReplacer` interface provides the new method definition, as the following example shows:
 
-Java
-
-Kotlin
+实现 `org.springframework.beans.factory.support.MethodReplacer`接口的类提供了新的方法定义，如下例所示：
 
 ```java
 /**
@@ -1891,6 +1936,8 @@ public class ReplacementComputeValue implements MethodReplacer {
 
 The bean definition to deploy the original class and specify the method override would resemble the following example:
 
+部署原始类并指定方法重写的bean定义类似于以下示例：
+
 ```xml
 <bean id="myValueCalculator" class="x.y.z.MyValueCalculator">
     <!-- arbitrary method replacement -->
@@ -1904,6 +1951,8 @@ The bean definition to deploy the original class and specify the method override
 
 You can use one or more `<arg-type/>` elements within the `<replaced-method/>` element to indicate the method signature of the method being overridden. The signature for the arguments is necessary only if the method is overloaded and multiple variants exist within the class. For convenience, the type string for an argument may be a substring of the fully qualified type name. For example, the following all match `java.lang.String`:
 
+您可以在`<replaced method/>`元素中使用一个或多个`<arg type/>`元素来指示要重写的方法的方法签名。只有当方法重载且类中存在多个变量时，才需要参数的签名。为方便起见，参数的类型字符串可以是完全限定类型名称的子字符串。例如，下面的所有匹配项都是`java。lang.String`:
+
 ```java
 java.lang.String
 String
@@ -1912,6 +1961,8 @@ Str
 
 Because the number of arguments is often enough to distinguish between each possible choice, this shortcut can save a lot of typing, by letting you type only the shortest string that matches an argument type.
 
+由于参数的数量通常足以区分每个可能的选择，因此此快捷方式可以通过只允许键入与参数类型匹配的最短字符串来节省大量键入。
+
 ### 1.5. Bean Scopes
 
 When you create a bean definition, you create a recipe for creating actual instances of the class defined by that bean definition. The idea that a bean definition is a recipe is important, because it means that, as with a class, you can create many object instances from a single recipe.
@@ -1919,6 +1970,10 @@ When you create a bean definition, you create a recipe for creating actual insta
 You can control not only the various dependencies and configuration values that are to be plugged into an object that is created from a particular bean definition but also control the scope of the objects created from a particular bean definition. This approach is powerful and flexible, because you can choose the scope of the objects you create through configuration instead of having to bake in the scope of an object at the Java class level. Beans can be defined to be deployed in one of a number of scopes. The Spring Framework supports six scopes, four of which are available only if you use a web-aware `ApplicationContext`. You can also create [a custom scope.](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-custom)
 
 The following table describes the supported scopes:
+
+当您创建一个bean定义时，您创建了一个菜谱，用于创建由该bean定义定义的类的实际实例。bean定义是一个菜谱的想法很重要，因为这意味着，与类一样，可以从一个菜谱创建多个对象实例。
+您不仅可以控制要插入到从特定bean定义创建的对象中的各种依赖项和配置值，还可以控制从特定bean定义创建的对象的范围。这种方法功能强大且灵活，因为您可以选择通过配置创建的对象的范围，而不必在Java类级别烘焙对象的范围。可以将bean定义为部署在多个作用域中的一个。Spring框架支持六个作用域，其中四个只有在使用web感知的“ApplicationContext”时才可用。您还可以创建[自定义范围。]
+下表描述了支持的作用域：
 
 | Scope                                                        | Description                                                  |
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
@@ -1929,9 +1984,9 @@ The following table describes the supported scopes:
 | [application](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-application) | Scopes a single bean definition to the lifecycle of a `ServletContext`. Only valid in the context of a web-aware Spring `ApplicationContext`. |
 | [websocket](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-stomp-websocket-scope) | Scopes a single bean definition to the lifecycle of a `WebSocket`. Only valid in the context of a web-aware Spring `ApplicationContext`. |
 
-|      | As of Spring 3.0, a thread scope is available but is not registered by default. For more information, see the documentation for [`SimpleThreadScope`](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/SimpleThreadScope.html). For instructions on how to register this or any other custom scope, see [Using a Custom Scope](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-custom-using). |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+> As of Spring 3.0, a thread scope is available but is not registered by default. For more information, see the documentation for [`SimpleThreadScope`](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/SimpleThreadScope.html). For instructions on how to register this or any other custom scope, see [Using a Custom Scope](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-custom-using).
+>
+> 从Spring3.0开始，线程作用域可用，但默认情况下未注册。有关详细信息，请参阅[`SimpleThreadScope`]的文档。有关如何注册此自定义作用域或任何其他自定义作用域的说明，请参阅[使用自定义作用域]。
 
 #### 1.5.1. The Singleton Scope
 
@@ -1939,9 +1994,14 @@ Only one shared instance of a singleton bean is managed, and all requests for be
 
 To put it another way, when you define a bean definition and it is scoped as a singleton, the Spring IoC container creates exactly one instance of the object defined by that bean definition. This single instance is stored in a cache of such singleton beans, and all subsequent requests and references for that named bean return the cached object. The following image shows how the singleton scope works:
 
-![singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/images/singleton.png)
+只管理一个单例bean的一个共享实例，对ID与该bean定义匹配的bean的所有请求都会导致Spring容器返回该特定bean实例。
+换句话说，当您定义一个bean定义并将其范围限定为一个单例时，SpringIOC容器只创建该bean定义定义的对象的一个实例。这个实例存储在这样的单例bean的缓存中，该命名bean的所有后续请求和引用都返回缓存对象。下图显示了singleton作用域的工作原理：
+
+![singleton](二、Core.resource/singleton.png)
 
 Spring’s concept of a singleton bean differs from the singleton pattern as defined in the Gang of Four (GoF) patterns book. The GoF singleton hard-codes the scope of an object such that one and only one instance of a particular class is created per ClassLoader. The scope of the Spring singleton is best described as being per-container and per-bean. This means that, if you define one bean for a particular class in a single Spring container, the Spring container creates one and only one instance of the class defined by that bean definition. The singleton scope is the default scope in Spring. To define a bean as a singleton in XML, you can define a bean as shown in the following example:
+
+Spring的单例bean概念不同于四人组（GangofFour，GoF）模式书中定义的单例模式。GoF单例硬编码对象的作用域，这样每个类加载器只创建一个特定类的实例。Spring单例的范围最好描述为每个容器和每个bean。这意味着，如果在单个Spring容器中为特定类定义一个bean，Spring容器将创建该bean定义的类的一个且仅一个实例。单例作用域是Spring中的默认作用域。要将bean定义为XML中的单例，可以定义bean，如下例所示：
 
 ```xml
 <bean id="accountService" class="com.something.DefaultAccountService"/>
@@ -1956,11 +2016,17 @@ The non-singleton prototype scope of bean deployment results in the creation of 
 
 The following diagram illustrates the Spring prototype scope:
 
+bean部署的非单例原型范围导致每次对特定bean发出请求时都创建一个新的bean实例。也就是说，该bean被注入到另一个bean中，或者通过容器上的`getBean（）`方法调用来请求它。通常，所有有状态bean都应该使用prototype作用域，无状态bean应该使用singleton作用域。
+下图说明了Spring原型的范围：
+
 ![prototype](https://docs.spring.io/spring-framework/docs/current/reference/html/images/prototype.png)
 
 (A data access object (DAO) is not typically configured as a prototype, because a typical DAO does not hold any conversational state. It was easier for us to reuse the core of the singleton diagram.)
 
 The following example defines a bean as a prototype in XML:
+
+（数据访问对象（DAO）通常不配置为原型，因为典型的DAO不包含任何会话状态。我们更容易重用单例图的核心。）
+以下示例将bean定义为XML中的原型：
 
 ```xml
 <bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
@@ -1970,15 +2036,24 @@ In contrast to the other scopes, Spring does not manage the complete lifecycle o
 
 In some respects, the Spring container’s role in regard to a prototype-scoped bean is a replacement for the Java `new` operator. All lifecycle management past that point must be handled by the client. (For details on the lifecycle of a bean in the Spring container, see [Lifecycle Callbacks](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle).)
 
+与其他作用域不同，Spring并不管理原型bean的整个生命周期。容器实例化、配置和以其他方式组装原型对象并将其交给客户机，而不再记录该原型实例。因此，尽管对所有对象调用初始化生命周期回调方法，而不考虑范围，但对于原型，不会调用配置的销毁生命周期回调。客户机代码必须清理原型范围的对象，并释放原型bean所持有的昂贵资源。为了让Spring容器释放原型范围的bean所持有的资源，请尝试使用自定义的[bean post processor]，它持有对需要清理的bean的引用。
+
+在某些方面，Spring容器在原型作用域bean中的角色是Java`new`操作符的替代品。所有超过该点的生命周期管理都必须由客户机处理。（有关Spring容器中bean生命周期的详细信息，请参阅[生命周期回调]。）
+
 #### 1.5.3. Singleton Beans with Prototype-bean Dependencies
 
 When you use singleton-scoped beans with dependencies on prototype beans, be aware that dependencies are resolved at instantiation time. Thus, if you dependency-inject a prototype-scoped bean into a singleton-scoped bean, a new prototype bean is instantiated and then dependency-injected into the singleton bean. The prototype instance is the sole instance that is ever supplied to the singleton-scoped bean.
 
 However, suppose you want the singleton-scoped bean to acquire a new instance of the prototype-scoped bean repeatedly at runtime. You cannot dependency-inject a prototype-scoped bean into your singleton bean, because that injection occurs only once, when the Spring container instantiates the singleton bean and resolves and injects its dependencies. If you need a new instance of a prototype bean at runtime more than once, see [Method Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-method-injection).
 
+当您将单例范围的bean与原型bean的依赖项一起使用时，请注意，依赖项是在实例化时解析的。因此，如果依赖项将原型范围的bean注入到单例范围的bean中，那么将实例化一个新的原型bean，然后将依赖项注入到单例bean中。原型实例是唯一一个提供给单例作用域bean的实例。
+但是，假设您希望单例作用域bean在运行时重复获取原型作用域bean的新实例。您不能将依赖项注入原型范围的bean到您的单例bean中，因为当Spring容器实例化单例bean并解析和注入其依赖项时，注入只发生一次。如果您在运行时多次需要原型bean的新实例，请参阅[方法注入]。
+
 #### 1.5.4. Request, Session, Application, and WebSocket Scopes
 
 The `request`, `session`, `application`, and `websocket` scopes are available only if you use a web-aware Spring `ApplicationContext` implementation (such as `XmlWebApplicationContext`). If you use these scopes with regular Spring IoC containers, such as the `ClassPathXmlApplicationContext`, an `IllegalStateException` that complains about an unknown bean scope is thrown.
+
+“请求”、“会话”、“应用程序”和“websocket”作用域只有在使用支持web的Spring“ApplicationContext”实现（例如“XmlWebApplicationContext”）时才可用。如果将这些作用域与常规Spring IoC容器（如“ClassPathXmlApplicationContext”）一起使用，则会抛出一个“IllegalStateException”，该异常抱怨未知的bean作用域。
 
 ##### Initial Web Configuration
 
@@ -1989,6 +2064,11 @@ How you accomplish this initial setup depends on your particular Servlet environ
 If you access scoped beans within Spring Web MVC, in effect, within a request that is processed by the Spring `DispatcherServlet`, no special setup is necessary. `DispatcherServlet` already exposes all relevant state.
 
 If you use a Servlet 2.5 web container, with requests processed outside of Spring’s `DispatcherServlet` (for example, when using JSF or Struts), you need to register the `org.springframework.web.context.request.RequestContextListener` `ServletRequestListener`. For Servlet 3.0+, this can be done programmatically by using the `WebApplicationInitializer` interface. Alternatively, or for older containers, add the following declaration to your web application’s `web.xml` file:
+
+为了支持在'request'、'session'、'application'和'websocket'级别（web范围的bean）对bean进行范围界定，在定义bean之前需要进行一些较小的初始配置。（标准作用域“singleton”和“prototype”不需要此初始设置。）
+如何完成初始设置取决于特定的Servlet环境。
+如果您在SpringWebMVC中访问作用域bean，实际上是在由Spring'DispatcherServlet'处理的请求中，则无需特殊设置`DispatcherServlet`已公开所有相关状态。
+如果使用Servlet2.5Web容器，并且请求在Spring的“DispatcherServlet”之外处理（例如，在使用JSF或Struts时），则需要注册“org”。springframework。网状物上下文要求RequestContextListener``ServletRequestListener`。对于Servlet 3.0+，这可以通过使用“WebApplicationInitializer”接口以编程方式完成。或者，对于较旧的容器，将以下声明添加到web应用程序的“web”。xml`文件：
 
 ```xml
 <web-app>
@@ -2003,6 +2083,8 @@ If you use a Servlet 2.5 web container, with requests processed outside of Sprin
 ```
 
 Alternatively, if there are issues with your listener setup, consider using Spring’s `RequestContextFilter`. The filter mapping depends on the surrounding web application configuration, so you have to change it as appropriate. The following listing shows the filter part of a web application:
+
+或者，如果您的侦听器设置存在问题，请考虑使用Spring的“RealestCutExter筛选器”。过滤器映射取决于周围的web应用程序配置，因此必须根据需要进行更改。以下列表显示了web应用程序的筛选器部分：
 
 ```xml
 <web-app>
@@ -2021,9 +2103,13 @@ Alternatively, if there are issues with your listener setup, consider using Spri
 
 `DispatcherServlet`, `RequestContextListener`, and `RequestContextFilter` all do exactly the same thing, namely bind the HTTP request object to the `Thread` that is servicing that request. This makes beans that are request- and session-scoped available further down the call chain.
 
+`DispatcherServlet`、`RequestContextListener`和`RequestContextFilter`都执行完全相同的操作，即将HTTP请求对象绑定到为该请求提供服务的`Thread`。这使得请求和会话作用域的bean在调用链的更下游可用。
+
 ##### Request scope
 
 Consider the following XML configuration for a bean definition:
+
+为bean定义考虑以下XML配置：
 
 ```xml
 <bean id="loginAction" class="com.something.LoginAction" scope="request"/>
@@ -2033,9 +2119,8 @@ The Spring container creates a new instance of the `LoginAction` bean by using t
 
 When using annotation-driven components or Java configuration, the `@RequestScope` annotation can be used to assign a component to the `request` scope. The following example shows how to do so:
 
-Java
-
-Kotlin
+Spring容器通过为每个HTTP请求使用“LoginAction”bean定义来创建“LoginAction”bean的新实例。也就是说，“loginAction”bean的作用域是HTTP请求级别。您可以随意更改创建的实例的内部状态，因为从同一`loginAction`bean定义创建的其他实例在状态中看不到这些更改。它们是特定于个人请求的。当请求完成处理时，作用域为请求的bean将被丢弃。
+使用注释驱动的组件或Java配置时，`@RequestScope`注释可用于将组件分配给`request`范围。以下示例显示了如何执行此操作：
 
 ```java
 @RequestScope
@@ -2049,6 +2134,8 @@ public class LoginAction {
 
 Consider the following XML configuration for a bean definition:
 
+为bean定义考虑以下XML配置：
+
 ```xml
 <bean id="userPreferences" class="com.something.UserPreferences" scope="session"/>
 ```
@@ -2057,9 +2144,9 @@ The Spring container creates a new instance of the `UserPreferences` bean by usi
 
 When using annotation-driven components or Java configuration, you can use the `@SessionScope` annotation to assign a component to the `session` scope.
 
-Java
+Spring容器通过在单个HTTP“会话”的生存期内使用“UserPreferences”bean定义来创建“UserPreferences”bean的新实例。换句话说，`userPreferences` bean有效地限定了HTTP`Session`级别的作用域。与请求范围的bean一样，您可以随意更改创建的实例的内部状态，因为您知道其他HTTP`Session`实例也使用从同一`userPreferences`bean定义创建的实例，它们在状态中看不到这些更改，因为它们是特定于单个HTTP`Session`的。当HTTP`Session`最终被丢弃时，作用于该特定HTTP`Session`的bean也被丢弃。
 
-Kotlin
+使用注释驱动的组件或Java配置时，可以使用`@SessionScope`注释将组件分配给`会话'范围。
 
 ```java
 @SessionScope
@@ -2073,6 +2160,8 @@ public class UserPreferences {
 
 Consider the following XML configuration for a bean definition:
 
+为bean定义考虑以下XML配置：
+
 ```xml
 <bean id="appPreferences" class="com.something.AppPreferences" scope="application"/>
 ```
@@ -2081,9 +2170,9 @@ The Spring container creates a new instance of the `AppPreferences` bean by usin
 
 When using annotation-driven components or Java configuration, you can use the `@ApplicationScope` annotation to assign a component to the `application` scope. The following example shows how to do so:
 
-Java
+Spring容器通过为整个web应用程序使用一次“AppPreferences”bean定义来创建“AppPreferences”bean的新实例。也就是说，`appPreferences` bean的作用域为`ServletContext`级别，并存储为常规的`ServletContext`属性。这有点类似于Spring单例bean，但在两个重要方面有所不同：它是每个“ServletContext”的单例bean，而不是每个Spring“ApplicationContext”（在任何给定的web应用程序中可能有多个），它实际上是公开的，因此作为“ServletContext”属性可见。
 
-Kotlin
+使用注释驱动的组件或Java配置时，可以使用`@ApplicationScope`注释将组件分配给`应用'范围。以下示例显示了如何执行此操作：
 
 ```java
 @ApplicationScope
@@ -2097,11 +2186,15 @@ public class AppPreferences {
 
 The Spring IoC container manages not only the instantiation of your objects (beans), but also the wiring up of collaborators (or dependencies). If you want to inject (for example) an HTTP request-scoped bean into another bean of a longer-lived scope, you may choose to inject an AOP proxy in place of the scoped bean. That is, you need to inject a proxy object that exposes the same public interface as the scoped object but that can also retrieve the real target object from the relevant scope (such as an HTTP request) and delegate method calls onto the real object.
 
-|      | You may also use `<aop:scoped-proxy/>` between beans that are scoped as `singleton`, with the reference then going through an intermediate proxy that is serializable and therefore able to re-obtain the target singleton bean on deserialization.When declaring `<aop:scoped-proxy/>` against a bean of scope `prototype`, every method call on the shared proxy leads to the creation of a new target instance to which the call is then being forwarded.Also, scoped proxies are not the only way to access beans from shorter scopes in a lifecycle-safe fashion. You may also declare your injection point (that is, the constructor or setter argument or autowired field) as `ObjectFactory<MyTargetBean>`, allowing for a `getObject()` call to retrieve the current instance on demand every time it is needed — without holding on to the instance or storing it separately.As an extended variant, you may declare `ObjectProvider<MyTargetBean>` which delivers several additional access variants, including `getIfAvailable` and `getIfUnique`.The JSR-330 variant of this is called `Provider` and is used with a `Provider<MyTargetBean>` declaration and a corresponding `get()` call for every retrieval attempt. See [here](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-standard-annotations) for more details on JSR-330 overall. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+SpringIOC容器不仅管理对象（bean）的实例化，还管理协作者（或依赖项）的连接。如果您想要（例如）将HTTP请求范围的bean注入到另一个更长寿命范围的bean中，您可以选择注入AOP代理来代替范围bean。也就是说，您需要注入一个代理对象，该代理对象公开与作用域对象相同的公共接口，但也可以从相关作用域（如HTTP请求）检索真实目标对象，并将方法调用委托给真实对象。
+
+> You may also use `<aop:scoped-proxy/>` between beans that are scoped as `singleton`, with the reference then going through an intermediate proxy that is serializable and therefore able to re-obtain the target singleton bean on deserialization.When declaring `<aop:scoped-proxy/>` against a bean of scope `prototype`, every method call on the shared proxy leads to the creation of a new target instance to which the call is then being forwarded.Also, scoped proxies are not the only way to access beans from shorter scopes in a lifecycle-safe fashion. You may also declare your injection point (that is, the constructor or setter argument or autowired field) as `ObjectFactory<MyTargetBean>`, allowing for a `getObject()` call to retrieve the current instance on demand every time it is needed — without holding on to the instance or storing it separately.As an extended variant, you may declare `ObjectProvider<MyTargetBean>` which delivers several additional access variants, including `getIfAvailable` and `getIfUnique`.The JSR-330 variant of this is called `Provider` and is used with a `Provider<MyTargetBean>` declaration and a corresponding `get()` call for every retrieval attempt. See [here](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-standard-annotations) for more details on JSR-330 overall.
+>
+> 您还可以在作用域为“singleton”的bean之间使用“<aop:scoped proxy/>”，然后引用将通过可序列化的中间代理，从而能够在反序列化时重新获取目标singleton bean。当针对作用域“prototype”的bean声明“<aop:scoped proxy/>”时，对共享代理的每个方法调用都会导致创建一个新的目标实例，然后将调用转发到该实例。此外，作用域代理并不是以生命周期安全的方式从较短作用域访问bean的唯一方法。您还可以将注入点（即构造函数或setter参数或autowired字段）声明为`ObjectFactory<MyTargetBean>`，从而允许每次需要时通过`getObject（）`调用按需检索当前实例 — 无需保留实例或单独存储它。作为扩展变量，您可以声明'ObjectProvider<MyTargetBean>'，它提供了几个额外的访问变量，包括'getIfAvailable'和'getIfUnique'。它的JSR-330变体称为“Provider”，并与“Provider<MyTargetBean>”声明以及每次检索尝试的相应“get（）”调用一起使用。有关JSR-330的更多详细信息，请参见[此处]。
 
 The configuration in the following example is only one line, but it is important to understand the “why” as well as the “how” behind it:
+
+以下示例中的配置仅为一行，但了解其背后的“为什么”和“如何”很重要：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2116,7 +2209,7 @@ The configuration in the following example is only one line, but it is important
     <!-- an HTTP Session-scoped bean exposed as a proxy -->
     <bean id="userPreferences" class="com.something.UserPreferences" scope="session">
         <!-- instructs the container to proxy the surrounding bean -->
-        <aop:scoped-proxy/> 
+        <aop:scoped-proxy/>   <!--注释一-->
     </bean>
 
     <!-- a singleton-scoped bean injected with a proxy to the above bean -->
@@ -2127,11 +2220,11 @@ The configuration in the following example is only one line, but it is important
 </beans>
 ```
 
-|      | The line that defines the proxy. |
-| ---- | -------------------------------- |
-|      |                                  |
+注释一：The line that defines the proxy.定义代理的行。
 
 To create such a proxy, you insert a child `<aop:scoped-proxy/>` element into a scoped bean definition (see [Choosing the Type of Proxy to Create](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-other-injection-proxies) and [XML Schema-based configuration](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#xsd-schemas)). Why do definitions of beans scoped at the `request`, `session` and custom-scope levels require the `<aop:scoped-proxy/>` element? Consider the following singleton bean definition and contrast it with what you need to define for the aforementioned scopes (note that the following `userPreferences` bean definition as it stands is incomplete):
+
+要创建这样一个代理，您需要将子“<aop:scoped proxy/>”元素插入到作用域bean定义中（请参见[选择要创建的代理类型]和[基于XML模式的配置]）。为什么在`request`、`session`和自定义作用域级别定义作用域的bean需要`aop:scoped proxy/>`元素？考虑下面的单点bean定义并将其与前面所定义的范围进行比较（注意，下面的“用户偏好”bean定义是不完整的）：
 
 ```xml
 <bean id="userPreferences" class="com.something.UserPreferences" scope="session"/>
@@ -2147,6 +2240,12 @@ This is not the behavior you want when injecting a shorter-lived scoped bean int
 
 Thus, you need the following (correct and complete) configuration when injecting `request-` and `session-scoped` beans into collaborating objects, as the following example shows:
 
+在前面的示例中，单例bean（`userManager`）被注入了对HTTP`Session`-作用域bean（`userPreferences`）的引用。这里最突出的一点是，`userManager` bean是一个单例：每个容器只实例化一次，它的依赖项（在本例中只有一个，`userPreferences` bean）也只注入一次。这意味着“userManager”bean只对完全相同的“userPreferences”对象（即最初注入它的对象）进行操作。
+
+这不是您在将一个寿命较短的作用域bean注入一个寿命较长的作用域bean时想要的行为（例如，将一个HTTP`Session`-作用域的协作bean作为依赖项注入到单例bean中）。相反，您需要一个“userManager”对象，并且在HTTP“会话”的生存期内，您需要一个特定于HTTP“会话”的“userPreferences”对象。因此，容器创建了一个对象，该对象公开了与“UserPreferences”类完全相同的公共接口（理想情况下是一个“UserPreferences”实例的对象），该对象可以从作用域机制（HTTP请求、“Session”等）获取真正的“UserPreferences”对象。容器将此代理对象注入到“userManager”bean中，该bean不知道此“UserPreferences”引用是代理。在本例中，“UserManager”实例调用依赖注入的“UserPreferences”对象上的方法时，实际上是在调用代理上的方法。然后，代理从HTTP`Session`获取真实的`UserPreferences`对象（在本例中为该对象），并将方法调用委托给检索到的真实`UserPreferences`对象。
+
+因此，在将'request-'和'session scoped'bean注入协作对象时，需要以下（正确且完整的）配置，如下例所示：
+
 ```xml
 <bean id="userPreferences" class="com.something.UserPreferences" scope="session">
     <aop:scoped-proxy/>
@@ -2159,13 +2258,19 @@ Thus, you need the following (correct and complete) configuration when injecting
 
 ###### Choosing the Type of Proxy to Create
 
+###### 选择要创建的代理的类型
+
 By default, when the Spring container creates a proxy for a bean that is marked up with the `<aop:scoped-proxy/>` element, a CGLIB-based class proxy is created.
 
-|      | CGLIB proxies intercept only public method calls! Do not call non-public methods on such a proxy. They are not delegated to the actual scoped target object. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+默认情况下，当Spring容器为标记有“<aop:scoped proxy/>”元素的bean创建代理时，将创建基于CGLIB的类代理。
+
+> CGLIB proxies intercept only public method calls! Do not call non-public methods on such a proxy. They are not delegated to the actual scoped target object.
+>
+> CGLIB代理只截获公共方法调用！不要在这样的代理上调用非公共方法。它们不会委托给实际的作用域目标对象。
 
 Alternatively, you can configure the Spring container to create standard JDK interface-based proxies for such scoped beans, by specifying `false` for the value of the `proxy-target-class` attribute of the `<aop:scoped-proxy/>` element. Using JDK interface-based proxies means that you do not need additional libraries in your application classpath to affect such proxying. However, it also means that the class of the scoped bean must implement at least one interface and that all collaborators into which the scoped bean is injected must reference the bean through one of its interfaces. The following example shows a proxy based on an interface:
+
+或者，您可以配置Spring容器，通过为“<aop:scoped proxy/>”元素的“proxy target class”属性的值指定“false”，为此类作用域bean创建基于JDK接口的标准代理。使用基于JDK接口的代理意味着您不需要在应用程序类路径中使用额外的库来影响这种代理。然而，这也意味着作用域bean的类必须实现至少一个接口，并且所有注入作用域bean的协作者必须通过其接口之一引用bean。以下示例显示了基于接口的代理：
 
 ```xml
 <!-- DefaultUserPreferences implements the UserPreferences interface -->
@@ -2180,11 +2285,17 @@ Alternatively, you can configure the Spring container to create standard JDK int
 
 For more detailed information about choosing class-based or interface-based proxying, see [Proxying Mechanisms](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-proxying).
 
+有关选择基于类或基于接口的代理的更多详细信息，请参阅[代理机制](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-代理）。
+
 #### 1.5.5. Custom Scopes
 
 The bean scoping mechanism is extensible. You can define your own scopes or even redefine existing scopes, although the latter is considered bad practice and you cannot override the built-in `singleton` and `prototype` scopes.
 
+bean作用域机制是可扩展的。您可以定义自己的作用域，甚至可以重新定义现有的作用域，尽管后者被认为是不好的做法，并且您不能覆盖内置的“singleton”和“prototype”作用域。
+
 ##### Creating a Custom Scope
+
+##### 创建自定义范围
 
 To integrate your custom scopes into the Spring container, you need to implement the `org.springframework.beans.factory.config.Scope` interface, which is described in this section. For an idea of how to implement your own scopes, see the `Scope` implementations that are supplied with the Spring Framework itself and the [`Scope`](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/beans/factory/config/Scope.html) javadoc, which explains the methods you need to implement in more detail.
 
@@ -2192,9 +2303,9 @@ The `Scope` interface has four methods to get objects from the scope, remove the
 
 The session scope implementation, for example, returns the session-scoped bean (if it does not exist, the method returns a new instance of the bean, after having bound it to the session for future reference). The following method returns the object from the underlying scope:
 
-Java
-
-Kotlin
+要将自定义作用域集成到Spring容器中，您需要实现“org”。springframework。豆。工厂配置。Scope`接口，本节将对此进行描述。要了解如何实现自己的作用域，请参阅Spring框架本身提供的“作用域”实现和[`Scope`]javadoc，其中更详细地解释了需要实现的方法。
+“Scope”接口有四种方法可用于从作用域中获取对象、从作用域中删除对象以及销毁对象。
+例如，会话作用域实现返回会话作用域bean（如果它不存在，则在将bean绑定到会话以供将来引用后，该方法返回bean的新实例）。以下方法从基础作用域返回对象：
 
 ```java
 Object get(String name, ObjectFactory<?> objectFactory)
@@ -2202,9 +2313,7 @@ Object get(String name, ObjectFactory<?> objectFactory)
 
 The session scope implementation, for example, removes the session-scoped bean from the underlying session. The object should be returned, but you can return `null` if the object with the specified name is not found. The following method removes the object from the underlying scope:
 
-Java
-
-Kotlin
+例如，会话作用域实现从底层会话中删除会话作用域bean。应该返回该对象，但如果找不到具有指定名称的对象，则可以返回'null'。以下方法从基础作用域中删除对象：
 
 ```java
 Object remove(String name)
@@ -2212,9 +2321,7 @@ Object remove(String name)
 
 The following method registers a callback that the scope should invoke when it is destroyed or when the specified object in the scope is destroyed:
 
-Java
-
-Kotlin
+以下方法注册一个回调，当作用域被销毁或作用域中的指定对象被销毁时，该回调应被调用：
 
 ```java
 void registerDestructionCallback(String name, Runnable destructionCallback)
@@ -2224,9 +2331,8 @@ See the [javadoc](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-ap
 
 The following method obtains the conversation identifier for the underlying scope:
 
-Java
-
-Kotlin
+参见[javadoc](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/beans/factory/config/Scope.html#registerDestructionCallback)或Spring范围实现，以获取有关销毁回调的更多信息。
+以下方法获取基础作用域的对话标识符：
 
 ```java
 String getConversationId()
@@ -2234,13 +2340,15 @@ String getConversationId()
 
 This identifier is different for each scope. For a session scoped implementation, this identifier can be the session identifier.
 
+此标识符对于每个作用域都是不同的。对于会话范围的实现，此标识符可以是会话标识符。
+
 ##### Using a Custom Scope
+
+##### 使用自定义作用域
 
 After you write and test one or more custom `Scope` implementations, you need to make the Spring container aware of your new scopes. The following method is the central method to register a new `Scope` with the Spring container:
 
-Java
-
-Kotlin
+在编写和测试一个或多个自定义“Scope”实现之后，您需要让Spring容器知道您的新作用域。以下方法是向Spring容器注册新“Scope”的中心方法：
 
 ```java
 void registerScope(String scopeName, Scope scope);
@@ -2252,13 +2360,15 @@ The first argument to the `registerScope(..)` method is the unique name associat
 
 Suppose that you write your custom `Scope` implementation, and then register it as shown in the next example.
 
-|      | The next example uses `SimpleThreadScope`, which is included with Spring but is not registered by default. The instructions would be the same for your own custom `Scope` implementations. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+此方法在`ConfigurableBeanFactory`接口上声明，该接口可通过Spring附带的大多数具体`ApplicationContext`实现的`BeanFactory`属性获得。
 
-Java
+“registerScope（…）”的第一个参数方法是与作用域关联的唯一名称。Spring容器本身中此类名称的示例有“singleton”和“prototype”。“registerScope（…）”的第二个参数方法是要注册和使用的自定义“Scope”实现的实际实例。
 
-Kotlin
+假设您编写自定义的“Scope”实现，然后注册它，如下一个示例所示。
+
+> The next example uses `SimpleThreadScope`, which is included with Spring but is not registered by default. The instructions would be the same for your own custom `Scope` implementations.
+>
+> 下一个示例使用“SimpleThreadScope”，它包含在Spring中，但默认情况下未注册。对于您自己的自定义“Scope”实现，说明将是相同的。
 
 ```java
 Scope threadScope = new SimpleThreadScope();
@@ -2267,11 +2377,15 @@ beanFactory.registerScope("thread", threadScope);
 
 You can then create bean definitions that adhere to the scoping rules of your custom `Scope`, as follows:
 
+然后，您可以创建符合自定义“Scope”的作用域规则的bean定义，如下所示：
+
 ```xml
 <bean id="..." class="..." scope="thread">
 ```
 
 With a custom `Scope` implementation, you are not limited to programmatic registration of the scope. You can also do the `Scope` registration declaratively, by using the `CustomScopeConfigurer` class, as the following example shows:
+
+使用自定义的“Scope”实现，您不仅限于对作用域进行编程注册。您还可以使用“CustomScopeConfigurer”类声明性地进行“Scope”注册，如下例所示：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2305,11 +2419,13 @@ With a custom `Scope` implementation, you are not limited to programmatic regist
 </beans>
 ```
 
-|      | When you place `<aop:scoped-proxy/>` within a `<bean>` declaration for a `FactoryBean` implementation, it is the factory bean itself that is scoped, not the object returned from `getObject()`. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+> When you place `<aop:scoped-proxy/>` within a `<bean>` declaration for a `FactoryBean` implementation, it is the factory bean itself that is scoped, not the object returned from `getObject()`.
+>
+> 当您将`<aop:scoped proxy/>放在`FactoryBean`实现的`<bean>`声明中时，作用域是工厂bean本身，而不是从`getObject（）`返回的对象。
 
 ### 1.6. Customizing the Nature of a Bean
+
+### 1.6. 自定义Bean的性质
 
 The Spring Framework provides a number of interfaces you can use to customize the nature of a bean. This section groups them as follows:
 
@@ -2317,13 +2433,21 @@ The Spring Framework provides a number of interfaces you can use to customize th
 - [`ApplicationContextAware` and `BeanNameAware`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-aware)
 - [Other `Aware` Interfaces](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aware-list)
 
+Spring 框架提供了许多接口，您可以使用这些接口来定制bean的性质。本节将其分组如下：
+
+- [生命周期回调]
+- [`ApplicationContextAware`和`BeanNameWare`]
+- [其他`感知'接口]
+
 #### 1.6.1. Lifecycle Callbacks
 
 To interact with the container’s management of the bean lifecycle, you can implement the Spring `InitializingBean` and `DisposableBean` interfaces. The container calls `afterPropertiesSet()` for the former and `destroy()` for the latter to let the bean perform certain actions upon initialization and destruction of your beans.
 
-|      | The JSR-250 `@PostConstruct` and `@PreDestroy` annotations are generally considered best practice for receiving lifecycle callbacks in a modern Spring application. Using these annotations means that your beans are not coupled to Spring-specific interfaces. For details, see [Using `@PostConstruct` and `@PreDestroy`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-postconstruct-and-predestroy-annotations).If you do not want to use the JSR-250 annotations but you still want to remove coupling, consider `init-method` and `destroy-method` bean definition metadata. |
-| ---- | ------------------------------------------------------------ |
-|      |                                                              |
+为了与容器对bean生命周期的管理进行交互，可以实现Spring`initializebean`和`DisposableBean`接口。容器对前者调用'AfterPropertieSet（）'，对后者调用'destroy（）'，以便bean在初始化和销毁bean时执行某些操作。
+
+> The JSR-250 `@PostConstruct` and `@PreDestroy` annotations are generally considered best practice for receiving lifecycle callbacks in a modern Spring application. Using these annotations means that your beans are not coupled to Spring-specific interfaces. For details, see [Using `@PostConstruct` and `@PreDestroy`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-postconstruct-and-predestroy-annotations).If you do not want to use the JSR-250 annotations but you still want to remove coupling, consider `init-method` and `destroy-method` bean definition metadata.
+>
+> JSR-250“@PostConstruct”和“@PreDestroy”注释通常被认为是在现代Spring应用程序中接收生命周期回调的最佳实践。使用这些注释意味着您的bean没有耦合到特定于Spring的接口。有关详细信息，请参见[使用“@PostConstruct”和“@PreDestroy”。如果您不想使用JSR-250注释，但仍希望删除耦合，请考虑“init方法”和“销毁方法”bean定义元数据。
 
 Internally, the Spring Framework uses `BeanPostProcessor` implementations to process any callback interfaces it can find and call the appropriate methods. If you need custom features or other lifecycle behavior Spring does not by default offer, you can implement a `BeanPostProcessor` yourself. For more information, see [Container Extension Points](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-extension).
 
@@ -2331,9 +2455,17 @@ In addition to the initialization and destruction callbacks, Spring-managed obje
 
 The lifecycle callback interfaces are described in this section.
 
+在内部，Spring框架使用“BeanPostProcessor”实现来处理它可以找到的任何回调接口，并调用适当的方法。如果您需要定制功能或Spring默认不提供的其他生命周期行为，您可以自己实现一个“BeanPostProcessor”。有关详细信息，请参见[容器扩展点]。
+
+除了初始化和销毁回调之外，Spring托管对象还可以实现“Lifecycle”接口，以便这些对象可以参与启动和关闭过程，这是由容器自身的生命周期驱动的。
+
+本节介绍了生命周期回调接口。
+
 ##### Initialization Callbacks
 
 The `org.springframework.beans.factory.InitializingBean` interface lets a bean perform initialization work after the container has set all necessary properties on the bean. The `InitializingBean` interface specifies a single method:
+
+`org.springframework.beans.factory.InitializingBean` 接口允许bean在容器对bean设置了所有必要的属性之后执行初始化工作。'InitializingBean'接口指定一个方法：
 
 ```java
 void afterPropertiesSet() throws Exception;
@@ -2341,13 +2473,13 @@ void afterPropertiesSet() throws Exception;
 
 We recommend that you do not use the `InitializingBean` interface, because it unnecessarily couples the code to Spring. Alternatively, we suggest using the [`@PostConstruct`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-postconstruct-and-predestroy-annotations) annotation or specifying a POJO initialization method. In the case of XML-based configuration metadata, you can use the `init-method` attribute to specify the name of the method that has a void no-argument signature. With Java configuration, you can use the `initMethod` attribute of `@Bean`. See [Receiving Lifecycle Callbacks](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java-lifecycle-callbacks). Consider the following example:
 
+我们建议您不要使用'InitializingBean'接口，因为它不必要地将代码耦合到Spring。或者，我们建议使用[`@PostConstruct`]注释或指定POJO初始化方法。对于基于XML的配置元数据，可以使用`init method`属性指定具有无效无参数签名的方法的名称。通过Java配置，您可以使用“@Bean”的“initMethod”属性。请参阅[接收生命周期回调]。考虑下面的例子：
+
 ```xml
 <bean id="exampleInitBean" class="examples.ExampleBean" init-method="init"/>
 ```
 
-Java
 
-Kotlin
 
 ```java
 public class ExampleBean {
@@ -2360,13 +2492,13 @@ public class ExampleBean {
 
 The preceding example has almost exactly the same effect as the following example (which consists of two listings):
 
+前面的示例与下面的示例（由两个列表组成）具有几乎完全相同的效果：
+
 ```xml
 <bean id="exampleInitBean" class="examples.AnotherExampleBean"/>
 ```
 
-Java
 
-Kotlin
 
 ```java
 public class AnotherExampleBean implements InitializingBean {
@@ -2379,6 +2511,8 @@ public class AnotherExampleBean implements InitializingBean {
 ```
 
 However, the first of the two preceding examples does not couple the code to Spring.
+
+前面的示例与下面的示例（由两个列表组成）具有几乎完全相同的效果：
 
 ##### Destruction Callbacks
 
@@ -2394,9 +2528,7 @@ We recommend that you do not use the `DisposableBean` callback interface, becaus
 <bean id="exampleInitBean" class="examples.ExampleBean" destroy-method="cleanup"/>
 ```
 
-Java
 
-Kotlin
 
 ```java
 public class ExampleBean {
