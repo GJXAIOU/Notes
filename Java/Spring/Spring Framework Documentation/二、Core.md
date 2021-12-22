@@ -333,7 +333,7 @@ You can then use `getBean` to retrieve instances of your beans. The `Application
 
 **您可以在同一个 `ApplicationContext`上混合和匹配这样的读卡器委托，从不同的配置源读取 bean 定义**。
 
-然后可以使用 `getBean` 检索 bean 的实例。`ApplicationContext` 接口有一些其他方法用于检索 bean，但理想情况下，应用程序代码不应使用它们。实际上，您的应用程序代码根本不应该调用`getBean()`方法，因此完全不依赖于Spring API。例如，Spring 与 web 框架的集成为各种 web 框架组件（如控制器和 JSF 托管 bean）提供了依赖项注入，允许您通过元数据（如自动连接注释）声明对特定bean的依赖项。
+然后可以使用 `getBean` 检索 bean 的实例。`ApplicationContext` 接口有一些其他方法用于检索 bean，但理想情况下，应用程序代码不应使用它们。实际上，您的应用程序代码根本不应该调用`getBean()`方法，因此完全不依赖于Spring API。例如，Spring 与 web 框架的集成为各种 web 框架组件（如控制器和 JSF 托管 bean）提供了依赖项注入，允许您通过元数据（如自动装配注释）声明对特定bean的依赖项。
 
 ### 1.3. Bean Overview
 
@@ -382,7 +382,7 @@ In addition to bean definitions that contain information on how to create a spec
 
 >Bean metadata and manually supplied singleton instances need to be registered as early as possible, in order for the container to properly reason about them during autowiring and other introspection steps. While overriding existing metadata and existing singleton instances is supported to some degree, the registration of new beans at runtime (concurrently with live access to the factory) is not officially supported and may lead to concurrent access exceptions, inconsistent state in the bean container, or both.
 >
->Bean 元数据和手动提供的单例实例需要尽早注册，以便容器在自动连接和其他自省步骤中正确地对它们进行推理。**虽然在某种程度上支持覆盖现有元数据和现有单例实例，但官方不支持在运行时注册新 bean（与对工厂的实时访问同时进行），这可能导致并发访问异常、bean容器中的状态不一致，或两者兼而有之。**
+>Bean 元数据和手动提供的单例实例需要尽早注册，以便容器在自动装配和其他自省步骤中正确地对它们进行推理。**虽然在某种程度上支持覆盖现有元数据和现有单例实例，但官方不支持在运行时注册新 bean（与对工厂的实时访问同时进行），这可能导致并发访问异常、bean容器中的状态不一致，或两者兼而有之。**
 
 #### 1.3.1. Naming Beans
 
@@ -1662,7 +1662,7 @@ The Spring container can autowire relationships between collaborating beans. You
 
 When using XML-based configuration metadata (see [Dependency Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators)), you can specify the autowire mode for a bean definition with the `autowire` attribute of the `<bean/>` element. The autowiring functionality has four modes. You specify autowiring per bean and can thus choose which ones to autowire. The following table describes the four autowiring modes:
 
-Spring 容器可以自动连接协作 bean 之间的关系。通过检查 `ApplicationContext` 的内容，您可以让 Spring 为您的 bean 自动解析协作者（其他 bean）。自动装配具有以下优点：
+Spring 容器可以自动装配协作 bean 之间的关系。通过检查 `ApplicationContext` 的内容，您可以让 Spring 为您的 bean 自动解析协作者（其他 bean）。自动装配具有以下优点：
 
 - 自动装配可以显著减少指定属性或构造函数参数的需要。（在这方面，其他机制（如 bean 模板[在本章其他部分讨论](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions)也很有价值。）
 - **自动装配可以随着对象的发展而更新配置**。例如，如果您需要向类添加依赖项，则可以自动满足该依赖项，而无需修改配置。因此，在开发过程中，自动装配特别有用，而不会在代码库变得更稳定时取消切换到显式连接的选项。
@@ -1673,7 +1673,7 @@ Spring 容器可以自动连接协作 bean 之间的关系。通过检查 `Appli
 | :------------ | :----------------------------------------------------------- |
 | `no`          | (Default) No autowiring. Bean references must be defined by `ref` elements. Changing the default setting is not recommended for larger deployments, because specifying collaborators explicitly gives greater control and clarity. To some extent, it documents the structure of a system.<br />（默认）无自动装配。Bean 引用必须由 `ref` 元素定义。**对于较大的部署，不建议更改默认设置，因为明确指定协作者可以提供更大的控制和清晰度。在某种程度上，它记录了一个系统的结构。** |
 | `byName`      | Autowiring by property name. Spring looks for a bean with the same name as the property that needs to be autowired. For example, if a bean definition is set to autowire by name and it contains a `master` property (that is, it has a `setMaster(..)` method), Spring looks for a bean definition named `master` and uses it to set the property.<br />按属性名称自动装配。Spring 查找与需要自动装配的属性同名的 bean。例如，如果一个 bean 定义按名称设置为 autowire，并且它包含一个`master`属性（即，它有一个`setMaster(..)`方法），Spring 查找名为 `master` 的 bean 定义并使用它设置属性。 |
-| `byType`      | Lets a property be autowired if exactly one bean of the property type exists in the container. If more than one exists, a fatal exception is thrown, which indicates that you may not use `byType` autowiring for that bean. If there are no matching beans, nothing happens (the property is not set).<br />如果容器中正好存在一个属性类型的 bean，则允许自动装配属性。如果存在多个，将抛出一个致命异常，这表示您可能不会对该 bean 使用 `byType` 自动连接。**如果没有匹配的 bean，则不会发生任何事情（未设置属性）。** |
+| `byType`      | Lets a property be autowired if exactly one bean of the property type exists in the container. If more than one exists, a fatal exception is thrown, which indicates that you may not use `byType` autowiring for that bean. If there are no matching beans, nothing happens (the property is not set).<br />如果容器中正好存在一个属性类型的 bean，则允许自动装配属性。如果存在多个，将抛出一个致命异常，这表示您可能不会对该 bean 使用 `byType` 自动装配。**如果没有匹配的 bean，则不会发生任何事情（未设置属性）。** |
 | `constructor` | Analogous to `byType` but applies to constructor arguments. If there is not exactly one bean of the constructor argument type in the container, a fatal error is raised.<br />类似于 `byType`，但适用于构造函数参数。如果容器中没有一个构造函数参数类型的 bean，则会引发致命错误。 |
 
 With `byType` or `constructor` autowiring mode, you can wire arrays and typed collections. In such cases, all autowire candidates within the container that match the expected type are provided to satisfy the dependency. You can autowire strongly-typed `Map` instances if the expected key type is `String`. An autowired `Map` instance’s values consist of all bean instances that match the expected type, and the `Map` instance’s keys contain the corresponding bean names.
@@ -1717,30 +1717,32 @@ In the latter scenario, you have several options:
 
 ##### Excluding a Bean from Autowiring
 
-##### 从自动装配中排除Bean
+##### 从自动装配中排除 Bean
 
 On a per-bean basis, you can exclude a bean from autowiring. In Spring’s XML format, set the `autowire-candidate` attribute of the `<bean/>` element to `false`. The container makes that specific bean definition unavailable to the autowiring infrastructure (including annotation style configurations such as [`@Autowired`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-autowired-annotation)).
 
-在每个bean的基础上，您可以将bean从自动连接中排除。在Spring的XML格式中，将`<bean/>`元素的`autowire-candidate`属性设置为`false`。该容器使特定的bean定义对自动布线基础结构不可用（包括注释样式配置，如[`@Autowired`]）。
+在每个 bean 的基础上，您可以将bean从自动装配中排除。在 Spring 的 XML 格式中，将`<bean/>`元素的`autowire-candidate`属性设置为`false`。该容器使特定的 bean 定义对自动装配基础结构不可用（包括注释样式配置，如[`@Autowired`](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-autowired-annotation)）。
 
 > The `autowire-candidate` attribute is designed to only affect type-based autowiring. It does not affect explicit references by name, which get resolved even if the specified bean is not marked as an autowire candidate. As a consequence, autowiring by name nevertheless injects a bean if the name matches.
 >
-> “autowire候选者”属性设计为仅影响基于类型的自动关联。它不会按名称影响显式引用，即使指定的bean未标记为autowire候选，也会解析显式引用。因此，如果名称匹配，按名称自动连接将注入bean。
+> **`autowire-candidate`  属性设计为仅影响基于类型的自动关联。它不会按名称影响显式引用**，即使指定的bean未标记为autowire候选，也会解析显式引用。因此，如果名称匹配，按名称自动匹配将注入 bean。
 
 You can also limit autowire candidates based on pattern-matching against bean names. The top-level `<beans/>` element accepts one or more patterns within its `default-autowire-candidates` attribute. For example, to limit autowire candidate status to any bean whose name ends with `Repository`, provide a value of `*Repository`. To provide multiple patterns, define them in a comma-separated list. An explicit value of `true` or `false` for a bean definition’s `autowire-candidate` attribute always takes precedence. For such beans, the pattern matching rules do not apply.
 
 These techniques are useful for beans that you never want to be injected into other beans by autowiring. It does not mean that an excluded bean cannot itself be configured by using autowiring. Rather, the bean itself is not a candidate for autowiring other beans.
 
-您还可以基于对bean名称的模式匹配来限制autowire候选项。顶级“<beans/>”元素在其“default autowire候选者”属性中接受一个或多个模式。例如，要将autowire候选状态限制为名称以“Repository”结尾的任何bean，请提供值“*Repository”。要提供多个模式，请在逗号分隔的列表中定义它们。bean定义的“autowire-candidate”属性的显式值“true”或“false”始终优先。对于这样的bean，模式匹配规则不适用。
-这些技术对于您永远不希望通过自动连接注入其他bean的bean非常有用。这并不意味着排除的bean本身不能通过使用自动连接进行配置。相反，bean本身不是自动连接其他bean的候选对象。
+**您还可以基于对 bean 名称的模式匹配来限制自动装配候选项**。顶级 `<beans/>` 元素在其 `default-autowire-candidates`属性中接受一个或多个模式。例如，要将 autowire 候选状态限制为名称以 `Repository` 结尾的任何 bean，请提供值 `*Repository`。要提供多个模式，请在逗号分隔的列表中定义它们。bean 定义的 `autowire-candidate` 属性的显式值 `true` 或 `false`始终优先。对于这样的 bean，模式匹配规则不适用。
+这些技术对于您永远不希望通过自动装配注入其他 bean 的 bean 非常有用。这并不意味着排除的 bean 本身不能通过使用自动装配进行配置。相反，bean 本身不是自动装配其他 bean 的候选对象。
 
 #### 1.4.6. Method Injection
+
+#### 1.4.6.方法注入
 
 In most application scenarios, most beans in the container are [singletons](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton). When a singleton bean needs to collaborate with another singleton bean or a non-singleton bean needs to collaborate with another non-singleton bean, you typically handle the dependency by defining one bean as a property of the other. A problem arises when the bean lifecycles are different. Suppose singleton bean A needs to use non-singleton (prototype) bean B, perhaps on each method invocation on A. The container creates the singleton bean A only once, and thus only gets one opportunity to set the properties. The container cannot provide bean A with a new instance of bean B every time one is needed.
 
 A solution is to forego some inversion of control. You can [make bean A aware of the container](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-aware) by implementing the `ApplicationContextAware` interface, and by [making a `getBean("B")` call to the container](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-client) ask for (a typically new) bean B instance every time bean A needs it. The following example shows this approach:
 
-在大多数应用程序场景中，容器中的大多数bean都是[Singleton]。当一个单例bean需要与另一个单例bean协作，或者一个非单例bean需要与另一个非单例bean协作时，通常通过将一个bean定义为另一个bean的属性来处理依赖关系。当bean的生命周期不同时，就会出现问题。假设单例bean A需要使用非单例（原型）bean B，可能是在A上的每个方法调用上。容器只创建单例bean A一次，因此只有一次机会设置属性。容器不能在每次需要时为bean A提供bean B的新实例。
+在大多数应用程序场景中，容器中的大多数 bean 都是单例的。当一个单例 bean 需要与另一个单例 bean 协作，或者一个非单例 bean 需要与另一个非单例 bean 协作时，通常通过将一个 bean 定义为另一个 bean的 属性来处理依赖关系。**当 bean 的生命周期不同时，就会出现问题**。假设单例 bean A 需要使用非单例（原型）bean B，可能是在A上的每个方法调用上。容器只创建单例bean A一次，因此只有一次机会设置属性。容器不能在每次需要时为bean A提供bean B的新实例。
 一个解决办法是放弃一些控制反转。您可以通过实现`ApplicationContextAware`接口[使bean A意识到容器]，并通过[使`getBean（“B”）`调用容器]在每次bean A需要时请求（通常是新的）bean B实例。以下示例显示了此方法：
 
 ```java
