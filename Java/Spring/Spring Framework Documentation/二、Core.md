@@ -1742,8 +1742,9 @@ In most application scenarios, most beans in the container are [singletons](http
 
 A solution is to forego some inversion of control. You can [make bean A aware of the container](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-aware) by implementing the `ApplicationContextAware` interface, and by [making a `getBean("B")` call to the container](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-client) ask for (a typically new) bean B instance every time bean A needs it. The following example shows this approach:
 
-在大多数应用程序场景中，容器中的大多数 bean 都是单例的。当一个单例 bean 需要与另一个单例 bean 协作，或者一个非单例 bean 需要与另一个非单例 bean 协作时，通常通过将一个 bean 定义为另一个 bean的 属性来处理依赖关系。**当 bean 的生命周期不同时，就会出现问题**。假设单例 bean A 需要使用非单例（原型）bean B，可能是在A上的每个方法调用上。容器只创建单例bean A一次，因此只有一次机会设置属性。容器不能在每次需要时为bean A提供bean B的新实例。
-一个解决办法是放弃一些控制反转。您可以通过实现`ApplicationContextAware`接口[使bean A意识到容器]，并通过[使`getBean（“B”）`调用容器]在每次bean A需要时请求（通常是新的）bean B实例。以下示例显示了此方法：
+在大多数应用程序场景中，容器中的大多数 bean 都是单例的。当一个单例 bean 需要与另一个单例 bean 协作，或者一个非单例 bean 需要与另一个非单例 bean 协作时，通常通过将一个 bean 定义为另一个 bean 的属性来处理依赖关系。**当 bean 的生命周期不同时，就会出现问题**。假设单例 bean A 需要使用非单例（原型）bean B，可能是在 A 上的每个方法调用上。容器只创建单例bean A 一次，因此只有一次机会设置属性。容器不能在每次需要时为 bean A 提供 bean B 的新实例。
+
+一个解决办法是放弃一些控制反转。您可以通过实现`ApplicationContextAware`接口[使bean A意识到容器](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-aware)，并通过[使用`getBean(“B”)`调用容器](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-client)在每次 bean A需 要时请求（通常是新的）bean B 实例。以下示例显示了此方法：
 
 ```java
 // a class that uses a stateful Command-style class to perform some processing
@@ -1782,14 +1783,16 @@ The preceding is not desirable, because the business code is aware of and couple
 
 You can read more about the motivation for Method Injection in [this blog entry](https://spring.io/blog/2004/08/06/method-injection/).
 
-前面的内容是不可取的，因为业务代码知道Spring框架并与之耦合。方法注入是SpringIoC容器的一个稍微高级的特性，它允许您干净地处理这个用例。
-你可以在[这篇博客文章]中阅读更多关于方法注入动机的信息(https://spring.io/blog/2004/08/06/method-injection/).
+**前面的内容是不可取的，因为业务代码知道 Spring 框架并与之耦合。方法注入是 Spring IoC 容器的一个稍微高级的特性，它允许您干净地处理这个用例。**
+你可以在[这篇博客文章](https://spring.io/blog/2004/08/06/method-injection/)中阅读更多关于方法注入动机的信息.
 
 ##### Lookup Method Injection
 
+##### 查找方法注入
+
 Lookup method injection is the ability of the container to override methods on container-managed beans and return the lookup result for another named bean in the container. The lookup typically involves a prototype bean, as in the scenario described in [the preceding section](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-method-injection). The Spring Framework implements this method injection by using bytecode generation from the CGLIB library to dynamically generate a subclass that overrides the method.
 
-查找方法注入是容器重写容器管理bean上的方法并返回容器中另一个命名bean的查找结果的能力。查找通常涉及一个原型bean，如[上一节]中描述的场景。Spring框架通过使用CGLIB库中的字节码生成来动态生成重写该方法的子类，从而实现这种方法注入。
+查找方法注入是容器重写容器管理 bean 上的方法并返回容器中另一个命名 bean 的查找结果的能力。查找通常涉及一个原型bean，如[上一节](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-method-injection)中描述的场景**。Spring 框架通过使用 CGLIB 库中的字节码生成来动态生成重写该方法的子类，从而实现这种方法注入。**
 
 > - For this dynamic subclassing to work, the class that the Spring bean container subclasses cannot be `final`, and the method to be overridden cannot be `final`, either.
 > - Unit-testing a class that has an `abstract` method requires you to subclass the class yourself and to supply a stub implementation of the `abstract` method.
