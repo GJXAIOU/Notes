@@ -826,7 +826,7 @@ public class ExampleBean {
 }
 ```
 
-##### Setter-based Dependency Injection
+##### Setter-based Dependency Injection 
 
 ##### 基于 Setter 的依赖注入
 
@@ -1799,14 +1799,14 @@ Lookup method injection is the ability of the container to override methods on c
 > - Concrete methods are also necessary for component scanning, which requires concrete classes to pick up.
 > - A further key limitation is that lookup methods do not work with factory methods and in particular not with `@Bean` methods in configuration classes, since, in that case, the container is not in charge of creating the instance and therefore cannot create a runtime-generated subclass on the fly.
 >
-> - 为了使这个动态子类能够工作，springbean容器子类的类不能是'final'，要重写的方法也不能是'final'。
-> - 对具有“abstract”方法的类进行单元测试需要您自己对该类进行子类化，并提供“abstract”方法的存根实现。
+> - 为了使这个动态子类能够工作，spring bean 容器子类的类不能 `final`，要重写的方法也不能是 `final`。
+> - 对具有 `abstract` 方法的类进行单元测试需要您自己对该类进行子类化，并提供 `abstract` 方法的存根实现。
 > - 组件扫描还需要具体的方法，这需要具体的类来拾取。
 > - 另一个关键限制是，查找方法不适用于工厂方法，特别是配置类中的“@Bean”方法，因为在这种情况下，容器不负责创建实例，因此无法动态创建运行时生成的子类。
 
 In the case of the `CommandManager` class in the previous code snippet, the Spring container dynamically overrides the implementation of the `createCommand()` method. The `CommandManager` class does not have any Spring dependencies, as the reworked example shows:
 
-对于前面代码段中的`CommandManager`类，Spring容器动态重写`createCommand（）`方法的实现。“CommandManager”类没有任何Spring依赖项，如修改后的示例所示：
+对于前面代码段中的`CommandManager`类，Spring 容器动态重写`createCommand()` 方法的实现。`CommandManager` 类没有任何 Spring 依赖项，如修改后的示例所示：
 
 ```java
 package fiona.apple;
@@ -1830,7 +1830,7 @@ public abstract class CommandManager {
 
 In the client class that contains the method to be injected (the `CommandManager` in this case), the method to be injected requires a signature of the following form:
 
-在包含要注入的方法的客户端类（本例中为“CommandManager”）中，要注入的方法需要以下形式的签名：
+在包含要注入的方法的客户端类（本例中为`CommandManager`）中，要注入的方法需要以下形式的签名：
 
 ```xml
 <public|protected> [abstract] <return-type> theMethodName(no-arguments);
@@ -1838,7 +1838,7 @@ In the client class that contains the method to be injected (the `CommandManager
 
 If the method is `abstract`, the dynamically-generated subclass implements the method. Otherwise, the dynamically-generated subclass overrides the concrete method defined in the original class. Consider the following example:
 
-如果方法为“抽象”，则动态生成的子类将实现该方法。否则，动态生成的子类将重写在原始类中定义的具体方法。考虑下面的例子：
+如果方法为`abstract`，则动态生成的子类将实现该方法。否则，动态生成的子类将重写在原始类中定义的具体方法。考虑下面的例子：
 
 ```xml
 <!-- a stateful bean deployed as a prototype (non-singleton) -->
@@ -1856,8 +1856,8 @@ The bean identified as `commandManager` calls its own `createCommand()` method w
 
 Alternatively, within the annotation-based component model, you can declare a lookup method through the `@Lookup` annotation, as the following example shows:
 
-标识为`commandManager`的bean在需要`myCommand` bean的新实例时调用自己的`createCommand（）`方法。如果实际需要的话，您必须小心地将'myCommand'bean部署为原型。如果它是一个[单身](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-工厂作用域（单例），每次都返回相同的'myCommand'bean实例。
-或者，在基于注释的组件模型中，可以通过“@lookup”注释声明查找方法，如下例所示：
+标识为`commandManager`的 bean 在需要`myCommand` bean 的新实例时调用自己的`createCommand()`方法。如果实际需要的话，您必须小心地将 `myCommand` bean 部署为原型。如果它是一个[单例](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton)，每次都返回相同的 `myCommand` bean实例。
+或者，在基于注释的组件模型中，可以通过 `@lookup` 注释声明查找方法，如下例所示：
 
 ```java
 public abstract class CommandManager {
@@ -1875,7 +1875,7 @@ public abstract class CommandManager {
 
 Or, more idiomatically, you can rely on the target bean getting resolved against the declared return type of the lookup method:
 
-或者，更习惯地说，您可以依靠目标bean根据查找方法的声明返回类型进行解析：
+或者，更习惯地说，您可以依靠目标 bean 根据查找方法的声明返回类型进行解析：
 
 ```java
 public abstract class CommandManager {
@@ -1901,12 +1901,14 @@ Note that you should typically declare such annotated lookup methods with a conc
 
 ##### Arbitrary Method Replacement
 
+##### 任意方法替换
+
 A less useful form of method injection than lookup method injection is the ability to replace arbitrary methods in a managed bean with another method implementation. You can safely skip the rest of this section until you actually need this functionality.
 
 With XML-based configuration metadata, you can use the `replaced-method` element to replace an existing method implementation with another, for a deployed bean. Consider the following class, which has a method called `computeValue` that we want to override:
 
-与查找方法注入相比，方法注入的一种不太有用的形式是能够用另一种方法实现替换托管bean中的任意方法。在实际需要此功能之前，您可以安全地跳过本节的其余部分。
-对于基于XML的配置元数据，您可以使用'replaced method'元素将已部署bean的现有方法实现替换为另一个方法实现。考虑下面的类，它有一个我们想重写的叫做“CtudioValueValue:”的方法：
+与查找方法注入相比，方法注入的一种不太有用的形式是能够用另一种方法实现替换托管 bean 中的任意方法。在实际需要此功能之前，您可以安全地跳过本节的其余部分。
+对于基于 XML 的配置元数据，您可以使用 `replaced-method`元素将已部署 bean 的现有方法实现替换为另一个方法实现。考虑下面的类，它有一个我们想重写的叫做 `computeValue` 的方法：
 
 ```java
 public class MyValueCalculator {
@@ -1970,43 +1972,49 @@ Because the number of arguments is often enough to distinguish between each poss
 
 ### 1.5. Bean Scopes
 
+### 1.5 Bean 作用域
+
 When you create a bean definition, you create a recipe for creating actual instances of the class defined by that bean definition. The idea that a bean definition is a recipe is important, because it means that, as with a class, you can create many object instances from a single recipe.
 
 You can control not only the various dependencies and configuration values that are to be plugged into an object that is created from a particular bean definition but also control the scope of the objects created from a particular bean definition. This approach is powerful and flexible, because you can choose the scope of the objects you create through configuration instead of having to bake in the scope of an object at the Java class level. Beans can be defined to be deployed in one of a number of scopes. The Spring Framework supports six scopes, four of which are available only if you use a web-aware `ApplicationContext`. You can also create [a custom scope.](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-custom)
 
 The following table describes the supported scopes:
 
-当您创建一个bean定义时，您创建了一个菜谱，用于创建由该bean定义定义的类的实际实例。bean定义是一个菜谱的想法很重要，因为这意味着，与类一样，可以从一个菜谱创建多个对象实例。
-您不仅可以控制要插入到从特定bean定义创建的对象中的各种依赖项和配置值，还可以控制从特定bean定义创建的对象的范围。这种方法功能强大且灵活，因为您可以选择通过配置创建的对象的范围，而不必在Java类级别烘焙对象的范围。可以将bean定义为部署在多个作用域中的一个。Spring框架支持六个作用域，其中四个只有在使用web感知的“ApplicationContext”时才可用。您还可以创建[自定义范围。]
+当您创建一个 bean 定义时，您创建了一个菜谱（方法），用于创建由 该bean 定义定义的类的实际实例。bean定义是一个菜谱的想法很重要，因为这意味着，与类一样，可以从一个菜谱创建多个对象实例。
+
+您不仅可以控制要插入到从特定bean定义创建的对象中的各种依赖项和配置值，还可以控制从特定bean定义创建的对象的范围。这种方法功能强大且灵活，因为您可以选择通过配置创建的对象的范围，而不必在Java类级别烘焙对象的范围。可以将bean定义为部署在多个作用域中的一个。Spring框架支持六个作用域，其中四个只有在使用web感知的 `ApplicationContext` 时才可用。您还可以创建[自定义范围。](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-custom)
 下表描述了支持的作用域：
 
 | Scope                                                        | Description                                                  |
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
-| [singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) | (Default) Scopes a single bean definition to a single object instance for each Spring IoC container. |
-| [prototype](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-prototype) | Scopes a single bean definition to any number of object instances. |
-| [request](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-request) | Scopes a single bean definition to the lifecycle of a single HTTP request. That is, each HTTP request has its own instance of a bean created off the back of a single bean definition. Only valid in the context of a web-aware Spring `ApplicationContext`. |
-| [session](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-session) | Scopes a single bean definition to the lifecycle of an HTTP `Session`. Only valid in the context of a web-aware Spring `ApplicationContext`. |
-| [application](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-application) | Scopes a single bean definition to the lifecycle of a `ServletContext`. Only valid in the context of a web-aware Spring `ApplicationContext`. |
-| [websocket](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-stomp-websocket-scope) | Scopes a single bean definition to the lifecycle of a `WebSocket`. Only valid in the context of a web-aware Spring `ApplicationContext`. |
+| [singleton](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-singleton) | (Default) Scopes a single bean definition to a single object instance for each Spring IoC container.<br />（默认）为每个 Spring IOC 容器将单个 bean 定义的范围限定为单个对象实例。 |
+| [prototype](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-prototype) | Scopes a single bean definition to any number of object instances.<br />将单个 bean 定义的范围限定为任意数量的对象实例。 |
+| [request](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-request) | Scopes a single bean definition to the lifecycle of a single HTTP request. That is, each HTTP request has its own instance of a bean created off the back of a single bean definition. Only valid in the context of a web-aware Spring `ApplicationContext`.<br />将单个 bean 定义限定为单个 HTTP 请求的生命周期。也就是说，每个 HTTP 请求都有自己的 bean 实例，该实例是在单个 bean 定义的后面创建的。仅在支持 web 的 Spring `ApplicationContext`上下文中有效。 |
+| [session](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-session) | Scopes a single bean definition to the lifecycle of an HTTP `Session`. Only valid in the context of a web-aware Spring `ApplicationContext`.<br />将单个 bean 定义的范围限定到 HTTP “会话”的生命周期。仅在支持 web 的 Spring `ApplicationContext`上下文中有效。 |
+| [application](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-application) | Scopes a single bean definition to the lifecycle of a `ServletContext`. Only valid in the context of a web-aware Spring `ApplicationContext`.<br />将单个bean定义限定为 `ServletContext` 的生命周期。仅在支持 web 的 Spring `ApplicationContext` 上下文中有效。 |
+| [websocket](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-stomp-websocket-scope) | Scopes a single bean definition to the lifecycle of a `WebSocket`. Only valid in the context of a web-aware Spring `ApplicationContext`.<br />将单个 bean 定义限定为 `WebSocket` 的生命周期。仅在支持 web 的 Spring `ApplicationContext`上下文中有效。 |
 
 > As of Spring 3.0, a thread scope is available but is not registered by default. For more information, see the documentation for [`SimpleThreadScope`](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/SimpleThreadScope.html). For instructions on how to register this or any other custom scope, see [Using a Custom Scope](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-custom-using).
 >
-> 从Spring3.0开始，线程作用域可用，但默认情况下未注册。有关详细信息，请参阅[`SimpleThreadScope`]的文档。有关如何注册此自定义作用域或任何其他自定义作用域的说明，请参阅[使用自定义作用域]。
+> **从 Spring 3.0 开始，线程作用域可用，但默认情况下未注册。有关详细信息，请参阅[`SimpleThreadScope`](https://docs.spring.io/spring-framework/docs/5.3.13/javadoc-api/org/springframework/context/support/SimpleThreadScope.html) 的文档**。有关如何注册此自定义作用域或任何其他自定义作用域的说明，请参阅[使用自定义作用域](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-custom-using)。
 
 #### 1.5.1. The Singleton Scope
+
+#### 1.5.1 单例作用域
 
 Only one shared instance of a singleton bean is managed, and all requests for beans with an ID or IDs that match that bean definition result in that one specific bean instance being returned by the Spring container.
 
 To put it another way, when you define a bean definition and it is scoped as a singleton, the Spring IoC container creates exactly one instance of the object defined by that bean definition. This single instance is stored in a cache of such singleton beans, and all subsequent requests and references for that named bean return the cached object. The following image shows how the singleton scope works:
 
-只管理一个单例bean的一个共享实例，对ID与该bean定义匹配的bean的所有请求都会导致Spring容器返回该特定bean实例。
-换句话说，当您定义一个bean定义并将其范围限定为一个单例时，SpringIOC容器只创建该bean定义定义的对象的一个实例。这个实例存储在这样的单例bean的缓存中，该命名bean的所有后续请求和引用都返回缓存对象。下图显示了singleton作用域的工作原理：
+只管理一个单例 bean 的一个共享实例，对 ID 与该 bean 定义匹配的 bean 的所有请求都会导致 Spring 容器返回该特定 bean 实例。
+
+换句话说，当您定义一个 bean 定义并将其范围限定为一个单例时，Spring IOC 容器只创建该 bean 定义定义的对象的一个实例。**这个实例存储在这样的单例 bean 的缓存中，该命名 bean 的所有后续请求和引用都返回缓存对象**。下图显示了 singleton 作用域的工作原理：
 
 ![singleton](二、Core.resource/singleton.png)
 
 Spring’s concept of a singleton bean differs from the singleton pattern as defined in the Gang of Four (GoF) patterns book. The GoF singleton hard-codes the scope of an object such that one and only one instance of a particular class is created per ClassLoader. The scope of the Spring singleton is best described as being per-container and per-bean. This means that, if you define one bean for a particular class in a single Spring container, the Spring container creates one and only one instance of the class defined by that bean definition. The singleton scope is the default scope in Spring. To define a bean as a singleton in XML, you can define a bean as shown in the following example:
 
-Spring的单例bean概念不同于四人组（GangofFour，GoF）模式书中定义的单例模式。GoF单例硬编码对象的作用域，这样每个类加载器只创建一个特定类的实例。Spring单例的范围最好描述为每个容器和每个bean。这意味着，如果在单个Spring容器中为特定类定义一个bean，Spring容器将创建该bean定义的类的一个且仅一个实例。单例作用域是Spring中的默认作用域。要将bean定义为XML中的单例，可以定义bean，如下例所示：
+Spring 的单例 bean 概念不同于四人组（Gang of Four，GoF）模式书中定义的单例模式。**GoF 单例硬编码对象的作用域，这样每个类加载器只创建一个特定类的实例**。**Spring 单例的范围最好描述为每个容器和每个 bean。这意味着，如果在单个 Spring 容器中为特定类定义一个 bean，Spring 容器将创建该 bean 定义的类的一个且仅一个实例。单例作用域是 Spring 中的默认作用域。**要将 bean 定义为 XML 中的单例，可以定义 bean，如下例所示：
 
 ```xml
 <bean id="accountService" class="com.something.DefaultAccountService"/>
@@ -2017,21 +2025,23 @@ Spring的单例bean概念不同于四人组（GangofFour，GoF）模式书中定
 
 #### 1.5.2. The Prototype Scope
 
+#### 1.5.2.原型作用域
+
 The non-singleton prototype scope of bean deployment results in the creation of a new bean instance every time a request for that specific bean is made. That is, the bean is injected into another bean or you request it through a `getBean()` method call on the container. As a rule, you should use the prototype scope for all stateful beans and the singleton scope for stateless beans.
 
 The following diagram illustrates the Spring prototype scope:
 
-bean部署的非单例原型范围导致每次对特定bean发出请求时都创建一个新的bean实例。也就是说，该bean被注入到另一个bean中，或者通过容器上的`getBean（）`方法调用来请求它。通常，所有有状态bean都应该使用prototype作用域，无状态bean应该使用singleton作用域。
-下图说明了Spring原型的范围：
+bean 部署的非单例原型范围导致每次对特定 bean 发出请求时都创建一个新的 bean 实例。也就是说，该 bean 被注入到另一个bean 中，或者通过容器上的`getBean()`方法调用来请求它。通常，**所有有状态 bean 都应该使用 prototype 作用域，无状态 bean 应该使用 singleton 作用域。**
+下图说明了 Spring 原型的范围：
 
-![prototype](https://docs.spring.io/spring-framework/docs/current/reference/html/images/prototype.png)
+![prototype](二、Core.resource/prototype.png)
 
 (A data access object (DAO) is not typically configured as a prototype, because a typical DAO does not hold any conversational state. It was easier for us to reuse the core of the singleton diagram.)
 
 The following example defines a bean as a prototype in XML:
 
-（数据访问对象（DAO）通常不配置为原型，因为典型的DAO不包含任何会话状态。我们更容易重用单例图的核心。）
-以下示例将bean定义为XML中的原型：
+（数据访问对象（DAO）通常不配置为原型，因为典型的 DAO 不包含任何会话状态。我们更容易重用单例图的核心。）
+以下示例将 bean 定义为 XML 中的原型：
 
 ```xml
 <bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
@@ -2041,26 +2051,33 @@ In contrast to the other scopes, Spring does not manage the complete lifecycle o
 
 In some respects, the Spring container’s role in regard to a prototype-scoped bean is a replacement for the Java `new` operator. All lifecycle management past that point must be handled by the client. (For details on the lifecycle of a bean in the Spring container, see [Lifecycle Callbacks](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle).)
 
-与其他作用域不同，Spring并不管理原型bean的整个生命周期。容器实例化、配置和以其他方式组装原型对象并将其交给客户机，而不再记录该原型实例。因此，尽管对所有对象调用初始化生命周期回调方法，而不考虑范围，但对于原型，不会调用配置的销毁生命周期回调。客户机代码必须清理原型范围的对象，并释放原型bean所持有的昂贵资源。为了让Spring容器释放原型范围的bean所持有的资源，请尝试使用自定义的[bean post processor]，它持有对需要清理的bean的引用。
+与其他作用域不同，**Spring 并不管理原型 bean 的整个生命周期。容器实例化、配置和以其他方式组装原型对象并将其交给客户机，而不再记录该原型实例**。因此，尽管对所有对象调用初始化生命周期回调方法，而不考虑范围，但对于原型，不会调用配置的销毁生命周期回调。**客户机代码必须清理原型范围的对象，并释放原型bean所持有的昂贵资源。为了让 Spring 容器释放原型范围的bean所持有的资源，请尝试使用自定义的[bean post-processor](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-extension-bpp)，它持有对需要清理的 bean 的引用。**
 
-在某些方面，Spring容器在原型作用域bean中的角色是Java`new`操作符的替代品。所有超过该点的生命周期管理都必须由客户机处理。（有关Spring容器中bean生命周期的详细信息，请参阅[生命周期回调]。）
+在某些方面，Spring 容器在原型作用域 bean 中的角色是 Java`new `操作符的替代品。所有超过该点的生命周期管理都必须由客户机处理。（有关 Spring 容器中 bean 生命周期的详细信息，请参阅[生命周期回调](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle)。）
 
 #### 1.5.3. Singleton Beans with Prototype-bean Dependencies
+
+#### 1.5.3.具有原型 bean 依赖关系的单例 bean
 
 When you use singleton-scoped beans with dependencies on prototype beans, be aware that dependencies are resolved at instantiation time. Thus, if you dependency-inject a prototype-scoped bean into a singleton-scoped bean, a new prototype bean is instantiated and then dependency-injected into the singleton bean. The prototype instance is the sole instance that is ever supplied to the singleton-scoped bean.
 
 However, suppose you want the singleton-scoped bean to acquire a new instance of the prototype-scoped bean repeatedly at runtime. You cannot dependency-inject a prototype-scoped bean into your singleton bean, because that injection occurs only once, when the Spring container instantiates the singleton bean and resolves and injects its dependencies. If you need a new instance of a prototype bean at runtime more than once, see [Method Injection](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-method-injection).
 
-当您将单例范围的bean与原型bean的依赖项一起使用时，请注意，依赖项是在实例化时解析的。因此，如果依赖项将原型范围的bean注入到单例范围的bean中，那么将实例化一个新的原型bean，然后将依赖项注入到单例bean中。原型实例是唯一一个提供给单例作用域bean的实例。
-但是，假设您希望单例作用域bean在运行时重复获取原型作用域bean的新实例。您不能将依赖项注入原型范围的bean到您的单例bean中，因为当Spring容器实例化单例bean并解析和注入其依赖项时，注入只发生一次。如果您在运行时多次需要原型bean的新实例，请参阅[方法注入]。
+**当您将单例范围的 bean 与原型 bean 的依赖项一起使用时，请注意，依赖项是在实例化时解析的。因此，如果依赖项将原型范围的 bean 注入到单例范围的 bean 中，那么将实例化一个新的原型 bean，然后将依赖项注入到单例 bean 中。原型实例是唯一一个提供给单例作用域bean的实例。**
+
+但是，假设您希望单例作用域bean在运行时重复获取原型作用域bean的新实例。您不能将依赖项注入原型范围的bean到您的单例bean中，因为当Spring容器实例化单例bean并解析和注入其依赖项时，注入只发生一次。如果您在运行时多次需要原型bean的新实例，请参阅[方法注入](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-method-injection)。
 
 #### 1.5.4. Request, Session, Application, and WebSocket Scopes
 
+#### 1.5.4 Request,Session,Application 和 WebSocket 作用域
+
 The `request`, `session`, `application`, and `websocket` scopes are available only if you use a web-aware Spring `ApplicationContext` implementation (such as `XmlWebApplicationContext`). If you use these scopes with regular Spring IoC containers, such as the `ClassPathXmlApplicationContext`, an `IllegalStateException` that complains about an unknown bean scope is thrown.
 
-“请求”、“会话”、“应用程序”和“websocket”作用域只有在使用支持web的Spring“ApplicationContext”实现（例如“XmlWebApplicationContext”）时才可用。如果将这些作用域与常规Spring IoC容器（如“ClassPathXmlApplicationContext”）一起使用，则会抛出一个“IllegalStateException”，该异常抱怨未知的bean作用域。
+ Request,Session,Application 和 WebSocket 作用域只有在使用支持 web 的 Spring  `ApplicationContext`实现（例如 `XmlWebApplicationContext`）时才可用。**如果将这些作用域与常规 Spring IoC 容器（如 `ClassPathXmlApplicationContext`）一起使用，则会抛出一个 `IllegalStateException`**，该异常抱怨未知的 bean 作用域。
 
 ##### Initial Web Configuration
+
+##### 初始化 web 配置
 
 To support the scoping of beans at the `request`, `session`, `application`, and `websocket` levels (web-scoped beans), some minor initial configuration is required before you define your beans. (This initial setup is not required for the standard scopes: `singleton` and `prototype`.)
 
@@ -2070,10 +2087,13 @@ If you access scoped beans within Spring Web MVC, in effect, within a request th
 
 If you use a Servlet 2.5 web container, with requests processed outside of Spring’s `DispatcherServlet` (for example, when using JSF or Struts), you need to register the `org.springframework.web.context.request.RequestContextListener` `ServletRequestListener`. For Servlet 3.0+, this can be done programmatically by using the `WebApplicationInitializer` interface. Alternatively, or for older containers, add the following declaration to your web application’s `web.xml` file:
 
-为了支持在'request'、'session'、'application'和'websocket'级别（web范围的bean）对bean进行范围界定，在定义bean之前需要进行一些较小的初始配置。（标准作用域“singleton”和“prototype”不需要此初始设置。）
-如何完成初始设置取决于特定的Servlet环境。
-如果您在SpringWebMVC中访问作用域bean，实际上是在由Spring'DispatcherServlet'处理的请求中，则无需特殊设置`DispatcherServlet`已公开所有相关状态。
-如果使用Servlet2.5Web容器，并且请求在Spring的“DispatcherServlet”之外处理（例如，在使用JSF或Struts时），则需要注册“org”。springframework。网状物上下文要求RequestContextListener``ServletRequestListener`。对于Servlet 3.0+，这可以通过使用“WebApplicationInitializer”接口以编程方式完成。或者，对于较旧的容器，将以下声明添加到web应用程序的“web”。xml`文件：
+为了支持在 `request`、`session`、`application` 和 `websocket` 级别（web 范围的 bean）对 bean 进行范围界定，在定义 bean 之前需要进行一些较小的初始配置。（标准作用域 `singleton` 和 `prototype` 不需要此初始设置。）
+
+如何完成初始设置取决于特定的 Servlet 环境。
+
+**如果您在 Spring Web MVC 中访问作用域 bean，实际上是在由 Spring `DispatcherServlet`处理的请求中，则无需特殊设置`DispatcherServlet`已公开所有相关状态。**
+
+如果使用 Servlet 2.5 Web 容器，并且请求在 Spring 的 `DispatcherServlet` 之外处理（例如，在使用 JSF 或 Struts 时），则需要注册`org.springframework.web.context.request.RequestContextListener/ServletRequestListener`。对于 Servlet 3.0+，这可以通过使用 `WebApplicationInitializer`接口以编程方式完成。或者，对于较旧的容器，将以下声明添加到web应用程序的 `web.xml`文件：
 
 ```xml
 <web-app>
@@ -2089,7 +2109,7 @@ If you use a Servlet 2.5 web container, with requests processed outside of Sprin
 
 Alternatively, if there are issues with your listener setup, consider using Spring’s `RequestContextFilter`. The filter mapping depends on the surrounding web application configuration, so you have to change it as appropriate. The following listing shows the filter part of a web application:
 
-或者，如果您的侦听器设置存在问题，请考虑使用Spring的“RealestCutExter筛选器”。过滤器映射取决于周围的web应用程序配置，因此必须根据需要进行更改。以下列表显示了web应用程序的筛选器部分：
+或者，如果您的 listener 设置存在问题，请考虑使用 Spring 的 `RequestContextFilter`。过滤器映射取决于周围的 web 应用程序配置，因此必须根据需要进行更改。以下列表显示了web应用程序的筛选器部分：
 
 ```xml
 <web-app>
@@ -2112,9 +2132,11 @@ Alternatively, if there are issues with your listener setup, consider using Spri
 
 ##### Request scope
 
+##### Request 作用域
+
 Consider the following XML configuration for a bean definition:
 
-为bean定义考虑以下XML配置：
+为 bean 定义考虑以下 XML 配置：
 
 ```xml
 <bean id="loginAction" class="com.something.LoginAction" scope="request"/>
@@ -2124,8 +2146,8 @@ The Spring container creates a new instance of the `LoginAction` bean by using t
 
 When using annotation-driven components or Java configuration, the `@RequestScope` annotation can be used to assign a component to the `request` scope. The following example shows how to do so:
 
-Spring容器通过为每个HTTP请求使用“LoginAction”bean定义来创建“LoginAction”bean的新实例。也就是说，“loginAction”bean的作用域是HTTP请求级别。您可以随意更改创建的实例的内部状态，因为从同一`loginAction`bean定义创建的其他实例在状态中看不到这些更改。它们是特定于个人请求的。当请求完成处理时，作用域为请求的bean将被丢弃。
-使用注释驱动的组件或Java配置时，`@RequestScope`注释可用于将组件分配给`request`范围。以下示例显示了如何执行此操作：
+Spring 容器通过为每个 HTTP 请求使用 `LoginAction` bean定义来创建 `LoginAction` bean 的新实例。也就是说，`loginAction` bean 的作用域是 HTTP 请求级别。您可以随意更改创建的实例的内部状态，因为从同一`loginAction`bean定义创建的其他实例在状态中看不到这些更改。它们是特定于个人请求的。当请求完成处理时，作用域为请求的 bean 将被丢弃。
+使用注释驱动的组件或 Java 配置时，`@RequestScope`注释可用于将组件分配给`request`范围。以下示例显示了如何执行此操作：
 
 ```java
 @RequestScope
@@ -2137,9 +2159,11 @@ public class LoginAction {
 
 ##### Session Scope
 
+##### Session 作用域
+
 Consider the following XML configuration for a bean definition:
 
-为bean定义考虑以下XML配置：
+为 bean 定义考虑以下 XML 配置：
 
 ```xml
 <bean id="userPreferences" class="com.something.UserPreferences" scope="session"/>
@@ -2149,9 +2173,9 @@ The Spring container creates a new instance of the `UserPreferences` bean by usi
 
 When using annotation-driven components or Java configuration, you can use the `@SessionScope` annotation to assign a component to the `session` scope.
 
-Spring容器通过在单个HTTP“会话”的生存期内使用“UserPreferences”bean定义来创建“UserPreferences”bean的新实例。换句话说，`userPreferences` bean有效地限定了HTTP`Session`级别的作用域。与请求范围的bean一样，您可以随意更改创建的实例的内部状态，因为您知道其他HTTP`Session`实例也使用从同一`userPreferences`bean定义创建的实例，它们在状态中看不到这些更改，因为它们是特定于单个HTTP`Session`的。当HTTP`Session`最终被丢弃时，作用于该特定HTTP`Session`的bean也被丢弃。
+Spring容器通过在单个 HTTP `Session` 的生存期内使用 `UserPreferences` bean 定义来创建 `UserPreferences` bean 的新实例。换句话说，`userPreferences` bean 有效地限定了 HTTP`Session` 级别的作用域。与 request 范围的 bean 一样，您可以随意更改创建的实例的内部状态，因为您知道其他HTTP`Session`实例也使用从同一`userPreferences`bean定义创建的实例，它们在状态中看不到这些更改，因为它们是特定于单个HTTP`Session`的。当HTTP`Session`最终被丢弃时，作用于该特定HTTP`Session`的bean也被丢弃。
 
-使用注释驱动的组件或Java配置时，可以使用`@SessionScope`注释将组件分配给`会话'范围。
+使用注释驱动的组件或 Java 配置时，可以使用`@SessionScope`注释将组件分配给 `session`范围。
 
 ```java
 @SessionScope
@@ -2163,9 +2187,11 @@ public class UserPreferences {
 
 ##### Application Scope
 
+##### Application 作用域
+
 Consider the following XML configuration for a bean definition:
 
-为bean定义考虑以下XML配置：
+为 bean 定义考虑以下 XML 配置：
 
 ```xml
 <bean id="appPreferences" class="com.something.AppPreferences" scope="application"/>
@@ -2175,9 +2201,9 @@ The Spring container creates a new instance of the `AppPreferences` bean by usin
 
 When using annotation-driven components or Java configuration, you can use the `@ApplicationScope` annotation to assign a component to the `application` scope. The following example shows how to do so:
 
-Spring容器通过为整个web应用程序使用一次“AppPreferences”bean定义来创建“AppPreferences”bean的新实例。也就是说，`appPreferences` bean的作用域为`ServletContext`级别，并存储为常规的`ServletContext`属性。这有点类似于Spring单例bean，但在两个重要方面有所不同：它是每个“ServletContext”的单例bean，而不是每个Spring“ApplicationContext”（在任何给定的web应用程序中可能有多个），它实际上是公开的，因此作为“ServletContext”属性可见。
+Spring 容器通过为整个 web 应用程序使用一次 `AppPreferences` bean 定义来创建 `AppPreferences` bean 的新实例。也就是说，**`appPreferences` bean的作用域为 `ServletContext` 级别，并存储为常规的`ServletContext`属性。这有点类似于 Spring 单例 bean，但在两个重要方面有所不同：它是每个 `ServletContext` 的单例 bean，而不是每个 Spring `ApplicationContext`（在任何给定的 web 应用程序中可能有多个），它实际上是公开的，因此作为 `ServletContext` 属性可见**。
 
-使用注释驱动的组件或Java配置时，可以使用`@ApplicationScope`注释将组件分配给`应用'范围。以下示例显示了如何执行此操作：
+使用注释驱动的组件或 Java 配置时，可以使用`@ApplicationScope`注释将组件分配给 `application` 范围。以下示例显示了如何执行此操作：
 
 ```java
 @ApplicationScope
@@ -2189,13 +2215,15 @@ public class AppPreferences {
 
 ##### Scoped Beans as Dependencies
 
+##### 作用域 bean 作为依赖项
+
 The Spring IoC container manages not only the instantiation of your objects (beans), but also the wiring up of collaborators (or dependencies). If you want to inject (for example) an HTTP request-scoped bean into another bean of a longer-lived scope, you may choose to inject an AOP proxy in place of the scoped bean. That is, you need to inject a proxy object that exposes the same public interface as the scoped object but that can also retrieve the real target object from the relevant scope (such as an HTTP request) and delegate method calls onto the real object.
 
-SpringIOC容器不仅管理对象（bean）的实例化，还管理协作者（或依赖项）的连接。如果您想要（例如）将HTTP请求范围的bean注入到另一个更长寿命范围的bean中，您可以选择注入AOP代理来代替范围bean。也就是说，您需要注入一个代理对象，该代理对象公开与作用域对象相同的公共接口，但也可以从相关作用域（如HTTP请求）检索真实目标对象，并将方法调用委托给真实对象。
+Spring IOC 容器不仅管理对象（bean）的实例化，还管理协作者（或依赖项）的连接。如果您想要（例如）将 HTTP 请求范围的bean 注入到另一个更长寿命范围的 bean 中，您可以选择注入 AOP 代理来代替作用域 bean。也就是说，您需要注入一个代理对象，该代理对象公开与作用域对象相同的公共接口，但也可以从相关作用域（如HTTP请求）检索真实目标对象，并将方法调用委托给真实对象。
 
 > You may also use `<aop:scoped-proxy/>` between beans that are scoped as `singleton`, with the reference then going through an intermediate proxy that is serializable and therefore able to re-obtain the target singleton bean on deserialization.When declaring `<aop:scoped-proxy/>` against a bean of scope `prototype`, every method call on the shared proxy leads to the creation of a new target instance to which the call is then being forwarded.Also, scoped proxies are not the only way to access beans from shorter scopes in a lifecycle-safe fashion. You may also declare your injection point (that is, the constructor or setter argument or autowired field) as `ObjectFactory<MyTargetBean>`, allowing for a `getObject()` call to retrieve the current instance on demand every time it is needed — without holding on to the instance or storing it separately.As an extended variant, you may declare `ObjectProvider<MyTargetBean>` which delivers several additional access variants, including `getIfAvailable` and `getIfUnique`.The JSR-330 variant of this is called `Provider` and is used with a `Provider<MyTargetBean>` declaration and a corresponding `get()` call for every retrieval attempt. See [here](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-standard-annotations) for more details on JSR-330 overall.
 >
-> 您还可以在作用域为“singleton”的bean之间使用“<aop:scoped proxy/>”，然后引用将通过可序列化的中间代理，从而能够在反序列化时重新获取目标singleton bean。当针对作用域“prototype”的bean声明“<aop:scoped proxy/>”时，对共享代理的每个方法调用都会导致创建一个新的目标实例，然后将调用转发到该实例。此外，作用域代理并不是以生命周期安全的方式从较短作用域访问bean的唯一方法。您还可以将注入点（即构造函数或setter参数或autowired字段）声明为`ObjectFactory<MyTargetBean>`，从而允许每次需要时通过`getObject（）`调用按需检索当前实例 — 无需保留实例或单独存储它。作为扩展变量，您可以声明'ObjectProvider<MyTargetBean>'，它提供了几个额外的访问变量，包括'getIfAvailable'和'getIfUnique'。它的JSR-330变体称为“Provider”，并与“Provider<MyTargetBean>”声明以及每次检索尝试的相应“get（）”调用一起使用。有关JSR-330的更多详细信息，请参见[此处]。
+> 您还可以在作用域为 `singleton` 的 bean 之间使用`<aop:scoped-proxy/>`，然后引用将通过可序列化的中间代理，从而能够在反序列化时重新获取目标 singleton bean。当针对作用域 `prototype` 的 bean 声明 `<aop:scoped-proxy/>` 时，对共享代理的每个方法调用都会导致创建一个新的目标实例，然后将调用转发到该实例。此外，作用域代理并不是以生命周期安全的方式从较短作用域访问 bean 的唯一方法。您还可以将注入点（即构造函数或setter参数或 autowired 字段）声明为`ObjectFactory<MyTargetBean>`，从而允许每次需要时通过`getObject()`调用按需检索当前实例 — 无需保留实例或单独存储它。作为扩展变量，您可以声明 `ObjectProvider<MyTargetBean>`，它提供了几个额外的访问变量，包括 `getIfAvailable` 和 `getIfUnique`。它的 JSR-330 变体称为 `Provider`，并与 `Provider<MyTargetBean>` 声明以及每次检索尝试的相应 `get()` 调用一起使用。有关JSR-330的更多详细信息，请参见[此处](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-standard-annotations)。
 
 The configuration in the following example is only one line, but it is important to understand the “why” as well as the “how” behind it:
 
