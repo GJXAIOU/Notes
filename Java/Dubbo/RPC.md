@@ -2,11 +2,9 @@
 
 [TOC]
 
-
-
 ## 零、前言
 
- RPC(Remote Procedure Call) 是一种概念，是一种远程通信方式、一种技术思想（不是一种规范或者协议），具体实现有很多种。它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的思想。
+ RPC（Remote Procedure Call）是一种概念，是一种远程通信方式、一种技术思想（不是一种规范或者协议），具体实现有很多种。它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的思想。
 
 常见 RPC 技术和框架有：
 
@@ -18,62 +16,53 @@
 
 在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中“RPC 协议”就指明了程序如何进行**网络传输和序列化**。
 
-在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中「RPC 协议」就指明了程序如何进行网络传输和序列化。
-
-
-
-[![img](RPC.resource/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)](https://s3.51cto.com/oss/201906/17/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051.jpg)
+![img](RPC.resource/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051-16375927468041.jpg)
 
 ## 一、名词解析
 
 从单机走向分布式产生了很多分布式的通信方式
 
-- 最古老也是最有效：TCP/UDP 的二进制传输。事实上所有的通信方式归根结底都是TCP/UDP。
+- 最古老也是最有效：TCP/UDP 的二进制传输，事实上所有的通信方式归根结底都是TCP/UDP。
 
-- CORBA (Common Object Request Broker Architecture)。支持面向对象的通信协议（复杂）。
+- CORBA (Common Object Request Broker Architecture)，支持面向对象的通信协议（复杂）。
 
-- Web Service(SOA SOAP RDDI WSDL…)
+- Web Service（SOA SOAP RDDI WSDL…）
 
-    基于 HTTP + XML 的标准化 Web API，服务端提供服务的接口是 XML 格式，并且该格式在 HTTP 上进行传输。因为 XML 本身大（纯文本）， HTTP 本身传输也是纯文本，所以慢。
+    基于 HTTP + XML 的标准化 Web API，服务端提供服务的接口是 XML 格式，并且该格式在 HTTP 上进行传输。因为 XML 是纯文本，所以本身比较大，HTTP 本身传输也是纯文本，所以慢。
 
 - RestFul ( Representational State Transfer，表现层状态转换)
 
-    回归简单化本源的 Web API 的事实标准h ttp://mashibing.com/product/java，使用 HTTP + JSON
+    回归简单化本源的 Web API 的事实标准，使用 HTTP + JSON。
 
-- RMI （Remote Method InvocationJava）
+- RMI （Remote Method Invocation Java）
 
     内部的分布式通信协议，只支持 Java 语言，不能跨语言。
 
 - JMS (Java Message Service)
 
-​    JavaEE 中的消息框架标准，为很多 MQ 所支持
+    JavaEE 中的消息框架标准，为很多 MQ 所支持。
 
-- RPC(Remote Procedure Call，远程过程调用) 
+- RPC（Remote Procedure Call，远程过程调用）
 
-    远程过程调用，是一个统称，重点在于方法调用（不支持对象的概念），具体实现甚至可以用 RMI RestFul 等去实现,但一般不用.因为 RMI 不能跨语言.而 RestFul效率太低。多用于服务器集群间的通信,因此常使用更加高效短小精悍的传输模式以提高效率。
+    远程过程调用，是一个统称，重点在于方法调用（不支持对象的概念），具体实现甚至可以用 RM、RestFul 等去实现，但一般不用，因为 RMI 不能跨语言而 RestFul 效率太低。多用于服务器集群间的通信，因此常使用更加高效短小精悍的传输模式以提高效率。
 
 ## 二、常见协议框架
 
-**现实问题**：
 Java 自带的 Serializable 只支持 Java 语言，同时效率低，并且转换的二进制长度也比较长。而 client 需要将所有服务、方法以及参数进行虚拟化之后传输，影响传输效率。
 
 - 其他的 RPC 序列化框架：
-    序列化就是将对象转换为二进制数组，其中 JSON 和 xml 就是先将对象转换为 JSON 或者 xml 格式，然后在转换为二进制
+    序列化就是将对象转换为二进制数组，其中 JSON 和 xml 就是先将对象转换为 JSON 或者 xml 格式，然后再转换为二进制。
     - java.io.Serializable
     - Hessian
-    - google protobuf
-    - facebook Thrift
+    - protobuf
+    - Thrift
     - kyro
     - fst
-    - Json 序列化框架
-        - Jackson
-        - Google Gson
-        - Alibaba FastJson
+    - Json 序列化框架：包括 FastJson/Gson/Jackson 等
     - xmlrpc(xstream)
-
 -  RPC 通讯协议
     - HTTP
-    - HTTP2.0(gRPC 用的就是2.0，因为 2.0 不仅可以传输文本，同时可以传输二进制)
+    - HTTP2.0（gRPC 用的就是 2.0，因为 2.0 不仅可以传输文本，同时可以传输二进制）
     - TCP
        同步、异步  阻塞、非阻塞
     - WebService
@@ -83,63 +72,13 @@ Java 自带的 Serializable 只支持 Java 语言，同时效率低，并且转�
 一个 RPC 的核心功能主要有 5 个部分组成，分别是：客户端、客户端 Stub、网络传输模块、服务端 Stub、服务端等。
 ![RPC 组成](RPC.resource/20200912232743848.png)
 
-- 客户端(Client)：服务调用方。
-- 客户端存根(Client Stub)：**存放服务端地址信息**，将客户端的请求参数数据信息打包成网络消息，再通过网络传输发送给服务端。
-- 服务端存根(Server Stub)：接收客户端发送过来的请求消息并进行解包，然后再调用本地服务进行处理。
-- 服务端(Server)：服务的真正提供者。
+- 客户端（Client）：服务调用方。
+- 客户端存根（Client Stub）：**存放服务端地址信息**，将客户端的请求参数数据信息打包成网络消息，再通过网络传输发送给服务端。
+- 服务端存根（Server Stub）：接收客户端发送过来的请求消息并进行解包，然后再调用本地服务进行处理。
+- 服务端（Server）：服务的真正提供者。
 - Network Service：底层传输，可以是 TCP 或 HTTP。
 
 ## 四、项目搭建
-=======
-    这是一个统称，重点在于方法调用(不支持对象的概念)。多用于服务器集群间的通信。
-
-
-
-## 二、常见协议框架
-
-**问题**
-首先 client 需要将所有服务、方法以及参数进行序列化之后传输，这里使用的 Java 自带的 Serializable，缺点：只支持 Java 语言，效率低，并且转换的二进制长度也比较长。
-
-序列化：序列化就是将对象转换为二进制数组，其中 JSON 和 xml 就是先将对象转换为 JSON 或者 xml 格式，然后再转换为二进制。
-
-RPC 序列化框架：
-
-- java.io.Serializable
-- Hessian
--  Protobuf（Google）
--  Thrift（Facebook）
-- kyro
-- fst
-- JSON 序列化框架
-    - Jackson
-    - Gson（Google）
-    -  FastJson（Alibaba）
-- xmlrpc(xstream)
-
- RPC 通讯协议
-- HTTP
-- HTTP2.0(gRPC 用的就是2.0，因为 2.0 不仅可以传输文本，同时可以传输二进制)
-- TCP
- 同步、异步  阻塞、非阻塞
-- WebService
-
-## 三、RPC 组成结构
-
-一个 RPC 的核心功能主要有 5 个部分组成，分别是：客户端、客户端 Stub、网络传输模块、服务端 Stub、服务端等。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200912232743848.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NzMTIzbWxr,size_16,color_FFFFFF,t_70#pic_center)
-
-下面分别介绍核心 RPC 框架的重要组成：
-- 客户端(Client)：服务调用方。
-- 客户端存根(Client Stub)：存放服务端地址信息，将客户端的请求参数数据信息打包成网络消息，再通过网络传输发送给服务端。
-- 服务端存根(Server Stub)：接收客户端发送过来的请求消息并进行解包，然后再调用本地服务进行处理。
-- 服务端(Server)：服务的真正提供者。
-- Network Service：底层传输，可以是 TCP 或 HTTP。
-
-### TCP/IP 模拟 RPC
-
-由服务的调用方与服务的提供方建立 Socket 连接，并由服务的调用方通过 Socket 将需要调用的接口名称、方法名称和参数序列化后传递给服务的提供方，服务的提供方反序列化后再利用反射调用相关的方法。
-
-***将结果返回给服务的调用方，整个基于 TCP 协议的 RPC 调用大致如此**。
 
 ### （一）TCP/IP 模拟 RPC
 
@@ -147,7 +86,6 @@ RPC 序列化框架：
 
 将结果返回给服务的调用方，整个基于 TCP 协议的 RPC 调用大致如此。
 
-## 四、项目搭建
 ### （二）基本包：common
 
 主要包括**实体类** User、Product，用于后续传输，同时提供两个**接口**访问方法，就是通过 id 返回对象（这里 id 限定为 123）
@@ -158,14 +96,13 @@ RPC 序列化框架：
 
         ```java
         package com.gjxaiou;
-        
         import java.io.Serializable;
         
+        @Data
         public class User implements Serializable {
             private static final long serialVersionUID = 1L;
             int id;
             String name;
-            // 省略构造方法、Getter、Setter 和 toString 方法。
         }
         ```
 
@@ -173,15 +110,14 @@ RPC 序列化框架：
 
         ```java
         package com.gjxaiou;
-        
         import java.io.Serializable;
         
+        @Data
         public class Product implements Serializable {
             private static final long serialVersionUID = 1L;
             int id;
             String name;
             int count;
-            // 省略构造方法、Getter、Setter 和 toString 方法。
         }
         ```
 
@@ -209,14 +145,7 @@ RPC 序列化框架：
 
 ### （三）最基础二进制传递
 
-
-
 这个例子使用了最原始的客户端服务器交互方式，硬编码完成功能，非常紧耦合。
-
-该例使用了最原始的客户端服务器交互方式：硬编码完成功能，非常紧耦合。
-**缺点**：需要对对象很了解，因为是对对象中所有属性都要传输接收，一旦更改属性，代码全部要变。同时传输过程和业务逻辑糅合在一起。
-
-
 
 **过程**：client 端直接将对象中 id 属性通过网络传输给 server，然后 server 端生成一个接口实现类来处理，并且将生成的 User 对象中的所有属性通过网络传输给 client，最后 client 得到属性组装为一个 User 对象。
 
@@ -249,10 +178,6 @@ RPC 序列化框架：
             
             // 服务端进行处理（具体见下面的服务端代码）
     
-                
-    
-            //接收服务端返回的结果
-    =======
             // 接收服务端返回的结果
     DataInputStream dis = new DataInputStream(socket.getInputStream());
                     // 读取各个属性再转换为对象
@@ -264,7 +189,7 @@ RPC 序列化框架：
             socket.close();
         }
     }
-
+    
 - 对应的 server 端
 
     ```java
@@ -337,7 +262,7 @@ RPC 序列化框架：
 
 
 
-### （四）简化客户端的流程 引入stub(客户端存根)
+### （四）简化客户端的流程 引入 stub（客户端存根）
 
 **改进**：通常客户端不需要知道网络连接的细节，只需要知道接口的用法就行，因此将网络部分进行封装。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
 
@@ -363,7 +288,7 @@ RPC 序列化框架：
 
 - 通过 Sub 来屏蔽网络细节
 
-    客户端存根(Client Stub)：存放服务端地址信息，将客户端的请求参数数据信息打包成网络消息，再通过网络传输发送给服务端。
+    客户端存根（Client Stub）：存放服务端地址信息，将客户端的请求参数数据信息打包成网络消息，再通过网络传输发送给服务端。
 
     ```java
     package com.gjxaiou.rpc2;
@@ -412,12 +337,6 @@ RPC 序列化框架：
 ### （五）使用动态代理生成 service 类供客户端调用
 
 **作用**：彻底隐藏所有网络细节
-
-**改进**：改动客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，即 stub 不 是 new 出来的，而是使用它的静态方法 getStub 进行创建。
-
-这个版本相对于上个版本的优点还不能直观显现，因为硬编码部分还没有改动完成，rpc4 中将通用化这个动态代理，就是不管调用什么版本，在 invoke 方法中的处理就是都是写入 123，对于 UserService 中暴露的其他方法没有处理。
-
-## 03 使用动态代理生成 service 类供客户端调用 彻底隐藏所有网络细节
 
 **问题**：
 
@@ -522,7 +441,7 @@ RPC 序列化框架：
 
 ## （六）引入客户端存根的真正含义-支持多个方法的打包 服务端利用反射解析打包过来的消息并invoke执行
 
-client 还是调用希望调用的函数，**stub 却对函数进行了规则化的传递，不在在自己这里处理了**。
+client 还是调用希望调用的函数，**stub 却对函数进行了规则化的传递，不在自己这里处理了**。
 
 该版本彻底改变了客户端和服务器的通信方式：
 

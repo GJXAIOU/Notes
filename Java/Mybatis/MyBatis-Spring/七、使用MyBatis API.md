@@ -2,21 +2,21 @@
 
 使用 MyBatis-Spring，你可以继续直接使用 MyBatis 的 API。只需简单地使用 `SqlSessionFactoryBean` 在 Spring 中创建一个 `SqlSessionFactory`，然后按你的方式在代码中使用工厂即可。
 
-```
+```java
 public class UserDaoImpl implements UserDao {
-  // SqlSessionFactory 一般会由 SqlSessionDaoSupport 进行设置
-  private final SqlSessionFactory sqlSessionFactory;
+    // SqlSessionFactory 一般会由 SqlSessionDaoSupport 进行设置
+    private final SqlSessionFactory sqlSessionFactory;
 
-  public UserDaoImpl(SqlSessionFactory sqlSessionFactory) {
-    this.sqlSessionFactory = sqlSessionFactory;
-  }
-
-  public User getUser(String userId) {
-    // 注意对标准 MyBatis API 的使用 - 手工打开和关闭 session
-    try (SqlSession session = sqlSessionFactory.openSession()) {
-      return session.selectOne("org.mybatis.spring.sample.mapper.UserMapper.getUser", userId);
+    public UserDaoImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
-  }
+
+    public User getUser(String userId) {
+        // 注意对标准 MyBatis API 的使用 - 手工打开和关闭 session
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            return session.selectOne("org.mybatis.spring.sample.mapper.UserMapper.getUser", userId);
+        }
+    }
 }
 ```
 

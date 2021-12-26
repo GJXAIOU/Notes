@@ -157,8 +157,6 @@ ERROR 1142 (42000): SELECT command denied to user 'b'@'localhost' for table 'T'
 
 在有些场景下，执行器调用一次，在引擎内部则扫描了多行，因此**引擎扫描行数跟rows_examined并不是完全相同的。**我们后面会专门有一篇文章来讲存储引擎的内部机制，里面会有详细的说明。
 
-
-
 ## 三、MySQL 存储引擎
 
 可以通过 `SHOW ENGINES` 语句或者 `information_schema` 架构下的 ENGINES 表查看当前使用的 MySQL 数据库所支持的存储引擎。

@@ -475,7 +475,7 @@ GROUP BY customers.cust_id;
 
 ### （一）创建组合查询
 
-- 使用union 
+- 使用 union 
     下面两个单条语句，使用 union 进行组合查询；
     价格小于等于5的所有物品
     `SELECT vend_id,prod_id,prod_price FROM products WHERE prod_price <=5;`
@@ -506,8 +506,8 @@ union all
 SELECT vend_id,prod_id,prod_price FROM products WHERE vend_id in (1001,1002);  # 结果中有一行出现2次 
 ```
 
-- 对union组合结果进行排序
-    **union组合完只能使用一条order by语句，放在最后一个SELECT语句后面 **，但是实际上 MySQL 将用它排序**所有 SELECT 语句**返回的所有结果；不能以不同的方式分别排序结果集，也不允许出现多条 ORDER BY 子句；
+- 对 union 组合结果进行排序
+    **union 组合完只能使用一条 order by 语句，放在最后一个SELECT语句后面 **，但是实际上 MySQL 将用它排序**所有 SELECT 语句**返回的所有结果；不能以不同的方式分别排序结果集，也不允许出现多条 ORDER BY 子句；
 
 ```sql
 SELECT vend_id,prod_id,prod_price FROM products WHERE prod_price <=5

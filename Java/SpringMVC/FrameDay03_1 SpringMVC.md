@@ -396,12 +396,12 @@ pulic String demo11(){
 ## 六、@ResponseBody
 
 - 在方法上只有@RequestMapping 时，无论方法返回值是什么都认为需要跳转
-- **在方法上添加@ResponseBody(恒不跳转)**
+- **在方法上添加 @ResponseBody(恒不跳转)**
   -  如果返回值满足 key-value 形式（即返回值为对象或 map）
      - 会把响应头设置为 application/json;charset=utf-8
      -  把转换后的内容以输出流的形式响应给客户端
   - 如果返回值不满足 key-value，例如返回值为 String
-     - 把相应头设置为 text/html
+     - 把响应头设置为 text/html
      - 把方法返回值以流的形式直接输出
      - 如果返回值包含中文，为了防止出现中文乱码，可以将 produces 表示设置响应头中 Content-Type 的值
 
@@ -418,8 +418,6 @@ public String demo12() throws IOException{
 ```
 
 底层使用 Jackson 进行 json 转换，因此需要在项目中一定要导入 jackson 的 jar。
-
-
 
 ## 一、 JSP 九大内置对象和四大作用域
 

@@ -14,7 +14,7 @@ InnoDB 的存储引擎的体系架构如图，lnnoDB 存储引擎有多个内存
 
 - 维护所有进程／线程需要访问的多个内部数据结构。
 - 缓存磁盘上的数据， 方便快速地读取， 同时在对磁盘文件的数据修改之前在这里缓存。
-- 重做日志(redo log)缓冲。
+- 重做日志（redo log）缓冲。
 - 。。。
 
 ![image-20200628103704490](第二章：InnoDB 存储引擎.resource/image-20200628103704490-1624234056892.png)
@@ -25,7 +25,7 @@ InnoDB 的存储引擎的体系架构如图，lnnoDB 存储引擎有多个内存
 
 - **Master Thread**（核心的线程）： **主要负责将缓冲池中的数据异步刷新到磁盘， 保证数据的一致性**， 包括~~脏页的刷新~~、合并插入缓冲(INSERT BUFFER)、undo 页的回收等。
 
-- **IO Thread**：在 InnoDB 存储引擎中大量使用了 AIO (Async IO)来处理写 IO 请求， 极大提高了数据库的性能。而 IO Thread 的主要负责这些 IO 请求的回调(call back)处理。
+- **IO Thread**：在 InnoDB 存储引擎中大量使用了 AIO (Async IO)来处理写 IO 请求， 极大提高了数据库的性能。而 IO Thread 的主要负责这些 IO 请求的回调（call back）处理。
 
     共有 10 个 IO Thread，分别为 `insert buffer(1)/log(1)/read(4)/write(4)`，当然后面两个 IO Thread 的数量可以根据 `innodb_read_io_threads` 和 `innodb_write_io_threads` 参数进行调节指定。同时可以看出读线程的 ID 总是小于写线程。
 
@@ -160,8 +160,6 @@ unzip_LRU 列表中各个大小的页可以通过 `INNODB_BUFFER_PAGE_LRU`进行
 在 LRU 列表中的页被修改后变为**脏页**，即缓冲池中的页和磁盘上的页的数据产生了不一致。 这时数据库会**通过 CHECKPOINT 机制将脏页刷新回磁盘，**而 Flush 列表中的页即为脏页列表。**脏页既存在于 LRU 列表中， 也存在于 Flush 列表中**。**LRU 列表用来管理缓冲池中页的可用性，Flush 列表用来管理将页刷新回磁盘，二者互不影响。**
 
 查看脏页的数量和脏页的类型，除了上面的 `show engine innodb status;` 还可以通过查询 LRU  的`INNODB_BUFFER_PAGE_LRU` 表（因为脏页同样在 LRU 列表中），加上限定条件：`OLDEST_MODIFICATION > 0`。其中 TABLE_NAME 为 NULL 表示该页为系统表空间。
-
-
 
 #### 3.重做日志缓冲（redo log buffer）
 
