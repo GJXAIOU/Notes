@@ -96,28 +96,43 @@ Kafka 是一个**分布式**的基于**发布/订阅模式**的**消息队列**�
 
 - 步骤一：下载安装包
 
-    Kafka 主目录文件位置为：`D:\Apache\Kafka\kafka-3.0.0`【下面使用  KAFKA_HOME 表示】
+    注意：下载的时候不要下载名称带 src 的，这种的需要编译一下才行，可以直接下载：https://downloads.apache.org/kafka/3.0.0/
 
-    下载[kafka 0.11.0.0](https://archive.apache.org/dist/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz)版本，解压到`C:\Kafka\`路径下，Kafka主目录文件为`C:\Kafka\kafka_2.11-0.11.0.0`（下文用 KAFKA_HOME表示）。
+    Kafka 主目录文件位置为：`D:\Apache\Kafka\kafka-3.0.0`【下面使用  KAFKA_HOME 表示】
 
 - 步骤二：启动 server
 
-    Kafka 用到 ZooKeeper 功能，所以要预先运行ZooKeeper。
+    Kafka 用到 ZooKeeper 功能，所以要预先运行ZooKeeper，但是最新版本的 Kafka 已经内置 Zookeeper；这里使用内置的 Zookeeper；
 
-    - 自定义 Zookeeper 和 Log 日志文件数据存放位置，分别在 `D:\Apache\Kafka` 下面新建 `Data\Zookeeper` 和 `Data\Logs` 文件夹，
+    - 修改 `config\zookeeper.properties`，修改增加以下内容：
 
-    - 修改`%KAFKA_HOME%\config\zookeeper.properties`中的`dataDir=/tmp/zookeeper`，改为`dataDir=D:\\Apache\\Kafka\\Data\\Zookeeper`。
+        ```properties
+        ## 该内置 Zookeeper 和单独下载的 Zookeeper 配置路径一直，便于查找
+        dataDir=D:\Apache\Zookeeper\Data
+        dataLogDir=D:\Apache\Zookeeper\Logs
+        
+        # the directory where the snapshot is stored.
+        dataDir=lZookeeper
+        dataLogDir=/home/GJXAIOU/kafka_2.13-3.0.0/Data/Zookeeper
+        ```
 
-    - 修改`%KAFKA_HOME%\config\server.properties`中的`log.dirs=/tmp/kafka-logs`，改为`log.dirs=D:\\Apache\\Kafka\\Data\\Logs`。
+    - 修改 `config\server.properties`，修改一下内容：
+
+        ```properties
+        log.dir=D:\Apache\Kafka\Data
+        log.dirs=D:\Apache\Kafka\Data
+        ```
 
     - 启动cmd，工作目录切换到`%KAFKA_HOME%`，执行命令行：
 
         ```shell
+        ## 先启动 Zookeeper
         start bin\windows\zookeeper-server-start.bat config\zookeeper.properties
         start bin\windows\kafka-server-start.bat config\server.properties
         ```
 
 - 可写一脚本，一键启动
+
 - 关闭服务，`bin\windows\kafka-server-stop.bat`和`bin\windows\zookeeper-server-stop.bat`。
 
 ------
@@ -132,20 +147,28 @@ TODO:**一个问题**，通过`kafka-server-stop.bat`或右上角关闭按钮来
 
 参阅网络，这可能是在windows下的一个Bug，没有更好的解决方案，暂时写个py脚本用来对kafka的log文件进行删除。下次启动kafka，先运行这个删除脚本吧。
 
-**好消息**，当你成功启动kafka，然后在对应的命令行窗口用`Ctrl + C`结束Kakfa，下次不用清理kafka日志，也能正常启动。
+**好消息**，当你成功启动 kafka，然后在对应的命令行窗口用`Ctrl + C`结束Kakfa，下次不用清理 kafka日 志，也能正常启动。
+
+如果一直提示找不到 `java.nio.file.FileSystemException` 则删除按照盘符下面的 `temp\kafka-logs` 文件夹；
+
+如果还有有问题，则先关闭 kafka 然后关闭 zookeeper，在启动即可；
+
+如果提示 `Exception in thread "main" joptsimple.UnrecognizedOptionException: zookeeper is not a recognized option` 则先
 
 #### Step 3: Create a topic
 
-- 用单一partition和单一replica创建一个名为`test`的topic:
+- 用单一partition和单一replica创建一个名为`test`的topic：
 
 ```bat
 bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
 ```
 
 - 查看已创建的topic，也就刚才创建的名为`test`的topic：
 
 ```bat
 bin\windows\kafka-topics.bat --list --zookeeper localhost:2181
+bin\windows\kafka-topics.bat --list --bootstrap-server localhost:9092
 ```
 
 或者，你可配置你的broker去自动创建未曾发布过的topic，代替手动创建topic
