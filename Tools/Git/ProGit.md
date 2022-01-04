@@ -8,29 +8,34 @@
 
 每台计算机上只需要配置一次，程序升级时会保留配置信息，可随时修改。
 
-Git 自带一个 git config 的工具来帮助设置控制 Git 外观和行为的配置变量。 这些变量存储在三个不同的位
-置：从下往上会：下一层级覆盖上一层级配置。
+Git 自带一个 git config 的工具来帮助设置控制 Git 外观和行为的配置变量。 这些变量存储在三个不同的位置：从下往上会：**下一层级覆盖上一层级配置。**
 
-- `/etc/gitconfig` 文件: 包含系统上每一个用户及他们仓库的通用配置（是系统配置文件，需要管理员权限）。 **如果在执行 `git config` 时带上 `--system` 选项，那么它就会读写该文件中的配置变量**。 
+- `/etc/gitconfig` 文件: 包含系统上每一个用户及他们仓库的通用配置（是系统配置文件，需要管理员权限）。 
 
-- `~/.gitconfig` 或 `~/.config/git/config` 文件：只针对**当前用户**。 如果加上 `--global` 选项即对系统上 **所有** 的仓库生效。
+    **如果在执行 `git config` 时带上 `--system` 选项，那么它就会读写该文件中的配置变量**。 
+
+- `~/.gitconfig` 或 `~/.config/git/config` 文件：只针对**当前用户**。 
   
-- 当前使用仓库的 Git 目录中的 config 文件（即 `.git/config`）：针对该仓库。 你可以传递 `--local` 选项让 Git 强制读写此文件（默认使用）。 （需进入某个 Git 仓库中才能让该选项生效。）
+  如果加上 `--global` 选项即对系统上 **所有** 的仓库生效。
   
-    查看所有的配置以及它们所在的文件命令：`git config --list --show-origin`
-    
-    ```shell
-    C:\Users\gjx16>git config --list --show-origin
-    file:E:/Program/VersionControl/Git/etc/gitconfig        core.fscache=true
-    .....
-    file:C:/Users/gjx16/.gitconfig  user.name=GJXAIOU
-    file:C:/Users/gjx16/.gitconfig  user.email=gjx1690048420@163.com
-    ......
-    file:.git/config        core.repositoryformatversion=0
-     remote.leetcode.url=https://github.com/GJXAIOU/LeetCode.git
-    file:.git/config        remote.interviewexperience.fetch=+refs/heads/*:refs/remotes/interviewexperience/*
-    ....
-    ```
+- 当前使用仓库的 Git 目录中的 config 文件（即 `.git/config`）：针对该仓库。 
+  
+    你可以传递 `--local` 选项让 Git 强制读写此文件（默认使用）。 （需进入某个 Git 仓库中才能让该选项生效。）
+
+查看所有的配置以及它们所在的文件命令：`git config --list --show-origin`
+
+```shell
+C:\Users\gjx16>git config --list --show-origin
+file:E:/Program/VersionControl/Git/etc/gitconfig        core.fscache=true
+.....
+file:C:/Users/gjx16/.gitconfig  user.name=GJXAIOU
+file:C:/Users/gjx16/.gitconfig  user.email=gjx1690048420@163.com
+......
+file:.git/config        core.repositoryformatversion=0
+ remote.leetcode.url=https://github.com/GJXAIOU/LeetCode.git
+file:.git/config        remote.interviewexperience.fetch=+refs/heads/*:refs/remotes/interviewexperience/*
+....
+```
 
 #### 设置用户信息
 
@@ -64,7 +69,7 @@ file:C:/Users/gjx16/.gitconfig  GJXAIOU
 
 ## 二、Git 基础
 
-### 获取 Git 仓库
+### （一）获取 Git 仓库
 
 通常有两种获取 Git 项目仓库的方式：
 - 将尚未进行版本控制的本地目录（已存在）转换为 Git 仓库：在项目目录下执行 `git init`。
@@ -73,9 +78,9 @@ file:C:/Users/gjx16/.gitconfig  GJXAIOU
 
     如果在而非空文件夹中进行版本控制，应该使用 `git add`开始追踪这些文件并使用 `git commit `进行初始提交。此时就是一个存在被追踪文件与初始提交的 Git 仓库。
 
-- 从其它服务器 克隆一个已存在的 Git 仓库。
+- 从其它服务器克隆一个已存在的 Git 仓库。
 
-    使用 `git clone  <url>`命令，或者 `git clone <url> 新的名字` 设置保存在本地项目名称，Git 克隆的是该 Git 仓库服务器上的几乎**所有数据**，默认配置下远程 Git 仓库中的**每一个文件的每一个版本**都将被拉取下来。
+    使用 `git clone <url>`命令，或者 `git clone <url> 新的名字` 设置保存在本地项目名称，Git 克隆的是该 Git 仓库服务器上的几乎**所有数据**，默认配置下远程 Git 仓库中的**每一个文件的每一个版本**都将被拉取下来。
 
 
 #### 记录每次更新到仓库
@@ -86,7 +91,7 @@ file:C:/Users/gjx16/.gitconfig  GJXAIOU
 
 编辑过某些文件之后，由于自上次提交后你对它们做了修改，Git 将它们标记为已修改文件。修改过的文件可以放入暂存区，然后提交所有已暂存的修改。
 
-![image-20210310151249594](Progit.resource/image-20210310151249594.png)
+![image-20210310151249594](ProGit.resource/image-20210310151249594-16363228813281.png)
 
 #### 检查当前文件状态
 
@@ -98,8 +103,7 @@ file:C:/Users/gjx16/.gitconfig  GJXAIOU
 
 #### 暂存已修改文件
 
-修改一个已被跟踪的文件，使用 `git status` 显示该文件处于 「Changes not staged for commit」 下面，即已追踪文件发生修改但是没有放到暂存区。如果要暂存该次更新，使用 git add。该命令可以用它开
-始跟踪新文件，或者把已跟踪的文件放到暂存区，还能用于合并时把有冲突的文件标记为已解决状态等，总的来说就是：精确的将内容添加到下一次提交中。
+修改一个已被跟踪的文件，使用 `git status` 显示该文件处于 「Changes not staged for commit」 下面，即已追踪文件发生修改但是没有放到暂存区。如果要暂存该次更新，使用 `git add`。该命令可以用它开始跟踪新文件，或者把已跟踪的文件放到暂存区，还能用于合并时把有冲突的文件标记为已解决状态等，总的来说就是：精确的将内容添加到下一次提交中。
 
 **注意** ：提交的时候，提交文件的版本是最后一次运行 `git add` 时的版本，而不是运行 `git commit` 时当前工作目录中的当前版本，所以运行 `git add` 之后又修改了该文件，需要重新运行 `git add` 将最新版本文件重新暂存起来才行。
 
@@ -129,7 +133,7 @@ M lib/simplegit.rb
 • 要忽略指定模式以外的文件或目录，可以在模式前加上叹号（!）取反。
 
 > glob 模式是指 shell 所使用的简化了的正则表达式。 星号（*）匹配零个或多个任意字符；[abc] 匹配
-> 任何一个列在方括号中的字符 （这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）； 问号（?）只匹配一个任意字符；如果在方括号中使用短划线分隔两个字符， 表示所有在这两个字符范围内的都可以匹配（比如 [0-9] 表示匹配所有 0 到 9 的数字）。 使用两个星号（**）表示匹配任意中间目录，比如 a/**/z 可以匹配 a/z 、 a/b/z 或 a/b/c/z 等。
+> 任何一个列在方括号中的字符 （这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）； 问号（?）只匹配一个任意字符；如果在方括号中使用短划线分隔两个字符， 表示所有在这两个字符范围内的都可以匹配（比如 [0-9] 表示匹配所有 0 到 9 的数字）。 使用两个星号（`**`）表示匹配任意中间目录，比如 a/**/z 可以匹配 a/z 、 a/b/z 或 a/b/c/z 等。
 
 ```shell
 # 忽略所有的 .a 文件
@@ -158,7 +162,7 @@ git diff 命令用来解决这两个问题：当前做的哪些更新尚未暂�
 
 #### 提交更新
 
-在每次提交之前使用 `git status` 查看是不是需要的文件都已经暂存了，然后在使用 `git commit`进行提交，这里会启动选择的文本编辑器进行提交说明。
+在每次提交之前使用 `git status` 查看是不是需要的文件都已经暂存了，然后载使用 `git commit`进行提交，这里会启动选择的文本编辑器进行提交说明。
 
 提交之后会显示分支和本次提交的完整 SHA-1 完整校验和，有多少文件修改过，多少行添加和删除。
 
@@ -176,8 +180,7 @@ $ git commit -m "Feat:ProGit；增加 Git 笔记";
 
 如果要移除某个文件，需要从已跟踪的文件清单中移除（即从暂存区域移除），然后提交。使用 `git rm`操作的时候会连带从工作目录中删除指定的文件，则以后就不会出现在未跟踪文件清单中了。
 
-如果手动使用 `rm` 将工作目录中文件删除，则使用 `git status` 则该文件就处于 「Changes not staged for  commit（未暂存清单）」中，则在使用 `git rm`删除该文件，则下一次提交的时候该文件就不再纳入版本管理了。如果要删除之前修改过或已经放到暂存区的文件，则必须使用
-强制删除选项 -f（译注：即 force 的首字母）。 这是一种安全特性，用于防止误删尚未添加到快照的数据，这样的数据不能被 Git 恢复。
+如果手动使用 `rm` 将工作目录中文件删除，则使用 `git status` 则该文件就处于 「Changes not staged for  commit（未暂存清单）」中，则在使用 `git rm`删除该文件，则下一次提交的时候该文件就不再纳入版本管理了。如果要删除之前修改过或已经放到暂存区的文件，则必须使用强制删除选项 -f（译注：即 force 的首字母）。 这是一种安全特性，用于防止误删尚未添加到快照的数据，这样的数据不能被 Git 恢复。
 
 如果想将文件从 Git 仓库（包括暂存区）删除（不想让 Git 追踪），但是本地工作目录保留，使用 `git rm --cached`即可。同时 `git rm` 后面可以使用匹配模式。
 

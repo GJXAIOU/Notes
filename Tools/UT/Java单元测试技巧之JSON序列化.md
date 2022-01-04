@@ -1,5 +1,7 @@
 # Java单元测试技巧之JSON序列化
 
+>https://mp.weixin.qq.com/s/HncA8TI7vuqW1lmnhfdv7A
+
 ## **一 前言**
 
 《论语》中孔子有言：“工欲善其事，必先利其器。”
