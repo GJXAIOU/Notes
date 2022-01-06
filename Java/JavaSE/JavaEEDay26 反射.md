@@ -1,68 +1,64 @@
----
-tags : 
-- 反射
----
+
 
 
 # JavaDay27 反射
 ## 一、反射总结
-- 反射：
- 	**当一个Java文件编译之后，编译成一个.class文件，也就是字节码文件，当这个字节码文件【加载】到内存的方法区/代码区，JVM会根据【加载】的字节码文件内容，创建一个Class的类对象。这个Class类对象里面包含了当前字节码文件里面的所有内容**。
+当一个Java文件编译之后，编译成一个.class文件，也就是字节码文件，当这个字节码文件【加载】到内存的方法区/代码区，JVM会根据【加载】的字节码文件内容，创建一个Class的类对象。这个Class类对象里面包含了当前字节码文件里面的所有内容。
 
- 	只要我们获取到这个Class对象，就可以为所欲为！！！
- 	这个Class对象中包含了对应字节码文件的所有成员变量(Field) 所有成员方法(Method)构造方法(Constructor)。
- 	
-- 1.获取Class对象的三种方式：
-    1> **Class.forName("完整的类名字符串");**
-        完整类名字符串是指 包名.类名
-    2> 类名.class;
-    3> 指定类对象.getClass();
+
+这个 Class 对象中包含了对应字节码文件的所有成员变量(Field) 所有成员方法(Method)构造方法(Constructor)。
+
+- 获取Class对象的三种方式：
     
-    最常用的是Class.forName("完整的类名字符串");
-    后期大量使用
-
-- 2.Constructor, Method, Field 
-    都是Java反射这个包(java.lang.reflect)里面的类 
-    Constructor 是构造方法类
-    Method 是成员方法类
-    Field 是成员变量类
+    - **Class.forName("完整的类名字符串");**
+            完整类名字符串是指 包名.类名
+    - 类名.class;
+    - 指定类对象.getClass();
     
-- 3.Constructor常用方法：
+- Constructor, Method, Field 
+    是 Java 反射包 `java.lang.reflect` 里面的类 
+    
+    - Constructor 是构造方法类
+    - Method 是成员方法类
+    - Field 是成员变量类
+    
+    
+
+### Constructor 常用方法：
 
 返回值 | 方法名| 作用
 ---|---|----
-Constructor[] | getConstructors(); |获取所有public修饰的构造方法
-  Constructor[] |getDeclaredConstructors();| 获取当前类里面所有的构造方法，包含用private修饰的构造方法
-Constructor |getConstructor(Object... paramterTyeps);|根据所需参数不同，获取指定的构造方法对象
-Constructor| getDeclaredConstructor(Object... paramterTyeps);|根据所需参数不同，获取指定的构造方法对象，包括私有化的方法
- Object | newInstance(Object... initargs); |给予确定的参数，通过反射调用构造方法，这里的参数列表是一个不定参数列表
+Constructor[] | `getConstructors();` |获取所有 public 修饰的构造方法
+  Constructor[] |`getDeclaredConstructors();`| 获取当前类里面所有的构造方法，包含用 private 修饰的构造方法 
+Constructor |`getConstructor(Object... paramterTyeps);`|根据所需参数不同，获取指定的构造方法对象
+Constructor| `getDeclaredConstructor(Object... paramterTyeps);` |根据所需参数不同，获取指定的构造方法对象，包括私有化的方法
+ Object | `newInstance(Object... initargs);` |给予确定的参数，通过反射调用构造方法，这里的参数列表是一个不定参数列表
 
-- 4.Method常用方法 
-
-返回值 | 方法名| 作用
----|---|----
-Method[]  |getMethods(); |获取当前类里面所有的public修饰的成员方法，这里或显示父类继承而来的public方法
-Method[] | getDeclaredMethods(); |获取当前类里面的所有方法，包括private修饰的方法，但是会过滤父类继承而来的方法
-Method  | getMethod(String methodName, Object... args);|根据方法的名字和对应的参数列表，获取指定方法
-Method | getDeclaredMethod(String methodName, Object... args);|根据方法的名字和对应的参数列表，获取指定方法，可以获取private修饰的方法
- 无    | invoke(Object obj, Object... args);  |执行成员方法的函数，第一个参数是执行该方法的类对象，第二个参数是执行该方法需要的参数列表
-
-- 5.Field常用方法
+### Method 常用方法 
 
 返回值 | 方法名| 作用
 ---|---|----
- Field[]  |getFields(); | 获取所有的用public修饰的成员变量
- Field[]| getDeclaredFields();| 获取所用成员变量，包括用private 修饰的成员变量
-Field |getField(String fieldName);|根据成员变量的名字获取对应的成员变量
-Field |getDeclaredField(String fieldName);|根据成员变量的名字获取包括private修饰在内的成员变量
-无   | set(Object obj, Object value);|设置成员变量的数值，第一个参数是调用该成员变量的对象，第二个参数是赋予数值
+Method[]  |`getMethods();` |获取当前类里面所有的 public 修饰的成员方法，这里或显示父类继承而来的 public 方法
+Method[] | `getDeclaredMethods();` |获取当前类里面的所有方法，包括 private 修饰的方法，但是会过滤父类继承而来的方法
+Method  | `getMethod(String methodName, Object... args);` |根据方法的名字和对应的参数列表，获取指定方法
+Method | `getDeclaredMethod(String methodName, Object... args);` |根据方法的名字和对应的参数列表，获取指定方法，可以获取private修饰的方法
+ 无    | `invoke(Object obj, Object... args);` |执行成员方法的函数，第一个参数是执行该方法的类对象，第二个参数是执行该方法需要的参数列表
 
-- 6.暴力反射赋予权限的函数
-        setAccessible(boolean )
+### Field 常用方法
 
---------------------------
+返回值 | 方法名| 作用
+---|---|----
+ Field[]  |`getFields();` | 获取所有的用 public 修饰的成员变量 
+ Field[]| `getDeclaredFields();` | 获取所用成员变量，包括用 private 修饰的成员变量 
+Field |`getField(String fieldName);`|根据成员变量的名字获取对应的成员变量
+Field |`getDeclaredField(String fieldName);`|根据成员变量的名字获取包括 private 修饰在内的成员变量
+无   | `set(Object obj, Object value);` |设置成员变量的数值，第一个参数是调用该成员变量的对象，第二个参数是赋予数值
 
-##  二、获取Class 类 对象的三种方式   
+### 暴力反射赋予权限的函数
+
+`setAccessible(boolean)`
+
+##  二、获取 Class 类 对象的三种方式   
 
 1.首先新建一个 Person 类，作为示例
 ```java
@@ -71,7 +67,6 @@ package com.qfedu.a_reflect;
 public class Person {
 	private int id;
 	private String name;
-	
 	public int test;
 	public static int testStatic = 10;
 	
@@ -149,13 +144,12 @@ public class GetClassObject {
 		System.out.println(cls1 == cls3);
 	}
 }
-
 ```
 
 
-## 三、Constructor常用方法
+## 三、Constructor 常用方法
 
-通过Class类对象获取当前类的构造方法并且调用
+通过 Class 类对象获取当前类的构造方法并且调用
 ```java
 package com.qfedu.a_reflect;
 import java.lang.reflect.Constructor;
@@ -272,7 +266,7 @@ public class ReflectPractice {
         System.out.println(person1.getName());
         System.out.println(person2.getName());
     }
-
+}
 ```
 
 补充：单例
@@ -305,7 +299,7 @@ public class SingleDemo {
 ```
 
 
-## 四、Method常用方法 
+## 四、Method 常用方法 
 4.通过反射借助于Class类对象，获取这个类里面所有的成员方法,并且进行调用
 ```java
 package com.qfedu.a_reflect;
@@ -367,7 +361,6 @@ public class GetClassMethod {
 		
 	}
 }
-
 ```
 
 ## 五、Field常用方法
@@ -439,31 +432,3 @@ public class GetClassField {
 	}
 }
 ```
-
-
-## 总结
-- 反射：
-  一个Java文件，编译之后生成的.class文件，程序运行时加载到内存中，会保存在内存的【代码区】，而这个.class字节码文件，会对应生成一个Class类对象，借助于Class类对象，可以完成一系列反射操作
-  
-  - 获取Class类对象的方式：
-      1.Class.forName("完整的类名"); 最常用！！！
-      2.已知类名.class;
-      3.对应类的类对象.getClass();
-  
-  - Constructor 
-      getConstructors();
-      getDeclaredConstructors();
-      getConstructor(Class... parameterTypes);
-          例如：getConstructor(int.class, String.class);
-      getDeclaredConstructor(Class... parameterTypes);
-      Constructor的类对象.newInstance(Object... args);
-  - Method
-      invoke(Object obj, Object... args);
-  - Field
-      set(Object obj, Object value);
-      
-  - 设置权限的方式：
-      setAccessible(boolean b);
-      
-  - 反射和单例类的一个平衡
-      一个类如果是单例类，一般不会采用反射的方式去暴力获取该类的构造方法，不符合单例的机制

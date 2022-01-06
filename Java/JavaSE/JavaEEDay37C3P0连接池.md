@@ -268,16 +268,6 @@ public class C3P0ConnectionPool {
 
 ```
 
-
-
-
-
-
-
--- MySQL增强
-create database day38;
-use day38;
-
 # 一、 数据约束
 ## （一） 默认值
 ```sql
