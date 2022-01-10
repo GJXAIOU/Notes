@@ -799,7 +799,7 @@ public class Student{
 public class People{
     private Student student;
     public void showStudent(){
-        this.student.descStudetn();
+        this.student.descStudent();
     }
 }
 ```
