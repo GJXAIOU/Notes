@@ -9,12 +9,12 @@
 常见 RPC 技术和框架有：
 
 - 应用级的服务框架：阿里的 Dubbo/Dubbox、Google gRPC、Spring Boot/Spring Cloud。
-- 远程通信协议：RMI、Socket、SOAP(HTTP XML)、REST(HTTP + JSON)。
+- 远程通信协议：RMI、Socket、SOAP（HTTP XML）、REST（HTTP + JSON）。
 - 通信框架：MINA 和 Netty。
 
 **完整的 RPC 框架**
 
-在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中“RPC 协议”就指明了程序如何进行**网络传输和序列化**。
+在一个典型 RPC 的使用场景中，包含了服务发现、负载、容错、网络传输、序列化等组件，其中「RPC 协议」就指明了程序如何进行**网络传输和序列化**。
 
 ![img](RPC.resource/fd5b5686336b0a1212398d8ea8fe6f66.jpg-wh_651x-s_3461264051-16375927468041.jpg)
 
@@ -44,7 +44,7 @@
 
 - RPC（Remote Procedure Call，远程过程调用）
 
-    远程过程调用，是一个统称，重点在于方法调用（不支持对象的概念），具体实现甚至可以用 RM、RestFul 等去实现，但一般不用，因为 RMI 不能跨语言而 RestFul 效率太低。多用于服务器集群间的通信，因此常使用更加高效短小精悍的传输模式以提高效率。
+    远程过程调用，是一个统称，重点在于方法调用（不支持对象的概念），具体实现甚至可以用 RMI、RestFul 等去实现，但一般不用，因为 RMI 不能跨语言而 RestFul 效率太低。多用于服务器集群间的通信，因此常使用更加高效短小精悍的传输模式以提高效率。
 
 ## 二、常见协议框架
 
@@ -58,8 +58,8 @@ Java 自带的 Serializable 只支持 Java 语言，同时效率低，并且转�
     - Thrift
     - kyro
     - fst
-    - Json 序列化框架：包括 FastJson/Gson/Jackson 等
-    - xmlrpc(xstream)
+    - JSON 序列化框架：包括 FastJson/Gson/Jackson 等
+    - xmlrpc（xstream）
 -  RPC 通讯协议
     - HTTP
     - HTTP2.0（gRPC 用的就是 2.0，因为 2.0 不仅可以传输文本，同时可以传输二进制）
@@ -256,18 +256,17 @@ Java 自带的 Serializable 只支持 Java 语言，同时效率低，并且转�
     }
     ```
 
-- 结构图
+最后先启动 Server 然后启动 Client 即可。
 
-    ![image-20201208130724191](RPC.resource/image-20201208130724191.png)
+![image-20201208130724191](RPC.resource/image-20201208130724191.png)
 
 
 
 ### （四）简化客户端的流程 引入 stub（客户端存根）
 
-**改进**：通常客户端不需要知道网络连接的细节，只需要知道接口的用法就行，因此将网络部分进行封装。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
+**改进**：通常客户端不需要知道网络连接的细节，只需要知道接口的用法就行，因此**将网络部分进行封装**。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
 
 客户端不需要知道网络连接的细节，只需要知道接口的用法就好了，即将网络部分进行封装。单独出来，可以认为是一个代理： Stub，屏蔽了网络的细节。
-
 
 **缺点**： Stub 只能代理一个方法。
 
@@ -347,7 +346,7 @@ Java 自带的 Serializable 只支持 Java 语言，同时效率低，并且转�
 
 **改动优化**：
 
-客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，stub 不 是 new 出来的，而是使用它的静态方法getStub
+客户端，在 rpc2 的基础上，把 stub 变成动态代理的形式，stub 不 是 new 出来的，而是使用它的静态方法 getStub
 
 这个版本相对于上个版本的优点还不能直观显现，因为硬编码部分还没有改动完成，rpc4 中将通用化这个动态代理。就是不管调用什么版本，在 invoke 方法中的处理就是都是写入 123，对于 UserService 中暴露的其他方法没有处理。
 
@@ -437,21 +436,22 @@ Java 自带的 Serializable 只支持 Java 语言，同时效率低，并且转�
     
 - Server 端没有改变
 
-    
 
-## （六）引入客户端存根的真正含义-支持多个方法的打包 服务端利用反射解析打包过来的消息并invoke执行
+### （六）引入客户端存根的真正含义
+
+**支持多个方法的打包，服务端利用反射解析打包过来的消息并 invoke 执行。**
 
 client 还是调用希望调用的函数，**stub 却对函数进行了规则化的传递，不在自己这里处理了**。
 
 该版本彻底改变了客户端和服务器的通信方式：
 
-- 客户端不仅仅传递参数给服务器，还要传输调用的方法名字，参数类型；    因此可以适用不同方法的调用而不用改代码
+- 客户端不仅仅传递参数给服务器，还要传输调用的方法名字和参数类型，因此可以适用不同方法的调用而不用改代码；
 
-- stub中使用反射拿到需要传递的上述信息， 因此 stub 对于不同的方法也不需要改动代码！
+- stub中使用反射拿到需要传递的上述信息， 因此 stub 对于不同的方法也不需要改动代码；
 
--  顺便这个版本改用了Object Input/Output Stream， 注意这个时候要确保传输的对象可序列化
+-  顺便这个版本改用了Object Input/Output Stream， 注意这个时候要确保传输的对象可序列化；
 
-总之这个版本在同一个服务类型（IUserService）之下，调用任何方法都不需要改动stub和服务端代码，只需要改动IUserService的接口
+总之这个版本在同一个服务类型（IUserService）之下，调用任何方法都不需要改动 stub 和服务端代码，只需要改动 IUserService的接口
 
 **缺点**：还不能实现对所有接口提供服务。
 
@@ -560,21 +560,16 @@ client 还是调用希望调用的函数，**stub 却对函数进行了规则化
     }
     ```
 
-    现在支持不同功能的函数经过存根打包 在网络中传输给服务端 那服务端也要对相应的服务进行解析并且返回函数
-
-
+    现在支持不同功能的函数经过存根打包在网络中传输给服务端，那服务端也要对相应的服务进行解析并且返回函数。
 
 ### （七）服务端支持对不同类的不同函数、不同参数的结果返回
 
 存根就是网络消息打包存放的地方
-现在已经升级为通过动态代理支持所有的类的所有的函数并且根据类型和参数能够区别重写的函数
-返回结果也支持所有的类型
-目前就是客户端做调用 然后存根进行打包运输给服务端
-服务端解析并且返回对象 存根再将对象写回
+现在已经升级为通过动态代理支持所有的类的所有的函数并且根据类型和参数能够区别重写的函数，返回结果也支持所有的类型，目前就是客户端做调用 然后存根进行打包运输给服务端，服务端解析并且返回对象。存根再将对象写回。
 
 这个版本在之前通用化的基础上，连服务类型都要能改变，变成通用的，主要是**将服务类型作为参数**传入 getStub
 
-为了验证server和stub的通用性，这里client调用了两个不同服务的不同的接口，都可以正常运行
+为了验证 server 和 stub 的通用性，这里 client 调用了两个不同服务的不同的接口，都可以正常运行
 
 获取服务器端暴露的任何接口，步骤为：
 
@@ -626,23 +621,28 @@ client 还是调用希望调用的函数，**stub 却对函数进行了规则化
                     Socket socket = new Socket("127.0.0.1", 8088);
                     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
     
-                    //添加了服务类型的传输
-                    oos.writeUTF(clazz.getName());//调用服务接口名称
-                    oos.writeUTF(method.getName());//方法名
-                    oos.writeObject(method.getParameterTypes());//方法参数类型
-                    oos.writeObject(args);//方法参数
+                    // 添加了服务类型的传输
+                    // 调用服务接口名称
+                    oos.writeUTF(clazz.getName());
+                    // 方法名
+                    oos.writeUTF(method.getName());
+                    // 方法参数类型
+                    oos.writeObject(method.getParameterTypes());
+                    // 方法参数
+                    oos.writeObject(args);
                     oos.flush();
     
-                    //接收服务端返回的结果,object读入
+                    // 接收服务端返回的结果,object读入
                     ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                     Object obj = ois.readObject();
     
-                    return obj;//改为返回通用对象
+                    // 改为返回通用对象
+                    return obj;
                 }
             };
     
             Object o = Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, h);
-            //这里要写成通用的c，而不是固定的接口
+            // 这里要写成通用的c，而不是固定的接口
             System.out.println(o.getClass().getName());
             System.out.println(o.getClass().getInterfaces()[0]);
             return o;
@@ -670,8 +670,8 @@ client 还是调用希望调用的函数，**stub 却对函数进行了规则化
         private static HashMap<String, Class> registerTable = new HashMap<>();
     
         static {
-            registerTable.put(IUserService.class.getName(), IUserServiceImpl.class);//key类型是接口，value
-            // 是具体实现类才能完成调用
+            // key 类型是接口，value 是具体实现类才能完成调用
+            registerTable.put(IUserService.class.getName(), IUserServiceImpl.class);
             registerTable.put(IProductService.class.getName(), IProductServiceImpl.class);
         }
     
@@ -689,7 +689,7 @@ client 还是调用希望调用的函数，**stub 却对函数进行了规则化
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
     
-            //为了适应客户端通用化而做的改动
+            // 为了适应客户端通用化而做的改动
             // 首先获取服务接口名称，然后方法
             String clazzName = ois.readUTF();
             String methodName = ois.readUTF();
@@ -731,38 +731,35 @@ client 还是调用希望调用的函数，**stub 却对函数进行了规则化
     }
     ```
 
-    
 
 
-### 总结
+## 五、总结
 
 一次 RPC 调用流程如下：
 
-- 服务消费者(Client 客户端)通过本地调用的方式调用服务。
-- 客户端存根(Client Stub)接收到调用请求后负责将方法、入参等信息序列化(组装)成能够进行**网络传输**的消息体。
-- 客户端存根(Client Stub)找到远程的服务地址，并且将消息通过网络发送给服务端。
-- 服务端存根(Server Stub)收到消息后进行解码(反序列化操作)。
-- 服务端存根(Server Stub)根据解码结果调用本地的服务进行相关处理
-    - 服务端(Server)本地服务业务处理。
-    - 处理结果返回给服务端存根(Server Stub)。
-    - 服务端存根(Server Stub)序列化结果。
-- 服务端存根(Server Stub)将结果通过网络发送至消费方。
-- 客户端存根(Client Stub)接收到消息，并进行解码(反序列化)。
+- 服务消费者（Client 客户端）通过本地调用的方式调用服务。
+- 客户端存根（Client Stub）接收到调用请求后负责将方法、入参等信息序列化（组装）成能够进行**网络传输**的消息体。
+- 客户端存根（Client Stub）找到远程的服务地址，并且将消息通过网络发送给服务端。
+- 服务端存根（Client Stub）收到消息后进行解码(反序列化操作)。
+- 服务端存根（Client Stub）根据解码结果调用本地的服务进行相关处理
+    - 服务端（Server）本地服务业务处理。
+    - 处理结果返回给服务端存根（Server Stub）。
+    - 服务端存根（Server Stub）序列化结果。
+- 服务端存根（Server Stub）将结果通过网络发送至消费方。
+- 客户端存根（Client Stub）接收到消息，并进行解码(反序列化)。
 - 服务消费方得到最终结果
 
 
 
 最简单的实现 RPC 需要实现三个部分：服务寻址、数据流的序列化和反序列化、网络传输。
 
-马老师讲的是本机的rpc调用 在微服务框架中微服务应用都是在不同的JVM、不同的内存中
-这时候简单的动态代理和反射就可能调用到其他微服务的内存空间里了 甚至会造成并发的一个错乱
-所以就引入了 相关的注册中心（Eureka zookeeper） 服务发现 根据ID
+本文是本机的 RPC 调用，在微服务框架中微服务应用都是在不同的 JVM、不同的内存中，这时候简单的动态代理和反射就可能调用到其他微服务的内存空间里了，甚至会造成并发的一个错乱，所以就引入了相关的注册中心（Eureka zookeeper） 服务发现 根据ID
 
-- 在 RPC 中，所有的函数都必须有自己的一个 ID。这个 ID 在所有进程中都是唯一确定的。客户端和服务端分别维护一个函数和Call ID的对应表。
-- 客户端想要调用函数A 就查找自己所的对应表把A对应的ID通过存根传输 服务端根据ID在自己这边的表中找到函数 并执行
+- 在 RPC 中，所有的函数都必须有自己的一个 ID。这个 ID 在所有进程中都是唯一确定的。客户端和服务端分别维护一个函数和Call ID 的对应表。
+- 客户端想要调用函数 A，就查找自己所的对应表把 A 对应的 ID 通过存根传输，服务端根据 ID 在自己这边的表中找到函数并执行。
 - 网络传输层需要把 Call ID 和序列化后的参数字节流传给服务端，然后再把序列化后的调用结果传回客户端。
 
-## RPC 核心之功能实现
+## 六、RPC 核心之功能实现
 
 RPC 的核心功能主要由 5 个模块组成，如果想要自己实现一个 RPC，最简单的方式要实现三个技术点，分别是：
 
@@ -770,39 +767,39 @@ RPC 的核心功能主要由 5 个模块组成，如果想要自己实现一个 
 - 数据流的序列化和反序列化
 - 网络传输
 
-### 服务寻址
+### （一）服务寻址
 
 服务寻址可以使用 Call ID 映射。在本地调用中，函数体是直接通过函数指针来指定的，但是在远程调用中，函数指针是不行的，因为两个进程的地址空间是完全不一样的。
 
 所以在 RPC 中，所有的函数都必须有自己的一个 ID。这个 ID 在所有进程中都是唯一确定的。
 
-客户端在做远程过程调用时，必须附上这个 ID。然后我们还需要在客户端和服务端分别维护一个函数和Call ID的对应表。
+客户端在做远程过程调用时，必须附上这个 ID。然后我们还需要在客户端和服务端分别维护一个函数和 Call ID 的对应表。
 
 当客户端需要进行远程调用时，它就查一下这个表，找出相应的 Call ID，然后把它传给服务端，服务端也通过查表，来确定客户端需要调用的函数，然后执行相应函数的代码。
 
-实现方式：服务注册中心。
+**实现方式：服务注册中心**。
 
 要调用服务，首先你需要一个服务注册中心去查询对方服务都有哪些实例。Dubbo 的服务注册中心是可以配置的，官方推荐使用 Zookeeper。
 
-实现案例：RMI(Remote Method Invocation，远程方法调用)也就是 RPC 本身的实现方式。
+实现案例：RMI(Remote Method Invocation，远程方法调用）也就是 RPC 本身的实现方式。
 
-[![img](RPC.resource/d72c4a9f518b3d75b256a50b48478614.jpg)](https://s4.51cto.com/oss/201906/17/d72c4a9f518b3d75b256a50b48478614.jpg)
+[![img](RPC.resource/d72c4a9f518b3d75b256a50b48478614-16423221993031.jpg)
 
 图 9：RMI 架构图
 
-Registry(服务发现)：借助 JNDI 发布并调用了 RMI 服务。实际上，JNDI 就是一个注册表，服务端将服务对象放入到注册表中，客户端从注册表中获取服务对象。
+Registry（服务发现）：借助 JNDI 发布并调用了 RMI 服务。实际上，JNDI 就是一个注册表，服务端将服务对象放入到注册表中，客户端从注册表中获取服务对象。
 
 RMI 服务在服务端实现之后需要注册到 RMI Server 上，然后客户端从指定的 RMI 地址上 Lookup 服务，调用该服务对应的方法即可完成远程方法调用。
 
 Registry 是个很重要的功能，当服务端开发完服务之后，要对外暴露，如果没有服务注册，则客户端是无从调用的，即使服务端的服务就在那里。
 
-### 序列化和反序列化
+### （二）序列化和反序列化
 
-客户端怎么把参数值传给远程的函数呢?在本地调用中，我们只需要把参数压到栈里，然后让函数自己去栈里读就行。
+客户端怎么把参数值传给远程的函数呢？在本地调用中，我们只需要把参数压到栈里，然后让函数自己去栈里读就行。
 
 但是在远程过程调用时，客户端跟服务端是不同的进程，不能通过内存来传递参数。
 
-这时候就需要客户端把参数先转成一个字节流，传给服务端后，再把字节流转成自己能读取的格式。
+这时候就需要**客户端把参数先转成一个字节流**，传给服务端后，再把字节流转成自己能读取的格式。
 
 只有二进制数据才能在网络中传输，序列化和反序列化的定义是：
 
@@ -811,11 +808,11 @@ Registry 是个很重要的功能，当服务端开发完服务之后，要对�
 
 这个过程叫序列化和反序列化。同理，从服务端返回的值也需要序列化反序列化的过程。
 
-### 网络传输
+### （三）网络传输
 
 网络传输：远程调用往往用在网络上，客户端和服务端是通过网络连接的。
 
-所有的数据都需要通过网络传输，因此就需要有一个网络传输层。网络传输层需要把 Call ID 和序列化后的参数字节流传给服务端，然后再把序列化后的调用结果传回客户端。
+**所有的数据都需要通过网络传输，因此就需要有一个网络传输层。网络传输层需要把 Call ID 和序列化后的参数字节流传给服务端，然后再把序列化后的调用结果传回客户端。**
 
 只要能完成这两者的，都可以作为传输层使用。因此，它所使用的协议其实是不限的，能完成传输就行。
 
@@ -829,7 +826,7 @@ TCP 的连接是最常见的，简要分析基于 TCP 的连接：通常 TCP 连
 - 序列化反序列化：可以自己写，也可以使用 Protobuf 或者 FlatBuffers 之类的。
 - 网络传输库：可以自己写 Socket，或者用 Asio，ZeroMQ，Netty 之类。
 
-### RPC 核心之网络传输协议
+### （四）RPC 核心之网络传输协议
 
 在第三节中说明了要实现一个 RPC，需要选择网络传输的方式。
 
@@ -885,7 +882,7 @@ OpenStack 的 RPC 架构中，加入了消息队列 RabbitMQ，这样做的目�
 
 角色分担如下图：
 
-[![img](https://s5.51cto.com/oss/201906/17/ababe901923446f86331282ccc82fe37.jpg-wh_600x-s_317456051.jpg)](https://s5.51cto.com/oss/201906/17/ababe901923446f86331282ccc82fe37.jpg-wh_600x-s_317456051.jpg)
+![img](RPC.resource/ababe901923446f86331282ccc82fe37.jpg-wh_600x-s_317456051.jpg)
 
 图 11：RabbitMQ 在 RPC 中角色
 
@@ -908,7 +905,7 @@ RabbitMQ 使用 Exchange(交换机)和 Queue(队列)来实现消息队列。
 
 基于这三种交换机类型，OpenStack 完成两种 RPC 的调用方式。首先简单介绍三种交换机。
 
-[![img](https://s4.51cto.com/oss/201906/17/76c9fc811719eb8ba9c56ad79309d25d.jpg-wh_600x-s_2543032175.jpg)](https://s4.51cto.com/oss/201906/17/76c9fc811719eb8ba9c56ad79309d25d.jpg-wh_600x-s_2543032175.jpg)
+![img](RPC.resource/76c9fc811719eb8ba9c56ad79309d25d.jpg-wh_600x-s_2543032175.jpg)
 
 图 12：RabbitMQ 架构图
 
@@ -916,7 +913,7 @@ RabbitMQ 使用 Exchange(交换机)和 Queue(队列)来实现消息队列。
 
 该类交换器不分析所接收到消息中的 Routing Key，默认将消息转发到所有与该交换器绑定的队列中去。
 
-[![img](https://s2.51cto.com/oss/201906/17/cd4fd25348cacd56e9fce9c5777fe6c3.jpg)](https://s2.51cto.com/oss/201906/17/cd4fd25348cacd56e9fce9c5777fe6c3.jpg)
+![img](RPC.resource/cd4fd25348cacd56e9fce9c5777fe6c3.jpg)
 
 图 13：广播式交换机
 
@@ -924,7 +921,7 @@ RabbitMQ 使用 Exchange(交换机)和 Queue(队列)来实现消息队列。
 
 该类交换器需要精确匹配 Routing Key 与 Binding Key，如消息的 Routing Key = Cloud，那么该条消息只能被转发至 Binding Key = Cloud 的消息队列中去。
 
-[![img](https://s5.51cto.com/oss/201906/17/0fa575e412a23cec3b3fa22a6b7b97bb.jpg)](https://s5.51cto.com/oss/201906/17/0fa575e412a23cec3b3fa22a6b7b97bb.jpg)
+![img](RPC.resource/0fa575e412a23cec3b3fa22a6b7b97bb.jpg)
 
 图 14：直接式交换机
 
@@ -953,7 +950,7 @@ Nova 基于 RabbitMQ 实现两种 RPC 调用：
 
 RPC.CALL 是一种双向通信流程，即 RabbitMQ 接收消息生产者生成的系统请求消息，消息消费者经过处理之后将系统相应结果反馈给调用程序。
 
-[![img](RPC.resource/06bf7f7efaac8fdf4015c093a73dc3b6.jpg-wh_600x-s_1451067491.jpg)](https://s2.51cto.com/oss/201906/17/06bf7f7efaac8fdf4015c093a73dc3b6.jpg-wh_600x-s_1451067491.jpg)
+![img](RPC.resource/06bf7f7efaac8fdf4015c093a73dc3b6.jpg-wh_600x-s_1451067491-16423260688296.jpg)
 
 图 16：RPC.CALL 原理图
 
@@ -971,7 +968,7 @@ Nova- Compute作为消费者将“虚拟机启动成功"的消息反馈给Nova-a
 
 RPC.CALL 工作原理如下图：
 
-[![img](RPC.resource/7a707824f90ab5369069164ac9af4096.jpg-wh_600x-s_1313714716.jpg)](https://s3.51cto.com/oss/201906/17/7a707824f90ab5369069164ac9af4096.jpg-wh_600x-s_1313714716.jpg)
+![img](RPC.resource/7a707824f90ab5369069164ac9af4096.jpg-wh_600x-s_1313714716-16423260579525.jpg)
 
 图 17：RPC.CALL 具体实现图
 
@@ -998,7 +995,7 @@ RPC.CAST 的远程调用流程与 RPC.CALL 类似，只是缺少了系统消息�
 
 其调用流程如图所示：
 
-[![img](RPC.resource/bf1c03b9d95c226affa623ff729eb3f3.jpg-wh_600x-s_3941992913.jpg)](https://s5.51cto.com/oss/201906/17/bf1c03b9d95c226affa623ff729eb3f3.jpg-wh_600x-s_3941992913.jpg)
+![img](RPC.resource/bf1c03b9d95c226affa623ff729eb3f3.jpg-wh_600x-s_3941992913-16423260330404.jpg)
 
 图 18：RPC.CAST 原理图
 
@@ -1010,7 +1007,7 @@ RabbitMQ 实现的 RPC 对网络的一般设计思路：消费者是长连接，
 
 Nova 中 RPC 代码设计：
 
-[![img](RPC.resource/d0e57d66070d27e299d1fa81ef656e3d.jpg-wh_600x-s_1537685190.jpg)](https://s2.51cto.com/oss/201906/17/d0e57d66070d27e299d1fa81ef656e3d.jpg-wh_600x-s_1537685190.jpg)
+![img](RPC.resource/d0e57d66070d27e299d1fa81ef656e3d.jpg-wh_600x-s_1537685190-16423260126063.jpg)
 
 **简单对比 RPC 和 Restful API**
 

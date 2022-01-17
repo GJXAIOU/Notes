@@ -6,40 +6,90 @@
 
 ## 一、Nginx 简介
 
-#### 1、概念
+#### （一）概念
 
-- Nginx ("engine x")是一个**高性能的 HTTP 和 反向代理 服务器**，特点是占有内存少，并发能力强。
+- Nginx （`engine x`)是一个**高性能的 HTTP 和 反向代理 服务器**，特点是占有内存少，并发能力强。
+
 - Nginx 专为性能优化而开发，性能是其最重要的考量，实现上非常注重效率，能经受高负载的考验，有报告表明能支持高达50000个并发连接数。
 
 - Nginx 可以作为静态页面的 web 服务器，但是不支持 java  Java 程序只能通过与  tomcat 配合完成。 
 
-具体的介绍和优缺点 [请点击这里](https://www.lnmp.org/nginx.html)
+- Nginx Plus（NP）是开源 Nginx 对应的商业版本，NGINX 与 NGINX Plus 的关键指标对比：
 
-#### 2、反向代理
+    - **方便**作为目前市场上最快的 Web 服务器，NGINX Plus 为你带来了 NGINX 开源的所有功能以及额外的**企业级功能**，例如 DNS 系统发现、会话持久性、主动健康检查和高可用性。
+    - **NGINX 专家的支持**使用 NGINX 开源许可证，你可以从社区贡献中受益，而使用 NGINX Plus，你可以获得 NGINX 工程师的 24×7 商业支持。
+    - **高级功能**NGINX Plus 结合了一个强大的负载均衡器，该负载均衡器具有高度可扩展性并加速缓存，为你的 Web 应用程序创建一个安全的端到端平台。NGINX Plus 建立在 NGINX 开源之上，提供高性能 Web 服务器的功能。
+    - **管理发布**为了为客户快速变化的需求构建和测试新的 NGINX 二进制文件，NGINX Plus 及时推出确保整个生态系统安全的版本。
+    - **应用交付能力**NGINX 还在为 NGINX Plus 开发应用程序交付功能。负载均衡软件提供商已经为 NGINX Plus 添加了会话持久性和健康监控功能。该公司正在为其添加更多你无法在 Web 服务器中看到的功能。
+    - **安全**为了保护数据功能，NGINX 与 ModSecurity WAF 合作。这也是NGINX Plus用户专属的服务功能。使用 ModSecurity WAF，你可以获得 7 层攻击保护。
 
-**a. 正向代理**
-需要在客户端(浏览器)配置代理服务器，然后通过代理服务器进行互联网访问
+    | **特征**                                             | **NGINX 开源** | **NGINX Plus** |
+    | ---------------------------------------------------- | -------------- | -------------- |
+    | **负载均衡器**                                       |                |                |
+    | 会话持久性                                           | 是的           | 是的           |
+    | TCP/UDP、HTTP 支持                                   | 是的           | 是的           |
+    | DNS 和服务发现的集成                                 | 是的           | 不             |
+    | 主动健康检查                                         | 不             | 是的           |
+    | **内容缓存**                                         |                |                |
+    | 缓存清除API                                          | 不             | 是的           |
+    | 缓存静态和动态内容                                   | 是的           | 是的           |
+    | **反向代理和网络服务器**                             |                |                |
+    | HTTP/2 网关                                          | 是的           | 是的           |
+    | HTTP/2 服务器推送                                    | 是的           | 是的           |
+    | **安全控制**                                         |                |                |
+    | RSA/TLS/ECC SSL 卸载双栈                             | 是的           | 是的           |
+    | 限速                                                 | 是的           | 是的           |
+    | NGINX App Protect 附加费用                           | 不             | 是的           |
+    | OpenID Connect 的单点登录 (SSO)                      | 不             | 是的           |
+    | JWT认证                                              | 不             | 是的           |
+    | **监控**                                             |                |                |
+    | 导出到外部监控工具                                   | 是的           | 是的           |
+    | 100+ 的扩展状态                                      | 不             | 是的           |
+    | 内置仪表板                                           | 不             | 是的           |
+    | **高可用性 (HA)**                                    |                |                |
+    | 集群智能配置同步                                     | 不             | 是的           |
+    | 用于粘性学习会话持久性的状态共享。速率限制和键值存储 | 不             | 是的           |
+    | 主动-主动模式和主动-被动模式                         | 不             | 是的           |
+    | **可编程性**                                         |                |                |
+    | 不包括进程重新加载的动态重新配置                     | 不             | 是的           |
+    | NGINX JavaScript 模块                                | 是的           | 是的           |
+    | 键值存储                                             | 不             | 是的           |
+    | 使用 NGINX Plus API 动态重新配置                     | 不             | 是的           |
+    | **流媒体**                                           |                |                |
+    | MP4 带宽控制                                         | 不             | 是的           |
+    | 自适应比特率 VOD，如 HLS、HDS                        | 不             | 是的           |
+    | RTMP、HLS、DASH 直播                                 | 是的           | 是的           |
+    | **第三方生态系统**                                   |                |                |
+    | 商业支持                                             | 不             | 是的           |
+    | 入口控制器                                           | 是的           | 是的           |
+
+具体的介绍和优缺点 [请点击这里](https://www.lnmp.org/nginx.html)，官方文档地址：https://nginx.org/en/docs/
+
+#### （二）反向代理
+
+**1.正向代理**
+需要**在客户端（浏览器）配置代理服务器**，然后通过代理服务器进行互联网访问。
 
 ![image-20201128122820351](Nginx笔记.resource/image-20201128122820351.png)
 
-**b. 反向代理**
-反向代理：客户端对代理是无感知的，因为**客户端不需要任何配置就可以访问**，我们只需要将请求发送到反向代理服务器，由反向代理服务器去选择目标服务器获取数据后,在返回给客户端，此时反向代理服务器和目标服务器对外就是一个服务器，暴露的是代理服务器地址，隐藏了真实服务器IP地址。
+**2. 反向代理**
+反向代理：客户端对代理是无感知的，因为**客户端不需要任何配置就可以访问**，我们只需要将请求发送到反向代理服务器，由反向代理服务器去选择目标服务器获取数据后，在返回给客户端，此时反向代理服务器和目标服务器对外就是一个服务器，暴露的是代理服务器地址，隐藏了真实服务器 IP 地址。
 
 ![反向代理](Nginx笔记.resource/image-20200606150932688.png)
 
-#### 3、负载均衡
+#### （三）负载均衡
 
-通过增加服务器的数量，然后将请求分发到各个服务器上,将原先请求集中到单个服务器上的情况改为将请求分发到多个服务器上,将负载分发到不同的服务器，也就是我们所说的负载均衡
+通过增加服务器的数量，然后将请求分发到各个服务器上，将原先请求集中到单个服务器上的情况改为将请求分发到多个服务器上，将负载分发到不同的服务器，也就是我们所说的负载均衡。
 
 ![负载均衡](Nginx笔记.resource/image-20200606154956614.png)
 
-#### 4、动静分离
+#### （四）动静分离
 
 为了加快网站的解析速度，可以**把动态页面和静态页面由不同的服务器来解析**，加快解析速度。降低原来单个服务器的压力。
 
 ![动静分离](Nginx笔记.resource/image-20200606155620164.png)
 
-## 一、安装 Nginx
+## 二、安装 Nginx
 
 ### （一）Docker 安装
 
@@ -91,9 +141,7 @@ firewall-cmd --reload
 
 访问：`http://192.168.238.151:80` 或者 `http://192.168.238.151` 。如果看到 Nginx 的欢迎页面就 OK 了。
 
-
-
-## 二、Nginx 常用命令
+## 三、Nginx 常用命令
 
 #### 使用 Docker 命令
 
@@ -153,7 +201,7 @@ docker exec -it 容器id bash
 
 - 重新加载 nginx：`./nginx -s reload`
 
-## 三、nginx.conf 配置文件
+## 四、nginx.conf 配置文件
 
 配置文件的位置：`vim /usr/local/nginx/conf/nginx.conf`，配置文件中的内容共包含三部分
 
@@ -321,13 +369,13 @@ docker exec -it 容器id bash
 
             这块的主要作用是基于 Nginx 服务器接收到的请求字符串（例如 server_name/uri-string），对虚拟主机名称（也可以是 IP 别名）之外的字符串（例如 前面的 /uri-string）进行匹配，对特定的请求进行处理。地址定向、数据缓存和应答控制等功能，还有许多第三方模块的配置也在这里进行。
 
-## 四、Nginx 反向代理实例 
+## 五、Nginx 反向代理实例 
 
-### 1、实现效果
+### （一）实现效果
 
 打开浏览器，在浏览器地址栏输入地址 www.123.com，跳转到 liunx 系统 tomcat 主页面中
 
-### 2、准备工作
+### （二）准备工作
 
 - 在 liunx 系统安装 tomcat，使用默认端口 8080
 
@@ -347,11 +395,11 @@ docker exec -it 容器id bash
 
 - 在 windows 系统中通过浏览器访问 tomcat 服务器
 
-### 3、访问过程的分析
+### （三）访问过程的分析
 
  ![img](Nginx笔记.resource/1455597-20191029103129000-1647870419.png)
 
-### 4、具体配置
+### （四）具体配置
 
 第一步 在 windows 系统的 host 文件进行域名和 ip 对应关系的配置，文件位置为：`c://Windows/System32/drivers/etc/HOSTS`
 
@@ -374,9 +422,9 @@ server{
 }
 ```
 
-### 5、最终测试
+### （五）最终测试
 
- ![img](https://img2018.cnblogs.com/blog/1455597/201910/1455597-20191029103210478-1402408403.png)
+ ![img](Nginx笔记.resource/1455597-20191029103210478-1402408403.png)
 
 **补充`location`部分**
 
@@ -398,11 +446,11 @@ location [ = | ~ | ~* | ^~] uri {
 注意: 如果uri包含正则表达式，则必须要有~或者~*标识。
 ```
 
-### 
 
-## 五、Nginx 反向代理实例 2
 
-### 1、实现效果
+## 六、Nginx 反向代理实例 2
+
+### （一）实现效果
 
 使用 nginx 反向代理，根据访问的路径跳转到不同端口的服务中
 
@@ -412,61 +460,57 @@ nginx 监听端口为 9001，
 
 访问`http:// 192.168.17.129:9001/vod/` 直接跳转到 `127.0.0.1:8081`
 
-### 2、准备工作
+### （二）准备工作
 
-（1）准备两个 tomcat 服务器，一个 8080 端口，一个 8081 端口，需要修改配置文件进行修改
+- 准备两个 tomcat 服务器，一个 8080 端口，一个 8081 端口，需要修改配置文件进行修改
 
-（2）创建文件夹和测试页面
+- 创建文件夹和测试页面
 
-分别在 8080 的 tomcat 的服务器和 8081 的服务器的 webapps 目录下面新建文件夹 `edu` 和 `vod`，然后里面分别放上两个 HTML 页面。
+    分别在 8080 的 tomcat 的服务器和 8081 的服务器的 webapps 目录下面新建文件夹 `edu` 和 `vod`，然后里面分别放上两个 HTML 页面。
 
-### 3、具体配置
+### （三）具体配置
 
-（1）找到 nginx 配置文件，进行反向代理配置
+- 找到 nginx 配置文件，进行反向代理配置
 
-```shell
-# 可以在配置文件中直接新增一个 server 配置
-server{
-	listen       9001;
-	server_name  192.168.17.129;
-	
-	location ~ /edu/ {
-		proxy_pass http://127.0.0.1:8080;
-	}
-	
-	location ~ /vod/ {
-		proxy_pass http://127.0.0.1:8081;
-	}
-}
-```
+    ```xml
+    # 可以在配置文件中直接新增一个 server 配置
+    server{
+    	listen       9001;
+    	server_name  192.168.17.129;
+    	
+    	location ~ /edu/ {
+    		proxy_pass http://127.0.0.1:8080;
+    	}
+    	
+    	location ~ /vod/ {
+    		proxy_pass http://127.0.0.1:8081;
+    	}
+    }
+    ```
 
-（2）开放对外访问的端口号 9001 8080 8081
+- 开放对外访问的端口号 9001 8080 8081
 
-### 4、最终测试
+### （四）最终测试
 
- ![img](https://img2018.cnblogs.com/blog/1455597/201910/1455597-20191029103245851-2135151223.png)
+ ![img](Nginx笔记.resource/1455597-20191029103245851-2135151223.png)
 
- 
 
- 
 
-## 六、Nginx 配置实例-负载均衡
+## 七、Nginx 配置实例-负载均衡
 
-### 1、实现效果
+### （一）实现效果
 
-（1）浏览器地址栏输入地址 `http://192.168.17.129/edu/a.html`，负载均衡效果，平均 8080
+浏览器地址栏输入地址 `http://192.168.17.129/edu/a.html`，负载均衡效果，平均 8080 和 8081 端口中
 
-和 8081 端口中
+### （二）准备工作
 
-### 2、准备工作
+- 准备两台 tomcat 服务器，一台 8080，一台 8081
 
-（1）准备两台 tomcat 服务器，一台 8080，一台 8081
-
-（2）在两台 tomcat 里面 webapps 目录中，都创建名称是 edu 文件夹，在 edu 文件夹中创建
+- 在两台 tomcat 里面 webapps 目录中，都创建名称是 edu 文件夹，在 edu 文件夹中创建
 
 页面 a.html，用于测试，都创建 vod 文件夹与对应的 HTML 文件
 
-### 3、在 nginx 的配置文件中进行负载均衡的配置
+### （三）在 nginx 的配置文件中进行负载均衡的配置
 
 ```shell
 http{
@@ -491,86 +535,70 @@ http{
 }
 ```
 
-### 4、nginx 分配服务器策略
+### （四）nginx 分配服务器策略
 
-#### 第一种 轮询（默认）
+- 第一种 轮询（默认）
 
-每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器 down 掉，能自动剔除。
+    每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器 down 掉，能自动剔除。
 
-#### 第二种 weight
+- 第二种 weight
 
-weight 代表权重默认为 1,权重越高被分配的客户端越多
+    weight 代表权重默认为 1，权重越高被分配的客户端越多。
 
-```shell
-upstream myserver{
-	server 192.168.17.129 weight=10;
-	server 192.168.17.131 weight=10;
-}
-```
+    ```xml
+    upstream myserver{
+    	server 192.168.17.129 weight=10;
+    	server 192.168.17.131 weight=10;
+    }
+    ```
 
-#### 第三种 ip_hash
+- 第三种 ip_hash
 
-每个请求按访问 ip 的 hash 结果分配，这样每个访客固定访问一个后端服务器
+    每个请求按访问 ip 的 hash 结果分配，这样每个访客固定访问一个后端服务器
 
-```shell
-upstream myserver{
-	ip_hash;
-	server 192.168.17.129:80;
-	server 192.168.17.131:80;
-}
-```
+    ```shell
+    upstream myserver{
+    	ip_hash;
+    	server 192.168.17.129:80;
+    	server 192.168.17.131:80;
+    }
+    ```
 
-#### 第四种 fair（第三方）
+- 第四种 fair（第三方）
 
-按后端服务器的响应时间来分配请求，响应时间短的优先分配。
+    按后端服务器的响应时间来分配请求，响应时间短的优先分配。
 
-```shell
-upstream myserver{
-	server 192.168.17.129:80;
-	server 192.168.17.131:80;
-	fair;
-}
-```
+    ```xml
+    upstream myserver{
+    	server 192.168.17.129:80;
+    	server 192.168.17.131:80;
+    	fair;
+    }
+    ```
 
-## 七、Nginx 配置实例-动静分离
+## 八、Nginx 配置实例-动静分离
 
-### 1、什么是动静分离
+### （一）动静分离含义
 
- ![img](https://img2018.cnblogs.com/blog/1455597/201910/1455597-20191029103503613-506507153.png)
+ ![img](Nginx笔记.resource/1455597-20191029103503613-506507153.png)
 
-Nginx 动静分离简单来说就是把**动态跟静态请求**分开，不能理解成只是单纯的把动态页面和
+Nginx 动静分离简单来说就是把**动态跟静态请求**分开，**不能理解成只是单纯的把动态页面和静态页面物理分离**。严格意义上说应该是动态请求跟静态请求分开，可以理解成使用 Nginx 处理静态页面，Tomcat 处理动态页面。
 
-静态页面物理分离。严格意义上说应该是动态请求跟静态请求分开，可以理解成使用 Nginx
+动静分离从目前实现角度来讲大致分为两种：
 
-处理静态页面，Tomcat 处理动态页面。动静分离从目前实现角度来讲大致分为两种，
+- 一种是纯粹把静态文件独立成单独的域名，放在独立的服务器上，也是目前主流推崇的方案；
 
-一种是纯粹把静态文件独立成单独的域名，放在独立的服务器上，也是目前主流推崇的方案；
+- 另外一种方法就是动态跟静态文件混合在一起发布，通过 nginx 来分开。
 
-另外一种方法就是动态跟静态文件混合在一起发布，通过 nginx 来分开。
+通过 location 指定不同的后缀名实现不同的请求转发。通过 expires 参数设置，可以使浏览器缓存过期时间，减少与服务器之前的请求和流量。具体 Expires 定义：是给一个资源设定一个过期时间，也就是说无需去服务端验证，直接通过浏览器自身确认是否过期即可，所以不会产生额外的流量。此种方法非常适合不经常变动的资源。（如果经常更新的文件，不建议使用 Expires 来缓存），我这里设置 3d，表示在这 3 天之内访问这个 URL，发送一个请求，比对服务器该文件最后更新时间没有变化，则不会从服务器抓取，返回状态码 304，如果有修改，则直接从服务器重新下载，返回状态码 200。
 
- 
-
-通过 location 指定不同的后缀名实现不同的请求转发。通过 expires 参数设置，可以使浏
-
-览器缓存过期时间，减少与服务器之前的请求和流量。具体 Expires 定义：是给一个资源
-
-设定一个过期时间，也就是说无需去服务端验证，直接通过浏览器自身确认是否过期即可，
-
-所以不会产生额外的流量。此种方法非常适合不经常变动的资源。（如果经常更新的文件，
-
-不建议使用 Expires 来缓存），我这里设置 3d，表示在这 3 天之内访问这个 URL，发送一
-
-个请求，比对服务器该文件最后更新时间没有变化，则不会从服务器抓取，返回状态码 304，
-
-如果有修改，则直接从服务器重新下载，返回状态码 200。
-
-### 2、准备工作
+### （二）准备工作
 
 在 liunx 系统中准备静态资源，用于进行访问。这里是在根目录下面新建 data 文件夹。其中 www 中放入一个 HTML 文件，然后在 image 文件夹中放入图片资源。
 
- ![img](https://img2018.cnblogs.com/blog/1455597/201910/1455597-20191029103551408-155195568.png)
+ ![img](Nginx笔记.resource/1455597-20191029103551408-155195568.png)
 
-### 3、具体配置
+### （三）具体配置
 
 在 nginx 配置文件中进行配置
 
@@ -592,9 +620,7 @@ server{
 }
 ```
 
-
-
-### 4、最终测试
+### （四）最终测试
 
 （1）浏览器中输入地址`http://192.168.17.129/image/01.jpg`
 
@@ -612,28 +638,25 @@ server{
 
 了，不走后端 tomcat 服务器
 
+### （五）Nginx 配置高可用集群
 
+#### 1.nginx 高可用含义
 
+- 需要两台 nginx 服务器
+- 需要 keepalived
+- 需要虚拟 ip
 
+![img](Nginx笔记.resource/image-20200607205253505-16423038722545.png)
 
-### 六、Nginx配置高可用集群
+#### 2.配置高可用的准备工作
 
-- 1、什么是nginx高可用
+- 需要两台服务器 192.168.17.129 和 192.168.17.131
+- 在两台服务器安装 nginx
+- 在两合服务器安装keepalived
 
-![img](Nginx笔记.resource/image-20200607205253505.png)
+#### 3.在两台服务器安装 keepalived
 
-> (1) 需要两台 nginx 服务器。
-> (2) 需要 keepalived
-> (3) 需要虚拟 ip
-
-- 2、配置高可用的准备工作
-
-> (1) 需要两台服务器 192.168.17.129 和 192.168.17.131
-> (2) 在两台服务器安装nginx.
-> (3) 在两合服务器安装keepalived.
-
-- 3、在两台服务器安装 keepalived
-    使用yum命令进行安装
+使用yum命令进行安装
 
 ```shell
 $ yum install keepalived
@@ -644,123 +667,118 @@ $ rpm -q -a keepalived    #查看是否已经安装上
 
 安装之后，在etc里面生成目录keepalived, 有配置文件keepalived.conf
 
-- 4、完成高可用配置(主从配置)
+#### 4.完成高可用配置(主从配置)
 
-（1）修改keepalived的配置文件`keepalived.conf`为：
+- 修改keepalived的配置文件`keepalived.conf`为：
 
-```shell
-global_defs {
-	notification_email {
-	  acassen@firewall.loc
-	  failover@firewall.loc
-	  sysadmin@firewall.loc
-	}
-	notification_email_from Alexandre.Cassen@firewall.loc
-	smtp_ server 192.168.17.129
-	smtp_connect_timeout 30
-	router_id LVS_DEVEL	# LVS_DEVEL 这字段在 /etc/hosts文件中看；通过它访问到主机。需要在 Linux 的 host 文件（vim /etc/hosts） 中指定 IP 地址和名称：127.0.0.1  LVS_DEVEL
-}
-
-vrrp_script chk_http_ port {
-	script "/usr/local/src/nginx_check.sh"
-	interval 2   # (检测脚本执行的间隔)2s
-	weight 2  # 权重，如果这个脚本检测为真，当前服务器权重+2
-}
-
-vrrp_instance VI_1 {
-	state BACKUP   # 设置该服务器是主还是备份服务器。备份服务器上将MASTER 改为BACKUP
-	interface ens33 # 网卡名称，使用 ifconfig 查看
-	virtual_router_id 51 # 主、备机的virtual_router_id必须相同
-	priority 100   #主、备机取不同的优先级，主机值较大，备份机值较小
-	advert_int 1	#每隔1s发送一次心跳
-	authentication {	# 校验方式， 类型是密码，密码1111
-        auth type PASS
-        auth pass 1111
+    ```xml
+    global_defs {
+    	notification_email {
+    	  acassen@firewall.loc
+    	  failover@firewall.loc
+    	  sysadmin@firewall.loc
+    	}
+    	notification_email_from Alexandre.Cassen@firewall.loc
+    	smtp_ server 192.168.17.129
+    	smtp_connect_timeout 30
+    	router_id LVS_DEVEL	# LVS_DEVEL 这字段在 /etc/hosts文件中看；通过它访问到主机。需要在 Linux 的 host 文件（vim /etc/hosts） 中指定 IP 地址和名称：127.0.0.1  LVS_DEVEL
     }
-	virtual_ipaddress { # 虛拟ip
-		192.168.17.50  # VRRP H虛拟ip地址
-	}
-}
-```
+    
+    vrrp_script chk_http_ port {
+    	script "/usr/local/src/nginx_check.sh"
+    	interval 2   # (检测脚本执行的间隔)2s
+    	weight 2  # 权重，如果这个脚本检测为真，当前服务器权重+2
+    }
+    
+    vrrp_instance VI_1 {
+    	state BACKUP   # 设置该服务器是主还是备份服务器。备份服务器上将MASTER 改为BACKUP
+    	interface ens33 # 网卡名称，使用 ifconfig 查看
+    	virtual_router_id 51 # 主、备机的virtual_router_id必须相同
+    	priority 100   #主、备机取不同的优先级，主机值较大，备份机值较小
+    	advert_int 1	#每隔1s发送一次心跳
+    	authentication {	# 校验方式， 类型是密码，密码1111
+            auth type PASS
+            auth pass 1111
+        }
+    	virtual_ipaddress { # 虛拟ip
+    		192.168.17.50  # VRRP H虛拟ip地址
+    	}
+    }
+    ```
 
-（2）在路径/usr/local/src/ 下新建检测脚本 nginx_check.sh
+- 在路径/usr/local/src/ 下新建检测脚本 nginx_check.sh，内容如下：
 
-nginx_check.sh
+    ```shell
+    #! /bin/bash
+    A=`ps -C nginx -no-header | wc - 1`
+    if [ $A -eq 0];then
+    	/usr/local/nginx/sbin/nginx
+    	sleep 2
+    	if [`ps -C nginx --no-header| wc -1` -eq 0 ];then
+    		killall keepalived
+    	fi
+    fi
+    ```
 
-```shell
-#! /bin/bash
-A=`ps -C nginx -no-header | wc - 1`
-if [ $A -eq 0];then
-	/usr/local/nginx/sbin/nginx
-	sleep 2
-	if [`ps -C nginx --no-header| wc -1` -eq 0 ];then
-		killall keepalived
-	fi
-fi
-```
+- 把两台服务器上 nginx 和 keepalived 启动
 
-(3) 把两台服务器上nginx和keepalived启动
+    ```shell
+    $ systemctl start keepalived.service		#keepalived启动
+    $ ps -ef I grep keepalived		#查看keepalived是否启动
+    ```
 
-```shell
-$ systemctl start keepalived.service		#keepalived启动
-$ ps -ef I grep keepalived		#查看keepalived是否启动
-```
+#### 5.最终测试
 
-**5、最终测试**
+- 在浏览器地址栏输入虚拟 ip 地址 192.168.17.50
 
-(1) 在浏览器地址栏输入虚拟ip地址192.168.17.50
+- 把主服务器(192.168.17.129) nginx和keealived停止，再输入192.168.17.50
 
-(2) 把主服务器(192.168.17.129) nginx和keealived停止，再输入192.168.17.50.
+    ```shell
+    $ systemctl stop keepalived.service  #keepalived停止
+    ```
 
-```shell
-$ systemctl stop keepalived.service  #keepalived停止
-```
+## 九、nginx 原理
 
-
-
-## 八、nginx 原理
-
-### 1、mater 和 worker
+### （一）mater 和 worker
 
 通过命令：`ps -ef | grep nginx` 查看 Nginx 进程
 
- ![img](https://img2018.cnblogs.com/blog/1455597/201910/1455597-20191029103710873-640599395.png)
+ ![img](Nginx笔记.resource/1455597-20191029103710873-640599395.png)
 
  
 
- ![img](Nginx笔记.resource/1455597-20191029103717881-58535625.png)
+ ![img](Nginx笔记.resource/1455597-20191029103717881-58535625-16423043004337.png)
 
-### 2、worker 如何进行工作的
+### （二）worker 如何进行工作的
 
-![img](Nginx笔记.resource/1455597-20191029103730680-1429030716.png)
+![img](Nginx笔记.resource/1455597-20191029103730680-1429030716-16423043039598.png)
 
 
 
-### 3、一个 master 和多个 woker 有好处
+### （三）一个 master 和多个 woker 有好处
 
-（1）可以使用 nginx –s reload 热部署，利用 nginx 进行热部署操作
+- 可以使用 `nginx –s reload` 热部署，利用 nginx 进行热部署操作
 
-（2）每个 woker 是独立的进程，如果有其中的一个 woker 出现问题，其他 woker 独立的，继续进行争抢，实现请求过程，不会造成服务中断
+- 每个 woker 是独立的进程，如果有其中的一个 woker 出现问题，其他 woker 独立的，继续进行争抢，实现请求过程，不会造成服务中断
 
-### 4、设置多少个 woker 合适
+### （四）设置多少个 woker 合适
 
 worker 数和服务器的 cpu 数相等是最为适宜的
 
-Nginx同redis类似都采用了io多路复用机制，每个worker都是一个独立的进程， 但每个进程里只有一个主线程，通过异步非阻塞的方式来处理请求，即使是 千上万个请求也不在话下。每个worker的线程可以把一个cpu的性能发挥到极致。所以worker数和服务器的cpu数相等是最为适宜的。设少了会浪费cpu,设多了会造成cpu频繁切换上下文带来的损耗。
+Nginx 同 redis 类似都采用了 io 多路复用机制，每个 worker 都是一个独立的进程， 但每个进程里只有一个主线程，通过异步非阻塞的方式来处理请求，即使是 千上万个请求也不在话下。每个worker的线程可以把一个cpu的性能发挥到极致。所以worker数和服务器的cpu数相等是最为适宜的。设少了会浪费cpu,设多了会造成cpu频繁切换上下文带来的损耗。
 
-设置worker数量
-
+```shell
+# 设置worker数量
 worker.processes 4 
 
-work绑定cpu(4work绑定4cpu)
-
+# work绑定cpu(4work绑定4cpu)
 worker_cpu_affinity 0001 0010 0100 1000
 
-work绑定cpu (4work绑定8cpu中的4个)
-
+# work绑定cpu (4work绑定8cpu中的4个)
 worker_cpu_affinity 0000001 00000010 00000100 00001000
+```
 
-### 5、连接数 worker_connection
+### （五）连接数 worker_connection
 
 第一个：发送请求，占用了 woker 的几个连接数？
 
@@ -768,7 +786,7 @@ worker_cpu_affinity 0000001 00000010 00000100 00001000
 
 两个：如果访问的是静态资源，则只有请求和响应（直接从静态资源服务器中得到资源进行返回）
 
- ![img](https://img2018.cnblogs.com/blog/1455597/201910/1455597-20191029103745507-149451607.png)
+ ![img](Nginx笔记.resource/1455597-20191029103745507-149451607.png)
 
 第二个：nginx 有一个 master，有四个 woker，每个 woker 支持最大的连接数 1024，支持的
 

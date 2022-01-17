@@ -468,7 +468,7 @@ localhost:7001
 
 ## Dubbo与SpringBoot整合
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612152443622.png)
+![在这里插入图片描述](Dubbo 笔记.resource/20200612152443622.png)
 
 ### boot-user-service-provider 服务提供者
 
@@ -657,14 +657,14 @@ public class BootConsumerApplication {
 配置完毕，此时启动zookeeper注册中心及监控。
 启动springboot配置的服务提供者和消费者
 在浏览器输入 localhost:7001 查看结果
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612143106487.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)http://localhost:8081/initOrder?uid=1 查询到地址信息
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612143122487.png)duboo的springboot整合配置完成。
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70.png)http://localhost:8081/initOrder?uid=1 查询到地址信息
+![在这里插入图片描述](Dubbo 笔记.resource/20200612143122487.png)duboo的springboot整合配置完成。
 
 ## Dubbo配置
 
 dubbo配置官网参考：http://dubbo.apache.org/zh-cn/docs/user/references/xml/dubbo-service.html
 **1、配置原则**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612152343133.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232625705613.png)
 JVM 启动 -D 参数优先，这样可以使用户在部署和启动时进行参数重写，比如在启动时需改变协议的端口。
 XML 次之，如果在 XML 中有配置，则 dubbo.properties 中的相应配置项无效。
 Properties 最后，相当于缺省值，只有 XML 没有配置时，dubbo.properties 的相应配置项才会生效，通常用于共享公共配置，比如应用名。
@@ -711,15 +711,15 @@ dubbo推荐在Provider上尽量多配置Consumer端属性
 1. 方法级配置别优于接口级别，即小Scope优先
 2. Consumer端配置 优于 Provider配置 优于 全局配置，
 3. 最后是Dubbo Hard Code的配置值（见配置文档）
-    ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612160853853.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)**多版本控制**
+    ![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232626230815.png)**多版本控制**
     [
     http://dubbo.apache.org/zh-cn/docs/user/demos/multi-versions.html](http://dubbo.apache.org/zh-cn/docs/user/demos/multi-versions.html)
     在服务提供者中复制多个impl。起不同的名字
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612163440781.png)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612163456305.png)配置多个文件的路径及信息。
+![在这里插入图片描述](Dubbo 笔记.resource/20200612163440781.png)
+![在这里插入图片描述](Dubbo 笔记.resource/20200612163456305-164232627220019.png)配置多个文件的路径及信息。
 服务消费者调用时，可自由配置版本
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612163603598.png)
+![在这里插入图片描述](Dubbo 笔记.resource/20200612163603598.png)
 
 ### dubbo与springboot整合的三种方式
 
@@ -758,18 +758,18 @@ zookeeper宕机与dubbo直连
 **负载均衡策略如下**
 
 **Random LoadBalance 基于权重的随机负载均衡机制**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612180908789.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232627988022.png)
 `随机，按权重设置随机概率。 在一个截面上碰撞的概率高，但调用量越大分布越均匀，而且按概率使用权重后也比较均匀，有利于动态调整提供者权重。`
 
 **RoundRobin LoadBalance 基于权重的轮询负载均衡机制**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612180928170.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232628193424.png)
 `轮循，按公约后的权重设置轮循比率。 存在慢的提供者累积请求的问题，比如：第二台机器很慢，但没挂，当请求调到第二台时就卡在那，久而久之，所有请求都卡在调到第二台上。`
 
 **LeastActive LoadBalance最少活跃数负载均衡机制**
 `最少活跃调用数，相同活跃数的随机，活跃数指调用前后计数差。 使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。`
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612180951468.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232628441926.png)
 **ConsistentHash LoadBalance一致性hash 负载均衡机制**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612181007825.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232628692628.png)
 `一致性 Hash，相同参数的请求总是发到同一提供者。 当某一台提供者挂时，原本发往该提供者的请求，基于虚拟节点，平摊到其它提供者，不会引起剧烈变动。算法参见：http://en.wikipedia.org/wiki/Consistent_hashing 缺省只对第一个参数 Hash，如果要修改，请配置 <dubbo:parameter key="hash.arguments" value="0,1" /> 缺省用 160 份虚拟节点，如果要修改，请配置 <dubbo:parameter key="hash.nodes" value="320" />`
 
 ## 整合hystrix，服务熔断与降级处理
@@ -897,8 +897,8 @@ public class HelloServiceImpl implements HelloService {
 
 ### RPC原理
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613170846919.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
-一次完整的RPC调用流程（同步调用，异步另说）如下：
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232629483430.png)
+一次完整的RPC调用流程（同步调用，异步另说)如下：
 
 1. **服务消费方（client）调用以本地调用方式调用服务；**
 2. client stub接收到调用后负责将方法、参数等组装成能够进行网络传输的消息体；
@@ -916,19 +916,19 @@ dubbo只用了两步1和8，中间的过程是透明的看不到的。RPC框架�
 
 Netty是一个异步事件驱动的网络应用程序框架， 用于快速开发可维护的高性能协议服务器和客户端。它极大地简化并简化了TCP和UDP套接字服务器等网络编程。
 **BIO：(Blocking IO)**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171108394.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)NIO (Non-Blocking IO)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171138127.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)Selector 一般称 为选择器 ，也可以翻译为 多路复用器，
-Connect（连接就绪）、Accept（接受就绪）、Read（读就绪）、Write（写就绪）
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232629976432.png)NIO (Non-Blocking IO)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232630256434.png)Selector 一般称 为选择器 ，也可以翻译为 多路复用器，
+Connect（连接就绪）、Accept（接受就绪）、Read（读就绪）、Write（写就绪)
 
 **Netty基本原理：**
 netty基本原理，可参考https://www.sohu.com/a/272879207_463994
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171217369.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232630663136.png)
 
 ## dubbo原理
 
 ### 1.dubbo原理 -框架设计
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171327533.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232631037738.png)
 
 - config 配置层：对外配置接口，以 ServiceConfig, ReferenceConfig 为中心，可以直接初始化配置类，也可以通过 spring 解析配置生成配置类
 - proxy 服务代理层：服务接口透明代理，生成服务的客户端 Stub 和服务器端 Skeleton, 以 ServiceProxy 为中心，扩展接口为 ProxyFactory
@@ -942,16 +942,16 @@ netty基本原理，可参考https://www.sohu.com/a/272879207_463994
 
 ### 2.dubbo原理 -启动解析、加载配置信息
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171545504.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232632072940.png)
 
 ### 3.dubbo原理 -服务暴露
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171614614.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232632382942.png)
 
 ### 4.dubbo原理 -服务引用
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171741579.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232632633244.png)
 
 ### 5.dubbo原理 -服务调用
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200613171806762.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](Dubbo 笔记.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxMTU3NTg4,size_16,color_FFFFFF,t_70-164232632873246.png)
