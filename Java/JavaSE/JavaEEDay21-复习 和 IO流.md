@@ -1,12 +1,4 @@
----
-tags: 
-- 单例
-- IO流
----
-
-
 # JavaDay21 IO 流
-@toc
 
 ## 一、 复习
 - 单例：
@@ -37,12 +29,11 @@ public class Single {
 ```
 
 ## 二、 IO流
-Input  Output
 
-- IO的参照物：当前运行程序：
+- IO（Input  Output）的参照物：当前运行程序：
   从硬盘中读取数据到内存中供程序使用： input
   从程序的内存中将数据保存到硬盘中:    output 
-    
+  
 - 按照处理的数据单位来做划分：
   - **字节流**：
     完完全全按照二进制编码格式，一个字节一个字节获取
@@ -50,7 +41,7 @@ Input  Output
   - **字符流**：
     其实也是字节操作，但是会考虑当前系统的编码问题
     会将读取的字节数据根据当前使用的字符集进行翻译
-   
+  
  - 常见的字符集：
     GBK GB2312 BIG5 UTF8
  -  **字符流 = 字节流 + 解码**；
@@ -60,21 +51,25 @@ Input  Output
 ###  （一）代码中的体现：读取文件
 - 字节流：
   输入字节流  input 从硬盘到内存的流向，读取数据操作
-     ---| InputStream 所有字节流的基类/父类   是一个抽象类
-     ------| FileInputStream 读取文件的输入字节流
-  - 字节流类：
-  	InputStream
-  		FileInputStream
-  	OutputStream
-  		FileOutputStream
-  - 操作步骤：
-    - 1.找到文件
- 	 是否是一个普通文件
- 	是否存在
- 	String字符串路径
-    - 2.创建FileInputStream 输入管道      resource 资源
-    - 3.读取文件
-    - 4.关闭管道(资源)
+  InputStream：所有字节流的基类/父类   是一个抽象类
+  FileInputStream：读取文件的输入字节流
+
+- 字节流类：
+  InputStream 与 FileInputStream
+  OutputStream 与 FileOutputStream
+
+- 操作步骤：
+  - 1.找到文件
+
+      是否是一个普通文件
+      是否存在
+      String字符串路径
+
+  - 2.创建FileInputStream 输入管道      resource 资源
+
+  - 3.读取文件
+
+  - 4.关闭管道(资源)
 
 读取示例 一：（通过循环得到所有字符）
 ```java
@@ -104,8 +99,8 @@ public class Demo1 {
 		
 		//3. 读取数据
 		int content = -1;
-		//fs.read()每次只能读取一个字节，不能读取所有的文件内容
-		//int read() 返回值就是读取到的字节数据，如果文件读取到最后，没有内容了，返回-1
+		// fs.read()每次只能读取一个字节，不能读取所有的文件内容
+		// int read() 返回值就是读取到的字节数据，如果文件读取到最后，没有内容了，返回-1
 		while ((content = fs.read()) != -1) {
 			System.out.println((char)content);
 		}
@@ -127,10 +122,9 @@ public class Demo1 {
 	public static void main(String[] args) throws IOException {	
 		readTest4();
 	}
-//可行
+
 	public static void readTest4() throws IOException {
-		
-		long start = System.currentTimeMillis(); //获取当系统时间，毫秒
+		long start = System.currentTimeMillis();
 		//1. 找到文件
 		File file = new File("C:/《红楼梦》.txt");
 		
@@ -160,28 +154,26 @@ public class Demo1 {
 ```
 
 以上代码，以 10MB 的文件读取结果：
-//readTest2(); //53363 毫秒
-//readTest4(); // 10448 毫秒
-
+readTest2()：53363 毫秒
+readTest4()：10448 毫秒
 
 ### （二）写入文件操作
+
+Output 所有输出字节流的基类，父类，抽象类
+FileOutputStream 文件输出字节流
 
 - 写入文件的操作流程：
   	1.找到要操作的文件 (文件可以存在，可以不存在，但是要求操作的文件必须有后缀名)
   	2.创建输出管道
   	3.写入数据
   	4.关闭资源  	
-  	---| Output 所有输出字节流的基类，父类，抽象类
-  	------| FileOutputStream 文件输出字节流
-  	
+  
 - FileOutputStream注意事项:	
   	1.使用FileOutputStream写入数据到文件中，该文件可以存在，可以不存在，FileOutputStream是拥有创建文件的能力
-  	2.默认情况下，FileOutputStream采用的是覆盖写入数据的方式，如果想要使用追加写,使用FileOutputStream(File file, boolean append)，添加追加写的模式	
+  	2.默认情况下，FileOutputStream 采用的是覆盖写入数据的方式，如果想要使用追加写,使用 `FileOutputStream(File file, boolean append)`，添加追加写的模式	
   	3.小写字母a ascii码是97：`0110 0001`,若写入的数据是353
   `0000 0000 0000 0000 0000 0001 0110 0001` 写入的结果都是小写字母a  			
-  	因为FileOutputStream调用write(int b)方法，**写入的数据其实是整个int数据内部二进制的低8位**，高24位对于write方法来说，是无效数据
-  			
-  	因为一个汉字在GBK编码下占用的是2个字节，在UTF8编码下占用的是3个字节,因此不能使用 write 写入。只能使用 String [] buffer = “XX“；方法
+  	因为FileOutputStream调用write(int b)方法，**写入的数据其实是整个int数据内部二进制的低8位**，高24位对于write方法来说，是无效数据。因为一个汉字在GBK编码下占用的是2个字节，在UTF8编码下占用的是3个字节,因此不能使用 write 写入。只能使用 String [] buffer = “XX“；方法
 ```java
 package com.qfedu.b_output;
 
@@ -203,7 +195,8 @@ public class Demo1 {
 		File file = new File("C:/aaa/1212.txt");
 		
 		//2. 建立输出管道
-		FileOutputStream fos = new FileOutputStream(file, true); //这时候才创建文件 ，后面没有true则是默认覆盖写入
+        // 这时候才创建文件，后面没有true则是默认覆盖写入
+		FileOutputStream fos = new FileOutputStream(file, true); 
 		
 		//3. 写入数据
 		String str = "今天双12，可以去店里买东东，便宜~~~\r\n";
@@ -242,7 +235,6 @@ public class Demo1 {
 		//4. 关闭资源
 		fos.close();
 	}
-	
 }
 
 ```
@@ -299,14 +291,16 @@ public class CopyImage {
 
 ### （一）读取数据	
  字符流读取数据，输入字符流
-  	---| Reader 输入字符流的基类/超类  抽象类
-  	------| FileReader 读取文件的输入字符流
+Reader 输入字符流的基类/超类  抽象类
+FileReader 读取文件的输入字符流
   	
+
 - 使用方式：
- 	1.找到文件：判断文件是否存在，是否是一个普通文件
- 	2.建立FileReader读取通道
- 	3.读取数据
- 	4.关闭资源
+    - 找到文件：判断文件是否存在，是否是一个普通文件
+    - 建立FileReader读取通道
+    - 读取数据
+    - 关闭资源
+
 ```java
 package com.qfedu.c_reader;
 
@@ -381,29 +375,32 @@ public class Demo1 {
 
 ### （二）写入数据
 - 输出字符流：
-  	---| Writer 输出字符流的基类/父类   抽象类
-  	------| FileWriter 文件操作的输出字符流
-  	
+  Writer 输出字符流的基类/父类   抽象类
+  FileWriter 文件操作的输出字符流
+  
 - 操作流程：
-  		1.找到目标文件
-  		2.建立输出管道
-  		3.写入数据
-  		4.关闭资源
-  		
-- [发现]
-  		1.如果写入的数据不多，程序如果中止，在目标文件中没有任何的数据，当程序继续运行，数据会写入到文件中
-  		2.如果写入数据很大，程序如果中止，可能会在目标文件中写入一部分数据，当程序继续运行之后的数据也会写入到文件中 
+  - 找到目标文件
+  - 建立输出管道
+  - 写入数据
+  - 关闭资源
+  
+- 注意
   	
+  - 如果写入的数据不多，程序如果中止，在目标文件中没有任何的数据，当程序继续运行，数据会写入到文件中；
+  - 如果写入数据很大，程序如果中止，可能会在目标文件中写入一部分数据，当程序继续运行之后的数据也会写入到文件中；
+  
 - **Java字符流的一个特征**：
   		目的是减少对于磁盘的写入操作，写入数据到硬盘是对硬盘有一定损耗的。Java中就是用了一种缓冲机制，当调用FileWriter的writer方法，并不是直接写入数据到硬盘，而是先行保存在FileWriter类对象里面 缓冲区中，这个缓冲区是一个【字符数组】，这个数组默认的元素格式【1024个字符】
-  		
+  
 - **三种情况下可以直接把数据写入到文件中**：
-  			1.关闭FileWriter资源
-  			2.缓冲区满了，会直接清空缓冲区，把数据写入到硬盘中
-  			3.调用flush方法，立即清空缓冲区，直接写入数据到硬盘
-  	
+  		
+  - 关闭 FileWriter 资源
+  
+  - 缓冲区满了，会直接清空缓冲区，把数据写入到硬盘中
+  - **调用 flush 方法，立即清空缓冲区，直接写入数据到硬盘**
+  
 - 注意事项：
-  		FileWriter在操作文件时，如果文件不存在，而且文件夹权限允许，可以直接创建文件如果想要追加写，调用FileWriter(File file. boolean append);
+  	FileWriter 在操作文件时，如果文件不存在，而且文件夹权限允许，可以直接创建文件如果想要追加写，调用 `FileWriter(File file,boolean append);`
 ```java
 package com.qfedu.d_writer;
 
@@ -497,14 +494,3 @@ public class CopyImage {
 	}
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
