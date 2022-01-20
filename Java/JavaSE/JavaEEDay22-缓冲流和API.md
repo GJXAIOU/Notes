@@ -1,26 +1,16 @@
----
-tags: 
-- IO流
-- JavaAPI
----
-# JavaEEDay22-缓冲流和API
-@toc
+
+
+# JavaEEDay22-缓冲流和 API
 
 ## 一、 IO流
-分为：输入流和输出流    
-字节流和字符流
-- 字节流：
-  - InputStream 
-      - FileInputStream
-  - OutputStream
-      - FileOutputStream
-    
-- 字符流：
-  - Reader
-      - FileReader
-  - Writer  
-      - FileWriter
+分为：输入流和输出流以及字节流和字符流
 
+- 字节流：
+  - InputStream  以及对应的 FileInputStream
+  - OutputStream 以及对应的 FileOutputStream
+- 字符流：
+  - Reader 以及对应的 FileReader
+  - Writer  以及对应的 FileWriter
 - 注意：
   - 1.使用缓冲效率更高，原因是解决了内存访问硬盘的次数过多导致的时间上的浪费，通常缓冲流使用的缓冲空间一般都是4KB或者8KB，为了迎合硬盘读取的特征，正是一个扇区的大小；
   - 2.FileWriter 不是直接把数据写入到磁盘，而是在内存中建立了一个缓冲区，用于保存用户想要写入到硬盘的数据，有三种情况才会真正的写入数据到硬盘：
@@ -34,28 +24,25 @@ tags:
 
 ## 二、缓冲
 
-昨天学习字符流和字节流的时候，发现如果使用了缓冲，时间效率更高
-  	
-Sun提供了Java自己的缓冲机制：字节缓冲流和字符缓冲流
+- Java 自身提供的缓冲机制：字节缓冲流和字符缓冲流
 
----| InputStream 输入字节流的基类/超类 抽象类
-------| FileInputStream 文件操作的字节输入流
-------| BufferedInputStream 缓冲输入字节流，在缓冲字符流对象中，底层维护了一个8kb缓冲字节数组
+    InputStream 输入字节流的基类/超类 抽象类
+    FileInputStream 文件操作的字节输入流
+    BufferedInputStream 缓冲输入字节流，在缓冲字符流对象中，底层维护了一个 8kb 缓冲字节数组
 
 - 构造方法：
 	BufferedInputStream(InputStream in);
 	BufferedInputStream(InputStream in, int size);	
-构造方法中都有一个参数是InputStream, 要求传入的是InputStream的子类对象（多态），第二个构造方法中多了一个参数是int size ，这个size表示设置缓冲区的大 小， 默认缓冲数组的大小是一个8kb的字节数组
-	构造方法中的InputStream是给缓冲流提供读写能力的！！！
+	构造方法中都有一个参数是 InputStream，要求传入的是 InputStream 的子类对象（多态），第二个构造方法中多了一个参数是 int size，表示设置缓冲区的大 小， 默认缓冲数组的大小是一个 8kb 的字节数组；
 	
-- 【记住】
-		**缓冲流是没有读写能力的，需要对应的字节流或者字符流来提供**
-		
+	构造方法中的 InputStream 是给缓冲流提供读写能力的
+	**缓冲流是没有读写能力的，需要对应的字节流或者字符流来提供**
+	
 - 使用流程：
   - 1.找到目标文件
   - 2.建立管道
-  	- a) 首先创建当前文件的InputStream的子类对象，FileInputStream
-  	-  b) 使用InputStream的子类对象，作为BufferedInputStream构造方法参数，创建缓冲流对象
+  	- 首先创建当前文件的 InputStream 的子类对象：FileInputStream
+  	-  使用 InputStream 的子类对象，作为 BufferedInputStream 构造方法参数，创建缓冲流对象
   - 3.读取数据
   - 4.关闭资源
 ### （一）输入字节缓冲
@@ -75,26 +62,26 @@ public class StreamInputBuffered {
 	}
 	
 	public static void readTest1() throws IOException {
-		//1. 找到文件
+		// 1. 找到文件
 		File file = new File("C:/aaa/1.txt");
 		
-		//判断他是否是一个普通文件，是否存在
+		// 判断他是否是一个普通文件，是否存在
 		if (!file.exists() || !file.isFile()) {
 			throw new FileNotFoundException();
 		}
 		
-		//2. 建立管道
-		//创建FileInputStream提供读写能力
+		// 2. 建立管道
+		// 创建FileInputStream提供读写能力
 		FileInputStream fis = new FileInputStream(file);
 		
-		//利用FileInputStream对象，创建对应的BufferedInputStream
+		// 利用FileInputStream对象，创建对应的BufferedInputStream
 		BufferedInputStream bs = new BufferedInputStream(fis);
 		
-		//这种方式将上面所有语句合成这一句话，前提是文件必须存在；
-		//BufferedInputStream bs2 = new BufferedInputStream(
+		// 这种方式将上面所有语句合成这一句话，前提是文件必须存在；
+		// BufferedInputStream bs2 = new BufferedInputStream(
 		//		new FileInputStream(new File("C:/aaa/1.txt")));
 		
-		//3. 读取数据（准备一个缓冲数组）
+		// 3. 读取数据（准备一个缓冲数组）
 		int length = -1;
 		byte[] buffer = new byte[512];
 		
@@ -111,10 +98,8 @@ public class StreamInputBuffered {
 }	
 ```
 
-
 ### （二） 输出字节缓冲
-StreamOutputBuffered.java
-能用缓冲就不用字节流
+
 ```java
 package com.qfedu.a_buffer;
 
