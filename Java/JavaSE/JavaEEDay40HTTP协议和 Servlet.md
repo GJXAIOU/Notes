@@ -1,12 +1,10 @@
 # JavaEEDay40 HTTP 和 Servlet
-@toc
 
 ## 一、 HTTP协议
 
-- HTTP是 HyperText Tranfer Protocol 超文本传输协议
+- HTTP 是 HyperText Tranfer Protocol 超文本传输协议
   - 是一个规范，是用来约束 WEB 服务器和浏览器直接的通讯协议；
   - 基于 TCP/IP 的一个协议，用于连接 WEB 服务器和 WEB 浏览器；
-​
 - HTTP 的协议版本：
  HTTP/1.0 和 HTTP/1.1
 
@@ -32,9 +30,8 @@ Cookie: BAIDUID=2010BC084DE91EB2B0EDD6EE92330BE1:FG=1; BIDUPSID=2010BC084DE91EB2
 - 请求方式
     - 使用 GET 请求方式：
     示例`GET /Day40/TestHttp?name=12345&password=12345678 HTTP/1.1`，其中?之后就是GET请求的数据参数
-​
-    - 使用 POST 请求方式：**在URL中没有看到任何的参数**, 而且请求的方式也略有不同
-示例：`POST /Day40/TestHttp HTTP/1.1`, 请求的数据在 POST 请求特有的请求体内保存，也就是谷歌浏览器 From Data
+    - 使用 POST 请求方式：**在 URL 中没有看到任何的参数**, 而且请求的方式也略有不同
+    示例：`POST /Day40/TestHttp HTTP/1.1`, 请求的数据在 POST 请求特有的请求体内保存，也就是谷歌浏览器 From Data
 
 ### （二）HTTP 响应 
 
@@ -43,17 +40,17 @@ Cookie: BAIDUID=2010BC084DE91EB2B0EDD6EE92330BE1:FG=1; BIDUPSID=2010BC084DE91EB2
 HTTP/1.1 200 OK
  Server: Apache-Coyote/1.1  -- 使用的服务器是什么
  Content-Length: 0          -- 响应得到的数据长度，字节数
- Date: Tue, 16 Jan 2018 03:01:56 GMT  时间
+ Date: Tue, 16 Jan 2018 03:01:56 GMT  --时间
 ```
 格式：
  HTTP/版本号(目前常用的版本号都是1.1) 状态码  原因的简单描述
 | 状态码 | 含义 |
 | --- | --- |
 | 100 ~ 199 | 表示成功接受请求，要求客户端继续提交下一次请求 |
-| 200 ~ 299 | 表示成功接受并且处理完成了整个操作流程，常用200 |
+| 200 ~ 299 | 表示成功接受并且处理完成了整个操作流程，常用 200 |
 | 300 ~ 399 | 为了完成请求，要求客户做出进一步的操作，例如：跳转，资源不存在，跳转到新界面 常用302 304 和 307 |
 | 400 ~ 499 | 客户请求错误，常用404 |
-| 500 ~ 599 | 服务器GG了！！！ 常用500 |
+| 500 ~ 599 | 服务器错误，常用500 |
 
 例如：Servlet-name= GJXAIOU，Servlet-class = com.gjxaiou.servlet.servletGJXAIOU;
 404：服务器中根本没有 name = GJXAIOU，就是客户端请求错误；
@@ -85,33 +82,33 @@ Tomcat服务器启动之后输入： http://localhost:8080/Day40/TestHttp
 ```
 - 浏览器访问服务器的 URL 分析
  1 . 浏览器根据输入的 URL 来访问 Tomcat 服务器 http://localhost:8080
- 2 . /Day40 访问在 Tomcat 服务器下 webapps 里面的 Day40 项目文件夹
- 3 . /TestHttp 用来匹配在【WEB-INF】下的【web.xml】文件里面的 url-pattern,服务器开始工作；
-​
+  2 . /Day40 访问在 Tomcat 服务器下 webapps 里面的 Day40 项目文件夹
+  3 . /TestHttp 用来匹配在【WEB-INF】下的【web.xml】文件里面的 url-pattern,服务器开始工作；
+ ​
 
 ### （一）映射路径
-​其中 `/TestHttp` 称之为 映射路径
+其中 `/TestHttp` 称之为 映射路径
 - 映射的流程：
  1 . 在【WEB-INF】下的 web.xml 文件中匹配 url-pattern
- 2 . 匹配到就可以获取到 <servlet-mapping>，可以找到 <servlet-name> 标签内容，获取 servlet-name
- 3 . 通过匹配 <servlet-name>，找到 <servlet>，也就可以获取到 <servlet-class> 标签内容
- 在这个标签中包含了 servlet 程序运行需要执行的 .class 文件
- 4 . 通过这个包名.类名就可以加载这个 .class (字节码文件)，运行 servlet 程序，这里用到的就是【反射】的思想
+  2 . 匹配到就可以获取到  `<servlet-mapping>`，可以找到 `<servlet-name>` 标签内容，获取 servlet-name
+  3 . 通过匹配 `<servlet-name>`，找到 `<servlet>`，也就可以获取到 `<servlet-class>` 标签内容
+  在这个标签中包含了 servlet 程序运行需要执行的 .class 文件
+  4 . 通过这个包名.类名就可以加载这个 .class (字节码文件)，运行 servlet 程序，这里用到的就是【反射】的思想
 
 - url-pattern 匹配形式：
    - 精确匹配：
- url-pattern规定的是写什么样的匹配，就在URL中写什么
- 例如：
- /TestHttp 在浏览器中只能输入：http://localhost:8080/Day40/TestHttp
- /TestHttp/hi 在浏览器中只能输入：http://localhost:8080/Day40/TestHttp/hi
- 一个字符都不能差！！！
+    url-pattern 规定的是写什么样的匹配，就在URL中写什么
+     例如：
+     /TestHttp 在浏览器中只能输入：http://localhost:8080/Day40/TestHttp
+     /TestHttp/hi 在浏览器中只能输入：http://localhost:8080/Day40/TestHttp/hi
+     一个字符都不能差！！！
 
    - 模糊匹配：
- `/*`   http://localhost:8080/Day40/任意内容      都可以访问当前的Servlet程序
- `*.do` 格式： http://localhost:8080/Day40/任意内容.do
- `*.html (伪静态)` 格式： http://localhost:8080/Day40/任意内容.html
- `*.action` 同上
- `*.jsp` 同上
+    `/*`   http://localhost:8080/Day40/任意内容      都可以访问当前的Servlet程序
+     `*.do` 格式： http://localhost:8080/Day40/任意内容.do
+     `*.html (伪静态)` 格式： http://localhost:8080/Day40/任意内容.html
+     `*.action` 同上
+     `*.jsp` 同上
 
  注意事项：
  1 . 模糊匹配不能同时使用\和* 不允许
@@ -149,7 +146,7 @@ Tomcat服务器启动之后输入： http://localhost:8080/Day40/TestHttp
 	</servlet-mapping>
 ```
 
- 
+
 ### （三）Servlet生命周期【重点】
 
 之前提到的生命周期有：成员变量，局部变量，类对象，线程的生命周期；

@@ -5,9 +5,7 @@
 ### HTTP 请求组成
 - 请求行：由请求方法字段、URL 字段、HTTP 协议版本字段组成，中间使用空格分隔；例如：`GET /index.html HTTP/1.1`
 - 请求头部：由关键字/键值对组成，每行一对，关键字和值使用英文`:`隔开；请求头部作用是通知服务器有关客户端请求的信息；例如：Host，请求的主机名；cookie，客户端的缓存；
-- 请求数据：请求数据不在 get 方法中使用，在 POST 方法中使用，POST 方法适用于需要客户填写表单的场合，与请求数据相关的最常使用的请求头是 Content-Type 和 Content-Length。
-
-
+- 请求数据：请求数据不在 get 方法中使用，在 POST 方法中使用，POST 方法适用于需要客户填写表单的场合，与请求数据相关的最常使用的请求头是 `Content-Type` 和 `Content-Length`。
 
 ### GET 和 POST 区别
 |操作方式|数据位置|明文密文|数据安全|长度限制|应用场景|
@@ -18,28 +16,30 @@
 
 ## 二、上传文件
 
-### 使用 Servlet 处理文件上传的原因
-一般不使用 JSP 处理文件上传；
+使用 Servlet 却一般不使用 JSP 处理文件上传的原因：
 因为 JSP 一般在 MVC 模式中是一个 view，偏向于视图展示。处理数据比如处理上传的文件进行保存，主要功能在于后台获取文件和文件保存，在 mvc 中是一个 control，或者可以简单的理解为不需要视图展示；jsp 可以做文件上传处理，但是一般不这样使用。
 
-
 ### 上传依赖的 jar 包
+
 Commons-fileupload.jar 和 commons-io.jar
 
 ### fileupload 包中重要的类和方法
 
-- DiskFileltemFactory类,用于配置上传参数
-  - setSizeThreshold设置缓存的大小,当上传文件的容量超过该缓存时,再放到临时存储室
-  - setRepository()设置临时存储路径,存放tem临时文件,可以和最终存储文件相同。
+#### DiskFileltemFactory 类，用于配置上传参数
+
+- setSizeThreshold 设置缓存的大小，当上传文件的容量超过该缓存时，再放到临时存储室
+- setRepository() 设置临时存储路径，存放 tem 临时文件，可以和最终存储文件相同。
 如果没上面两个方法设置的话,上传大的文件会占用很多内存
 
-可以存放到项目根目录下,跟路径的获取
-request.getSession().getServletContext(). getRealPath(“/upload“)
+可以存放到项目根目录下，根路径的获取
+`request.getSession().getServletContext(). getRealPath(“/upload“)`
 返回一个字符串,包含一个给定虚拟路径的真实路径
 
-- ServletFileUpload类,处理文件和文件上传
-  - 初始化:`new ServletFileUpload( factory);` factory就是 DiskFileltemFactory类方法:
-  - `isMultipartContent( request)`判断请求form是否是文件类型。
+#### ServletFileUpload 类，处理文件和文件上传
+
+- 初始化:`new ServletFileUpload( factory);` factory就是 DiskFileltemFactory类方法:
+- `isMultipartContent( request)`判断请求form是否是文件类型。
+
 - `setFilesizemax()`设置最大文件上传值(即单个文件大小的上限)
 - `setSizemax()`设置最大请求值(包含文件和表单数据)
 - `parseRequest( request);`解析请求中的文件返回List< Filelten>//获取数据
@@ -57,13 +57,12 @@ request.getSession().getServletContext(). getRealPath(“/upload“)
 
 
 ### 上传的表单指定属性
-form中添加 enctype=" multipart/form-data"设置表单的MME编码。
+form 中添加 `enctype=" multipart/form-data"` 设置表单的 MME 编码。
 
-enctype共有3个值可选
-- application/x-www-form-urlencode(默认值)，作用是设置表单传输的编码。
-- multipart/form-dat，主要就是我们上传二进制文件的非文本的内容,比如图片或是mp3等等。
-- text/pain，纯文本传输的意思,在发邮件的时候要设置这种编码类型(不常用)
-
+enctype 共有 3 个值可选
+- `application/x-www-form-urlencode`(默认值)，作用是设置表单传输的编码。
+- `multipart/form-dat`，主要就是我们上传二进制文件的非文本的内容,比如图片或是 mp3 等。
+- `text/pain`，纯文本传输的意思,在发邮件的时候要设置这种编码类型(不常用)
 
 ### 代码示例
 
@@ -201,17 +200,13 @@ Upload.html
 
 其他如：success.html 和 error.html
 
-
-
-
-
 ## 三、下载文件
 
 ==WEB-INF 下面的资源只能通过转发进行访问==
 
 ### 响应的组成部分
 
-HTTP响应与HTTP请求相似,HTTP响应也由3个部分构成
+HTTP 响应与 HTTP 请求相似，HTTP 响应也由 3 个部分构成
 - 1)状态行
 请求版本响应码(404,200,500)
 
