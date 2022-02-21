@@ -106,13 +106,11 @@ For example, `var x = "Hello"; x = Color.RED;` does *not* work; the type of x wi
 
 
 
-
-
 # 三、@NonNull
 
 ### or: How I learned to stop worrying and love the NullPointerException.
 
-或者：我是如何学会停止担忧，爱上NullPointerException的。
+### 或者：我是如何学会停止担忧，爱上 NullPointerException 的。
 
 `@NonNull` was introduced in lombok v0.11.10
 
@@ -128,11 +126,11 @@ The null-check looks like `if (param == null) throw new NullPointerException("pa
 
 If a null-check is already present at the top, no additional null-check will be generated.
 
-您可以对记录组件或方法或构造函数的参数使用“@NonNull”。这将使得 lombok 为您生成空检查语句。
+**您可以对记录组件、方法或构造函数的参数使用`@NonNull`。这将使得 lombok 为您生成空检查语句**。
 
-Lombok 始终将字段上通常命名为“@NonNull”的各种注释视为信号，以便在 Lombok为您生成整个方法或构造函数时生成 null 检查，例如通过[`@Data`](https://projectlombok.org/features/Data).但是，使用 lombok 自己的`@lombok`。参数或记录组件上的 `NonNull`导致在该方法的顶部插入null检查。
+Lombok 始终将字段上通常命名为`@NonNull` 的各种注解视为信号，**以便在 Lombok 为您生成整个方法或构造函数时生成 null 检查**，例如通过[`@Data`](https://projectlombok.org/features/Data)。但是，**对参数或记录组件使用 lombok 自己的 `@lombok.NonNull` 会导致在该方法的顶部插入空检查。**
 
-空检查类似于“如果（param==null）抛出新的NullPointerException（“param标记为@NonNull，但为null”）；”**并将插入到方法的最顶部**。对于构造函数，空检查将在任何显式 `this()` 或 `super()` 调用之后立即插入。对于记录组件，空检查将插入到“紧凑构造函数”（完全没有参数列表的构造函数）中，如果没有构造函数，将生成该构造函数。如果您以长格式编写了记录构造函数（参数与您的组件完全匹配），那么什么也不会发生——您将不得不注释这个长格式构造函数的参数。
+空检查类似于 `if(param == null) throw new NullPointerException("param is marked @NonNull,but is null");` 并将插入到方法的最顶部。对于构造函数，空检查将在任何显式 `this()` 或 `super()` 调用之后立即插入。对于记录组件，空检查将插入到「空构造函数」（完全没有参数列表的构造函数）中，如果没有构造函数，将生成该构造函数。如果您以长格式编写了记录构造函数（参数与您的组件完全匹配），那么什么也不会发生——您将不得不注释这个长格式构造函数的参数。
 
 如果顶部已存在空检查，则不会生成额外的空检查。
 
@@ -181,7 +179,7 @@ public class NonNullExample extends Something {
     
 - `lombok.nonNull.exceptionType` = [`NullPointerException` | `IllegalArgumentException` | `JDK` | `Guava` | `Assertion`] ，默认为 `NullPointerException`
 
-    当 lombok 生成一个 if 声明的空校验时，默认情况下，将抛出一个异常信息为「XXX属性名称 is marked non-null but is null」的 `java.lang.NullPointerException`，您可以在此配置键中使用非法ArgumentException，让lombok将该异常与此消息一起抛出。通过使用“断言”，将生成具有相同消息的“断言”语句。键'JDK'或'Guava'导致调用这两个框架的标准nullcheck方法：`java。util。物体！requirennull（[此处的字段名]，[此处的字段名]标记为非空，但为空）；或“com”。谷歌。普通的基地。先决条件！checkNotZero（[field name here]，[field name here]标记为非null，但为null；
+    当 lombok 生成一个 if 声明的空校验时，默认情况下，将抛出一个异常信息为「XXX 属性名称 is marked non-null but is null」的 `java.lang.NullPointerException`，您可以在此配置键中使用 `IllegalArgumentException`，让lombok 将该异常与此消息一起抛出。通过使用「断言」，将生成具有相同消息的「断言」语句。键 `JDK` 或 `Guava` 分别导致调用这两个框架的标准 nullcheck 方法：`java.util.Objects.requireNonNull([field name here], "[field name here] is marked non-null but is null");` 或 `com.google.common.base.Preconditions.checkNotNull([field name here], "[field name here] is marked non-null but is null");`。
 
 - `lombok.nonNull.flagUsage` = [`warning` | `error`] ，默认没有配置
 
@@ -196,6 +194,12 @@ While `@Data` and other method-generating lombok annotations will trigger on var
 A `@NonNull` on a primitive parameter results in a warning. No null-check will be generated.
 
 A `@NonNull` on a parameter of an abstract method used to generate a warning; starting with version 1.16.8, this is no longer the case, to acknowledge the notion that `@NonNull` also has a documentary role. For the same reason, you can annotate a method as `@NonNull`; this is allowed, generates no warning, and does not generate any code.
+
+### Small print
+Lombok 针对现有空检查的检测方案包括扫描与 Lombok 类似的 if 语句或 assert 语句。任何作为 if 语句“then”部分的“throws”语句，无论是否使用大括号，都将被计算在内。对任何名为'requirennull'或'checkNotNull'的方法的任何调用都会计数。if语句*的条件必须*看起来像'PARAMNAME==null'；assert语句*必须*看起来与'PARAMNAME！=空`。对“requireNonNull”风格方法的调用必须是单独的（仅调用该方法的语句），或者必须是赋值或变量声明语句的表达式。方法中第一条不是空检查的语句将停止检查空检查的过程。
+虽然生成lombok注释的“@Data”和其他方法将在各种已知注释上触发，这些注释表示字段不能为“@NonNull”，但此功能仅在lombok自己的“lombok”包中的“@NonNull”注释上触发。
+基元参数上的“@NonNull”将导致警告。不会生成空检查。
+用于生成警告的抽象方法参数上的“@NonNull”；从1.16.8版开始，情况就不再是这样了，因为它承认“@NonNull”也有纪录片角色。出于同样的原因，可以将方法注释为“@NonNull”；这是允许的，不会生成警告，也不会生成任何代码。
 
 
 

@@ -14,7 +14,7 @@
 >
 >实现 AOP 的技术，主要分为两大类：一是采用动态代理技术，利用截取消息的方式，对该消息进行装饰，以取代原有对象行为的 执行；二是采用静态织入的方式，引入特定的语法创建「方面」，从而使得编译器可以在编译期间织入有关“方面”的代码。
 
-- **AOP 和 Filter 区别主要体现在：拦截的对象不同**：
+- **AOP 和 Filter 区别主要体现在拦截的对象不同**：
   
     - **AOP 拦截的是切点（即方法），只要该方法可以被 Spring 管理就可以被拦截**；
     - Filter 拦截的是请求；
@@ -28,7 +28,7 @@
   - **原有功能：称为切点： `pointcut`**；
   - 前置通知：在切点之前执行的功能：`beforeAdvice`
   - 后置通知：在切点之后执行的功能：`afterAdvice`
-  - 如果切点执行过程中出现异常，会触发异常通知：`throwsadvice`
+  - 如果切点执行过程中出现异常，会触发异常通知：`throwsAdvice`
   - 所有功能总称叫做切面；
   - **织入: 把切面嵌入到原有功能的过程叫做织入**
 
@@ -38,7 +38,7 @@
 
 **方式一：Schema-based**
 
-- 每个通知都需要实现接口或类（`implement MethodBeforeAdvice` 或者 `implement  AfterReturningAdvice`）
+- 每个通知都需要实现接口或类（`implement MethodBeforeAdvice` 或者 `implement AfterReturningAdvice`）
 - 配置 spring 配置文件时在`<aop:config>`配置
 
 **方式二： AspectJ**
@@ -49,13 +49,13 @@
 ### （一）Schema-based 实现步骤
 **本质上即在切点方法之前和之后分别执行了一个方法**
 
-- **步骤一：首先导入 jar**，除了 spring 核心功能包外，注意添加两个额外的包：aopalliance.jar 和 aspectjweaver.jar
+- **步骤一：首先导入 jar**，除了 spring 核心功能包外，注意添加两个额外的包：aopalliance.jar 和 aspectjweaver.jar（不然会报 pointcut 无法创建）
 
 - **步骤二：然后新建通知类并重写 before() 或者 afterReturning() 方法**（对应前置通知类和后置通知类，根据需要使用）
 
   - 新建前置通知类：实现 MethodBeforeAdvice 接口
 
-    `before()` 方法三个参数含义：切点方法对 Method 对象、切点方法参数、切点在哪个对象中；
+    `before()` 方法三个参数含义：切点方法对应的 Method 对象、切点方法参数、切点在哪个对象中；
 
     ```java
     // 前置通知类实现 MethodBeforeAdvice 接口
@@ -80,18 +80,39 @@
     }
     ```
 
+  - 切点
+
+      ```java
+      package com.gjxaiou.pointcut;
+      import lombok.*;
+      
+      /**
+       * @author GJXAIOU
+       * @create 2019-09-23-21:10
+       */
+      @Setter
+      @Getter
+      
+      @ToString
+      public class AOPpointcut {
+          public void AopPointcut(){
+              System.out.println("这是切点");
+          }
+      }
+      ```
+
 - **步骤三：配置 spring 配置文件**
 
   - 首先引入 aop 命名空间(通过查询文档即可)
-  
+
   - 然后配置通知类的 `<bean>`，同样可以使用注解来表示。
-  
+
   - 配置切面
     - `*` 为通配符,匹配任意方法名,任意类名,任意一级包名
     - 如果希望匹配任意方法参数 `(..)`，就是下面 expression中的最后demo2(..)
     通配符的使用范例：
-    `<aop:pointcut expression="execution(* com.gjxaiou.test.*.*(..))" id="mypoint"/>` 表示test 这个包下面的任意类的任意方法的任意参数都需要形成切面，本质上任意位置都可以使用 * 表示任意；
-  
+    `<aop:pointcut expression="execution(* com.gjxaiou.test.*.*(..))" id="mypoint"/>` 表示 test 这个包下面的任意类的任意方法的任意参数都需要形成切面，本质上任意位置都可以使用 * 表示任意；
+
     ```xml
     <?xml version="1.0" encoding="UTF-8"?>
     <beans
@@ -120,10 +141,9 @@
     
     
         <bean id = "pointcut" class="com.gjxaiou.pointcut.AOPpointcut"></bean>
-    
     </beans>
     ```
-  
+
 - 步骤四：编写测试代码
 
     ```java
@@ -181,7 +201,6 @@
                             throwing="e"></aop:after-throwing>
     </aop:aspect>
 </aop:config>
-
 ```
 如果不在这里面声明通知的话，另一种方式是：
 在 Test 类中，通过 getBean 获取对象，然后通过对象调用方法的时候使用 try-catch，在上面的类中使用 throws抛出，不能使用 try-catch,否则 spring 接收不到异常
@@ -302,9 +321,7 @@ public  class  MyAdvice  {
 </aop:config>
 ```
 
-
-
-## 六、 使用注解(基于 Aspect) 实现 AOP
+## 六、 使用注解（基于 Aspect）实现 AOP
 
 - spring 不会自动去寻找注解,必须告诉 spring 哪些包下的类中可能有注解
 
@@ -322,22 +339,23 @@ public  class  MyAdvice  {
 - 步骤一：在 spring 配置文件中设置注解在哪些包中（使用组件扫描）
   `<context:component-scan base-package="com.gjxaiou.advice,com.gjxaiou.test"></context:component-scan>`
 
-  同时要添加动态代理： proxy-target-class值为 true表示使用 cglib动态代理，值为 false 表示使用 jdk 动态代理；
+  同时要添加动态代理：`proxy-target-class` 值为 true 表示使用 cglib 动态代理，值为 false 表示使用 jdk 动态代理；
   `<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>`
 
-- 步骤二：在 Demo.java 类中添加 @Componet,可以加参数用于别名，相当于直接替代了配置文件中的 bean 标签
+- 步骤二：在 Demo.java 类中添加 `@Componet`，可以加参数用于别名，相当于直接替代了配置文件中的 bean 标签
   
   在方法上添加 `@Pointcut(“”)` 定义切点（必要步骤）
-```java
-@Component（"dd"）
-public class Demo {
-    @Pointcut("execution(* com.gjxaiou.test.Demo.demo1())")
-    public void demo1() throws Exception{
-        // int i = 5/0;
-      System.out.println("demo1");
-    }
-}
-```
+  
+  ```java
+  @Component（"dd"）
+  public class Demo {
+      @Pointcut("execution(* com.gjxaiou.test.Demo.demo1())")
+      public void demo1() throws Exception{
+          // int i = 5/0;
+        System.out.println("demo1");
+      }
+  }
+  ```
 
 - 步骤三：在通知类中配置MyAdvice.java 中
   -  @Component 类被 spring 管理

@@ -23,7 +23,7 @@ InnoDB 的存储引擎的体系架构如图，lnnoDB 存储引擎有多个内存
 
 **InnoDB 存储引擎是多线程的模型**， 因此其后台有多个不同的后台线程，**后台线程的主要作用是负责刷新内存池中的数据， 保证缓冲池中的内存缓存的是最近的数据。 此外将已修改的数据文件刷新到磁盘文件， 同时保证在数据库发生异常的情况下 InnoDB 能恢复到正常运行状态。**
 
-- **Master Thread**（核心的线程）： **主要负责将缓冲池中的数据异步刷新到磁盘， 保证数据的一致性**， 包括~~脏页的刷新~~、合并插入缓冲(INSERT BUFFER)、undo 页的回收等。
+- **Master Thread**（核心的线程）： **主要负责将缓冲池中的数据异步刷新到磁盘， 保证数据的一致性**， 包括~~脏页的刷新~~、合并插入缓冲（INSERT BUFFER）、undo 页的回收等。
 
 - **IO Thread**：在 InnoDB 存储引擎中大量使用了 AIO (Async IO)来处理写 IO 请求， 极大提高了数据库的性能。而 IO Thread 的主要负责这些 IO 请求的回调（call back）处理。
 
@@ -80,8 +80,6 @@ lnnoDB 存储引擎是基于磁盘存储的， 并将**其中的记录按照页�
 **缓冲池中缓存的数据页类型有：数据页、索引页、undo 页、插入缓冲(insert buffer)、自适应哈希索引(adaptive hash index)、InnoDB 存储的锁信息(lock info)、数据字典信息(data dictionary)等**。
 
 ![image-20200628110042543](第二章：InnoDB 存储引擎.resource/image-20200628110042543.png)
-
-​	
 
 **InnoDB 允许有多个缓冲池实例**。每个页根据哈希值平均分配到不同缓冲池实例中 。这样做的好处是减少数据库内部的资源竞争，增加数据库的并发处理能力，默认为 1 个。可以通过 `innodb_buffer_pool_instances` 进行设置。多个缓冲池状态可以通过 `show engine innodb status` 或者 `information_schema` 架构下的表 `INNODB_BUFFER_POOL_STATS` 表进行查看。
 
@@ -182,8 +180,6 @@ mysql> show variables like 'innodb_log_buffer_size';
 - 每个事务提交时会将重做日志缓冲刷新到重做日志文件；
 
 - 当重做日志缓冲池剩余空间小于1/2 时， 重做日志缓冲刷新到重做日志文件。
-
-
 
 #### 4.额外的内存池
 
@@ -440,8 +436,6 @@ InnoDB 1.0.x 之后将 Insert Buffer 升级为 Change Buffer（适用对象仍�
 通过参数 `innodb_change_buffering` 可以开启各种 Buffer 选项，包括：inserts/deletes/purges/changes(仅包括 inserts 和 deletes）/all/none。默认值为 all。
 
 从 1.2.X 版本开始使用参数 `innodb_change_buffer_max_size` 控制 Change Buffer 最大使用内存的大小，默认为 25，即最多使用 25% 的缓冲池内存空间，该参数最大有效值为：50。
-
-
 
 ==Insert Buffer 内部实现==
 
