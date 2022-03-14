@@ -17,14 +17,14 @@ SSM 框架是 spring MVC ，spring 和 mybatis 框架的整合，是标准的 MV
 ### （二）实现原理
 
 - **spring MVC**
-  - DNS 负责域名的解析, 比如访问`www.baidu.com` 先通过 DNS 获取相应的服务器 IP 和端口；
-  - 请求消息到达端口以后由**Tomcat 主动去询问**自己占用的端口是否由请求发来；
+  - DNS 负责域名的解析, 比如访问 `www.baidu.com` 先通过 DNS 获取相应的服务 IP 和端口；
+  - 请求消息到达端口以后由 **Tomcat 主动去询问**自己占用的端口是否由请求发来；
   - 如果有请求 Tomcat **交给对应的项目**处理；
   - 客户端发送请求到 DispacherServlet（前端控制器即分发器），这里可以设置拦截器，对请求进行过滤处理；
   - 由 DispacherServlet 控制器查询 HanderMapping，通过解析请求，判断请求希望执行的具体方法，即找到处理请求的 Controller；
-  这个map表由很多key:value键值对组成, key值是controller的名字(@mapping ...), value值是该controller所在类的地址和方法签名;
-  (一个类中可能由很多controller)这个找到controller位置并实例化的过程叫做**反射**
-  反射得到实例后通过**代理**执行相应的方法即相应controller;
+  这个 map 表由很多 key: value 键值对组成, key 值是 controller 的名字(@mapping ...), value 值是该controller 所在类的地址和方法签名;
+  (一个类中可能由很多 controller)这个找到 controller 位置并实例化的过程叫做**反射**
+  反射得到实例后通过**代理**执行相应的方法即相应 controller;
   - 通过 HandlerAdapter 调用具体的 Controller 方法；
   - Controller 调用业务逻辑处理后，返回 ModelAndView，即控制器结果返回给视图解析器；
   - DispacherServlet 查询视图解析器，找到ModelAndView 指定的视图
