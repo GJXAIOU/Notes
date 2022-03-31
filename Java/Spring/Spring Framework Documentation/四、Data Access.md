@@ -6,7 +6,13 @@ This part of the reference documentation is concerned with data access and the i
 
 Spring’s comprehensive transaction management support is covered in some detail, followed by thorough coverage of the various data access frameworks and technologies with which the Spring Framework integrates.
 
+参考文档的这一部分涉及数据访问以及数据访问层和业务或服务层之间的交互。
+
+本文将详细介绍 Spring 的全面事务管理支持，然后全面介绍 Spring 框架集成的各种数据访问框架和技术。
+
 ## 1. Transaction Management
+
+## 1.事务管理
 
 Comprehensive transaction support is among the most compelling reasons to use the Spring Framework. The Spring Framework provides a consistent abstraction for transaction management that delivers the following benefits:
 
@@ -26,39 +32,91 @@ The following sections describe the Spring Framework’s transaction features an
 
 The chapter also includes discussions of best practices, [application server integration](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-application-server-integration), and [solutions to common problems](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-solutions-to-common-problems).
 
+全面的事务支持是使用 Spring 框架最引人入胜的原因之一。Spring  框架为事务管理提供了一致的抽象，提供了以下好处：
+
+- 跨不同事务 API（如 Java Transaction API（JTA）、JDBC、Hibernate 和Java Persistence  API（JPA））的一致编程模型。
+- 支持[声明性事务管理](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-declarative)。
+- 与复杂的事务 API（如 JTA）相比，[编程事务管理](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-programmatic) 的 API 更简单。
+- 与 Spring 的数据访问抽象完美集成。
+
+以下几节描述了 Spring 框架的事务特性和技术：
+
+- [Spring 框架的事务支持模型的优点](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-motivation) 描述了为什么要使用 Spring 框架的事务抽象，而不是 EJB 容器管理的事务（CMT, Container-Managed Transactions），或者选择通过专有 API（如 Hibernate）驱动本地事务。
+- [理解 Spring 框架事务抽象](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-strategies) 概述了核心类，并描述了如何从各种源配置和获取 `DataSource` 实例。
+- [将资源与事务同步](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#tx-resource-synchronization) 描述应用程序代码如何确保正确创建、重用和清理资源。
+- [声明性事务管理](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-declarative) 描述对声明性事务管理的支持。
+- [编程式事务管理](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-programmatic) 包括对编程（即显式编码）事务管理的支持。
+- [事务绑定事件](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-event) 描述如何在事务中使用应用程序事件。
+
+本章还讨论了最佳实践，[应用服务器集成](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-application-server-integration) 和[常见问题的解决方案](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-solutions-to-common-problems)。
+
 ### 1.1. Advantages of the Spring Framework’s Transaction Support Model
+
+### 1.1. Spring 框架的事务支持模型的优点
 
 Traditionally, Java EE developers have had two choices for transaction management: global or local transactions, both of which have profound limitations. Global and local transaction management is reviewed in the next two sections, followed by a discussion of how the Spring Framework’s transaction management support addresses the limitations of the global and local transaction models.
 
+传统上，JavaEE 开发人员有两种事务管理选择：全局事务或本地事务，这两种事务都有很大的局限性。在接下来的两部分中，将回顾全局和本地事务管理，然后讨论 Spring 框架的事务管理支持如何解决全局和本地事务模型的局限性。
+
 #### 1.1.1. Global Transactions
+
+#### 1.1.1.全局事务
 
 Global transactions let you work with multiple transactional resources, typically relational databases and message queues. The application server manages global transactions through the JTA, which is a cumbersome API (partly due to its exception model). Furthermore, a JTA `UserTransaction` normally needs to be sourced from JNDI, meaning that you also need to use JNDI in order to use JTA. The use of global transactions limits any potential reuse of application code, as JTA is normally only available in an application server environment.
 
 Previously, the preferred way to use global transactions was through EJB CMT (Container Managed Transaction). CMT is a form of declarative transaction management (as distinguished from programmatic transaction management). EJB CMT removes the need for transaction-related JNDI lookups, although the use of EJB itself necessitates the use of JNDI. It removes most but not all of the need to write Java code to control transactions. The significant downside is that CMT is tied to JTA and an application server environment. Also, it is only available if one chooses to implement business logic in EJBs (or at least behind a transactional EJB facade). The negatives of EJB in general are so great that this is not an attractive proposition, especially in the face of compelling alternatives for declarative transaction management.
 
+全局事务允许您处理多个事务资源，通常是关系数据库和消息队列。应用服务器通过 JTA 管理全局事务，JTA 是一个繁琐的 API（部分原因是它的异常模型）。此外，JTA  `UserTransaction` 通常需要来自 JNDI，这意味着您还需要使用 JNDI 才能使用 JTA。全局事务的使用限制了应用程序代码的任何潜在重用，因为 JTA 通常仅在应用程序服务器环境中可用。
+
+以前，使用全局事务的首选方式是通过 EJB CMT（Container Managed Transaction，容器管理事务）。CMT 是声明式事务管理的一种形式（与编程式事务管理不同）。EJB CMT 不再需要与事务相关的 JNDI 查找，尽管使用 EJB 本身就需要使用 JNDI。它消除了编写 Java 代码来控制事务的大部分（但不是全部）需求。显著的**缺点是 CMT 与 JTA 和应用服务器环境相关联**。此外，只有选择在 EJB 中实现业务逻辑（或者至少在事务 EJB 外观后面）时，它才可用。EJB 总体上的缺点是如此之大，以至于这不是一个有吸引力的提议，尤其是在面对声明性事务管理的令人信服的替代方案时。
+
 #### 1.1.2. Local Transactions
+
+#### 1.1.2.本地事务
 
 Local transactions are resource-specific, such as a transaction associated with a JDBC connection. Local transactions may be easier to use but have a significant disadvantage: They cannot work across multiple transactional resources. For example, code that manages transactions by using a JDBC connection cannot run within a global JTA transaction. Because the application server is not involved in transaction management, it cannot help ensure correctness across multiple resources. (It is worth noting that most applications use a single transaction resource.) Another downside is that local transactions are invasive to the programming model.
 
+本地事务是特定于资源的，例如与 JDBC 连接关联的事务。本地事务可能更易于使用，但有一个显著的**缺点：它们无法跨多个事务资源工作**。例如，使用 JDBC 连接管理事务的代码不能在全局 JTA 事务中运行。因为应用服务器不参与事务管理，所以它无法帮助确保跨多个资源的正确性。（值得注意的是，大多数应用程序使用单一事务资源。）另一个缺点是，本地事务会侵入编程模型。
+
 #### 1.1.3. Spring Framework’s Consistent Programming Model
+
+#### 1.1.3. Spring 框架的一致性编程模型
 
 Spring resolves the disadvantages of global and local transactions. It lets application developers use a consistent programming model in any environment. You write your code once, and it can benefit from different transaction management strategies in different environments. The Spring Framework provides both declarative and programmatic transaction management. Most users prefer declarative transaction management, which we recommend in most cases.
 
 With programmatic transaction management, developers work with the Spring Framework transaction abstraction, which can run over any underlying transaction infrastructure. With the preferred declarative model, developers typically write little or no code related to transaction management and, hence, do not depend on the Spring Framework transaction API or any other transaction API.
 
-Do you need an application server for transaction management?
+Spring 解决了全局和本地事务的缺点。它允许应用程序开发人员在任何环境中使用一致的编程模型。您只需编写一次代码，就可以从不同环境中的不同事务管理策略中获益。Spring 框架提供声明式和编程式事务管理。大多数用户更喜欢声明式事务管理，我们也建议在大多数情况下使用。
 
-The Spring Framework’s transaction management support changes traditional rules as to when an enterprise Java application requires an application server.
+通过编程事务管理，开发人员可以使用 Spring 框架事务抽象，它可以运行在任何底层事务基础设施上。使用首选的声明性模型，开发人员通常很少编写或不编写与事务管理相关的代码，因此不依赖 Spring 框架事务 API 或任何其他事务 API。
 
-In particular, you do not need an application server purely for declarative transactions through EJBs. In fact, even if your application server has powerful JTA capabilities, you may decide that the Spring Framework’s declarative transactions offer more power and a more productive programming model than EJB CMT.
-
-Typically, you need an application server’s JTA capability only if your application needs to handle transactions across multiple resources, which is not a requirement for many applications. Many high-end applications use a single, highly scalable database (such as Oracle RAC) instead. Stand-alone transaction managers (such as [Atomikos Transactions](https://www.atomikos.com/) and [JOTM](http://jotm.objectweb.org/)) are other options. Of course, you may need other application server capabilities, such as Java Message Service (JMS) and Java EE Connector Architecture (JCA).
-
-The Spring Framework gives you the choice of when to scale your application to a fully loaded application server. Gone are the days when the only alternative to using EJB CMT or JTA was to write code with local transactions (such as those on JDBC connections) and face a hefty rework if you need that code to run within global, container-managed transactions. With the Spring Framework, only some of the bean definitions in your configuration file need to change (rather than your code).
+> ​                                                      Do you need an application server for transaction management?
+>
+> ​                                                               您需要一个应用服务器来进行事务管理吗？
+>
+> The Spring Framework’s transaction management support changes traditional rules as to when an enterprise Java application requires an application server.
+>
+> In particular, you do not need an application server purely for declarative transactions through EJBs. In fact, even if your application server has powerful JTA capabilities, you may decide that the Spring Framework’s declarative transactions offer more power and a more productive programming model than EJB CMT.
+>
+> Typically, you need an application server’s JTA capability only if your application needs to handle transactions across multiple resources, which is not a requirement for many applications. Many high-end applications use a single, highly scalable database (such as Oracle RAC) instead. Stand-alone transaction managers (such as [Atomikos Transactions](https://www.atomikos.com/) and [JOTM](http://jotm.objectweb.org/)) are other options. Of course, you may need other application server capabilities, such as Java Message Service (JMS) and Java EE Connector Architecture (JCA).
+>
+> The Spring Framework gives you the choice of when to scale your application to a fully loaded application server. Gone are the days when the only alternative to using EJB CMT or JTA was to write code with local transactions (such as those on JDBC connections) and face a hefty rework if you need that code to run within global, container-managed transactions. With the Spring Framework, only some of the bean definitions in your configuration file need to change (rather than your code).
+>
+> Spring 框架的事务管理支持改变了企业 Java 应用程序何时需要应用服务器的传统规则。
+>
+> 特别是，通过 EJB 进行声明性事务不需要应用服务器。事实上，即使您的应用服务器具有强大的 JTA 功能，您也可能会认为Spring 框架的声明性事务提供了比 EJB CMT 更强大的功能和更高效的编程模型。
+>
+> 通常，只有当应用程序需要处理跨多个资源的事务时，才需要应用程序服务器的 JTA 功能，这不是许多应用程序的要求。许多高端应用程序使用单一的、高度可扩展的数据库（如 Oracle RAC）。独立事务管理器（例如  [Atomikos Transactions](https://www.atomikos.com/) 和 [JOTM](http://jotm.objectweb.org/)）是其他选项。当然，您可能需要其他应用服务器功能，例如 Java 消息服务（JMS）和 Java EE 连接器体系结构（JCA）。
+>
+> Spring 框架让您可以选择何时将应用程序扩展到完全加载的应用程序服务器。使用 EJB CMT 或 JTA 的唯一替代方法是使用本地事务（如 JDBC 连接上的事务）编写代码的日子已经一去不复返了，如果您需要在全局容器管理的事务中运行代码，那么代码将面临大量返工。使用 Spring 框架，只有配置文件中的一些 bean 定义需要更改（而不是代码）。
 
 ### 1.2. Understanding the Spring Framework Transaction Abstraction
 
+### 1.2. 理解 Spring 框架事务抽象
+
 The key to the Spring transaction abstraction is the notion of a transaction strategy. A transaction strategy is defined by a `TransactionManager`, specifically the `org.springframework.transaction.PlatformTransactionManager` interface for imperative transaction management and the `org.springframework.transaction.ReactiveTransactionManager` interface for reactive transaction management. The following listing shows the definition of the `PlatformTransactionManager` API:
+
+**Spring 事务抽象的关键是事务策略的概念**。事务策略由 `TransactionManager` 定义，特别是用于强制事务管理的  `org.springframework.transaction.PlatformTransactionManager` 接口和用于被动事务管理的 `org.springframework.transaction.ReactiveTransactionManager` 接口。下面的列表显示了 `PlatformTransactionManager` API 的定义：
 
 ```java
 public interface PlatformTransactionManager extends TransactionManager {
@@ -78,6 +136,14 @@ Again, in keeping with Spring’s philosophy, the `TransactionException` that ca
 The `getTransaction(..)` method returns a `TransactionStatus` object, depending on a `TransactionDefinition` parameter. The returned `TransactionStatus` might represent a new transaction or can represent an existing transaction, if a matching transaction exists in the current call stack. The implication in this latter case is that, as with Java EE transaction contexts, a `TransactionStatus` is associated with a thread of execution.
 
 As of Spring Framework 5.2, Spring also provides a transaction management abstraction for reactive applications that make use of reactive types or Kotlin Coroutines. The following listing shows the transaction strategy defined by `org.springframework.transaction.ReactiveTransactionManager`:
+
+这主要是一个服务提供者接口（Service Provider interface，SPI），尽管您可以从应用程序代码中 [以编程方式](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-programmatic-ptm) 使用它。由于`PlatformTransactionManager` 是一个接口，因此可以根据需要轻松地对其进行模拟或存根。它与查找策略无关，比如 JNDI。`PlatformTransactionManager`  的实现与 Spring Framework IoC 容器中的任何其他对象（或 bean）一样定义。单凭这一优势就可以让 Spring 框架事务成为一个有价值的抽象，即使在使用 JTA 时也是如此。与直接使用 JTA 相比，测试事务性代码要容易得多。
+
+同样，与 Spring 的理念一致，可以由任何 `PlatformTransactionManager`  接口的方法引发的  `TransactionException`  被取消选中（也就是说，它扩展了 `java.lang.RuntimeException` 类）。事务基础设施故障几乎总是致命的。在应用程序代码实际上可以从事务失败中恢复的罕见情况下，应用程序开发人员仍然可以选择捕获并处理 `TransactionException`。突出的一点是，开发人员并不是被迫这么做的。
+
+`getTransaction(..)`  方法返回一个 `TransactionStatus` 对象，具体取决于 `TransactionDefinition` 参数。如果当前调用堆栈中存在匹配的事务，则返回的 `TransactionStatus` 可能代表新事务，也可能代表现有事务。后一种情况的含义是，与Java EE 事务上下文一样，`TransactionStatus` 与执行线程相关联。
+
+从 Spring Framework 5.2 开始，Spring 还为使用被动类型或 Kotlin 协同路由的被动应用程序提供事务管理抽象。下表显示了 `org.springframework.transaction.ReactiveTransactionManager` 定义的事务策略：
 
 ```java
 public interface ReactiveTransactionManager extends TransactionManager {
