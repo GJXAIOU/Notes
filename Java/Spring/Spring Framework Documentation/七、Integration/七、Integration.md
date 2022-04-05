@@ -4,6 +4,8 @@ Version 5.3.13-SNAPSHOT
 
 This part of the reference documentation covers Spring Framework’s integration with a number of technologies.
 
+这部分参考文档涵盖了 Spring 框架与许多技术的集成。
+
 ## 1. REST Endpoints
 
 The Spring Framework provides two choices for making calls to REST endpoints:
@@ -11,11 +13,20 @@ The Spring Framework provides two choices for making calls to REST endpoints:
 - [`RestTemplate`](https://docs.spring.io/spring-framework/docs/5.3.13-SNAPSHOT/reference/html/integration.html#rest-resttemplate): The original Spring REST client with a synchronous, template method API.
 - [WebClient](https://docs.spring.io/spring-framework/docs/5.3.13-SNAPSHOT/reference/html/web-reactive.html#webflux-client): a non-blocking, reactive alternative that supports both synchronous and asynchronous as well as streaming scenarios.
 
+Spring 框架为调用 REST 端点提供了两种选择：
+
+- [`RestTemplate`](https://docs.spring.io/spring-framework/docs/5.3.13-SNAPSHOT/reference/html/integration.html#rest-resttemplate)：原始的 Spring REST 客户端，带有一个同步的模板方法 API。
+- [WebClient](https://docs.spring.io/spring-framework/docs/5.3.13-SNAPSHOT/reference/html/web-reactive.html#webflux-client)：一种无阻塞、反应式的替代方案，支持同步和异步以及流媒体场景。
+
 > As of 5.0 the `RestTemplate` is in maintenance mode, with only minor requests for changes and bugs to be accepted going forward. Please, consider using the [WebClient](https://docs.spring.io/spring-framework/docs/5.3.13-SNAPSHOT/reference/html/web-reactive.html#webflux-client) which offers a more modern API and supports sync, async, and streaming scenarios.
+>
+> 从 5.0 版开始，`RestTemplate` 处于维护模式，只接受少量的更改请求和 bug。请考虑使用 [WebClient](https://docs.spring.io/spring-framework/docs/5.3.13-SNAPSHOT/reference/html/web-reactive.html#webflux-client)，它提供了一个更现代的 API 并支持同步、异步和流式场景。
 
 ### 1.1. `RestTemplate`
 
 The `RestTemplate` provides a higher level API over HTTP client libraries. It makes it easy to invoke REST endpoints in a single line. It exposes the following groups of overloaded methods:
+
+`RestTemplate` 通过 HTTP 客户端库提供了更高级别的 API。这使得在一行中调用 REST 端点变得很容易。它公开了以下重载方法组：
 
 | Method group      | Description                                                  |
 | :---------------- | :----------------------------------------------------------- |
@@ -36,11 +47,15 @@ The `RestTemplate` provides a higher level API over HTTP client libraries. It ma
 
 The default constructor uses `java.net.HttpURLConnection` to perform requests. You can switch to a different HTTP library with an implementation of `ClientHttpRequestFactory`. There is built-in support for the following:
 
+默认构造函数使用 `java.net.HttpURLConnection` 来执行请求。您可以通过 `ClientHttpRequestFactory` 的实现切换到不同的 HTTP 库。内置了对以下各项的支持：
+
 - Apache HttpComponents
 - Netty
 - OkHttp
 
 For example, to switch to Apache HttpComponents, you can use the following:
+
+例如，要切换到 Apache HttpComponents，可以使用以下命令：
 
 ```java
 RestTemplate template = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
@@ -48,7 +63,11 @@ RestTemplate template = new RestTemplate(new HttpComponentsClientHttpRequestFact
 
 Each `ClientHttpRequestFactory` exposes configuration options specific to the underlying HTTP client library — for example, for credentials, connection pooling, and other details.
 
+每个 `ClientHttpRequestFactory` 都会公开特定于底层 HTTP 客户端库的配置选项 — 例如，有关凭据、连接池和其他详细信息。
+
 > Note that the `java.net` implementation for HTTP requests can raise an exception when accessing the status of a response that represents an error (such as 401). If this is an issue, switch to another HTTP client library.
+>
+> 请注意，HTTP 请求的 `java.net` 实现在访问表示错误的响应（例如 401）的状态时可能会引发异常。如果这是一个问题，请切换到另一个 HTTP 客户端库。
 
 ##### URIs
 
@@ -56,12 +75,18 @@ Many of the `RestTemplate` methods accept a URI template and URI template variab
 
 The following example uses a `String` variable argument:
 
+许多 `RestTemplate` 方法接受 URI 模板和 URI 模板变量，要么作为 `String` 变量参数，要么作为 `Map<String,String>`。
+
+以下示例使用 `String` 变量参数：
+
 ```java
 String result = restTemplate.getForObject(
         "https://example.com/hotels/{hotel}/bookings/{booking}", String.class, "42", "21");
 ```
 
 The following example uses a `Map<String, String>`:
+
+下面的示例使用 `Map<String, String>`：
 
 ```java
 Map<String, String> vars = Collections.singletonMap("hotel", "42");
@@ -71,6 +96,8 @@ String result = restTemplate.getForObject(
 ```
 
 Keep in mind URI templates are automatically encoded, as the following example shows:
+
+请记住，URI 模板是自动编码的，如下例所示：
 
 ```java
 restTemplate.getForObject("https://example.com/hotel list", String.class);
@@ -889,11 +916,33 @@ The `org.springframework.jms.config` package provides the parser implementation 
 
 Finally, the `org.springframework.jms.connection` package provides an implementation of the `ConnectionFactory` suitable for use in standalone applications. It also contains an implementation of Spring’s `PlatformTransactionManager` for JMS (the cunningly named `JmsTransactionManager`). This allows for seamless integration of JMS as a transactional resource into Spring’s transaction management mechanisms.
 
+Spring 提供了一个 JMS 集成框架，简化了 JMS API 的使用，其方式与 Spring 集成 JDBC API 的方式大致相同。
+
+JMS 可以大致分为两个功能领域，即消息的产生和使用。`JmsTemplate` 类用于消息生成和同步消息接收。对于类似于 Java EE 的消息驱动 bean 风格的异步接收，Spring 提供了许多消息侦听器容器，您可以使用这些容器创建消息驱动的 POJO（MDP）。Spring 还提供了一种声明性的方法来创建消息侦听器。
+
+`org.springframework.jms.core` 包提供了使用 JMS 的核心功能。它包含 JMS 模板类，这些类通过处理资源的创建和释放来简化 JMS 的使用，就像 `JdbcTemplate` 对  JDBC 所做的那样。Spring 模板类的共同设计原则是提供帮助器方法来执行常见操作，并且为了更复杂的使用，将处理任务的本质委托给用户实现的回调接口。JMS 模板遵循相同的设计。这些类提供了各种方便的方法，用于发送消息、同步消费消息，以及向用户公开 JMS 会话和消息生成器。
+
+`org.springframework.jms.support` 软件包提供了 `JMSException` 翻译功能。转换将选中的 `JMSException` 层次结构转换为未选中异常的镜像层次结构。如果存在选中的 `javax.jms.JMSException` 的任何特定于提供程序的子类，则此异常将包装在未选中的 `UncategorizedJmsException` 中。
+
+`org.springframework.jms.support.converter` 包提供了一个 `MessageConverter` 抽象，用于在 Java 对象和 JMS 消息之间进行转换。
+
+`org.springframework.jms.support.destination`包提供了管理 JMS 目的地的各种策略，例如为存储在 JNDI 中的目的地提供服务定位器。
+
+`org.springframework.jms.annotation` 包提供了必要的基础设施，通过使用 `@JmsListener` 来支持注释驱动的侦听器端点。
+
+`org.springframework.jms.config` 包提供了 `jms` 名称空间的解析器实现，以及配置侦听器容器和创建侦听器端点的 java 配置支持。
+
+最后， `org.springframework.jms.connection` 包提供了 `ConnectionFactory` 的实现，适合在独立应用程序中使用。它还包含 Spring 针对 JMS 的 `PlatformTransactionManager`（巧妙地命名为 `JmsTransactionManager`）的实现。这允许将 JMS 作为事务资源无缝集成到 Spring 的事务管理机制中。
+
 >As of Spring Framework 5, Spring’s JMS package fully supports JMS 2.0 and requires the JMS 2.0 API to be present at runtime. We recommend the use of a JMS 2.0 compatible provider.If you happen to use an older message broker in your system, you may try upgrading to a JMS 2.0 compatible driver for your existing broker generation. Alternatively, you may also try to run against a JMS 1.1 based driver, simply putting the JMS 2.0 API jar on the classpath but only using JMS 1.1 compatible API against your driver. Spring’s JMS support adheres to JMS 1.1 conventions by default, so with corresponding configuration it does support such a scenario. However, please consider this for transition scenarios only.
+>
+>从 Spring Framework 5 开始，Spring 的 JMS 包完全支持 JMS 2.0，并要求在运行时提供 JMS 2.0 API。我们建议使用与 JMS 2.0兼容的提供程序。如果您碰巧在系统中使用了较旧的消息代理，您可以尝试升级到与 JMS 2.0 兼容的驱动程序，以生成现有的代理。或者，您也可以尝试运行基于 JMS 1.1 的驱动程序，只需将 JMS 2.0 API jar 放在类路径上，但仅对驱动程序使用与 JMS 1.1 兼容的 API。Spring 的 JMS 支持默认遵循 JMS 1.1 约定，因此通过相应的配置，它确实支持这样的场景。但是，请只考虑过渡场景。
 
 ### 4.1. Using Spring JMS
 
 This section describes how to use Spring’s JMS components.
+
+本节介绍如何使用 Spring 的 JMS 组件。
 
 #### 4.1.1. Using `JmsTemplate`
 
@@ -907,9 +956,23 @@ Some JMS providers allow the setting of default QOS values administratively thro
 
 For convenience, `JmsTemplate` also exposes a basic request-reply operation that allows for sending a message and waiting for a reply on a temporary queue that is created as part of the operation.
 
+`JmsTemplate` 类是 JMS 核心包中的中心类。它简化了 JMS 的使用，因为它在发送或同步接收消息时处理资源的创建和释放。
+
+使用 `JmsTemplate` 的代码只需要实现回调接口，这些接口为它们提供了一个明确定义的高级约定。当给定由调用代码在 `JmsTemplate` 中提供的 `Session` 时，`MessageCreator` 回调接口将创建一条消息。为了允许更复杂地使用 JMS API，`SessionCallback` 提供 JMS 会话（Session），`ProducerCallback` 公开了 `Session` 和 `MessageProducer` 对。
+
+JMS API 公开了两种类型的发送方法，一种是将交付模式、优先级和生存时间作为服务质量（QOS）参数，另一种是不接受 QOS 参数并使用默认值。由于 `JmsTemplate` 有许多发送方法，因此设置 QOS 参数已作为 bean 属性公开，以避免发送方法的数量重复。类似地，同步接收呼叫的超时值是通过使用 `setReceiveTimeout` 属性设置的。
+
+一些 JMS 提供程序允许通过配置 `ConnectionFactory` 以管理方式设置默认 QOS 值。这会导致对 `MessageProducer` 实例的`send` 方法（`send(Destination destination, Message message)`）的调用使用不同于 JMS 规范中指定的 QOS 默认值。因此，为了提供对 QOS 值的一致性管理，`JmsTemplate` 必须通过将布尔属性 `isExplicitQosEnabled` 设置为 `true` 来专门启用，以使用其自己的 QOS 值。
+
+为了方便起见，`JmsTemplate` 还公开了一个基本的请求-应答操作，该操作允许发送消息并在作为操作一部分创建的临时队列上等待应答。
+
 > Instances of the `JmsTemplate` class are thread-safe, once configured. This is important, because it means that you can configure a single instance of a `JmsTemplate` and then safely inject this shared reference into multiple collaborators. To be clear, the `JmsTemplate` is stateful, in that it maintains a reference to a `ConnectionFactory`, but this state is not conversational state.
+>
+> 一旦配置，`JmsTemplate` 类的实例是线程安全的。这很重要，因为这意味着您可以配置 `JmsTemplate` 的单个实例，然后将此共享引用安全地注入多个协作者。需要明确的是，`JmsTemplate` 是有状态的，因为它维护了对 `ConnectionFactory` 的引用，但这种状态不是会话状态。
 
 As of Spring Framework 4.1, `JmsMessagingTemplate` is built on top of `JmsTemplate` and provides an integration with the messaging abstraction — that is, `org.springframework.messaging.Message`. This lets you create the message to send in a generic manner.
+
+从 Spring Framework 4.1 开始，`JmsMessagingTemplate` 构建在 `JmsTemplate` 之上，并提供与消息传递抽象的集成 — 也就是说，`org.springframework.messaging.Message`。这使您可以创建以通用方式发送的消息。
 
 #### 4.1.2. Connections
 
@@ -917,9 +980,17 @@ The `JmsTemplate` requires a reference to a `ConnectionFactory`. The `Connection
 
 When using JMS inside an EJB, the vendor provides implementations of the JMS interfaces so that they can participate in declarative transaction management and perform pooling of connections and sessions. In order to use this implementation, Java EE containers typically require that you declare a JMS connection factory as a `resource-ref` inside the EJB or servlet deployment descriptors. To ensure the use of these features with the `JmsTemplate` inside an EJB, the client application should ensure that it references the managed implementation of the `ConnectionFactory`.
 
+`JmsTemplate` 需要对 `ConnectionFactory` 的引用。`ConnectionFactory` 是 JMS 规范的一部分，是使用 JMS 的入口点。客户端应用程序将其用作工厂，以创建与 JMS 提供程序的连接，并封装各种配置参数，其中许多参数是特定于供应商的，例如 SSL 配置选项。
+
+在 EJB 中使用 JMS 时，供应商提供 JMS 接口的实现，以便它们可以参与声明性事务管理，并执行连接和会话池。为了使用这种实现，Java EE 容器通常需要在 EJB 或 servlet 部署描述符中将 JMS 连接工厂声明为 `resource-ref`。为了确保将这些特性与 EJB中的 `JmsTemplate` 一起使用，客户机应用程序应该确保它引用了 `ConnectionFactory` 的托管实现。
+
 ##### Caching Messaging Resources
 
+##### 缓存消息传递资源
+
 The standard API involves creating many intermediate objects. To send a message, the following 'API' walk is performed:
+
+标准 API 涉及创建许多中间对象。要发送消息，请执行以下 `API` 漫游：
 
 ```
 ConnectionFactory->Connection->Session->MessageProducer->send
@@ -927,13 +998,19 @@ ConnectionFactory->Connection->Session->MessageProducer->send
 
 Between the `ConnectionFactory` and the `Send` operation, three intermediate objects are created and destroyed. To optimize the resource usage and increase performance, Spring provides two implementations of `ConnectionFactory`.
 
+在 `ConnectionFactory` 和 `Send` 操作之间，创建并销毁了三个中间对象。为了优化资源使用并提高性能，Spring 提供了两种 `ConnectionFactory` 的实现。
+
 ##### Using `SingleConnectionFactory`
 
 Spring provides an implementation of the `ConnectionFactory` interface, `SingleConnectionFactory`, that returns the same `Connection` on all `createConnection()` calls and ignores calls to `close()`. This is useful for testing and standalone environments so that the same connection can be used for multiple `JmsTemplate` calls that may span any number of transactions. `SingleConnectionFactory` takes a reference to a standard `ConnectionFactory` that would typically come from JNDI.
 
+Spring 提供了 `ConnectionFactory` 接口，`SingleConnectionFactory` 的实现，该接口在所有 `createConnection()` 调用上返回相同的 `Connection`，并忽略对 `close()` 的调用。这对于测试和独立环境非常有用，这样同一个连接就可以用于多个可能跨越任意多个事务的 `JmsTemplate` 调用 `SingleConnectionFactory` 引用通常来自 JNDI 的标准 `ConnectionFactory`。
+
 ##### Using `CachingConnectionFactory`
 
 The `CachingConnectionFactory` extends the functionality of `SingleConnectionFactory` and adds the caching of `Session`, `MessageProducer`, and `MessageConsumer` instances. The initial cache size is set to `1`. You can use the `sessionCacheSize` property to increase the number of cached sessions. Note that the number of actual cached sessions is more than that number, as sessions are cached based on their acknowledgment mode, so there can be up to four cached session instances (one for each acknowledgment mode) when `sessionCacheSize` is set to one. `MessageProducer` and `MessageConsumer` instances are cached within their owning session and also take into account the unique properties of the producers and consumers when caching. MessageProducers are cached based on their destination. MessageConsumers are cached based on a key composed of the destination, selector, noLocal delivery flag, and the durable subscription name (if creating durable consumers).
+
+`CachingConnectionFactory` 扩展了 `SingleConnectionFactory` 的功能，并添加了 `Session`、`MessageProducer` 和 `MessageConsumer` 实例的缓存。初始缓存大小设置为 `1`。可以使用 `sessionCacheSize` 属性增加缓存会话的数量。请注意，实际缓存会话的数量大于该数量，因为会话是基于其确认模式进行缓存的，所以当 `sessionCacheSize` 设置为 1 时，最多可以有四个缓存会话实例（每个确认模式一个）`MessageProducer` 和 `MessageConsumer` 实例被缓存在它们所属的会话中，并且在缓存时还考虑了生产者和消费者的独特属性。MessageProducer 根据其目的地进行缓存。MessageConsumers 基于由目标、选择器、noLocal 传递标志和持久订阅名称（如果创建持久使用者）组成的密钥进行缓存。
 
 #### 4.1.3. Destination Management
 
@@ -2728,7 +2805,7 @@ The following example shows the bean definitions for the preceding code:
 
 This section describes another implementation of `OrderManager` that uses the `MimeMessagePreparator` callback interface. In the following example, the `mailSender` property is of type `JavaMailSender` so that we are able to use the JavaMail `MimeMessage` class:
 
-本节介绍使用 `MimeMessagePreparator` 回调接口的 `OrderManager` 的另一个实现。在以下示例中，`mailSender` 属性的类型为`JavaMailSender`，因此我们可以使用 JavaMail `MimeMessage` 类：
+本节介绍使用 `MimeMessagePreparator` 回调接口的 `OrderManager` 的另一个实现。在以下示例中，`mailSender` 属性的类型为 `JavaMailSender`，因此我们可以使用 JavaMail `MimeMessage` 类：
 
 ```java
 import javax.mail.Message;
