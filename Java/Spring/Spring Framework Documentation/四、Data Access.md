@@ -56,7 +56,7 @@ The chapter also includes discussions of best practices, [application server int
 
 Traditionally, Java EE developers have had two choices for transaction management: global or local transactions, both of which have profound limitations. Global and local transaction management is reviewed in the next two sections, followed by a discussion of how the Spring Framework’s transaction management support addresses the limitations of the global and local transaction models.
 
-传统上，JavaEE 开发人员有两种事务管理选择：全局事务或本地事务，这两种事务都有很大的局限性。在接下来的两部分中，将回顾全局和本地事务管理，然后讨论 Spring 框架的事务管理支持如何解决全局和本地事务模型的局限性。
+传统上，Java EE 开发人员有两种事务管理选择：全局事务或本地事务，这两种事务都有很大的局限性。在接下来的两部分中，将回顾全局和本地事务管理，然后讨论 Spring 框架的事务管理支持如何解决全局和本地事务模型的局限性。
 
 #### 1.1.1. Global Transactions
 
@@ -86,7 +86,7 @@ Spring resolves the disadvantages of global and local transactions. It lets appl
 
 With programmatic transaction management, developers work with the Spring Framework transaction abstraction, which can run over any underlying transaction infrastructure. With the preferred declarative model, developers typically write little or no code related to transaction management and, hence, do not depend on the Spring Framework transaction API or any other transaction API.
 
-Spring 解决了全局和本地事务的缺点。它允许应用程序开发人员在任何环境中使用一致的编程模型。您只需编写一次代码，就可以从不同环境中的不同事务管理策略中获益。Spring 框架提供声明式和编程式事务管理。大多数用户更喜欢声明式事务管理，我们也建议在大多数情况下使用。
+Spring 解决了全局和本地事务的缺点。它允许应用程序开发人员在任何环境中使用一致的编程模型。您只需编写一次代码，就可以从不同环境中的不同事务管理策略中获益。Spring 框架提供声明式和编程式事务管理。**大多数用户更喜欢声明式事务管理，我们也建议在大多数情况下使用。**
 
 通过编程事务管理，开发人员可以使用 Spring 框架事务抽象，它可以运行在任何底层事务基础设施上。使用首选的声明性模型，开发人员通常很少编写或不编写与事务管理相关的代码，因此不依赖 Spring 框架事务 API 或任何其他事务 API。
 
@@ -137,9 +137,9 @@ The `getTransaction(..)` method returns a `TransactionStatus` object, depending 
 
 As of Spring Framework 5.2, Spring also provides a transaction management abstraction for reactive applications that make use of reactive types or Kotlin Coroutines. The following listing shows the transaction strategy defined by `org.springframework.transaction.ReactiveTransactionManager`:
 
-这主要是一个服务提供者接口（Service Provider interface，SPI），尽管您可以从应用程序代码中 [以编程方式](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-programmatic-ptm) 使用它。由于`PlatformTransactionManager` 是一个接口，因此可以根据需要轻松地对其进行模拟或存根。它与查找策略无关，比如 JNDI。`PlatformTransactionManager`  的实现与 Spring Framework IoC 容器中的任何其他对象（或 bean）一样定义。单凭这一优势就可以让 Spring 框架事务成为一个有价值的抽象，即使在使用 JTA 时也是如此。与直接使用 JTA 相比，测试事务性代码要容易得多。
+这主要是一个服务提供者接口（Service Provider interface，SPI），尽管您可以从应用程序代码中 [以编程方式](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-programmatic-ptm) 使用它。由于`PlatformTransactionManager` 是一个接口，因此可以根据需要轻松地对其进行模拟（Mock）或存根（Stub）。它与查找策略无关，比如 JNDI。`PlatformTransactionManager`  的实现与 Spring Framework IoC 容器中的任何其他对象（或 bean）一样定义。单凭这一优势就可以让 Spring 框架事务成为一个有价值的抽象，即使在使用 JTA 时也是如此。与直接使用 JTA 相比，测试事务性代码要容易得多。
 
-同样，与 Spring 的理念一致，可以由任何 `PlatformTransactionManager`  接口的方法引发的  `TransactionException`  被取消选中（也就是说，它扩展了 `java.lang.RuntimeException` 类）。事务基础设施故障几乎总是致命的。在应用程序代码实际上可以从事务失败中恢复的罕见情况下，应用程序开发人员仍然可以选择捕获并处理 `TransactionException`。突出的一点是，开发人员并不是被迫这么做的。
+同样，与 Spring 的理念一致，`PlatformTransactionManager` 接口的任何方法都可以抛出的未受检查（unchecked）的 `TransactionException`（也就是说，它扩展了 `java.lang.RuntimeException` 类）。事务基础设施故障几乎总是致命的。在应用程序代码实际上可以从事务失败中恢复的罕见情况下，应用程序开发人员仍然可以选择捕获并处理 `TransactionException`。突出的一点是，开发人员并不是被迫这么做的。
 
 `getTransaction(..)`  方法返回一个 `TransactionStatus` 对象，具体取决于 `TransactionDefinition` 参数。如果当前调用堆栈中存在匹配的事务，则返回的 `TransactionStatus` 可能代表新事务，也可能代表现有事务。后一种情况的含义是，与Java EE 事务上下文一样，`TransactionStatus` 与执行线程相关联。
 
@@ -169,18 +169,18 @@ These settings reflect standard transactional concepts. If necessary, refer to r
 
 The `TransactionStatus` interface provides a simple way for transactional code to control transaction execution and query transaction status. The concepts should be familiar, as they are common to all transaction APIs. The following listing shows the `TransactionStatus` interface:
 
-声明式事务管理器主要是一个服务提供者接口（SPI，service provider interface），尽管您可以从应用程序代码中[以编程方式](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-programmatic-rtm) 使用它。因为 `ReactiveTransactionManager` 是一个接口，所以可以根据需要轻松地对其进行模拟或存根。
+声明式事务管理器主要是一个服务提供者接口（SPI，service provider interface），尽管您可以从应用程序代码中[以编程方式](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-programmatic-rtm) 使用它。因为 `ReactiveTransactionManager` 是一个接口，所以可以根据需要轻松地对其进行模拟（mock）或存根（stub）。
 
-`TransactionDefinition`  接口指定：
+**`TransactionDefinition`  接口指定：**
 
-- 传播：通常，事务范围内的所有代码都在该事务中运行。但是，如果在事务上下文已经存在的情况下运行事务方法，则可以指定行为。例如，代码可以在现有事务中继续运行（常见情况），或者可以暂停现有事务并创建新事务。Spring 提供了 EJB CMT 中熟悉的所有事务传播选项。要了解 Spring 中事务传播的语义，请参阅 [Transaction Propagation](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#tx-propagation)
+- 传播：通常，事务范围内的所有代码都在该事务中运行。但是，如果在事务上下文已经存在的情况下运行事务方法，则可以指定行为。例如，代码可以在现有事务中继续运行（常见情况），或者可以暂停现有事务并创建新事务。Spring 提供了 EJB CMT 中熟悉的所有事务传播选项。要了解 Spring 中事务传播的语义，请参阅 [Transaction Propagation](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#tx-propagation)。
 - 隔离：此事务与其他事务的工作隔离的程度。例如，此事务能否看到其他事务中未提交的写入？
 - 超时：此事务在超时并被底层事务基础结构自动回滚之前运行的时间。
 - 只读状态：当代码读取但不修改数据时，可以使用只读事务。在某些情况下，只读事务可能是一种有用的优化，例如在使用 Hibernate 时。
 
 这些设置反映了标准的事务概念。如有必要，请参阅讨论事务隔离级别和其他核心事务概念的参考资料。理解这些概念对于使用 Spring 框架或任何事务管理解决方案至关重要。
 
-`TransactionStatus` 接口为事务代码提供了控制事务执行和查询事务状态的简单方法。这些概念应该很熟悉，因为它们对所有事务 API 都是通用的。下面的列表显示了`TransactionStatus`  接口：
+**`TransactionStatus` 接口为事务代码提供了控制事务执行和查询事务状态的简单方法**。这些概念应该很熟悉，因为它们对所有事务 API 都是通用的。下面的列表显示了`TransactionStatus`  接口：
 
 ```java
 public interface TransactionStatus extends TransactionExecution, SavepointManager, Flushable {
@@ -365,7 +365,7 @@ Or alternatively, you may pass the `JtaTransactionManager` into your `LocalSessi
 
 How to create different transaction managers and how they are linked to related resources that need to be synchronized to transactions (for example `DataSourceTransactionManager` to a JDBC `DataSource`, `HibernateTransactionManager` to a Hibernate `SessionFactory`, and so forth) should now be clear. This section describes how the application code (directly or indirectly, by using a persistence API such as JDBC, Hibernate, or JPA) ensures that these resources are created, reused, and cleaned up properly. The section also discusses how transaction synchronization is (optionally) triggered through the relevant `TransactionManager`.
 
-现在应该清楚地知道如何创建不同的事务管理器，以及它们如何链接到需要与事务同步的相关资源（例如，`DataSourceTransactionManager` 到JDBC `DataSource`，以及 `HibernateTransactionManager` 到 Hibernate  `SessionFactory`，等等）。本节描述应用程序代码（通过使用持久性API（如 JDBC、Hibernate 或 JPA）直接或间接地）如何确保这些资源的创建、重用和正确清理。本节还讨论了如何（可选地）通过相关的`TransactionManager` 触发事务同步。
+**现在应该清楚地知道如何创建不同的事务管理器，以及它们如何链接到需要与事务同步的相关资源**（例如，`DataSourceTransactionManager` 到 JDBC `DataSource`，以及 `HibernateTransactionManager` 到 Hibernate  `SessionFactory`，等等）。本节描述应用程序代码（通过使用持久性 API（如 JDBC、Hibernate 或 JPA）直接或间接地）如何确保这些资源的创建、重用和正确清理。本节还讨论了如何（可选地）通过相关的 `TransactionManager` 触发事务同步。
 
 #### 1.3.1. High-level Synchronization Approach
 
@@ -442,10 +442,10 @@ Spring 框架的声明性事务管理类似于 EJB CMT，因为您可以**将事
 - 与绑定到 JTA 的 EJB CMT 不同，**Spring 框架的声明式事务管理可以在任何环境中工作**。它可以通过使用 JDBC、JPA 处理 JTA 事务或本地事务，或者通过调整配置文件来使用 Hibernate。
 - 您可以将 Spring 框架声明式事务管理应用于任何类，而不仅仅是像 EJB 这样的特殊类。
 - Spring 框架提供声明性[回滚规则](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#transaction-declarative-rolling-back)，这是一个没有 EJB 等价物的特性。提供了对回滚规则的编程和声明支持。
-- Spring 框架允许您使用 AOP 定制事务行为。例如，在事务回滚的情况下，可以插入自定义行为。您还可以添加任意通知以及事务性通知。但是如果使用 EJB CMT，除了通过 `setRollbackOnly()` 之外，您无法影响容器的事务管理。
+- **Spring 框架允许您使用 AOP 定制事务行为。例如，在事务回滚的情况下，可以插入自定义行为。您还可以添加任意通知以及事务性通知**。但是如果使用 EJB CMT，除了通过 `setRollbackOnly()` 之外，您无法影响容器的事务管理。
 - **Spring 框架不支持事务上下文跨远程调用的传播**，就像高端应用服务器那样。如果您需要此功能，我们建议您使用 EJB。但是，在使用这样的特性之前要仔细考虑，因为通常情况下，不希望事务跨越远程调用。
 
-回滚规则的概念很重要。它们允许您指定哪些异常（和 throwables）应该导致自动回滚。您可以在配置中，而不是在 Java 代码中，以声明的方式指定这一点。因此，尽管您仍然可以在 `TransactionStatus` 对象上调用 `setRollbackOnly()`，以回滚当前事务，但大多数情况下，您可以指定`MyApplicationException` 必须始终导致回滚的规则。此选项的显著优点是业务对象不依赖于事务基础架构。例如，他们通常不需要导入 Spring 事务 API 或其他 Spring  API。
+回滚规则的概念很重要。它们允许您指定哪些异常（和 throwables）应该导致自动回滚。您可以在配置中，而不是在 Java 代码中，以声明的方式指定这一点。因此，尽管您仍然可以在 `TransactionStatus` 对象上调用 `setRollbackOnly()`，以回滚当前事务，但大多数情况下，您可以指定 `MyApplicationException` 必须始终导致回滚的规则。此选项的显著优点是业务对象不依赖于事务基础架构。例如，他们通常不需要导入 Spring 事务 API 或其他 Spring  API。
 
 尽管 EJB 容器默认行为会在系统异常（通常是运行时异常）时自动回滚事务，但 EJB CMT不 会在应用程序异常（即除 `java.rmi.RemoteException` 之外的已检查异常）时自动回滚事务。虽然声明性事务管理的 Spring 默认行为遵循 EJB 约定（只有在未检查的异常情况下才会自动回滚），但定制这种行为通常很有用。
 

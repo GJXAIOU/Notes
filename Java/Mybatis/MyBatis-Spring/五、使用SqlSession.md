@@ -12,10 +12,13 @@
 
 可以使用 `SqlSessionFactory` 作为构造方法的参数来创建 `SqlSessionTemplate` 对象。
 
-```
+```xml
 <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
   <constructor-arg index="0" ref="sqlSessionFactory" />
 </bean>
+```
+
+```java
 @Configuration
 public class MyBatisConfig {
   @Bean
@@ -27,7 +30,7 @@ public class MyBatisConfig {
 
 现在，这个 bean 就可以直接注入到你的 DAO bean 中了。你需要在你的 bean 中添加一个 SqlSession 属性，就像下面这样：
 
-```
+```java
 public class UserDaoImpl implements UserDao {
 
   private SqlSession sqlSession;
@@ -44,7 +47,7 @@ public class UserDaoImpl implements UserDao {
 
 按下面这样，注入 `SqlSessionTemplate`：
 
-```
+```xml
 <bean id="userDao" class="org.mybatis.spring.sample.dao.UserDaoImpl">
   <property name="sqlSession" ref="sqlSession" />
 </bean>
@@ -52,11 +55,14 @@ public class UserDaoImpl implements UserDao {
 
 `SqlSessionTemplate` 还有一个接收 `ExecutorType` 参数的构造方法。这允许你使用如下 Spring 配置来批量创建对象，例如批量创建一些 SqlSession：
 
-```
+```xml
 <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
   <constructor-arg index="0" ref="sqlSessionFactory" />
   <constructor-arg index="1" value="BATCH" />
 </bean>
+```
+
+```java
 @Configuration
 public class MyBatisConfig {
   @Bean
@@ -68,7 +74,7 @@ public class MyBatisConfig {
 
 现在所有的映射语句可以进行批量操作了，可以在 DAO 中编写如下的代码
 
-```
+```java
 public class UserService {
   private final SqlSession sqlSession;
   public UserService(SqlSession sqlSession) {
@@ -90,7 +96,7 @@ public class UserService {
 
 `SqlSessionDaoSupport` 是一个抽象的支持类，用来为你提供 `SqlSession`。调用 `getSqlSession()` 方法你会得到一个 `SqlSessionTemplate`，之后可以用于执行 SQL 方法，就像下面这样:
 
-```
+```java
 public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
   public User getUser(String userId) {
     return getSqlSession().selectOne("org.mybatis.spring.sample.mapper.UserMapper.getUser", userId);
@@ -104,7 +110,7 @@ public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
 
 假设类 `UserMapperImpl` 是 `SqlSessionDaoSupport` 的子类，可以编写如下的 Spring 配置来执行设置：
 
-```
+```xml
 <bean id="userDao" class="org.mybatis.spring.sample.dao.UserDaoImpl">
   <property name="sqlSessionFactory" ref="sqlSessionFactory" />
 </bean>

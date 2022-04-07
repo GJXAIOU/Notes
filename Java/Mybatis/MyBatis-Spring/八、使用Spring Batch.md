@@ -18,7 +18,7 @@ reader 还提供了一些标准的请求参数。在命名查询的 SQL 中，�
 
 它们可以被映射成如下的 select 语句：
 
-```
+```xml
 <select id="getEmployee" resultMap="employeeBatchResult">
   SELECT id, name, job FROM employees ORDER BY id ASC LIMIT #{_skiprows}, #{_pagesize}
 </select>
@@ -26,11 +26,14 @@ reader 还提供了一些标准的请求参数。在命名查询的 SQL 中，�
 
 配合如下的配置样例：
 
-```
+```xml
 <bean id="reader" class="org.mybatis.spring.batch.MyBatisPagingItemReader">
   <property name="sqlSessionFactory" ref="sqlSessionFactory" />
   <property name="queryId" value="com.my.name.space.batch.EmployeeMapper.getEmployee" />
 </bean>
+```
+
+```java
 @Configuration
 public class BatchAppConfig {
   @Bean
@@ -45,7 +48,7 @@ public class BatchAppConfig {
 
 **让我们通过一个更复杂一点的例子来阐明一切：**
 
-```
+```xml
 <bean id="dateBasedCriteriaReader"
   class="org.mybatis.spring.batch.MyBatisPagingItemReader"
   p:sqlSessionFactory-ref="batchReadingSessionFactory"
@@ -59,6 +62,9 @@ public class BatchAppConfig {
   <entry key="first_day_of_the_month" value="#{jobExecutionContext['FIRST_DAY_OF_THE_MONTH_DATE']}"/>
   <entry key="first_day_of_the_previous_month" value="#{jobExecutionContext['FIRST_DAY_OF_THE_PREVIOUS_MONTH_DATE']}"/>
 </util:map>
+```
+
+```java
 @Configuration
 public class BatchAppConfig {
   @StepScope
@@ -92,7 +98,7 @@ public class BatchAppConfig {
 
 上面的样例使用了几个东西：
 
-- `sqlSessionFactory：可以为 reader 指定你自定义的 sessionFactory，当你想从多个数据库中读取数据时尤其有用
+- `sqlSessionFactory`：可以为 reader 指定你自定义的 sessionFactory，当你想从多个数据库中读取数据时尤其有用
 - `queryId`：指定在检索记录时要执行的查询的 ID，可以指定短的 ID 或是带命名空间的完整 ID。一般来说，你的应用可能从多个表或数据库中读取数据，因此会配置多个查询，可能会使用到在不同命名空间中的不同映射器。因此最好提供映射器文件的命名空间以便准确指定你想使用的查询 ID。
 - `parameterValues`：可以通过这个 map 传递多个附加的参数，上面的例子中就使用了一个由 Spring 构建的 map，并使用 SpEL 表达式从 `jobExecutionContext` 中获取信息。 而 map 的键将在映射器文件中被 MyBatis 使用（例如：*yesterday* 可以通过 `#{yesterday,jdbcType=TIMESTAMP}` 来读取）。注意，map 和 reader 都构建于 `step` 作用域，这样才能够在 Spring 表达式语言中使用 `jobExecutionContext`。 另外，如果正确配置了 MyBatis 的类型处理器，你可以将自定义的实例像参数那样传递到 map 中，比如将参数类型换成 JodaTime。
 - `pageSize`：如果批处理流配置了块大小（chunk size），需要通过此属性将块大小告知 reader。
@@ -109,7 +115,7 @@ public class BatchAppConfig {
 
 当使用游标时，只需要执行普通的查询：
 
-```
+```xml
 <select id="getEmployee" resultMap="employeeBatchResult">
   SELECT id, name, job FROM employees ORDER BY id ASC
 </select>
@@ -117,11 +123,14 @@ public class BatchAppConfig {
 
 搭配以下的配置样例：
 
-```
+```xml
 <bean id="reader" class="org.mybatis.spring.batch.MyBatisCursorItemReader">
   <property name="sqlSessionFactory" ref="sqlSessionFactory" />
   <property name="queryId" value="com.my.name.space.batch.EmployeeMapper.getEmployee" />
 </bean>
+```
+
+```java
 @Configuration
 public class BatchAppConfig {
   @Bean
@@ -142,11 +151,14 @@ public class BatchAppConfig {
 
 下面是一个配置样例：
 
-```
+```xml
 <bean id="writer" class="org.mybatis.spring.batch.MyBatisBatchItemWriter">
   <property name="sqlSessionFactory" ref="sqlSessionFactory" />
   <property name="statementId" value="com.my.name.space.batch.EmployeeMapper.updateEmployee" />
 </bean>
+```
+
+```java
 @Configuration
 public class BatchAppConfig {
   @Bean
@@ -165,7 +177,7 @@ public class BatchAppConfig {
 
 首先，创建一个自定义的转换器类（或工厂方法）。以下例子使用了工厂方法。
 
-```
+```java
 public class ItemToParameterMapConverters {
   public static <T> Converter<T, Map<String, Object>> createItemToParameterMapConverter(String operationBy, LocalDateTime operationAt) {
     return item -> {
@@ -181,7 +193,7 @@ public class ItemToParameterMapConverters {
 
 接下来，编写 SQL 映射。
 
-```
+```xml
 <select id="createPerson" resultType="org.mybatis.spring.sample.domain.Person">
     insert into persons (first_name, last_name, operation_by, operation_at)
            values(#{item.firstName}, #{item.lastName}, #{operationBy}, #{operationAt})
@@ -190,7 +202,7 @@ public class ItemToParameterMapConverters {
 
 最后，配置 `MyBatisBatchItemWriter`。
 
-```
+```java
 @Configuration
 public class BatchAppConfig {
   @Bean
@@ -202,6 +214,9 @@ public class BatchAppConfig {
         .build();
   }
 }
+```
+
+```xml
 <bean id="writer" class="org.mybatis.spring.batch.MyBatisBatchItemWriter">
   <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
   <property name="statementId" value="org.mybatis.spring.sample.mapper.PersonMapper.createPerson"/>
@@ -222,7 +237,7 @@ public class BatchAppConfig {
 
 在这种方法中，处理 Spring Batch 项的处理器中将会*持有*各种不同的记录。假设每个项都有一个与 *InteractionMetadata* 相关联的 *Interaction*，并且还有两个不相关的行 *VisitorInteraction* 和 *CustomerInteraction*，这时候持有器（holder）看起来像这样：
 
-```
+```java
 public class InteractionRecordToWriteInMultipleTables {
   private final VisitorInteraction visitorInteraction;
   private final CustomerInteraction customerInteraction;
@@ -236,7 +251,7 @@ public class Interaction {
 
 在 Spring 配置中要配置一个 `CompositeItemWriter`，它将会将写入操作委托到特定种类的 writer 上面去。注意 *InteractionMetadata* 在例子里面是一个关联，它需要首先被写入，这样 Interaction 才能获得更新之后的键。
 
-```
+```xml
 <bean id="interactionsItemWriter" class="org.springframework.batch.item.support.CompositeItemWriter">
   <property name="delegates">
     <list>
@@ -249,6 +264,9 @@ public class Interaction {
     </list>
   </property>
 </bean>
+```
+
+```java
 @Configuration
 public class BatchAppConfig {
   @Bean
@@ -267,7 +285,7 @@ public class BatchAppConfig {
 
 接下来需要配置每一个被委托的 writer；例如 *Interaction* 和 *InteractionMetadata* 对应的 writer。
 
-```
+```xml
 <bean id="interactionMetadataWriter"
   class="org.mybatis.spring.batch.MyBatisBatchItemWriter"
   p:sqlSessionTemplate-ref="batchSessionTemplate"
@@ -282,7 +300,7 @@ public class BatchAppConfig {
 
 而在映射器配置文件中，应该根据每种特定的记录编写特定的语句，如下所示：
 
-```
+```xml
 <insert id="insertInteractionMetadata"
   parameterType="com.my.batch.interactions.item.InteractionRecordToWriteInMultipleTables"
   useGeneratedKeys="true"
@@ -304,4 +322,4 @@ public class BatchAppConfig {
 
 执行的时候会怎么样呢？首先，`insertInteractionMetadata` 将会被调用，update 语句被设置为返回由 JDBC 驱动返回的主键（参考 `keyProperty` 和 `keyColumn`）。 由于 `InteractionMetadata` 的对象被此查询更新了，下一个查询将可以通过 `insertInteraction` 开展父对象 `Interaction` 的写入工作。
 
-***然而要注意，JDBC 驱动在这方面的行为并不总是与此相一致。在编写文档时，H2 的数据库驱动 1.3.168 甚至只在 BATCH 模式下返回最后的索引值（参考 `org.h2.jdbc.JdbcStatement#getGeneratedKeys`）， 而 MySQL 的 JDBC 驱动则工作良好并返回所有 ID。\***
+**然而要注意，JDBC 驱动在这方面的行为并不总是与此相一致。在编写文档时，H2 的数据库驱动 1.3.168 甚至只在 BATCH 模式下返回最后的索引值（参考 `org.h2.jdbc.JdbcStatement#getGeneratedKeys`）， 而 MySQL 的 JDBC 驱动则工作良好并返回所有 ID。**
