@@ -1795,12 +1795,12 @@
 ### 附  2：本手册专有名词
 
 - POJO（Plain Ordinary Java Object）: 在本规约中，POJO专指只有 setter/getter/toString 的简单类，包括 DO/DTO/BO/VO 等。 
-- DO（Data Object）：阿里巴巴专指数据库表一一对应的 POJO 类。此对象与数据库表结构一一对应，通过 DAO 层向上传输数据源对象。
-- DTO（Data Transfer Object）：数据传输对象，Service 或 Manager 向外传输的对象。
-- BO（Business Object）：业务对象，可以由 Service 层输出的封装业务逻辑的对象。 
+- DO（Data Object）：阿里巴巴专指数据库表一一对应的 POJO 类。此对象与数据库表结构一一对应，通过 DAO 层向上传输数据源对象。就是从现实世界中抽象出来的有形或无形的业务实体。
+- DTO（Data Transfer Object）：数据传输对象，Service 或 Manager 向外传输的对象。泛指用于展示层与服务层之间的数据传输对象。
+- BO（Business Object）：业务对象，可以由 Service 层输出的封装业务逻辑的对象。 从业务模型的角度看 , 见 UML 元件领域模型中的领域对象。封装业务逻辑的 java 对象 , 通过调用 DAO 方法 , 结合 PO,VO 进行业务操作。 business object: 业务对象 主要作用是把业务逻辑封装为一个对象。这个对象可以包括一个或多个其它的对象。 比如一个简历，有教育经历、工作经历、社会关系等等。 我们可以把教育经历对应一个 PO ，工作经历对应一个 PO ，社会关系对应一个 PO 。 建立一个对应简历的 BO 对象处理简历，每个 BO 包含这些 PO 。 这样处理业务逻辑时，我们就可以针对 BO 去处理。
 - Query：数据查询对象，各层接收上层的查询请求。注意超过 2 个参数的查询封装，禁止使用Map 类来传输。
-- VO（View Object）：显示层对象，通常是 Web 向模板渲染引擎层传输的对象。 
-- AO（Application Object）: 阿里巴巴专指 Application Object，即在 Service 层上，极为贴近业务的复用代码。
+- VO（View Object）：显示层对象，通常是 Web 向模板渲染引擎层传输的对象。 它的作用是把某个指定页面（或组件）的所有数据封装起来。
+- AO（Application Object）: 阿里巴巴专指 Application Object，即在 Service 层上，极为贴近业务的复用代码。应用对象。 在Web层与Service层之间抽象的复用对象模型，极为贴近展示层，复用度不高。
 - CAS（Compare And Swap）：解决多线程并行情况下使用锁造成性能损耗的一种机制，这是硬件实现的原子操作。CAS 操作包含三个操作数：内存位置、预期原值和新值。如果内存位置的值与预期原值相匹配，那么处理器会自动将该位置值更新为新值。否则，处理器不做任何操作。
 - GAV（GroupId、ArtifactId、Version）: Maven 坐标，是用来唯一标识 jar 包。 
 - OOP（Object Oriented Programming）: 本文泛指类、对象的编程处理方式。

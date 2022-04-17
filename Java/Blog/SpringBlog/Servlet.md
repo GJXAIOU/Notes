@@ -1,68 +1,49 @@
 # Servlet（上）
 
-[![bravo1988](https://pica.zhimg.com/v2-1907eb21be63d35b077e6ed3cbcbfe13_xs.jpg?source=172ae18b)](https://www.zhihu.com/people/huangsunting)
-
-[bravo1988](https://www.zhihu.com/people/huangsunting)
-
-Java进阶小册已上线，详见动态置顶，助力野生程序员
-
-关注他
-
-175 人赞同了该文章
-
-忘写Servlet了，还是有很多东西想聊聊。向大家保证，写完这几篇就真的收手。
-
-主要内容：
-
-- Servlet的前世今生
-- 我所理解的JavaWeb三大组件
-- 如何编写一个Servlet
-
-------
 
 ## Servlet的前世今生
 
-类似于Servlet是**Ser**ver App**let**（运行在服务端的小程序）等其他博文已经提过的内容，这里就不重复了。它就是用来处理浏览器请求的。
+类似于 Servlet 是 **Server Applet**（运行在服务端的小程序）等其他博文已经提过的内容，这里就不重复了。它就是用来处理浏览器请求的。
 
-之前在[Tomcat外传](https://zhuanlan.zhihu.com/p/54121733)中我们聊过，所谓Tomcat其实是Web服务器和Servlet容器的结合体。
+之前在 [Tomcat外传](https://zhuanlan.zhihu.com/p/54121733)中我们聊过，所谓 Tomcat 其实是 Web 服务器和 Servlet 容器的结合体。
 
-什么是Web服务器？
+什么是 Web 服务器？
 
-比如，我当前在杭州，你能否用自己的电脑访问我桌面上的一张图片？恐怕不行。我们太习惯通过URL访问一个网站、下载一部电影了。一个资源，如果没有URL映射，那么外界几乎很难访问。而Web服务器的作用说穿了就是：将某个主机上的资源映射为一个URL供外界访问。
+比如，我当前在杭州，你能否用自己的电脑访问我桌面上的一张图片？恐怕不行。我们太习惯通过URL访问一个网站、下载一部电影了。一个资源，如果没有 URL 映射，那么外界几乎很难访问。而 Web 服务器的作用说穿了就是：将某个主机上的资源映射为一个 URL 供外界访问。
 
 什么是Servlet容器？
 
-Servlet容器，顾名思义里面存放着Servlet对象。我们为什么能通过Web服务器映射的URL访问资源？肯定需要写程序处理请求，主要3个过程：
+Servlet 容器，顾名思义里面存放着 Servlet 对象。我们为什么能通过Web服务器映射的URL访问资源？肯定需要写程序处理请求，主要3个过程：
 
 - 接收请求
 - 处理请求
 - 响应请求
 
-任何一个应用程序，必然包括这三个步骤。其中接收请求和响应请求是共性功能，且没有差异性。访问淘宝和访问京东，都是接收[www.taobao.com/brandNo=1](https://link.zhihu.com/?target=http%3A//www.taobao.com/brandNo%3D1)，响应给浏览器的都是JSON数据。于是，大家就把接收和响应两个步骤抽取成Web服务器：
+任何一个应用程序，必然包括这三个步骤。其中接收请求和响应请求是共性功能，且没有差异性。访问淘宝和访问京东，都是接收 [www.taobao.com/brandNo=1](https://link.zhihu.com/?target=http%3A//www.taobao.com/brandNo%3D1)，响应给浏览器的都是 JSON 数据。于是，大家就把接收和响应两个步骤抽取成 Web 服务器：
 
 ![img](https://pic4.zhimg.com/80/v2-3d86f470ec1dc31bbe93d1df2c30fa47_720w.jpg)
 
-但处理请求的逻辑是不同的。没关系，抽取出来做成Servlet，交给程序员自己编写。当然，随着后期互联网发展，出现了三层架构，所以一些逻辑就从Servlet抽取出来，分担到Service和Dao。
+但处理请求的逻辑是不同的。没关系，抽取出来做成 Servlet，交给程序员自己编写。当然，随着后期互联网发展，出现了三层架构，所以一些逻辑就从 Servlet 抽取出来，分担到 Service 和 Dao。
 
-![img](https://pic2.zhimg.com/80/v2-f41587429ebde63225029b0c235960c1_720w.jpg)JavaWeb开发经典三层架构：代码分层，逻辑清晰，还解耦
+![img](https://pic2.zhimg.com/80/v2-f41587429ebde63225029b0c235960c1_720w.jpg)Java Web 开发经典三层架构：代码分层，逻辑清晰，还解耦
 
-但是Servlet并不擅长往浏览器输出HTML页面，所以出现了JSP。JSP的故事，我已经在[浅谈JSP](https://zhuanlan.zhihu.com/p/42343690)讲过了。
+但是 Servlet 并不擅长往浏览器输出 HTML 页面，所以出现了 JSP。JSP 的故事，我已经在[浅谈 JSP](https://zhuanlan.zhihu.com/p/42343690)讲过了。
 
-等Spring家族出现后，Servlet开始退居幕后，取而代之的是方便的SpringMVC。SpringMVC的核心组件DispatcherServlet其实本质就是一个Servlet。但它已经自立门户，在原来HttpServlet的基础上，又封装了一条逻辑。
+等 Spring 家族出现后，Servlet 开始退居幕后，取而代之的是方便的 SpringMVC。SpringMVC 的核心组件DispatcherServlet 其实本质就是一个 Servlet。但它已经自立门户，在原来 HttpServlet 的基础上，又封装了一条逻辑。
 
-总之，很多新手程序员框架用久了，甚至觉得SpringMVC就是SpringMVC，和Servlet没半毛钱关系。没关系，看完以后你就想起来被Servlet支配的恐惧了。
+总之，很多新手程序员框架用久了，甚至觉得 Spring MVC 就是 Spring MVC，和 Servlet 没半毛钱关系。没关系，看完以后你就想起来被 Servlet 支配的恐惧了。
 
 ------
 
-## 我所理解的JavaWeb三大组件
+## 我所理解的 Java Web 三大组件
 
-不知道从什么时候开始，我们已经不再关心、甚至根本不知道到底谁调用了我写的这个程序，反正我写了一个类，甚至从来没new过，它就跑起来了...
+不知道从什么时候开始，我们已经不再关心、甚至根本不知道到底谁调用了我写的这个程序，反正我写了一个类，甚至从来没 new 过，它就跑起来了...
 
-我们把模糊的记忆往前推一推，没错，就是在学了Tomcat后！从Tomcat开始，我们再也没写过main方法。以前，一个main方法启动，程序间的调用井然有序，我们知道程序所有流转过程。
+我们把模糊的记忆往前推一推，没错，就是在学了 Tomcat 后！从 Tomcat 开始，我们再也没写过 main 方法。以前，一个main 方法启动，程序间的调用井然有序，我们知道程序所有流转过程。
 
-但是到了Javaweb后，Servlet/Filter/Listener一路下来我们越学越沮丧。没有main，也没有new，写一个类然后在web.xml中配个标签，它们就这么兀自运行了。
+但是到了 Java web 后，Servlet/Filter/Listener 一路下来我们越学越沮丧。没有 main，也没有 new，写一个类然后在web.xml 中配个标签，它们就这么兀自运行了。
 
-其实，这一切的一切，简单来说就是“注入”和“回调”。想象一下吧朋友们，Tomcat里有个main方法，假设是这样的：
+其实，这一切的一切，简单来说就是“注入”和“回调”。想象一下 Tomcat 里有个 main 方法，假设是这样的：
 
 ![img](https://pic3.zhimg.com/80/v2-ce6e39bb02e3c6a2f4eb1e5afaa6e4e6_720w.jpg)
 
@@ -70,31 +51,31 @@ Servlet容器，顾名思义里面存放着Servlet对象。我们为什么能通
 
 ![img](https://pic3.zhimg.com/80/v2-d473a8662d758859e75c3f9afce9e982_720w.jpg)
 
-其实，编程学习越往后越是如此，我们能做的其实很有限。大部分工作，框架都已经帮我们做了。只要我们实现xxx接口，它会帮我们创建实例，然后搬运（接口注入）到它合适的位置，然后一套既定的流程下来，肯定会执行到。我只能用中国一个古老的成语形容这种开发模式：闭门造车，出门合辙（敲黑板，成语本身是夸技术牛逼，而不是说某人瞎几把搞）。
+其实，编程学习越往后越是如此，我们能做的其实很有限。大部分工作，框架都已经帮我们做了。只要我们实现 xxx 接口，它会帮我们创建实例，然后搬运（接口注入）到它合适的位置，然后一套既定的流程下来，肯定会执行到。我只能用中国一个古老的成语形容这种开发模式：闭门造车，出门合辙（敲黑板，成语本身是夸技术牛逼，而不是说某人瞎几把搞）。
 
 很多时候，框架就像一个傀儡师，我们写的程序是傀儡，顶多就是给傀儡化化妆、打扮打扮，实际的运作全是傀儡师搞的。
 
-![img](https://pic2.zhimg.com/80/v2-ad197d60b26731c743e17423a5adf919_720w.jpg)
 
-了解到这个层面后，JavaWeb三大组件任何生命周期相关的方法、以及调用时Tomcat传入的形参，这里就不再强调。肯定是程序的某处，在创建实例后紧接着就传入参数调用了呗。没啥神秘的。
+
+了解到这个层面后，Java Web 三大组件任何生命周期相关的方法、以及调用时 Tomcat 传入的形参，这里就不再强调。肯定是程序的某处，在创建实例后紧接着就传入参数调用了呗。没啥神秘的。
 
 ------
 
-## 如何编写一个Servlet
+## 如何编写一个 Servlet
 
 首先，我们心里必须有一个信念：我们都是菜鸡，框架肯定不会让我们写很难的代码。
 
-你别不服。进入Tomcat阶段后，我们开始全面面向接口编程。但是“面向接口编程”这个概念，最早其实出现在JDBC阶段。我就问你，JDBC接口是你自己实现的吗？别闹了，你导入MySQL的驱动包，它给你搞定了一切。
+进入 Tomcat 阶段后，我们开始全面面向接口编程。但是“面向接口编程”这个概念，最早其实出现在 JDBC 阶段。我就问你，JDBC 接口是你自己实现的吗？别闹了，你导入 MySQL 的驱动包，它给你搞定了一切。
 
-真正的连接过程太难写了，朋友们。底层就是TCP连接数据库啊，你会吗？写Socket，然后进行数据库校验，最后返回Connection？这显然超出我们的能力范围了。我们这么菜，JDBC不可能让我们自己动手的。所以各大数据库厂商体贴地推出了驱动包，里面有个Driver类，调用
+真正的连接过程太难写了，朋友们。底层就是 TCP 连接数据库啊，你会吗？写 Socket，然后进行数据库校验，最后返回Connection？这显然超出我们的能力范围了。我们这么菜，JDBC 不可能让我们自己动手的。所以各大数据库厂商体贴地推出了驱动包，里面有个 Driver 类，调用
 
 ```text
 driver.connect(url, username, password);
 ```
 
-即可得到Connection。
+即可得到 Connection。
 
-BUT，这一次难得Tomcat竟然这么瞧得起我黄某 ，仅仅提供了javax.servlet接口，这是打算让我自己去实现？
+BUT，这一次难得 Tomcat 竟然这么瞧得起我黄某 ，仅仅提供了 javax.servlet 接口，这是打算让我自己去实现？
 
 不，不可能的，肯定是因为太简单了。
 
@@ -102,37 +83,37 @@ BUT，这一次难得Tomcat竟然这么瞧得起我黄某 ，仅仅提供了java
 
 ![img](https://pic4.zhimg.com/80/v2-cbb35ec0c92292ea599108e643fd5183_720w.jpg)
 
-五个方法，最难的地方在于形参，然而Tomcat会事先把形参对象封装好传给我...除此以外，既不需要我写TCP连接数据库，也不需要我解析HTTP请求，更不需要我把结果转成HTTP响应，request对象和response对象帮我搞定了。
+五个方法，最难的地方在于形参，然而 Tomcat 会事先把形参对象封装好传给我...除此以外，既不需要我写 TCP 连接数据库，也不需要我解析 HTTP 请求，更不需要我把结果转成 HTTP 响应，request 对象和 response 对象帮我搞定了。
 
-看吧，Tomcat是不是把我们当成智障啊。
+看吧，Tomcat 是不是把我们当成智障啊。
 
-Tomcat之所以放心地交给我们实现，是因为Servlet里主要写的代码都是业务逻辑代码。和原始的、底层的解析、连接等没有丝毫关系。最难的几个操作，人家已经给你封装成形参传进来了。
+Tomcat 之所以放心地交给我们实现，是**因为 Servlet 里主要写的代码都是业务逻辑代码**。和原始的、底层的解析、连接等没有丝毫关系。最难的几个操作，人家已经给你封装成形参传进来了。
 
-也就是说，**Servlet虽然是个接口，但实现类只是个空壳，我们写点业务逻辑就好了。**
+也就是说，**Servlet 虽然是个接口，但实现类只是个空壳，我们写点业务逻辑就好了。**
 
 ![img](https://pic1.zhimg.com/80/v2-1a911529c489ebdcb2a17a8e19d87290_720w.jpg)
 
-总的来说，Tomcat已经替我们完成了所有“菜鸡程序员搞不定的骚操作”，并且传入三个对象：ServletConfig、ServletRequest、ServletResponse。接下来，我们看看这三个传进来都是啥。
+总的来说，Tomcat 已经替我们完成了所有“菜鸡程序员搞不定的骚操作”，并且传入三个对象：ServletConfig、ServletRequest、ServletResponse。接下来，我们看看这三个传进来都是啥。
 
 
 
 **ServletConfig**
 
-翻译过来就是“Servlet配置”。我们在哪配置Servlet来着？web.xml嘛。请问你会用dom4j解析xml得到对象吗？
+翻译过来就是“Servlet 配置”。我们在哪配置 Servlet 来着？web.xml 嘛。请问你会用 dom4j 解析 xml 得到对象吗？
 
 可能...会吧，就是不熟练，嘿嘿嘿。
 
-所以，Tomcat还真没错怪我们，已经帮“菜鸡们”搞掂啦：
+所以，Tomcat 还真没错怪我们，已经帮“菜鸡们”搞掂啦：
 
 ![img](https://pic1.zhimg.com/80/v2-3dd656100783b3e9e62621ad8e2e9b04_720w.jpg)
 
-也就是说，servletConfig对象封装了servlet的一些参数信息。如果需要，我们可以从它获取。
+也就是说，servletConfig 对象封装了 servlet 的一些参数信息。如果需要，我们可以从它获取。
 
 
 
 **Request/Response**
 
-两位老朋友，不用多介绍了。其实，很多人看待HTTP和Request/Response的眼光过于分裂。它们的关系就像菜园里的大白菜和餐桌上的酸辣白菜一样。HTTP请求到了Tomcat后，Tomcat通过字符串解析，把各个请求头（Header），请求地址（URL），请求参数（QueryString）都封装进了Request对象中。通过调用
+两位老朋友，不用多介绍了。其实，很多人看待 HTTP 和 Request/Response 的眼光过于分裂。它们的关系就像菜园里的大白菜和餐桌上的酸辣白菜一样。**HTTP 请求到了 Tomcat 后，Tomcat 通过字符串解析，把各个请求头（Header），请求地址（URL），请求参数（QueryString）都封装进了 Request 对象中**。通过调用
 
 ```text
 request.getHeader();
@@ -143,17 +124,17 @@ request.getQueryString();
 
 等等方法，都可以得到浏览器当初发送的请求信息。
 
-至于Response，Tomcat传给Servlet时，它还是空的对象。Servlet逻辑处理后得到结果，最终通过response.write()方法，将结果写入response内部的缓冲区。Tomcat会在servlet处理结束后，拿到response，遍历里面的信息，组装成HTTP响应发给客户端。
+至于 Response，Tomcat 传给 Servlet 时，它还是空的对象。Servlet 逻辑处理后得到结果，最终通过 response.write() 方法，将结果写入 response 内部的缓冲区。Tomcat 会在 servlet 处理结束后，拿到 response，遍历里面的信息，组装成HTTP 响应发给客户端。
 
 ![img](https://pic1.zhimg.com/80/v2-7405fb1912570c73de8dd76da725b17c_720w.jpg)
 
-Servlet接口5个方法，其中init、service、destroy是生命周期方法。init和destroy各自只执行一次，即servlet创建和销毁时。而service会在每次有新请求到来时被调用。也就是说，我们主要的业务代码需要写在service中。
+**Servlet 接口 5 个方法，其中 init、service、destroy 是生命周期方 法。init 和destroy 各自只执行一次，即 servlet 创建和销毁时。而 service 会在每次有新请求到来时被调用。也就是说，我们主要的业务代码需要写在 service 中。**
 
 但是，浏览器发送请求最基本的有两种：Get/Post，于是我们必须这样写：
 
 ![img](https://pic1.zhimg.com/80/v2-94e6aac29c7bb1353020d2df7f422d58_720w.jpg)
 
-很烦啊。有没有办法简化这个操作啊？我不想直接实现javax.servlet接口啊。
+很烦啊。有没有办法简化这个操作啊？我不想直接实现 javax.servlet 接口啊。
 
 
 

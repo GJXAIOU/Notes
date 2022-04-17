@@ -1,6 +1,6 @@
-# Spring源码解析(1)：Bean容器
+# Spring 解析
 
-
+# 一、Bean 容器
 
 这一篇开始，正式进入Spring源码解析。本系列主要讨论单例Bean。
 
@@ -109,7 +109,9 @@ public class Student extends Human {
 
 来看看我的做法：
 
-![img](https://pic1.zhimg.com/80/v2-dd82e7039d5cd0997a668f01ddd357c0_720w.jpg)这才是真正的一目了然
+![img](https://pic1.zhimg.com/80/v2-dd82e7039d5cd0997a668f01ddd357c0_720w.jpg)
+
+这才是真正的一目了然
 
 当然，由于eat()方法实际并不由Student定义，实际调用时可能是这样：
 
@@ -168,7 +170,9 @@ public class Test {
 
 最后，让大家看看什么叫英雄所见略同（IDEA）
 
-![img](https://pic1.zhimg.com/80/v2-f6c37ca54e72369e2c2dd50d7de1b0e0_720w.jpg)以前我没得选，现在我想简简单单做个BeanFactory
+![img](Spring源码解析.resource/v2-f6c37ca54e72369e2c2dd50d7de1b0e0_720w.jpg)
+
+以前我没得选，现在我想简简单单做个BeanFactory
 
 ------
 
@@ -180,11 +184,13 @@ Spring作为IOC容器，首要任务自然是解决对象存储问题。长久�
 
 首先，这两个都是接口，而且ApplicationContext继承了BeanFactory。
 
-![img](https://pic4.zhimg.com/80/v2-82fde91eb358235a16ce29576e8276d7_720w.jpg)
+![img](Spring源码解析.resource/v2-82fde91eb358235a16ce29576e8276d7_720w.jpg)
 
 所以，我们先来看看BeanFactory：
 
-![img](https://pic3.zhimg.com/80/v2-54ed0c1f6cc7ea6954ea75770640685a_720w.jpg)没看到addBean()之类的方法
+![img](Spring源码解析.resource/v2-54ed0c1f6cc7ea6954ea75770640685a_720w.jpg)
+
+没看到addBean()之类的方法
 
 不是说BeanFactory是Bean工厂吗，怎么“只出不进”？
 
@@ -215,7 +221,9 @@ public class Student {
 
 向大家隆重介绍一下DefaultSingletonBeanRegistry（省略部分字段、方法）
 
-![img](https://pic4.zhimg.com/80/v2-c419dc218611e60e188fb1584cd12623_720w.jpg)DefaultSingletonBeanRegistry是一个类。直译的话，就是“默认的单例bean注册表”
+![img](Spring源码解析.resource/v2-c419dc218611e60e188fb1584cd12623_720w.jpg)
+
+DefaultSingletonBeanRegistry是一个类。直译的话，就是“默认的单例bean注册表”
 
 也就是说，**DefaultSingletonBeanRegistry是专门来管理单例bean的。**那它是怎么做的呢？主要从两个方面考察：
 
@@ -230,15 +238,19 @@ DefaultSingletonBeanRegistry最重要的三个成员变量：
 - earlySingletonObjects
 - singletonFactories
 
-![img](https://pic1.zhimg.com/80/v2-5f58c44137165b02ac2f54514316285c_720w.jpg)二、三级缓存暂时不用理会，只关注singletonObjects即可
+![img](Spring源码解析.resource/v2-5f58c44137165b02ac2f54514316285c_720w.jpg)
+
+二、三级缓存暂时不用理会，只关注singletonObjects即可
 
 我们之前所理解的Spring容器非常狭隘，认为它就是一个Map。但现在我们知道了，真正存bean的其实是一个叫singletonObjects的Map，但singletonObjects对于整个Spring体系来讲，九牛一毛。甚至DefaultSingletonBeanRegistry本身也只是在Spring容器的一个小角落。
 
-![img](https://pic2.zhimg.com/80/v2-88b51d962292435ff777c9c7d75ca709_720w.jpg)
+![img](Spring源码解析.resource/v2-88b51d962292435ff777c9c7d75ca709_720w.jpg)
 
 还有一个问题值得关注：既然是专门管理单例bean的工厂，它如何保证单例？
 
-![img](https://pic4.zhimg.com/80/v2-12a719bdf71e8529aa29b038c83bbfef_720w.png)concurrentHashMap转成set
+![img](Spring源码解析.resource/v2-12a719bdf71e8529aa29b038c83bbfef_720w.png)
+
+concurrentHashMap转成set
 
 原来，DefaultSingletonBeanRegistry搞了一个Set<String> singletonsCurrentlyInCreation，专门来存放正在创建的单例bean的名字（注意，只是名字而不是bean，因为bean还在创建中）。
 
@@ -266,13 +278,17 @@ protected void afterSingletonCreation(String beanName) {
 
 控制单例示意图
 
-![img](https://pic3.zhimg.com/80/v2-da36edf539da75040f4e09be9030b8f2_720w.jpg)一个单例bean在创建前，先往singletonsCurrentlyInCreation存自己的name，其他bean在创建时，会先来这里确认有无同名bean
+![img](Spring源码解析.resource/v2-da36edf539da75040f4e09be9030b8f2_720w.jpg)
+
+一个单例bean在创建前，先往singletonsCurrentlyInCreation存自己的name，其他bean在创建时，会先来这里确认有无同名bean
 
 
 
 **如何存取？**
 
-![img](https://pic1.zhimg.com/80/v2-395ddd58c51149655dd8ed94690ce908_720w.jpg)DefaultSingletonBeanRegistry提供了存取bean的一系列方法
+![img](Spring源码解析.resource/v2-395ddd58c51149655dd8ed94690ce908_720w.jpg)
+
+DefaultSingletonBeanRegistry提供了存取bean的一系列方法
 
 
 
@@ -483,15 +499,7 @@ GenericApplicationContext#getBeanFactory()
 
 
 
-# Spring基础(2)：放弃XML，走向注解
-
-[![bravo1988](https://pic2.zhimg.com/v2-1907eb21be63d35b077e6ed3cbcbfe13_xs.jpg?source=172ae18b)](https://www.zhihu.com/people/huangsunting)
-
-[bravo1988](https://www.zhihu.com/people/huangsunting)
-
-Java进阶小册已上线，详见动态置顶，助力野生程序员
-
-188 人赞同了该文章
+# 二、放弃 XML，走向注解
 
 上一篇并没有实际地带大家去看源码，而是介绍了两个概念：
 
