@@ -7,7 +7,7 @@ JVM 对待反射的两种方式：
 - 使用 native 方法进行反射操作，这种方式第一次执行时会比较快，但是后面每次执行的速度都差不多
 - 生成 bytecode 进行反射操作，所谓的 sun.reflect.GeneratedMethodAccessor，它是一个被反射调用方法的包装类，每次调用会有一个递增的序号。这种方式第一次调用速度较慢，但是多次调用后速度会提升 20 倍（jvm 代码文档说的，就不贴代码了，感兴趣的可以移步[这里](http://hg.openjdk.java.net/jdk6/jdk6/jdk/raw-file/ffa98eed5766/src/share/classes/sun/reflect/MethodAccessorGenerator.java)和[这里](http://hg.openjdk.java.net/jdk6/jdk6/jdk/file/tip/src/share/classes/sun/reflect/ReflectionFactory.java)的注释里观摩）
 
-第二种方式的缺点就是会耗额外的内存，并且是在 permgen space 里。由于我真的不在乎那 20 倍的速度，所以决定把这个有一点点坑的特性关掉。在 ReflectionFactory 里有一种机制，就是当一个方法被反射调用的次数超过一定的阀值时（inflationThreshold），会使用第二种方式来提升速度。这个阀值的默认值是 15.那只要把这个值改大就好了，于是在启动参数里加上了
+第二种方式的缺点就是会耗额外的内存，并且是在 permgen space 里。由于我真的不在乎那20倍的速度，所以决定把这个有一点点坑的特性关掉。在 ReflectionFactory 里有一种机制，就是当一个方法被反射调用的次数超过一定的阀值时（inflationThreshold），会使用第二种方式来提升速度。这个阀值的默认值是15.那只要把这个值改大就好了，于是在启动参数里加上了
 
 ```
 -Dsun.reflect.inflationThreshold=2147483647
@@ -34,7 +34,7 @@ public class A {
 }
 ```
 
-可以编写另外一个类来反射调用 A 上的方法：
+可以编写另外一个类来反射调用A上的方法：
 
 ```java
 import java.lang.reflect.Method;
@@ -61,7 +61,7 @@ java -XX:+TraceClassLoading TestClassLoad
 ```
 
 
-可以看到输出了一大堆 log，把其中相关的部分截取出来如下：（完整的 log 可以从附件下载）
+可以看到输出了一大堆log，把其中相关的部分截取出来如下：（完整的log可以从附件下载）
 
 ```java
 [Loaded TestClassLoad from file:/D:/temp_code/test_java_classload/]
@@ -103,7 +103,7 @@ Hello, 15
 ```
 
 
-可以看到前 15 次反射调用 `A.foo()` 方法并没有什么稀奇的地方，但在第 16 次反射调用时似乎有什么东西被触发了，导致 JVM 新加载了一堆类，其中就包括 `[Loaded sun.reflect.GeneratedMethodAccessor1 from __JVM_DefineClass__]`这么一行。这是哪里来的呢？
+可以看到前15次反射调用 `A.foo()` 方法并没有什么稀奇的地方，但在第 16 次反射调用时似乎有什么东西被触发了，导致 JVM 新加载了一堆类，其中就包括 `[Loaded sun.reflect.GeneratedMethodAccessor1 from __JVM_DefineClass__]`这么一行。这是哪里来的呢？
 
 先来看看 JDK 里 `Method.invoke()` 是怎么实现的。
 java.lang.reflect.Method：
@@ -175,7 +175,7 @@ public final
 可以看到 `Method.invoke()` 实际上并不是自己实现的反射调用逻辑，而是委托给 `sun.reflect.MethodAccessor` 来处理。
 每个实际的 Java 方法只有一个对应的 Method 对象作为 root，。这个 root 是不会暴露给用户的，而是每次在通过反射获取 `Method` 对象时新创建 `Method`对象把 root 包装起来再给用户。在第一次调用一个实际 Java 方法对应得 Method 对象的 `invoke()` 方法之前，实现调用逻辑的 MethodAccessor 对象还没创建；等第一次调用时才新创建 MethodAccessor 并更新给 root，然后调用`MethodAccessor.invoke()` 真正完成反射调用。
 
-那么 MethodAccessor 是啥呢？
+那么MethodAccessor是啥呢？
 sun.reflect.MethodAccessor：
 
 ```java
@@ -289,7 +289,7 @@ public class ReflectionFactory {
 
 如注释所述，实际的 MethodAccessor 实现有两个版本，一个是 Java 实现的，另一个是 native code 实现的。**Java 实现的版本在初始化时需要较多时间，但长久来说性能较好；native 版本正好相反，启动时相对较快，但运行时间长了之后速度就比不过 Java 版了**。这是 HotSpot 的优化方式带来的性能特性，同时也是许多虚拟机的共同点：跨越 native 边界会对优化有阻碍作用，它就像个黑箱一样让虚拟机难以分析也将其内联，于是运行时间长了之后反而是托管版本的代码更快些。
 
-为了权衡两个版本的性能，Sun 的 JDK 使用了 `inflation` 的技巧：让 Java 方法在被反射调用时，开头若干次使用 native 版，等反射调用次数超过阈值时则生成一个专用的 `MethodAccessor` 实现类，生成其中的 `invoke()`方法的字节码，以后对该 Java 方法的反射调用就会使用 Java 版。
+为了权衡两个版本的性能，Sun 的 JDK 使用了 `inflation` 的技巧：让 Java 方法在被反射调用时，开头若干次使用 native版，等反射调用次数超过阈值时则生成一个专用的 `MethodAccessor` 实现类，生成其中的 `invoke()`方法的字节码，以后对该 Java 方法的反射调用就会使用 Java 版。
 
 Sun 的 JDK 是从 1.4 系开始采用这种优化的，主要作者是 [Ken Russell](https://www.open-open.com/misc/goto?guid=4959676304937921919)
 
@@ -363,7 +363,7 @@ class NativeMethodAccessorImpl extends MethodAccessorImpl {
 }
 ```
 
-每次 `NativeMethodAccessorImpl.invoke()` 方法被调用时，都会增加一个调用次数计数器，看超过阈值没有；一旦超过，则调用 `MethodAccessorGenerator.generateMethod()` 来生成 Java 版的 MethodAccessor 的实现类，并且改变 DelegatingMethodAccessorImpl 所引用的 MethodAccessor 为 Java 版。后续经由 `DelegatingMethodAccessorImpl.invoke()` 调用到的就是 Java 版的实现了。
+每次 `NativeMethodAccessorImpl.invoke()` 方法被调用时，都会增加一个调用次数计数器，看超过阈值没有；一旦超过，则调用 `MethodAccessorGenerator.generateMethod()` 来生成 Java 版的 MethodAccessor 的实现类，并且改变DelegatingMethodAccessorImpl 所引用的 MethodAccessor 为 Java 版。后续经由 `DelegatingMethodAccessorImpl.invoke()` 调用到的就是 Java 版的实现了。
 
 注意到关键的 `invoke0()` 方法是个 native 方法。它在 HotSpot VM 里是由 `JVM_InvokeMethod()` 函数所支持的：
 
@@ -404,7 +404,7 @@ JVM_END
 ```
 
 
-其中的关键又是 Reflection::invoke_method()：
+其中的关键又是Reflection::invoke_method()：
 
 ```java
 // This would be nicer if, say, java.lang.reflect.Method was a subclass
@@ -436,9 +436,9 @@ oop Reflection::invoke_method(oop method_mirror, Handle receiver, objArrayHandle
 ```
 
 
-再下去就深入到 HotSpot VM 的内部了，本文就在这里打住吧。有同学有兴趣深究的话以后可以再写一篇讨论 native 版的实现。
+再下去就深入到HotSpot VM的内部了，本文就在这里打住吧。有同学有兴趣深究的话以后可以再写一篇讨论native版的实现。
 
-回到 Java 的一侧。MethodAccessorGenerator 长啥样呢？由于代码太长，这里就不完整贴了，有兴趣的可以到 OpenJDK 6 的 Mercurial 仓库看： [OpenJDK 6 build 17的MethodAccessorGenerator](https://www.open-open.com/misc/goto?guid=4959676305031596494) 。它的基本工作就是在内存里生成新的专用 Java 类，并将其加载。就贴这么一个方法：
+回到Java的一侧。MethodAccessorGenerator长啥样呢？由于代码太长，这里就不完整贴了，有兴趣的可以到OpenJDK 6的Mercurial仓库看： [OpenJDK 6 build 17的MethodAccessorGenerator](https://www.open-open.com/misc/goto?guid=4959676305031596494) 。它的基本工作就是在内存里生成新的专用Java类，并将其加载。就贴这么一个方法：
 
 ```java
 private static synchronized String generateName(boolean isConstructor,
@@ -460,8 +460,8 @@ private static synchronized String generateName(boolean isConstructor,
 ```
 
 
-去阅读源码的话，可以看到 MethodAccessorGenerator 是如何一点点把 Java 版的 MethodAccessor 实现类生产出来的。也可以看到 GeneratedMethodAccessor+数字这种名字是从哪里来的了，就在上面的 generateName()方法里。
-对本文开头的例子的 A.foo()，生成的 Java 版 MethodAccessor 大致如下：
+去阅读源码的话，可以看到MethodAccessorGenerator是如何一点点把Java版的MethodAccessor实现类生产出来的。也可以看到GeneratedMethodAccessor+数字这种名字是从哪里来的了，就在上面的generateName()方法里。
+对本文开头的例子的A.foo()，生成的Java版MethodAccessor大致如下：
 
 ```java
 package sun.reflect;
@@ -494,15 +494,15 @@ public class GeneratedMethodAccessor1 extends MethodAccessorImpl {
 }
 ```
 
-就反射调用而言，这个 invoke()方法非常干净（然而就“正常调用”而言这额外开销还是明显的）。注意到参数数组被拆开了，把每个参数都恢复到原本没有被 Object[]包装前的样子，然后对目标方法做正常的 invokevirtual 调用。由于在生成代码时已经循环遍历过参数类型的数组，生成出来的代码里就不再包含循环了。
+就反射调用而言，这个invoke()方法非常干净（然而就“正常调用”而言这额外开销还是明显的）。注意到参数数组被拆开了，把每个参数都恢复到原本没有被Object[]包装前的样子，然后对目标方法做正常的invokevirtual调用。由于在生成代码时已经循环遍历过参数类型的数组，生成出来的代码里就不再包含循环了。
 
-当该反射调用成为热点时，它甚至可以被内联到靠近 Method.invoke()的一侧，大大降低了反射调用的开销。而 native 版的反射调用则无法被有效内联，因而调用开销无法随程序的运行而降低。
+当该反射调用成为热点时，它甚至可以被内联到靠近Method.invoke()的一侧，大大降低了反射调用的开销。而native版的反射调用则无法被有效内联，因而调用开销无法随程序的运行而降低。
 
-虽说 Sun 的 JDK 这种实现方式使得反射调用方法成本比以前降低了很多，但 Method.invoke()本身要用数组包装参数；而且每次调用都必须检查方法的可见性（在 Method.invoke()里），也必须检查每个实际参数与形式参数的类型匹配性（在 NativeMethodAccessorImpl.invoke0()里或者生成的 Java 版 MethodAccessor.invoke()里）；而且 Method.invoke()就像是个独木桥一样，各处的反射调用都要挤过去，在调用点上收集到的类型信息就会很乱，影响内联程序的判断，使得 Method.invoke()自身难以被内联到调用方。
+虽说Sun的JDK这种实现方式使得反射调用方法成本比以前降低了很多，但Method.invoke()本身要用数组包装参数；而且每次调用都必须检查方法的可见性（在Method.invoke()里），也必须检查每个实际参数与形式参数的类型匹配性（在NativeMethodAccessorImpl.invoke0()里或者生成的Java版MethodAccessor.invoke()里）；而且Method.invoke()就像是个独木桥一样，各处的反射调用都要挤过去，在调用点上收集到的类型信息就会很乱，影响内联程序的判断，使得Method.invoke()自身难以被内联到调用方。
 
-相比之下 [JDK 7里新的MethodHandle](https://www.open-open.com/misc/goto?guid=4959676305110459284) 则更有潜力，在其功能完全实现后能达到比普通反射调用方法更高的性能。在使用 MethodHandle 来做反射调用时，MethodHandle.invoke()的形式参数与返回值类型都是准确的，所以只需要在链接方法的时候才需要检查类型的匹配性，而不必在每次调用时都检查。而且 MethodHandle 是不可变值，在创建后其内部状态就不会再改变了；JVM 可以利用这个知识而放心的对它做激进优化，例如将实际的调用目标内联到做反射调用的一侧。
+相比之下 [JDK 7里新的MethodHandle](https://www.open-open.com/misc/goto?guid=4959676305110459284) 则更有潜力，在其功能完全实现后能达到比普通反射调用方法更高的性能。在使用MethodHandle来做反射调用时，MethodHandle.invoke()的形式参数与返回值类型都是准确的，所以只需要在链接方法的时候才需要检查类型的匹配性，而不必在每次调用时都检查。而且MethodHandle是不可变值，在创建后其内部状态就不会再改变了；JVM可以利用这个知识而放心的对它做激进优化，例如将实际的调用目标内联到做反射调用的一侧。
 
-到本来 Java 的安全机制使得不同类之间不是任意信息都可见，但 Sun 的 JDK 里开了个口，有一个标记类专门用于开后门：
+到本来Java的安全机制使得不同类之间不是任意信息都可见，但Sun的JDK里开了个口，有一个标记类专门用于开后门：
 
 ```java
 package sun.reflect;

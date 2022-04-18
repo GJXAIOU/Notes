@@ -4,11 +4,11 @@
 
 ## 一、什么是MyBatis?
 
-MyBatis 本是 apache 的一个开源项目 iBatis, 2010 年这个项目由 apache software foundation 迁移到了 google code，并且改名为 MyBatis 。2013 年 11 月迁移到 Github。
+MyBatis 本是apache的一个开源项目iBatis, 2010年这个项目由apache software foundation 迁移到了google code，并且改名为MyBatis 。2013年11月迁移到Github。
 
-iBATIS 一词来源于“internet”和“abatis”的组合，是**一个基于Java的持久层框架**。iBATIS 提供的持久层框架包括 SQL Maps 和 Data Access Objects（DAO）。
+iBATIS一词来源于“internet”和“abatis”的组合，是**一个基于Java的持久层框架**。iBATIS提供的持久层框架包括SQL Maps和Data Access Objects（DAO）。
 
-MyBatis 是支持普通 SQL 查询，存储过程和高级映射的优秀持久层框架。MyBatis 消除了几乎所有的 JDBC 代码和参数的手工设置以及结果集的检索。**MyBatis 使用简单的 XML或注解用于配置和原始映射，将接口和 Java 的POJOs（Plain Ordinary Java Objects，普通的 Java对象）映射成数据库中的记录**。
+MyBatis 是支持普通 SQL查询，存储过程和高级映射的优秀持久层框架。MyBatis 消除了几乎所有的JDBC代码和参数的手工设置以及结果集的检索。**MyBatis 使用简单的 XML或注解用于配置和原始映射，将接口和 Java 的POJOs（Plain Ordinary Java Objects，普通的 Java对象）映射成数据库中的记录**。
 
 ## 二、为什么会有 MyBatis?
 
@@ -128,10 +128,10 @@ public class CRUDDao {
 ①、问题一：数据库连接，使用时就创建，使用完毕就关闭，这样会对数据库进行频繁的获取连接和关闭连接，造成数据库资源浪费，影响数据库性能。
 设想解决：使用数据库连接池管理数据库连接
 
-②、问题二：将 sql 语句硬编码到程序中，如果 sql 语句修改了，那么需要重新编译 Java 代码，不利于系统维护
+②、问题二：将 sql 语句硬编码到程序中，如果sql语句修改了，那么需要重新编译 Java 代码，不利于系统维护
 设想解决：将 sql 语句配置到 xml 文件中，即使 sql 语句变化了，我们也不需要对 Java 代码进行修改，重新编译
 
-③、问题三：在 PreparedStatement 中设置参数，对占位符设置值都是硬编码在 Java 代码中，不利于系统维护
+③、问题三：在 PreparedStatement 中设置参数，对占位符设置值都是硬编码在Java代码中，不利于系统维护
 设想解决：将 sql 语句以及占位符和参数都配置到 xml 文件中
 
 ④、问题四：从 resultset 中遍历结果集时，对表的字段存在硬编码，不利于系统维护
@@ -143,7 +143,7 @@ public class CRUDDao {
 ⑥、问题六：缓存做的很差，如果存在数据量很大的情况下，这种方式性能特别低
 设想解决：集成缓存框架去操作数据库
 
-⑦、问题七：sql 的移植性不好，如果换个数据库，那么 sql 语句可能要重写
+⑦、问题七：sql 的移植性不好，如果换个数据库，那么sql 语句可能要重写
 设想解决：在 JDBC 和 数据库之间插入第三方框架，用第三方去生成 sql 语句，屏蔽数据库的差异
 
 既然直接使用 JDBC 操作数据库有那么多的缺点，那么我们如何去解决呢？请看下面 mybatis 框架的入门实例介绍。
@@ -155,7 +155,7 @@ public class CRUDDao {
 [原文链接](https://www.cnblogs.com/ysocean/p/7277545.html)
 
 
-通过上一小节，mybatis 和 jdbc 的区别，我们对 mybatis 有了一个大致的了解，下面我们通过一个入门实例来对 mybatis 有更近一步的了解。
+通过上一小节，mybatis 和 jdbc 的区别，我们对 mybatis有了一个大致的了解，下面我们通过一个入门实例来对mybatis有更近一步的了解。
 
 我们用 mybatis 来对 user 表进行增删改查操作。
 
@@ -173,7 +173,7 @@ user 表字段如下：
 
 ## 2、建立一个Java工程，并导入相应的jar包，具体目录如下
 
-注意：log4j 和 Junit 不是必须的，但是我们为了查看日志以及便于测试，加入了这两个 jar 包
+注意：log4j和Junit不是必须的，但是我们为了查看日志以及便于测试，加入了这两个jar包
 ![](https://images2017.cnblogs.com/blog/1120165/201708/1120165-20170803002013365-1628654827.png)
 
 ### 3、在 MyBatisTest 工程中添加数据库配置文件 mybatis-configuration.xml
@@ -480,14 +480,14 @@ public class CRUDTest {
 
 ①、parameterType：指定输入参数的类型
 
-②、resultType：指定输出结果的类型，在 select 中如果查询结果是集合，那么也表示集合中每个元素的类型
+②、resultType：指定输出结果的类型，在select中如果查询结果是集合，那么也表示集合中每个元素的类型
 
-③、`#{}`：表示占位符，用来接收输入参数，类型可以是简单类型，pojo,HashMap 等等
+③、`#{}`：表示占位符，用来接收输入参数，类型可以是简单类型，pojo,HashMap等等
 如果接收简单类型，#{}可以写成 value 或者其他名称
 如果接收 pojo 对象值，通过 OGNL 读取对象中的属性值，即属性.属性.属性...的方式获取属性值
 
 ④、`${}`：表示一个拼接符，会引起 sql 注入，不建议使用　　
-用来接收输入参数，类型可以是简单类型，pojo,HashMap 等等
+用来接收输入参数，类型可以是简单类型，pojo,HashMap等等
 如果接收简单类型，${}里面只能是 value
 如果接收 pojo 对象值，通过 OGNL 读取对象中的属性值，即属性.属性.属性...的方式获取属性值
 
@@ -503,20 +503,20 @@ public class CRUDTest {
 
 ##  1、创建MySQL数据库：mybatisDemo和表：user 
 
-详情参考：mybatis 详解（二）------入门实例（基于 XML） 一致
+详情参考：mybatis 详解（二）------入门实例（基于XML） 一致
 
 ## 2、建立一个Java工程，并导入相应的jar包，具体目录如下
 
-详情参考：mybatis 详解（二）------入门实例（基于 XML）]一致
+详情参考：mybatis 详解（二）------入门实例（基于XML）]一致
 
 
 ##  3、在 MyBatisTest 工程中添加数据库配置文件 mybatis-configuration.xml
 
-详情参考：mybatis 详解（二）------入门实例（基于 XML） 一致
+详情参考：mybatis 详解（二）------入门实例（基于XML） 一致
 
 ## 4、定义表所对应的实体类
 
-详情参考：mybatis 详解（二）------入门实例（基于 XML) 一致
+详情参考：mybatis 详解（二）------入门实例（基于XML) 一致
 
 
 ## 5、定义操作 user 表的注解接口 UserMapper.java
@@ -638,7 +638,7 @@ public class UserAnnocationTest {
 
 @toc
 
-　　上一篇博客我们介绍了 mybatis 的增删改查入门实例，我们发现在 mybatis-configuration.xml 的配置文件中，对数据库的配置都是硬编码在这个 xml 文件中，如下图，那么我们如何改进这个写法呢？
+　　上一篇博客我们介绍了mybatis的增删改查入门实例，我们发现在 mybatis-configuration.xml 的配置文件中，对数据库的配置都是硬编码在这个xml文件中，如下图，那么我们如何改进这个写法呢？
 
 　　![](https://images2017.cnblogs.com/blog/1120165/201708/1120165-20170804220404022-1871062647.png)
 【注：硬编码和软编码的区别】
@@ -646,7 +646,7 @@ public class UserAnnocationTest {
     硬编码和软编码的区别是：软编码可以在运行时确定，修改；而硬编码是不能够改变的。所有的硬编码和软编码的区别都可以有这个意思扩展开。
     在计算机程序或文本编辑中，硬编码是指将可变变量用一个固定值来代替的方法。用这种方法编译后，如果以后需要更改此变量就非常困难了。大部分程序语言里，可以将一个固定数值定义为一个标记，然后用这个特殊标记来取代变量名称。当标记名称改变时，变量名不变，这样，当重新编译整个程序时，所有变量都不再是固定值，这样就更容易的实现了改变变量的目的。
     尽管通过编辑器的查找替换功能也能实现整个变量名称的替换，但也很有可能出现多换或者少换的情况，而在计算机 程序中，任何小错误的出现都是不可饶恕的。最好的方法是单独为变量名划分空间，来实现这种变化，就如同前面说的那样，将需要改变的变量名暂时用一个定义好 的标记名称来代替就是一种很好的方法。通常情况下，都应该避免使用硬编码方法。　 　　
-    java 小例子： `int a=2,b=2;` 　　
+    java小例子： `int a=2,b=2;` 　　
     硬编码：`if(a==2) return false;` 　　
     非硬编码 `if(a==b) return true;` 　　（就是把数值写成常数而不是变量 ）
     一个简单的版本：如求圆的面积 的问题 PI（3.14) 　　
@@ -697,7 +697,7 @@ jdbc.password=root
 </properties>
 ```
 
-　　那么这个时候是读取的 username 是以 db.properties 文件中的 root 为准，还是以自己配置的 aaa 为准呢?
+　　那么这个时候是读取的username 是以 db.properties 文件中的 root 为准，还是以自己配置的 aaa 为准呢?
 
 我们先看一段 properties 文件加载的源码
 
@@ -761,7 +761,7 @@ private void propertiesElement(XNode context) throws Exception {
 
 # mybatis 的别名配置　　
 
-　　在 userMapper.xml 文件中，我们可以看到 resultType 和 parameterType 需要指定，这这个值往往都是全路径，不方便开发，那么我们就可以对这些属性进行一些别名设置
+　　在 userMapper.xml 文件中，我们可以看到resultType 和 parameterType 需要指定，这这个值往往都是全路径，不方便开发，那么我们就可以对这些属性进行一些别名设置
 
 ![MyBatis别名设置](MyBatis详解.resource/MyBatis别名设置.png)
 
@@ -810,9 +810,9 @@ private void propertiesElement(XNode context) throws Exception {
 
 [原文链接](https://www.cnblogs.com/ysocean/p/7289529.html)
 
-前面几篇博客我们通过实例讲解了用 mybatis 对一张表进行的 CRUD 操作，但是我们发现写的 SQL 语句都比较简单，如果有比较复杂的业务，我们需要写复杂的 SQL 语句，往往需要拼接，而拼接 SQL ，稍微不注意，由于引号，空格等缺失可能都会导致错误。
+前面几篇博客我们通过实例讲解了用mybatis对一张表进行的CRUD操作，但是我们发现写的 SQL 语句都比较简单，如果有比较复杂的业务，我们需要写复杂的 SQL 语句，往往需要拼接，而拼接 SQL ，稍微不注意，由于引号，空格等缺失可能都会导致错误。
 
-那么怎么去解决这个问题呢？这就是本篇所讲的使用 mybatis 动态 SQL，通过 if, choose, when, otherwise, trim, where, set, foreach 等标签，可组合成非常灵活的 SQL 语句，从而在提高 SQL 语句的准确性的同时，也大大提高了开发人员的效率。
+那么怎么去解决这个问题呢？这就是本篇所讲的使用 mybatis 动态SQL，通过 if, choose, when, otherwise, trim, where, set, foreach等标签，可组合成非常灵活的SQL语句，从而在提高 SQL 语句的准确性的同时，也大大提高了开发人员的效率。
 
 我们以 User 表为例来说明：
 ![表样式](MyBatis详解.resource/表样式.png)
@@ -820,9 +820,9 @@ private void propertiesElement(XNode context) throws Exception {
 
 ## 1、动态SQL:if 语句
 
-　　根据 username 和 sex 来查询数据。如果 username 为空，那么将只根据 sex 来查询；反之只根据 username 来查询
+　　根据 username 和 sex 来查询数据。如果username为空，那么将只根据sex来查询；反之只根据username来查询
 
-　　首先不使用 动态 SQL 来书写
+　　首先不使用 动态SQL 来书写
 
 ```sql
 <select id="selectUserByUsernameAndSex"
@@ -849,7 +849,7 @@ private void propertiesElement(XNode context) throws Exception {
 </select>
 ```
 
-　　这样写我们可以看到，如果 sex 等于 null，那么查询语句为 select * from user where username=#{username},但是如果 usename 为空呢？那么查询语句为 select * from user where and sex=#{sex}，这是错误的 SQL 语句，如何解决呢？请看下面的 where 语句
+　　这样写我们可以看到，如果 sex 等于 null，那么查询语句为 select * from user where username=#{username},但是如果usename 为空呢？那么查询语句为 select * from user where and sex=#{sex}，这是错误的 SQL 语句，如何解决呢？请看下面的 where 语句
 
 ## 2、动态SQL:if+where 语句
 
@@ -868,7 +868,7 @@ private void propertiesElement(XNode context) throws Exception {
 </select>
 ```
 
-　　这个“where”标签会知道如果它包含的标签中有返回值的话，它就插入一个‘where’。此外，如果标签返回的内容是以 AND 或 OR 开头的，则它会剔除掉。
+　　这个“where”标签会知道如果它包含的标签中有返回值的话，它就插入一个‘where’。此外，如果标签返回的内容是以AND 或OR 开头的，则它会剔除掉。
 
 ## 3、动态SQL:if+set 语句
 
@@ -921,14 +921,14 @@ private void propertiesElement(XNode context) throws Exception {
 
 如果 id 不为空，那么查询语句为：select * from user where  id=?
 
-如果 id 为空，那么看 username 是否为空，如果不为空，那么语句为 select * from user where  username=?;
+如果 id 为空，那么看username 是否为空，如果不为空，那么语句为 select * from user where  username=?;
 
 如果 username 为空，那么查询语句为 select * from user where sex=?
 
 
 ## 5、动态SQL:trim 语句
 
-　　trim 标记是一个格式化的标记，可以完成 set 或者是 where 标记的功能
+　　trim标记是一个格式化的标记，可以完成set或者是where标记的功能
 
 　　①、用 trim 改写上面第二点的 if+where 语句
 
@@ -957,7 +957,7 @@ private void propertiesElement(XNode context) throws Exception {
 
 prefix：前缀　　　　　　
 
-prefixoverride：去掉第一个 and 或者是 or
+prefixoverride：去掉第一个and或者是or
 
 ②、用 trim 改写上面第三点的 if+set 语句
 
@@ -988,7 +988,7 @@ prefixoverride：去掉第一个 and 或者是 or
 
 　　suffix：后缀　　
 
-　　suffixoverride：去掉最后一个逗号（也可以是其他的标记，就像是上面前缀中的 and 一样）
+　　suffixoverride：去掉最后一个逗号（也可以是其他的标记，就像是上面前缀中的and一样）
 
 [回到顶部](https://www.cnblogs.com/ysocean/p/7289529.html#_labelTop)
 
@@ -1030,9 +1030,9 @@ prefixoverride：去掉第一个 and 或者是 or
 
 ## 7、动态SQL: foreach 语句
 
-　　需求：我们需要查询 user 表中 id 分别为 1,2,3 的用户
+　　需求：我们需要查询 user 表中 id 分别为1,2,3的用户
 
-　　sql 语句：select * from user where id=1 or id=2 or id=3
+　　sql语句：select * from user where id=1 or id=2 or id=3
 
 　　　　　　 select * from user where id in (1,2,3)
 
@@ -1125,4 +1125,4 @@ public void testSelectUserByListId(){
 
 ### 8、总结
 
-　　其实动态 sql 语句的编写往往就是一个拼接的问题，为了保证拼接准确，我们最好首先要写原生的 sql 语句出来，然后在通过 mybatis 动态 sql 对照着改，防止出错。
+　　其实动态 sql 语句的编写往往就是一个拼接的问题，为了保证拼接准确，我们最好首先要写原生的 sql 语句出来，然后在通过 mybatis 动态sql 对照着改，防止出错。

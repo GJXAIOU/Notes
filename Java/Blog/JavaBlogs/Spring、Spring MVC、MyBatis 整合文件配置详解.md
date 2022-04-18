@@ -1,17 +1,17 @@
 ## Spring、Spring MVC、MyBatis 整合文件配置详解
 
 
-使用 SSM 框架做了几个小项目了，感觉还不错是时候总结一下了。先总结一下 SSM 整合的文件配置。其实具体的用法最好还是看官方文档。
+使用SSM框架做了几个小项目了，感觉还不错是时候总结一下了。先总结一下SSM整合的文件配置。其实具体的用法最好还是看官方文档。
 
 Spring:http://spring.io/docs
 
 MyBatis:http://mybatis.github.io/mybatis-3/
 
-基本的组织结构和用法就不说了，前面的博客和官方文档上都非常的全面。jar 包可以使用 Maven 来组织管理。来看配置文件。
+基本的组织结构和用法就不说了，前面的博客和官方文档上都非常的全面。jar包可以使用Maven来组织管理。来看配置文件。
 
 ### **1 ****web.xml的配置**
 
-web.xml 应该是整个项目最重要的配置文件了，不过 servlet3.0 中已经支持注解配置方式了。在 servlet3.0 以前每个 servlet 必须要在 web.xml 中配置 servlet 及其映射关系。但是在 spring 框架中就不用了，因为 Spring 中是依赖注入（Dependency Injection）的也叫控制反转（Inversion of Control）。但是也要配置一个重要的 servlet，就是前端控制器（DispatcherServlet）。配置方式与普通的 servlet 基本相似。
+web.xml应该是整个项目最重要的配置文件了，不过servlet3.0中已经支持注解配置方式了。在servlet3.0以前每个servlet必须要在web.xml中配置servlet及其映射关系。但是在spring框架中就不用了，因为Spring中是依赖注入（Dependency Injection）的也叫控制反转（Inversion of Control）。但是也要配置一个重要的servlet，就是前端控制器（DispatcherServlet）。配置方式与普通的servlet基本相似。
 
 配置内容如下：
 
@@ -37,9 +37,9 @@ web.xml 应该是整个项目最重要的配置文件了，不过 servlet3.0 中
   </servlet-mapping>
 ```
 
-这里需要注意，springmvc.xml 是 spring 配置文件，将在后面讨论。在<servlet-mapping>中 url 如果是.action，前端控制器就只会拦截以.action 结尾的请求，并不会理会静态的文件。对静态页面的控制就要通过其他的手段。以/作为 url 的话就会拦截所有的请求，包括静态页面的请求。这样的话就可以拦截任何想要处理的请求，但是有一个问题。如果拦截了所有的请求，如果不在拦截器中做出相应的处理那么所有静态的 js、css 以及页面中用到的图片就会访问不到造成页面无法正常显示。但这可以通过静态资源的配置来解决这个问题。后面会提到。
+这里需要注意，springmvc.xml是spring配置文件，将在后面讨论。在<servlet-mapping>中url如果是.action，前端控制器就只会拦截以.action结尾的请求，并不会理会静态的文件。对静态页面的控制就要通过其他的手段。以/作为url的话就会拦截所有的请求，包括静态页面的请求。这样的话就可以拦截任何想要处理的请求，但是有一个问题。如果拦截了所有的请求，如果不在拦截器中做出相应的处理那么所有静态的js、css以及页面中用到的图片就会访问不到造成页面无法正常显示。但这可以通过静态资源的配置来解决这个问题。后面会提到。
 
-配置 spring 容器：
+配置spring容器：
 
 ```
 <context-param>
@@ -48,7 +48,7 @@ web.xml 应该是整个项目最重要的配置文件了，不过 servlet3.0 中
 </context-param>
 ```
 
-其中 applicationContext-*.xml 包含 3 个配置文件，是 springIoC 容器的具体配置。后面会提到。
+其中applicationContext-*.xml包含3个配置文件，是springIoC容器的具体配置。后面会提到。
 
 配置一个监听器：
 
@@ -58,7 +58,7 @@ web.xml 应该是整个项目最重要的配置文件了，不过 servlet3.0 中
 </listener>
 ```
 
-web.xml 的完整配置是这样的：
+web.xml的完整配置是这样的：
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -130,9 +130,9 @@ http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 </web-app>
 ```
 
-看到配置文件中多了两块内容，一个是 error page 是用来友好的处理错误的，可以使用错误代码来区别并跳转到相应的处理页面。这段配置代码最好放到最前面，在前端控制器拦截之前处理。
+看到配置文件中多了两块内容，一个是error page是用来友好的处理错误的，可以使用错误代码来区别并跳转到相应的处理页面。这段配置代码最好放到最前面，在前端控制器拦截之前处理。
 
-还有一块内容是一个解决 post 乱码问题的过滤器，拦截 post 请求并编码为 utf8。
+还有一块内容是一个解决post乱码问题的过滤器，拦截post请求并编码为utf8。
 
 **2 springmvc.xml的配置**
 
@@ -147,18 +147,18 @@ http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 </bean>
 ```
 
-在 Controller 中设置视图名的时候会自动加上前缀和后缀。
+在Controller中设置视图名的时候会自动加上前缀和后缀。
 
-Controller 的配置
+Controller的配置
 
-自动扫描方式，扫描包下面所有的 Controller，可以使用注解来指定访问路径。
+自动扫描方式，扫描包下面所有的Controller，可以使用注解来指定访问路径。
 
 ```
 <!-- 使用组件扫描的方式可以一次扫描多个Controller -->
 <context:component-scan base-package="com.wxisme.ssm.controller">
 ```
 
-也可以使用单个的配置方式，需要指定 Controller 的全限定名。
+也可以使用单个的配置方式，需要指定Controller的全限定名。
 
 ```
 <bean name="/queryUser.action" class="com.wxisme.ssm.controller.Controller1"/>
@@ -237,14 +237,14 @@ Controller 的配置
 <mvc:resources mapping="/imgdata/**" location="/imgdata/" />
 ```
 
-也可以使用默认，但是需要在 web.xml 中配置。
+也可以使用默认，但是需要在web.xml中配置。
 
 ```
 <!-- 访问静态资源文件 -->
 <!-- <mvc:default-servlet-handler/> 需要在web.xml中配置-->
 ```
 
-完全可以不拦截所有路径，大可避免这个问题的发生。完整的配置大概是这样的，需要注意 xml 文件的命名空间，有时候会有影响的。
+完全可以不拦截所有路径，大可避免这个问题的发生。完整的配置大概是这样的，需要注意xml文件的命名空间，有时候会有影响的。
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -323,13 +323,13 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
  </beans>
 ```
 
-applicationContext-*.xml 的配置
+applicationContext-*.xml的配置
 
-applicationContext-*.xml 包括三个配置文件，分别对应数据层控制、业务逻辑 service 控制和事务的控制。
+applicationContext-*.xml包括三个配置文件，分别对应数据层控制、业务逻辑service控制和事务的控制。
 
-数据访问层的控制，applicationContext-dao.xml 的配置：
+数据访问层的控制，applicationContext-dao.xml的配置：
 
-配置加载数据连接资源文件的配置，把数据库连接数据抽取到一个 properties 资源文件中方便管理。
+配置加载数据连接资源文件的配置，把数据库连接数据抽取到一个properties资源文件中方便管理。
 
 配置为：
 
@@ -338,7 +338,7 @@ applicationContext-*.xml 包括三个配置文件，分别对应数据层控制�
 <context:property-placeholder location="/WEB-INF/classes/jdbc.properties"/>
 ```
 
-其中 jdbc.properties 文件的内容如下：配置内容如下：
+其中jdbc.properties文件的内容如下：配置内容如下：
 
 ```
 jdbc.driver=com.mysql.jdbc.Driver
@@ -347,7 +347,7 @@ jdbc.username=root
 jdbc.password=1234
 ```
 
-配置数据库连接池，这里使用的是 dbcp，别忘了添加 jar 包！
+配置数据库连接池，这里使用的是dbcp，别忘了添加jar包！
 
 ```
 
@@ -362,7 +362,7 @@ jdbc.password=1234
 
 **3 ****Spring和MyBatis整合配置，jar包由MyBatis提供**
 
-配置 sqlSessionFactory
+配置sqlSessionFactory
 
 ```
 
@@ -375,9 +375,9 @@ jdbc.password=1234
 </bean>
 ```
 
-SqlMapConfig.xml 文件是 MyBatis 的配置文件，后面会提到。
+SqlMapConfig.xml文件是MyBatis的配置文件，后面会提到。
 
-配置 Mapper 扫描器，扫描 mapper 包下的所有 mapper 文件和类，要求 mapper 配置文件和类名需要一致。
+配置Mapper扫描器，扫描mapper包下的所有mapper文件和类，要求mapper配置文件和类名需要一致。
 
 ```
 <!-- 配置mapper扫描器 -->
@@ -388,7 +388,7 @@ SqlMapConfig.xml 文件是 MyBatis 的配置文件，后面会提到。
 </bean>
 ```
 
-整个 applicationContext-dao.xml 配置文件应该是这样的：
+整个applicationContext-dao.xml配置文件应该是这样的：
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -440,18 +440,18 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
 </beans>
 ```
 
-业务逻辑控制，applicationContext-service.xml 的配置：
+业务逻辑控制，applicationContext-service.xml的配置：
 
-这个文件里暂时只需要定义 service 的实现类即可。
+这个文件里暂时只需要定义service的实现类即可。
 
 ```
 <!-- 定义service -->
 <bean id="userService" class="com.wxisme.ssm.service.impl.UserServiceImpl"/>
 ```
 
-事务控制，applicationContext-transaction.xml 的配置
+事务控制，applicationContext-transaction.xml的配置
 
-配置数据源，使用 JDBC 控制类。
+配置数据源，使用JDBC控制类。
 
 ```
 
@@ -479,7 +479,7 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
     </tx:advice>
 ```
 
-配置 AOP 切面
+配置AOP切面
 
 ```
 <!-- 配置aop  -->
@@ -542,7 +542,7 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
 
 **4 ****MyBatis的配置**
 
-SqlMapConfig.xml 的配置   全局 setting 配置这里省略，数据库连接池在 spring 整合文件中已经配置，具体 setting 配置参考官方文档。
+SqlMapConfig.xml的配置   全局setting配置这里省略，数据库连接池在spring整合文件中已经配置，具体setting配置参考官方文档。
 
 别名的定义：
 
@@ -554,7 +554,7 @@ SqlMapConfig.xml 的配置   全局 setting 配置这里省略，数据库连接
 </typeAliases>
 ```
 
-mapper 映射文件的配置：
+mapper映射文件的配置：
 
 ```
 
@@ -606,4 +606,4 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 
 ```
 
-以上只是对 SSM 框架简单使用时的配置文件，如果需要深入使用或者需要理解其内部机理需要参考官方文档和其源代码。
+以上只是对SSM框架简单使用时的配置文件，如果需要深入使用或者需要理解其内部机理需要参考官方文档和其源代码。

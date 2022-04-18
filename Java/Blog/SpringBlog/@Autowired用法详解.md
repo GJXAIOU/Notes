@@ -8,25 +8,25 @@ tags:
 # @Autowired用法详解
 
 
-*   首先要知道另一个东西，default-autowire，它是在 xml 文件中进行配置的，可以设置为 byName、byType、constructor 和 autodetect；比如 byName，不用显式的在 bean 中写出依赖的对象，它会自动的匹配其它 bean 中 id 名与本 bean 的 set**相同的，并自动装载。
-*   @Autowired 是用在 JavaBean 中的注解，通过 byType 形式，用来给指定的字段或方法注入所需的外部资源。
+*   首先要知道另一个东西，default-autowire，它是在xml文件中进行配置的，可以设置为byName、byType、constructor和autodetect；比如byName，不用显式的在bean中写出依赖的对象，它会自动的匹配其它bean中id名与本bean的set**相同的，并自动装载。
+*   @Autowired是用在JavaBean中的注解，通过byType形式，用来给指定的字段或方法注入所需的外部资源。
 *   两者的功能是一样的，就是能**减少或者消除属性或构造器参数的设置**，只是配置地方不一样而已。
-*   autowire 四种模式的区别： 
+*   autowire四种模式的区别： 
     ![这里写图片描述](https://img-blog.csdn.net/20160824172800163)
-*   先看一下 bean 实例化和@Autowired 装配过程：
+*   先看一下bean实例化和@Autowired装配过程：
 
-    1.  一切都是从 bean 工厂的 getBean 方法开始的，一旦该方法调用总会返回一个 bean 实例，无论当前是否存在，不存在就实例化一个并装配，否则直接返回。（Spring MVC 是在什么时候开始执行 bean 的实例化过程的呢？其实就在组件扫描完成之后）
+    1.  一切都是从bean工厂的getBean方法开始的，一旦该方法调用总会返回一个bean实例，无论当前是否存在，不存在就实例化一个并装配，否则直接返回。（Spring MVC是在什么时候开始执行bean的实例化过程的呢？其实就在组件扫描完成之后）
 
-    2.  实例化和装配过程中会多次递归调用 getBean 方法来解决类之间的依赖。
+    2.  实例化和装配过程中会多次递归调用getBean方法来解决类之间的依赖。
 
-    3.  Spring 几乎考虑了所有可能性，所以方法特别复杂但完整有条理。
+    3.  Spring几乎考虑了所有可能性，所以方法特别复杂但完整有条理。
 
-    4.  @Autowired 最终是根据类型来查找和装配元素的，但是我们设置了`<beans default-autowire="byName"/>`后会影响最终的类型匹配查找。因为在前面有根据 BeanDefinition 的 autowire 类型设置 PropertyValue 值得一步，其中会有新实例的创建和注册。就是那个 autowireByName 方法。
+    4.  @Autowired最终是根据类型来查找和装配元素的，但是我们设置了`<beans default-autowire="byName"/>`后会影响最终的类型匹配查找。因为在前面有根据BeanDefinition的autowire类型设置PropertyValue值得一步，其中会有新实例的创建和注册。就是那个autowireByName方法。
 
-*   下面通过@Autowired 来说明一下用法
+*   下面通过@Autowired来说明一下用法
 
 *   Setter 方法中的 @Autowired 
-    你可以在 JavaBean 中的 setter 方法中使用 @Autowired 注解。当 Spring 遇到一个在 setter 方法中使用的 @Autowired 注解，它会在方法中执行 byType 自动装配。 
+    你可以在 JavaBean中的 setter 方法中使用 @Autowired 注解。当 Spring遇到一个在 setter 方法中使用的 @Autowired 注解，它会在方法中执行 byType 自动装配。 
     这里是 TextEditor.java 文件的内容：
 
 ```
