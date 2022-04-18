@@ -5,33 +5,33 @@
 
 ### 1.特点
 
-TreeSet是用来排序的, 可以指定一个顺序, 对象存入之后会按照指定的顺序排列
+TreeSet 是用来排序的, 可以指定一个顺序, 对象存入之后会按照指定的顺序排列
 
 ### 2.使用方式
 
 **a.自然顺序(Comparable)**
 
-*   TreeSet类的add()方法中会把存入的对象提升为Comparable类型
+*   TreeSet 类的 add()方法中会把存入的对象提升为 Comparable 类型
 
-*   调用对象的compareTo()方法和集合中的对象比较(当前存入的是谁,谁就会调用compareTo方法)
+*   调用对象的 compareTo()方法和集合中的对象比较(当前存入的是谁,谁就会调用 compareTo 方法)
 
-*   根据compareTo()方法返回的结果进行存储
+*   根据 compareTo()方法返回的结果进行存储
 
 **b.比较器顺序(Comparator)**
 
-*   创建TreeSet的时候可以制定 一个Comparator
+*   创建 TreeSet 的时候可以制定 一个 Comparator
 
-*   如果传入了Comparator的子类对象, 那么TreeSet就会按照比较器中的顺序排序
+*   如果传入了 Comparator 的子类对象, 那么 TreeSet 就会按照比较器中的顺序排序
 
-*   add()方法内部会自动调用Comparator接口中compare()方法排序
+*   add()方法内部会自动调用 Comparator 接口中 compare()方法排序
 
-*   调用的对象(就是当前存入的对象)是compare方法的第一个参数,集合中的对象(已经添加进去的对象)是compare方法的第二个参数
+*   调用的对象(就是当前存入的对象)是 compare 方法的第一个参数,集合中的对象(已经添加进去的对象)是 compare 方法的第二个参数
 
 **c.两种方式的区别**
 
-*   TreeSet构造函数什么都不传, 默认按照类中Comparable的顺序(没有就报错ClassCastException)
+*   TreeSet 构造函数什么都不传, 默认按照类中 Comparable 的顺序(没有就报错 ClassCastException)
 
-*   TreeSet如果传入Comparator, 就优先按照Comparator
+*   TreeSet 如果传入 Comparator, 就优先按照 Comparator
 
 ## 1\. TreeSet存储Integer类型的元素
 
@@ -100,7 +100,7 @@ public class Demo3_TreeSet {
 
 ![](https://mmbiz.qpic.cn/mmbiz_jpg/JfTPiahTHJhq7GdnjvDGx9OicYMEibmOn97hic8Jg4zenCPFq4X9Ungvb8NxhJCudr6hXRxeHIYYFLlLvIXTRFnsjw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-注意上面的输出，跟添加的顺序相反，那是因为compareTo方法的返回值
+注意上面的输出，跟添加的顺序相反，那是因为 compareTo 方法的返回值
 
 **Person实体类：**
 
@@ -146,7 +146,7 @@ public class Person implements Comparable<Person> {
 
 ## TreeSet保证元素唯一和自然排序的原理和图解
 
-TreeSet保证元素唯一和自然排序的原理和图解,小的放左侧,大的放右侧
+TreeSet 保证元素唯一和自然排序的原理和图解,小的放左侧,大的放右侧
 
 ![](https://mmbiz.qpic.cn/mmbiz_jpg/JfTPiahTHJhq7GdnjvDGx9OicYMEibmOn97y2whcxBPMIpqLOibibnE0FKwgibr1fcOCaAFx3165wyiatZia0v6gPU5jWQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -170,7 +170,7 @@ public class Person implements Comparable<Person> {
 
 **TreeSet保证元素唯一和比较器排序的原理:**
 
-定义比较器是实现Comparator接口,重写compare方法和equals方法,但是由于所有的类默认继承Object,而Object中有equals方法,所以自定义比较器类时,不用重写equals方法,只需要重写compare方法
+定义比较器是实现 Comparator 接口,重写 compare 方法和 equals 方法,但是由于所有的类默认继承 Object,而 Object 中有 equals 方法,所以自定义比较器类时,不用重写 equals 方法,只需要重写 compare 方法
 
 字符串长度比较器图解:
 

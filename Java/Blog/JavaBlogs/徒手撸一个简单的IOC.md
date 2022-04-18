@@ -2,15 +2,15 @@
 
 
 
-Spring框架中最经典的两个就是IOC和AOP，其中IOC(Inversion of Control)是什么呢？控制反转，简单来说就是将控制实体Bean的动作交给了Spring容器进行管理。
+Spring 框架中最经典的两个就是 IOC 和 AOP，其中 IOC(Inversion of Control)是什么呢？控制反转，简单来说就是将控制实体 Bean 的动作交给了 Spring 容器进行管理。
 
 推荐相关阅读：[透彻理解Spring事务设计思想之手写实现](http://mp.weixin.qq.com/s?__biz=MzAxMjEwMzQ5MA==&mid=2448885967&idx=2&sn=a8634cafe753e1c6c18673917a5bfe92&chksm=8fb552e2b8c2dbf4223538769af6e40a363b3903849213cb67cef206d361e32aabbcecd58889&scene=21#wechat_redirect)
 
-再简单点来说就是例如之前想用一个类，必须new一个，但是使用了Spring那么直接用@Autowired注解或者用xml配置的方式就能直接获得此对象，而且你也不用管它的生命周期啊等等之类的。就不用自己new一个对象了。
+再简单点来说就是例如之前想用一个类，必须 new 一个，但是使用了 Spring 那么直接用@Autowired 注解或者用 xml 配置的方式就能直接获得此对象，而且你也不用管它的生命周期啊等等之类的。就不用自己 new 一个对象了。
 
 ![](https://mmbiz.qpic.cn/mmbiz/JfTPiahTHJhrHYNfLpkVoZyib4kPnZe9BC8y2wnb7NzERibH04jjnbh8jo1tU9WNz2NNibF4bGmEDZgPibanY60v5Qw/640?wx_fmt=other&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-如果是之前没有使用IOC的话，那么这些对象的创建以及赋值都是由我们自己创建了，下面简单的演示了如果有上面四个对象依赖的话，那么没有IOC我们必须要创建对象并且赋值。仅仅四个对象就这么多，那么一旦项目大了，对象成百上千，如果还这样写的话，那么绝对是一场灾难。
+如果是之前没有使用 IOC 的话，那么这些对象的创建以及赋值都是由我们自己创建了，下面简单的演示了如果有上面四个对象依赖的话，那么没有 IOC 我们必须要创建对象并且赋值。仅仅四个对象就这么多，那么一旦项目大了，对象成百上千，如果还这样写的话，那么绝对是一场灾难。
 
 ```
 对象A a = new 对象A();
@@ -23,25 +23,25 @@ b.setD(d);
 c.setD(d);
 ```
 
-因此在Spring中通过IOC将所有的对象统一放到Spring的容器中进行管理，所以就简单了很多。上面的实例化对象的代码也不需要我们写了。
+因此在 Spring 中通过 IOC 将所有的对象统一放到 Spring 的容器中进行管理，所以就简单了很多。上面的实例化对象的代码也不需要我们写了。
 
 ![](https://mmbiz.qpic.cn/mmbiz/JfTPiahTHJhrHYNfLpkVoZyib4kPnZe9BCza5ewoesSTN8eXGib9iapSicf4zic5Isldzh7Qxefgzbbib6FnzWtR2UZUQ/640?wx_fmt=other&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-上面说了那么多，其实就是一句话IOC非常重要，但是如果直接看Spring源码的话会非常懵逼，所以就简单的写一个IOC的小例子来理解这种思想。
+上面说了那么多，其实就是一句话 IOC 非常重要，但是如果直接看 Spring 源码的话会非常懵逼，所以就简单的写一个 IOC 的小例子来理解这种思想。
 
 ## 分析并编写代码
 
-还是编写代码前的分析阶段，Spring的IOC其实就是将所有的Bean放在统一容器中进行管理起来，然后在在获取的时候进行初始化，所以需要我们在程序启动的时候将被标记的类进行存储在自定义的容器中管理。
+还是编写代码前的分析阶段，Spring 的 IOC 其实就是将所有的 Bean 放在统一容器中进行管理起来，然后在在获取的时候进行初始化，所以需要我们在程序启动的时候将被标记的类进行存储在自定义的容器中管理。
 
-*   初始化阶段：将被@MyIoc类似于Spring中@Service标记的类放入到自定义的容器中。
+*   初始化阶段：将被@MyIoc 类似于 Spring 中@Service 标记的类放入到自定义的容器中。
 
-*   使用：通过自定义的获取Bean的类进行统一获取。
+*   使用：通过自定义的获取 Bean 的类进行统一获取。
 
 现在我们就以上面两个步骤进行详细点的分析
 
 ### 数据准备阶段
 
-首先初始化阶段我们要先建立两个注解类用于类的发现(@MyIoc类似于@Service)。
+首先初始化阶段我们要先建立两个注解类用于类的发现(@MyIoc 类似于@Service)。
 
 ```
 @Target(ElementType.TYPE)
@@ -51,7 +51,7 @@ public @interface MyIoc {
 }
 ```
 
-然后要初始化信息进自定义容器的话用什么类型的容器去存储这些信息呢？这里可以想到是用Map来存，用key为类名，value用什么呢？value就是要放在容器中进行管理的类的信息了，那么一个类有什么信息呢即类是由什么组成呢？有以下几个信息
+然后要初始化信息进自定义容器的话用什么类型的容器去存储这些信息呢？这里可以想到是用 Map 来存，用 key 为类名，value 用什么呢？value 就是要放在容器中进行管理的类的信息了，那么一个类有什么信息呢即类是由什么组成呢？有以下几个信息
 
 *   类名
 *   构造函数
@@ -71,7 +71,7 @@ public class BeanDefinition {
 
 ### 初始化阶段
 
-有了存储类信息的类了，那么我们在程序启动的时候就应该将这些信息给加载到Map中，此时建立一个启动类用于初始化被@MyIoc标记的类的信息。
+有了存储类信息的类了，那么我们在程序启动的时候就应该将这些信息给加载到 Map 中，此时建立一个启动类用于初始化被@MyIoc 标记的类的信息。
 
 ```
 @Component
@@ -105,7 +105,7 @@ public class IoCInitConifg implements CommandLineRunner{
 }
 ```
 
-此时得说一下自定义的统一容器管理的类MyBeanFactory此类用作统一获得类的途径
+此时得说一下自定义的统一容器管理的类 MyBeanFactory 此类用作统一获得类的途径
 
 ```
 public interface MyBeanFactory {
@@ -179,7 +179,7 @@ public class MyBeanFactoryImpl implements MyBeanFactory{
 }
 ```
 
-此时初始化的阶段已经完成了，即已经将所有被@MyIoc标记的类已经被全部存放在了自定义的容器中了。其实在这里我们已经能使用自己的自定义的容器进行获得Bean了。
+此时初始化的阶段已经完成了，即已经将所有被@MyIoc 标记的类已经被全部存放在了自定义的容器中了。其实在这里我们已经能使用自己的自定义的容器进行获得 Bean 了。
 
 ```
 @MyIoc
@@ -214,7 +214,7 @@ public class Student {
         System.out.println(student3);
 ```
 
-发现控制台中输出的对象都是同一个对象，并且在User中也自动注入了Student对象。此时一个简单的IOC就完成了。
+发现控制台中输出的对象都是同一个对象，并且在 User 中也自动注入了 Student 对象。此时一个简单的 IOC 就完成了。
 
 ```
 User(student=com.example.ioc.domain.Student@705e7b93)

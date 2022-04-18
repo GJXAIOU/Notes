@@ -79,7 +79,7 @@ private static final int DEFAULT_CAPACITY = 10;private static final Object[] EMP
 
 从上图可以看出，将新元素插入至序列指定位置，需要先将该位置及其之后的元素都向后移动一位，为新元素腾出位置。这个操作的时间复杂度为`O(N)`，频繁移动元素可能会导致效率问题，特别是集合中元素数量较多时。在日常开发中，若非所需，我们应当尽量避免在大集合中调用第二个插入方法。
 
-以上是 ArrayList 插入相关的分析，上面的分析以及配图均未体现扩容机制。那么下面就来简单分析一下 ArrayList 的扩容机制。对于变长数据结构，当结构中没有空余空间可供使用时，就需要进行扩容。在 ArrayList 中，当空间用完，其会按照原数组空间的1.5倍进行扩容。相关源码如下：
+以上是 ArrayList 插入相关的分析，上面的分析以及配图均未体现扩容机制。那么下面就来简单分析一下 ArrayList 的扩容机制。对于变长数据结构，当结构中没有空余空间可供使用时，就需要进行扩容。在 ArrayList 中，当空间用完，其会按照原数组空间的 1.5 倍进行扩容。相关源码如下：
 
 ```
 /** 计算最小容量 */private static int calculateCapacity(Object[] elementData, int minCapacity) {
@@ -291,7 +291,7 @@ private class Itr implements Iterator<E> {
     // 省略不相关的代码}
 ```
 
-我们一步一步执行一下上面的代码，第一次进入 while 循环时，一切正常，元素 1 也被删除了。但删除元素 1 后，就无法再进入 while 循环，此时 it.hasNext() 为 false。原因是删除元素 1 后，元素计数器 size = 1，而迭代器中的 cursor 也等于 1，从而导致 it.hasNext() 返回false。归根结底，上面的代码段没抛异常的原因是，循环提前结束，导致 next 方法没有机会抛异常。不信的话，大家可以把代码稍微修改一下，即可发现问题：
+我们一步一步执行一下上面的代码，第一次进入 while 循环时，一切正常，元素 1 也被删除了。但删除元素 1 后，就无法再进入 while 循环，此时 it.hasNext() 为 false。原因是删除元素 1 后，元素计数器 size = 1，而迭代器中的 cursor 也等于 1，从而导致 it.hasNext() 返回 false。归根结底，上面的代码段没抛异常的原因是，循环提前结束，导致 next 方法没有机会抛异常。不信的话，大家可以把代码稍微修改一下，即可发现问题：
 
 ```
 List<String> a = new ArrayList<>();

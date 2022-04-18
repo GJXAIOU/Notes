@@ -4,29 +4,29 @@
 
 
 
-一、什么是ASM
- ASM是一个java字节码操纵框架，它能被用来动态生成类或者增强既有类的功能。ASM 可以直接产生二进制 class 文件，也可以在类被加载入 Java 虚拟机之前动态改变类行为。Java class 被存储在严格格式定义的 .class文件里，这些类文件拥有足够的元数据来解析类中的所有元素：类名称、方法、属性以及 Java 字节码（指令）。ASM从类文件中读入信息后，能够改变类行为，分析类信息，甚至能够根据用户要求生成新类。asm字节码增强技术主要是用来反射的时候提升性能的，如果单纯用jdk的反射调用，性能是非常低下的，而使用字节码增强技术后反射调用的时间已经基本可以与直接调用相当了
+一、什么是 ASM
+ ASM 是一个 java 字节码操纵框架，它能被用来动态生成类或者增强既有类的功能。ASM 可以直接产生二进制 class 文件，也可以在类被加载入 Java 虚拟机之前动态改变类行为。Java class 被存储在严格格式定义的 .class 文件里，这些类文件拥有足够的元数据来解析类中的所有元素：类名称、方法、属性以及 Java 字节码（指令）。ASM 从类文件中读入信息后，能够改变类行为，分析类信息，甚至能够根据用户要求生成新类。asm 字节码增强技术主要是用来反射的时候提升性能的，如果单纯用 jdk 的反射调用，性能是非常低下的，而使用字节码增强技术后反射调用的时间已经基本可以与直接调用相当了
 
-　　使用ASM框架需要导入asm的jar包，下载链接：asm-3.2.jar。
+　　使用 ASM 框架需要导入 asm 的 jar 包，下载链接：asm-3.2.jar。
 
-二、如何使用ASM
+二、如何使用 ASM
 
-　　ASM框架中的核心类有以下几个：
+　　ASM 框架中的核心类有以下几个：
 
-　　① ClassReader:该类用来解析编译过的class字节码文件。
+　　① ClassReader:该类用来解析编译过的 class 字节码文件。
 
 　　② ClassWriter:该类用来重新构建编译后的类，比如说修改类名、属性以及方法，甚至可以生成新的类的字节码文件。
 
-　　③ ClassAdapter:该类也实现了ClassVisitor接口，它将对它的方法调用委托给另一个ClassVisitor对象。
+　　③ ClassAdapter:该类也实现了 ClassVisitor 接口，它将对它的方法调用委托给另一个 ClassVisitor 对象。
 
-三、 ASM字节码处理框架是用Java开发的而且使用基于访问者模式生成字节码及驱动类到字节码的转换，通俗的讲，它就是对class文件的CRUD，经过CRUD后的字节码可以转换为类。ASM的解析方式类似于SAX解析XML文件，它综合运用了访问者模式、职责链模式、桥接模式等多种设计模式，相对于其他类似工具如BCEL、SERP、Javassist、CGLIB，它的最大的优势就在于其性能更高，其jar包仅30K。Hibernate和Spring都使用了cglib代理，而cglib本身就是使用的ASM，可见ASM在各种开源框架都有广泛的应用。
- ASM是一个强大的框架，利用它我们可以做到：
- 1、获得class文件的详细信息，包括类名、父类名、接口、成员名、方法名、方法参数名、局部变量名、元数据等
- 2、对class文件进行动态修改，如增加、删除、修改类方法、在某个方法中添加指令等
+三、 ASM 字节码处理框架是用 Java 开发的而且使用基于访问者模式生成字节码及驱动类到字节码的转换，通俗的讲，它就是对 class 文件的 CRUD，经过 CRUD 后的字节码可以转换为类。ASM 的解析方式类似于 SAX 解析 XML 文件，它综合运用了访问者模式、职责链模式、桥接模式等多种设计模式，相对于其他类似工具如 BCEL、SERP、Javassist、CGLIB，它的最大的优势就在于其性能更高，其 jar 包仅 30K。Hibernate 和 Spring 都使用了 cglib 代理，而 cglib 本身就是使用的 ASM，可见 ASM 在各种开源框架都有广泛的应用。
+ ASM 是一个强大的框架，利用它我们可以做到：
+ 1、获得 class 文件的详细信息，包括类名、父类名、接口、成员名、方法名、方法参数名、局部变量名、元数据等
+ 2、对 class 文件进行动态修改，如增加、删除、修改类方法、在某个方法中添加指令等
 
-CGLIB（动态代理）是对ASM的封装，简化了ASM的操作，降低了ASM的使用门槛，
+CGLIB（动态代理）是对 ASM 的封装，简化了 ASM 的操作，降低了 ASM 的使用门槛，
 
-其中，hibernate的懒加载使用到了asm，spring的AOP也使用到了。你建立一个hibernate映射对象并使用懒加载配置的时候，在内存中生成的对象使用的不再是你实现的那个类了，而是hibernate根据字节码技术已你的类为模板构造的一个新类，证明就是当你获得那个对象输出类名是，不是你自己生成的类名了。spring可能是proxy$xxx，hibernate可能是<你的类名>$xxx$xxx之类的名字。
+其中，hibernate 的懒加载使用到了 asm，spring 的 AOP 也使用到了。你建立一个 hibernate 映射对象并使用懒加载配置的时候，在内存中生成的对象使用的不再是你实现的那个类了，而是 hibernate 根据字节码技术已你的类为模板构造的一个新类，证明就是当你获得那个对象输出类名是，不是你自己生成的类名了。spring 可能是 proxy$xxx，hibernate 可能是<你的类名>$xxx$xxx 之类的名字。
 
 AOP 的利器：ASM 3.0 介绍
  随着 AOP（Aspect Oriented Programming）的发展，代码动态生成已然成为 Java 世界中不可或缺的一环。本文将介绍一种小巧轻便的 Java 字节码操控框架 ASM，它能方便地生成和改造 Java 代码。著名的框架，如 Hibernate 和 Spring 在底层都用到了 ASM。比起传统的 Java 字节码操控框架，BCEL 或者 SERP，它具有更符合现代软件模式的编程模型和更迅捷的性能。
@@ -44,9 +44,9 @@ AOP 的利器：ASM 3.0 介绍
 
 图 1. ASM – AOP
 
-然而 Bank、Customer、Account、Invoice 是代表不同的事务，派生自不同的父类，很难在高层上加入关于 Security Checker 的共有功能。对于没有多继承的 Java 来说，更是如此。传统的解决方案是使用 Decorator 模式，它可以在一定程度上改善耦合，而功能仍旧是分散的 —— 每个需要 Security Checker 的类都必须要派生一个 Decorator，每个需要 Security Checker 的方法都要被包装（wrap）。下面我们以Account类为例看一下 Decorator：
+然而 Bank、Customer、Account、Invoice 是代表不同的事务，派生自不同的父类，很难在高层上加入关于 Security Checker 的共有功能。对于没有多继承的 Java 来说，更是如此。传统的解决方案是使用 Decorator 模式，它可以在一定程度上改善耦合，而功能仍旧是分散的 —— 每个需要 Security Checker 的类都必须要派生一个 Decorator，每个需要 Security Checker 的方法都要被包装（wrap）。下面我们以 Account 类为例看一下 Decorator：
 
-首先，我们有一个 SecurityChecker类，其静态方法 checkSecurity执行安全检查功能：
+首先，我们有一个 SecurityChecker 类，其静态方法 checkSecurity 执行安全检查功能：
 
  public class SecurityChecker { 
  public static void checkSecurity() { 
@@ -54,7 +54,7 @@ AOP 的利器：ASM 3.0 介绍
  //TODO real security check 
  }    
  }
- 另一个是 Account类：
+ 另一个是 Account 类：
 
  public class Account { 
  public void operation() { 
@@ -62,12 +62,12 @@ AOP 的利器：ASM 3.0 介绍
  //TODO real operation 
  } 
  }
- 若想对 operation加入对 SecurityCheck.checkSecurity()调用，标准的 Decorator 需要先定义一个Account类的接口：
+ 若想对 operation 加入对 SecurityCheck.checkSecurity()调用，标准的 Decorator 需要先定义一个 Account 类的接口：
 
  public interface Account { 
  void operation(); 
  }
- 然后把原来的 Account类定义为一个实现类：
+ 然后把原来的 Account 类定义为一个实现类：
 
  public class AccountImpl extends Account{ 
  public void operation() { 
@@ -75,7 +75,7 @@ AOP 的利器：ASM 3.0 介绍
  //TODO real operation 
  } 
  }
- 定义一个 Account类的 Decorator，并包装 operation方法：
+ 定义一个 Account 类的 Decorator，并包装 operation 方法：
 
  public class AccountWithSecurityCheck implements Account {    
  private  Account account; 
@@ -95,12 +95,12 @@ AOP 的利器：ASM 3.0 介绍
 Java 5 中提供的 Instrument 包也可以提供类似的功能：启动时往 Java 虚拟机中挂上一个用户定义的 hook 程序，可以在装入特定类的时候改变特定类的字节码，从而改变该类的行为。但是其缺点也是明显的：
 
 Instrument 包是在整个虚拟机上挂了一个钩子程序，每次装入一个新类的时候，都必须执行一遍这段程序，即使这个类不需要改变。
- 直接改变字节码事实上类似于直接改写 class 文件，无论是调用 ClassFileTransformer. transform(ClassLoader loader, String className, Class classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer)，还是Instrument.redefineClasses(ClassDefinition[] definitions)，都必须提供新 Java 类的字节码。也就是说，同直接改写 class 文件一样，使用 Instrument 也必须了解想改造的方法相对类首部的偏移量，才能在适当的位置上插入新的代码。
+ 直接改变字节码事实上类似于直接改写 class 文件，无论是调用 ClassFileTransformer. transform(ClassLoader loader, String className, Class classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer)，还是 Instrument.redefineClasses(ClassDefinition[] definitions)，都必须提供新 Java 类的字节码。也就是说，同直接改写 class 文件一样，使用 Instrument 也必须了解想改造的方法相对类首部的偏移量，才能在适当的位置上插入新的代码。
  尽管 Instrument 可以改造类，但事实上，Instrument 更适用于监控和控制虚拟机的行为。
 
-一种比较理想且流行的方法是使用 java.lang.ref.proxy。我们仍旧使用上面的例子，给 Account类加上 checkSecurity 功能 :
+一种比较理想且流行的方法是使用 java.lang.ref.proxy。我们仍旧使用上面的例子，给 Account 类加上 checkSecurity 功能 :
 
-首先，Proxy 编程是面向接口的。下面我们会看到，Proxy 并不负责实例化对象，和 Decorator 模式一样，要把 Account定义成一个接口，然后在AccountImpl里实现Account接口，接着实现一个 InvocationHandlerAccount方法被调用的时候，虚拟机都会实际调用这个InvocationHandler的invoke方法：
+首先，Proxy 编程是面向接口的。下面我们会看到，Proxy 并不负责实例化对象，和 Decorator 模式一样，要把 Account 定义成一个接口，然后在 AccountImpl 里实现 Account 接口，接着实现一个 InvocationHandlerAccount 方法被调用的时候，虚拟机都会实际调用这个 InvocationHandler 的 invoke 方法：
 
  class SecurityProxyInvocationHandler implements InvocationHandler { 
  private Object proxyedObject; 
@@ -116,7 +116,7 @@ Instrument 包是在整个虚拟机上挂了一个钩子程序，每次装入一
  return method.invoke(proxyedObject, arguments); 
  } 
  }
- 最后，在应用程序中指定 InvocationHandler生成代理对象：
+ 最后，在应用程序中指定 InvocationHandler 生成代理对象：
 
  public static void main(String[] args) { 
  Account account = (Account) Proxy.newProxyInstance( 
@@ -128,7 +128,7 @@ Instrument 包是在整个虚拟机上挂了一个钩子程序，每次装入一
  }
  其不足之处在于：
 
-Proxy 是面向接口的，所有使用 Proxy 的对象都必须定义一个接口，而且用这些对象的代码也必须是对接口编程的：Proxy 生成的对象是接口一致的而不是对象一致的：例子中Proxy.newProxyInstance生成的是实现Account接口的对象而不是 AccountImpl的子类。这对于软件架构设计，尤其对于既有软件系统是有一定掣肘的。
+Proxy 是面向接口的，所有使用 Proxy 的对象都必须定义一个接口，而且用这些对象的代码也必须是对接口编程的：Proxy 生成的对象是接口一致的而不是对象一致的：例子中 Proxy.newProxyInstance 生成的是实现 Account 接口的对象而不是 AccountImpl 的子类。这对于软件架构设计，尤其对于既有软件系统是有一定掣肘的。
  Proxy 毕竟是通过反射实现的，必须在效率上付出代价：有实验数据表明，调用反射比一般的函数开销至少要大 10 倍。而且，从程序实现上可以看出，对 proxy class 的所有方法调用都要通过使用反射的 invoke 方法。因此，对于性能关键的应用，使用 proxy class 是需要精心考虑的，以避免反射成为整个应用的瓶颈。
  ASM 能够通过改造既有类，直接生成需要的代码。增强的代码是硬编码在新生成的类文件内部的，没有反射带来性能上的付出。同时，ASM 与 Proxy 编程不同，不需要为增强代码而新定义一个接口，生成的代码可以覆盖原来的类，或者是原始类的子类。它是一个普通的 Java 类而不是 proxy 类，甚至可以在应用程序的类框架中拥有自己的位置，派生自己的子类。
 
@@ -171,15 +171,15 @@ Magic：该项存放了一个 Java 类文件的魔数（magic number）和版本
 ASM 3.0 编程框架
  ASM 通过树这种数据结构来表示复杂的字节码结构，并利用 Push 模型来对树进行遍历，在遍历过程中对字节码进行修改。所谓的 Push 模型类似于简单的 Visitor 设计模式，因为需要处理字节码结构是固定的，所以不需要专门抽象出一种 Vistable 接口，而只需要提供 Visitor 接口。所谓 Visitor 模式和 Iterator 模式有点类似，它们都被用来遍历一些复杂的数据结构。Visitor 相当于用户派出的代表，深入到算法内部，由算法安排访问行程。Visitor 代表可以更换，但对算法流程无法干涉，因此是被动的，这也是它和 Iterator 模式由用户主动调遣算法方式的最大的区别。
 
-在 ASM 中，提供了一个 ClassReader类，这个类可以直接由字节数组或由 class 文件间接的获得字节码数据，它能正确的分析字节码，构建出抽象的树在内存中表示字节码。它会调用accept方法，这个方法接受一个实现了ClassVisitor接口的对象实例作为参数，然后依次调用 ClassVisitor接口的各个方法。字节码空间上的偏移被转换成 visit 事件时间上调用的先后，所谓 visit 事件是指对各种不同 visit 函数的调用，ClassReader知道如何调用各种 visit 函数。在这个过程中用户无法对操作进行干涉，所以遍历的算法是确定的，用户可以做的是提供不同的 Visitor 来对字节码树进行不同的修改。ClassVisitor会产生一些子过程，比如visitMethod会返回一个实现MethordVisitor接口的实例，visitField会返回一个实现FieldVisitor接口的实例，完成子过程后控制返回到父过程，继续访问下一节点。因此对于ClassReader来说，其内部顺序访问是有一定要求的。实际上用户还可以不通过ClassReader类，自行手工控制这个流程，只要按照一定的顺序，各个 visit 事件被先后正确的调用，最后就能生成可以被正确加载的字节码。当然获得更大灵活性的同时也加大了调整字节码的复杂度。
+在 ASM 中，提供了一个 ClassReader 类，这个类可以直接由字节数组或由 class 文件间接的获得字节码数据，它能正确的分析字节码，构建出抽象的树在内存中表示字节码。它会调用 accept 方法，这个方法接受一个实现了 ClassVisitor 接口的对象实例作为参数，然后依次调用 ClassVisitor 接口的各个方法。字节码空间上的偏移被转换成 visit 事件时间上调用的先后，所谓 visit 事件是指对各种不同 visit 函数的调用，ClassReader 知道如何调用各种 visit 函数。在这个过程中用户无法对操作进行干涉，所以遍历的算法是确定的，用户可以做的是提供不同的 Visitor 来对字节码树进行不同的修改。ClassVisitor 会产生一些子过程，比如 visitMethod 会返回一个实现 MethordVisitor 接口的实例，visitField 会返回一个实现 FieldVisitor 接口的实例，完成子过程后控制返回到父过程，继续访问下一节点。因此对于 ClassReader 来说，其内部顺序访问是有一定要求的。实际上用户还可以不通过 ClassReader 类，自行手工控制这个流程，只要按照一定的顺序，各个 visit 事件被先后正确的调用，最后就能生成可以被正确加载的字节码。当然获得更大灵活性的同时也加大了调整字节码的复杂度。
 
-各个 ClassVisitor通过职责链 （Chain-of-responsibility） 模式，可以非常简单的封装对字节码的各种修改，而无须关注字节码的字节偏移，因为这些实现细节对于用户都被隐藏了，用户要做的只是覆写相应的 visit 函数。
+各个 ClassVisitor 通过职责链 （Chain-of-responsibility） 模式，可以非常简单的封装对字节码的各种修改，而无须关注字节码的字节偏移，因为这些实现细节对于用户都被隐藏了，用户要做的只是覆写相应的 visit 函数。
 
-ClassAdaptor类实现了 ClassVisitor接口所定义的所有函数，当新建一个 ClassAdaptor对象的时候，需要传入一个实现了 ClassVisitor接口的对象，作为职责链中的下一个访问者 （Visitor），这些函数的默认实现就是简单的把调用委派给这个对象，然后依次传递下去形成职责链。当用户需要对字节码进行调整时，只需从ClassAdaptor类派生出一个子类，覆写需要修改的方法，完成相应功能后再把调用传递下去。这样，用户无需考虑字节偏移，就可以很方便的控制字节码。
+ClassAdaptor 类实现了 ClassVisitor 接口所定义的所有函数，当新建一个 ClassAdaptor 对象的时候，需要传入一个实现了 ClassVisitor 接口的对象，作为职责链中的下一个访问者 （Visitor），这些函数的默认实现就是简单的把调用委派给这个对象，然后依次传递下去形成职责链。当用户需要对字节码进行调整时，只需从 ClassAdaptor 类派生出一个子类，覆写需要修改的方法，完成相应功能后再把调用传递下去。这样，用户无需考虑字节偏移，就可以很方便的控制字节码。
 
-每个 ClassAdaptor类的派生类可以仅封装单一功能，比如删除某函数、修改字段可见性等等，然后再加入到职责链中，这样耦合更小，重用的概率也更大，但代价是产生很多小对象，而且职责链的层次太长的话也会加大系统调用的开销，用户需要在低耦合和高效率之间作出权衡。用户可以通过控制职责链中 visit 事件的过程，对类文件进行如下操作：
+每个 ClassAdaptor 类的派生类可以仅封装单一功能，比如删除某函数、修改字段可见性等等，然后再加入到职责链中，这样耦合更小，重用的概率也更大，但代价是产生很多小对象，而且职责链的层次太长的话也会加大系统调用的开销，用户需要在低耦合和高效率之间作出权衡。用户可以通过控制职责链中 visit 事件的过程，对类文件进行如下操作：
 
-删除类的字段、方法、指令：只需在职责链传递过程中中断委派，不访问相应的 visit 方法即可，比如删除方法时只需直接返回 null，而不是返回由visitMethod方法返回的MethodVisitor对象。
+删除类的字段、方法、指令：只需在职责链传递过程中中断委派，不访问相应的 visit 方法即可，比如删除方法时只需直接返回 null，而不是返回由 visitMethod 方法返回的 MethodVisitor 对象。
 
  class DelLoginClassAdapter extends ClassAdapter { 
  public DelLoginClassAdapter(ClassVisitor cv) { 
@@ -209,7 +209,7 @@ ClassAdaptor类实现了 ClassVisitor接口所定义的所有函数，当新建�
  }
  增加新的类、方法、字段
 
-ASM 的最终的目的是生成可以被正常装载的 class 文件，因此其框架结构为客户提供了一个生成字节码的工具类 —— ClassWriter。它实现了ClassVisitor接口，而且含有一个toByteArray()函数，返回生成的字节码的字节流，将字节流写回文件即可生产调整后的 class 文件。一般它都作为职责链的终点，把所有 visit 事件的先后调用（时间上的先后），最终转换成字节码的位置的调整（空间上的前后），如下例：
+ASM 的最终的目的是生成可以被正常装载的 class 文件，因此其框架结构为客户提供了一个生成字节码的工具类 —— ClassWriter。它实现了 ClassVisitor 接口，而且含有一个 toByteArray()函数，返回生成的字节码的字节流，将字节流写回文件即可生产调整后的 class 文件。一般它都作为职责链的终点，把所有 visit 事件的先后调用（时间上的先后），最终转换成字节码的位置的调整（空间上的前后），如下例：
 
  ClassWriter  classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS); 
  ClassAdaptor delLoginClassAdaptor = new DelLoginClassAdapter(classWriter); 
@@ -222,9 +222,9 @@ ASM 的最终的目的是生成可以被正常装载的 class 文件，因此其
 图 4. ASM – 时序图
 
 使用 ASM3.0 进行 AOP 编程
- 我们还是用上面的例子，给 Account类加上 security check 的功能。与 proxy 编程不同，ASM 不需要将 Account声明成接口，Account可以仍旧是一个实现类。ASM 将直接在 Account类上动手术，给Account类的operation方法首部加上对 SecurityChecker.checkSecurity的调用。
+ 我们还是用上面的例子，给 Account 类加上 security check 的功能。与 proxy 编程不同，ASM 不需要将 Account 声明成接口，Account 可以仍旧是一个实现类。ASM 将直接在 Account 类上动手术，给 Account 类的 operation 方法首部加上对 SecurityChecker.checkSecurity 的调用。
 
-首先，我们将从 ClassAdapter继承一个类。ClassAdapter是 ASM 框架提供的一个默认类，负责沟通ClassReader和ClassWriter。如果想要改变 ClassReader处读入的类，然后从ClassWriter处输出，可以重写相应的ClassAdapter函数。这里，为了改变 Account类的operation 方法，我们将重写visitMethdod方法。
+首先，我们将从 ClassAdapter 继承一个类。ClassAdapter 是 ASM 框架提供的一个默认类，负责沟通 ClassReader 和 ClassWriter。如果想要改变 ClassReader 处读入的类，然后从 ClassWriter 处输出，可以重写相应的 ClassAdapter 函数。这里，为了改变 Account 类的 operation 方法，我们将重写 visitMethdod 方法。
 
 class AddSecurityCheckClassAdapter extends ClassAdapter {
 
@@ -250,7 +250,7 @@ class AddSecurityCheckClassAdapter extends ClassAdapter {
  return wrappedMv; 
  } 
  }
- 下一步就是定义一个继承自 MethodAdapter的 AddSecurityCheckMethodAdapter，在“operation”方法首部插入对SecurityChecker.checkSecurity()的调用。
+ 下一步就是定义一个继承自 MethodAdapter 的 AddSecurityCheckMethodAdapter，在“operation”方法首部插入对 SecurityChecker.checkSecurity()的调用。
 
  class AddSecurityCheckMethodAdapter extends MethodAdapter { 
  public AddSecurityCheckMethodAdapter(MethodVisitor mv) { 
@@ -262,9 +262,9 @@ class AddSecurityCheckClassAdapter extends ClassAdapter {
  "checkSecurity", "()V"); 
  } 
  }
- 其中，ClassReader读到每个方法的首部时调用 visitCode()，在这个重写方法里，我们用 visitMethodInsn(Opcodes.INVOKESTATIC, "SecurityChecker","checkSecurity", "()V");插入了安全检查功能。
+ 其中，ClassReader 读到每个方法的首部时调用 visitCode()，在这个重写方法里，我们用 visitMethodInsn(Opcodes.INVOKESTATIC, "SecurityChecker","checkSecurity", "()V");插入了安全检查功能。
 
-最后，我们将集成上面定义的 ClassAdapter，ClassReader和 ClassWriter产生修改后的Account类文件 :
+最后，我们将集成上面定义的 ClassAdapter，ClassReader 和 ClassWriter 产生修改后的 Account 类文件 :
 
  import java.io.File; 
  import java.io.FileOutputStream; 
@@ -295,14 +295,14 @@ class AddSecurityCheckClassAdapter extends ClassAdapter {
 
  SecurityChecker.checkSecurity ... 
  operation...
- 也就是说，在 Account原来的 operation内容执行之前，进行了 SecurityChecker.checkSecurity()检查。
+ 也就是说，在 Account 原来的 operation 内容执行之前，进行了 SecurityChecker.checkSecurity()检查。
 
 将动态生成类改造成原始类 Account 的子类
- 上面给出的例子是直接改造 Account类本身的，从此 Account类的 operation方法必须进行 checkSecurity 检查。但事实上，我们有时仍希望保留原来的Account类，因此把生成类定义为原始类的子类是更符合 AOP 原则的做法。下面介绍如何将改造后的类定义为Account的子类Account$EnhancedByASM。其中主要有两项工作 :
+ 上面给出的例子是直接改造 Account 类本身的，从此 Account 类的 operation 方法必须进行 checkSecurity 检查。但事实上，我们有时仍希望保留原来的 Account 类，因此把生成类定义为原始类的子类是更符合 AOP 原则的做法。下面介绍如何将改造后的类定义为 Account 的子类 Account$EnhancedByASM。其中主要有两项工作 :
 
 改变 Class Description, 将其命名为 Account$EnhancedByASM，将其父类指定为 Account。
- 改变构造函数，将其中对父类构造函数的调用转换为对 Account构造函数的调用。
- 在 AddSecurityCheckClassAdapter类中，将重写 visit方法：
+ 改变构造函数，将其中对父类构造函数的调用转换为对 Account 构造函数的调用。
+ 在 AddSecurityCheckClassAdapter 类中，将重写 visit 方法：
 
  public void visit(final int version, final int access, final String name, 
  final String signature, final String superName, 
@@ -312,7 +312,7 @@ class AddSecurityCheckClassAdapter extends ClassAdapter {
  super.visit(version, access, enhancedName, signature, 
  enhancedSuperName, interfaces); 
  }
- 改进 visitMethod方法，增加对构造函数的处理：
+ 改进 visitMethod 方法，增加对构造函数的处理：
 
  public MethodVisitor visitMethod(final int access, final String name, 
  final String desc, final String signature, final String[] exceptions) { 
@@ -328,7 +328,7 @@ class AddSecurityCheckClassAdapter extends ClassAdapter {
  } 
  return wrappedMv; 
  }
- 这里 ChangeToChildConstructorMethodAdapter将负责把 Account的构造函数改造成其子类Account$EnhancedByASM的构造函数：
+ 这里 ChangeToChildConstructorMethodAdapter 将负责把 Account 的构造函数改造成其子类 Account$EnhancedByASM 的构造函数：
 
  class ChangeToChildConstructorMethodAdapter extends MethodAdapter { 
  private String superClassName; 
@@ -348,7 +348,7 @@ class AddSecurityCheckClassAdapter extends ClassAdapter {
  super.visitMethodInsn(opcode, owner, name, desc);// 改写父类为 superClassName 
  } 
  }
- 最后演示一下如何在运行时产生并装入产生的 Account$EnhancedByASM。 我们定义一个 Util 类，作为一个类工厂负责产生有安全检查的Account类：
+ 最后演示一下如何在运行时产生并装入产生的 Account$EnhancedByASM。 我们定义一个 Util 类，作为一个类工厂负责产生有安全检查的 Account 类：
 
 public class SecureAccountGenerator { 
 
@@ -379,7 +379,7 @@ public class SecureAccountGenerator {
  } 
  } 
  }
- 静态方法 SecureAccountGenerator.generateSecureAccount()在运行时动态生成一个加上了安全检查的Account子类。著名的 Hibernate 和 Spring 框架，就是使用这种技术实现了 AOP 的“无损注入”。
+ 静态方法 SecureAccountGenerator.generateSecureAccount()在运行时动态生成一个加上了安全检查的 Account 子类。著名的 Hibernate 和 Spring 框架，就是使用这种技术实现了 AOP 的“无损注入”。
 
 小结
  最后，我们比较一下 ASM 和其他实现 AOP 的底层技术：
@@ -394,25 +394,25 @@ public class SecureAccountGenerator {
 作者：阿拉斯加大闸蟹
 链接：https://juejin.cn/post/7023319134410637348
 来源：稀土掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。什么是asm呢？asm是assembly的缩写，是汇编的称号，对于java而言，asm就是字节码级别的编程。  
-而这里说到的asm是指objectweb asm,一种.class的代码生成器的开源项目.  
-ASM是一套java字节码生成架构，它可以动态生成二进制格式的stub类或其它代理类，  
-或者在类被java虚拟机装入内存之前，动态修改类。  
-现在挺多流行的框架都使用到了asm.所以从aop追溯来到了这。  
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。什么是 asm 呢？asm 是 assembly 的缩写，是汇编的称号，对于 java 而言，asm 就是字节码级别的编程。  
+而这里说到的 asm 是指 objectweb asm,一种.class 的代码生成器的开源项目.  
+ASM 是一套 java 字节码生成架构，它可以动态生成二进制格式的 stub 类或其它代理类，  
+或者在类被 java 虚拟机装入内存之前，动态修改类。  
+现在挺多流行的框架都使用到了 asm.所以从 aop 追溯来到了这。  
 
-1．什么是ObjectWeb ASM  
-  ObjectWeb ASM是轻量级的Java字节码处理框架。它可以动态生成二进制格式的stub类或其他代理类，或者在类被JAVA虚拟机装入内存之前，动态修改类。  
-  ASM 提供了与 BCEL和SERP相似的功能，只有22K的大小，比起350K的BCEL和150K的SERP来说，是相当小巧的，并且它有更高的执行效率，  
-  是BCEL 的7倍，SERP的11倍以上。  
+1．什么是 ObjectWeb ASM  
+  ObjectWeb ASM 是轻量级的 Java 字节码处理框架。它可以动态生成二进制格式的 stub 类或其他代理类，或者在类被 JAVA 虚拟机装入内存之前，动态修改类。  
+  ASM 提供了与 BCEL 和 SERP 相似的功能，只有 22K 的大小，比起 350K 的 BCEL 和 150K 的 SERP 来说，是相当小巧的，并且它有更高的执行效率，  
+  是 BCEL 的 7 倍，SERP 的 11 倍以上。  
 
-在我看来，ObjectWeb ASM具有如下几个非常诱人的特点  
+在我看来，ObjectWeb ASM 具有如下几个非常诱人的特点  
   \* 小巧、高效  
-  \* 源代码实现非常简洁而又优雅，简直就是Gof的《设计模式》非常棒的注解  
+  \* 源代码实现非常简洁而又优雅，简直就是 Gof 的《设计模式》非常棒的注解  
   \* 字节码级的控制，能够更高效地实现字节码的控制  
 
-ObjectWeb ASM有2组接口：  
-  \* 基于事件驱动的接口，类似于xml的SAX接口，visitor模式，在访问到类定义某个部分的时候进行回调，实现上比tree接口高效，占用内存更小  
-  \* 基于tree的接口，类似于xml的DOM接口，将类定义解析成tree  
+ObjectWeb ASM 有 2 组接口：  
+  \* 基于事件驱动的接口，类似于 xml 的 SAX 接口，visitor 模式，在访问到类定义某个部分的时候进行回调，实现上比 tree 接口高效，占用内存更小  
+  \* 基于 tree 的接口，类似于 xml 的 DOM 接口，将类定义解析成 tree  
 
 
 
