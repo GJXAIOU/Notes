@@ -2,7 +2,7 @@
 
 # 一、Bean 容器
 
-这一篇开始，正式进入Spring源码解析。本系列主要讨论单例Bean。
+这一篇开始，正式进入 Spring 源码解析。本系列主要讨论单例 Bean。
 
 需要的知识储备有：
 
@@ -16,19 +16,19 @@
 
 [尚硅谷Spring注解开发视频_雷丰阳老师](https://link.zhihu.com/?target=https%3A//www.bilibili.com/video/av20967380)
 
-源码之所以难，是因为体量庞大、抽象层次深。如果之前从来没看过，很难有全局观。本系列采用先局部，再整体，再局部的方式展现Spring的源码。
+源码之所以难，是因为体量庞大、抽象层次深。如果之前从来没看过，很难有全局观。本系列采用先局部，再整体，再局部的方式展现 Spring 的源码。
 
-今天这篇不看整体，只看局部：存bean的地方。
+今天这篇不看整体，只看局部：存 bean 的地方。
 
 ------
 
 ## 一、逃离复杂的组织
 
-网上很多Spring的文章开头必然先甩出一张继承体系图（没有任何预热）：
+网上很多 Spring 的文章开头必然先甩出一张继承体系图（没有任何预热）：
 
 ![img](Spring源码解析.resource/v2-6213af54ec5117c50fa4cc0e400c5d6f_720w.jpg)
 
-我想先把Spring拍扁了给大家看看，等大家大概熟悉以后，我再想着把它捏圆了。
+我想先把 Spring 拍扁了给大家看看，等大家大概熟悉以后，我再想着把它捏圆了。
 
 如何拍扁？
 
@@ -105,7 +105,7 @@ public class Student extends Human {
 
 老实说，这种继承体系图只适合复习，而不是预习。
 
-我并非刻意贬低继承体系图，但必须承认任何工具都有它的局限性，尤其当它面对的是Spring这样的怪物时。
+我并非刻意贬低继承体系图，但必须承认任何工具都有它的局限性，尤其当它面对的是 Spring 这样的怪物时。
 
 来看看我的做法：
 
@@ -113,11 +113,11 @@ public class Student extends Human {
 
 这才是真正的一目了然
 
-当然，由于eat()方法实际并不由Student定义，实际调用时可能是这样：
+当然，由于 eat()方法实际并不由 Student 定义，实际调用时可能是这样：
 
 ![img](https://pic3.zhimg.com/80/v2-c1d65c24d9ed721a3c68a70599bcff0a_720w.jpg)
 
-但我只要知道student.eat()能返回执行结果就行，其他的我不管。
+但我只要知道 student.eat()能返回执行结果就行，其他的我不管。
 
 听到这，突然有个聪明的读者跳出来说：
 
@@ -131,9 +131,9 @@ Student s = new Student();
 System.out.println(s.rank);
 ```
 
-点语法访问的前提是，这个字段是public的，否则只能通过方法访问：getter/setter方法或者普通方法。而通过方法访问字段才是正道，点语法那是走后门，不一定通用！
+点语法访问的前提是，这个字段是 public 的，否则只能通过方法访问：getter/setter 方法或者普通方法。而通过方法访问字段才是正道，点语法那是走后门，不一定通用！
 
-举个例子，我在Human类中定义private String text字段，并提供了public void getText()方法。
+举个例子，我在 Human 类中定义 private String text 字段，并提供了 public void getText()方法。
 
 ```java
 public class Human extends Animal implements Art{
@@ -159,9 +159,9 @@ public class Test {
 }
 ```
 
-也就是说，虽然父类的字段是private的，但如果子类继承了父类方法，且这个方法中刚好用到了这个字段，那么就相当于间接访问了。
+也就是说，虽然父类的字段是 private 的，但如果子类继承了父类方法，且这个方法中刚好用到了这个字段，那么就相当于间接访问了。
 
-这就是我早期分析Spring的思路：忘掉复杂的继承体系，把Spring拍扁，浓缩到只有两个对象（暂时不知道没关系）
+这就是我早期分析 Spring 的思路：忘掉复杂的继承体系，把 Spring 拍扁，浓缩到只有两个对象（暂时不知道没关系）
 
 - AnnotationConfigApplicationContext
 - DefaultListableBeanFactory
@@ -172,27 +172,27 @@ public class Test {
 
 ![img](Spring源码解析.resource/v2-f6c37ca54e72369e2c2dd50d7de1b0e0_720w.jpg)
 
-以前我没得选，现在我想简简单单做个BeanFactory
+以前我没得选，现在我想简简单单做个 BeanFactory
 
 ------
 
 ## 快说，你把东西存哪里了！！
 
-Spring作为IOC容器，首要任务自然是解决对象存储问题。长久以来，我们都认为Spring是个能帮我们完成自动注入的大Map（不知为何，有点萌），但这其实是对它的误解。
+Spring 作为 IOC 容器，首要任务自然是解决对象存储问题。长久以来，我们都认为 Spring 是个能帮我们完成自动注入的大 Map（不知为何，有点萌），但这其实是对它的误解。
 
-说到Spring的源码，无论是谁都要扯扯ApplicationContext和BeanFactory。我也不能免俗，就从这里开始吧。
+说到 Spring 的源码，无论是谁都要扯扯 ApplicationContext 和 BeanFactory。我也不能免俗，就从这里开始吧。
 
-首先，这两个都是接口，而且ApplicationContext继承了BeanFactory。
+首先，这两个都是接口，而且 ApplicationContext 继承了 BeanFactory。
 
 ![img](Spring源码解析.resource/v2-82fde91eb358235a16ce29576e8276d7_720w.jpg)
 
-所以，我们先来看看BeanFactory：
+所以，我们先来看看 BeanFactory：
 
 ![img](Spring源码解析.resource/v2-54ed0c1f6cc7ea6954ea75770640685a_720w.jpg)
 
-没看到addBean()之类的方法
+没看到 addBean()之类的方法
 
-不是说BeanFactory是Bean工厂吗，怎么“只出不进”？
+不是说 BeanFactory 是 Bean 工厂吗，怎么“只出不进”？
 
 那我又要反问在座各位一句了：你平时写代码，用什么存数据呀？
 
@@ -200,7 +200,7 @@ Spring作为IOC容器，首要任务自然是解决对象存储问题。长久�
 
 **所有和存储相关的，追究到最后必然是字段或者集合。**
 
-字段能存东西，是因为成员变量和成员方法是对象的基本组成，对象通过成员变量组织数据关系。集合也能存东西，因为它本身就是Java糅合了数据结构造出来专门存数据的。而且通常来说，相较于String、Integer这些，我们更愿意用集合作为一个成员变量，大气！
+字段能存东西，是因为成员变量和成员方法是对象的基本组成，对象通过成员变量组织数据关系。集合也能存东西，因为它本身就是 Java 糅合了数据结构造出来专门存数据的。而且通常来说，相较于 String、Integer 这些，我们更愿意用集合作为一个成员变量，大气！
 
 ```java
 public class Student {
@@ -211,50 +211,50 @@ public class Student {
 }
 ```
 
-而BeanFactory接口内部并没有定义字段去存储bean，仅仅是提供了方法规范：
+而 BeanFactory 接口内部并没有定义字段去存储 bean，仅仅是提供了方法规范：
 
 > 所有实现BeanFactory接口的子类必须实现getBean()方法。
 
-就好比有人提供了一张工厂设计图，规定了以后造的厂房必须有1个门、2个窗户，但设计图本身并不能存东西。既然BeanFactory接口本身不存储bean，那么不提供addBean()之类的方法也说得过去。
+就好比有人提供了一张工厂设计图，规定了以后造的厂房必须有 1 个门、2 个窗户，但设计图本身并不能存东西。既然 BeanFactory 接口本身不存储 bean，那么不提供 addBean()之类的方法也说得过去。
 
-那真正存bean的工厂在哪呢？
+那真正存 bean 的工厂在哪呢？
 
-向大家隆重介绍一下DefaultSingletonBeanRegistry（省略部分字段、方法）
+向大家隆重介绍一下 DefaultSingletonBeanRegistry（省略部分字段、方法）
 
 ![img](Spring源码解析.resource/v2-c419dc218611e60e188fb1584cd12623_720w.jpg)
 
-DefaultSingletonBeanRegistry是一个类。直译的话，就是“默认的单例bean注册表”
+DefaultSingletonBeanRegistry 是一个类。直译的话，就是“默认的单例 bean 注册表”
 
-也就是说，**DefaultSingletonBeanRegistry是专门来管理单例bean的。**那它是怎么做的呢？主要从两个方面考察：
+也就是说，**DefaultSingletonBeanRegistry 是专门来管理单例 bean 的。**那它是怎么做的呢？主要从两个方面考察：
 
 - 容器在哪？
 - 如何存取？
 
 **容器在哪？**
 
-DefaultSingletonBeanRegistry最重要的三个成员变量：
+DefaultSingletonBeanRegistry 最重要的三个成员变量：
 
-- singletonObjects（存放单例bean）
+- singletonObjects（存放单例 bean）
 - earlySingletonObjects
 - singletonFactories
 
 ![img](Spring源码解析.resource/v2-5f58c44137165b02ac2f54514316285c_720w.jpg)
 
-二、三级缓存暂时不用理会，只关注singletonObjects即可
+二、三级缓存暂时不用理会，只关注 singletonObjects 即可
 
-我们之前所理解的Spring容器非常狭隘，认为它就是一个Map。但现在我们知道了，真正存bean的其实是一个叫singletonObjects的Map，但singletonObjects对于整个Spring体系来讲，九牛一毛。甚至DefaultSingletonBeanRegistry本身也只是在Spring容器的一个小角落。
+我们之前所理解的 Spring 容器非常狭隘，认为它就是一个 Map。但现在我们知道了，真正存 bean 的其实是一个叫 singletonObjects 的 Map，但 singletonObjects 对于整个 Spring 体系来讲，九牛一毛。甚至 DefaultSingletonBeanRegistry 本身也只是在 Spring 容器的一个小角落。
 
 ![img](Spring源码解析.resource/v2-88b51d962292435ff777c9c7d75ca709_720w.jpg)
 
-还有一个问题值得关注：既然是专门管理单例bean的工厂，它如何保证单例？
+还有一个问题值得关注：既然是专门管理单例 bean 的工厂，它如何保证单例？
 
 ![img](Spring源码解析.resource/v2-12a719bdf71e8529aa29b038c83bbfef_720w.png)
 
-concurrentHashMap转成set
+concurrentHashMap 转成 set
 
-原来，DefaultSingletonBeanRegistry搞了一个Set<String> singletonsCurrentlyInCreation，专门来存放正在创建的单例bean的名字（注意，只是名字而不是bean，因为bean还在创建中）。
+原来，DefaultSingletonBeanRegistry 搞了一个 Set<String> singletonsCurrentlyInCreation，专门来存放正在创建的单例 bean 的名字（注意，只是名字而不是 bean，因为 bean 还在创建中）。
 
-除了singletonsCurrentlyInCreation这个字段，它还设计了两个方法：
+除了 singletonsCurrentlyInCreation 这个字段，它还设计了两个方法：
 
 beforeSingletonCreation(String beanName)
 
@@ -280,7 +280,7 @@ protected void afterSingletonCreation(String beanName) {
 
 ![img](Spring源码解析.resource/v2-da36edf539da75040f4e09be9030b8f2_720w.jpg)
 
-一个单例bean在创建前，先往singletonsCurrentlyInCreation存自己的name，其他bean在创建时，会先来这里确认有无同名bean
+一个单例 bean 在创建前，先往 singletonsCurrentlyInCreation 存自己的 name，其他 bean 在创建时，会先来这里确认有无同名 bean
 
 
 
@@ -288,15 +288,15 @@ protected void afterSingletonCreation(String beanName) {
 
 ![img](Spring源码解析.resource/v2-395ddd58c51149655dd8ed94690ce908_720w.jpg)
 
-DefaultSingletonBeanRegistry提供了存取bean的一系列方法
+DefaultSingletonBeanRegistry 提供了存取 bean 的一系列方法
 
 
 
-我相信，看到这大家都没发现一个问题：DefaultSingletonBeanRegistry没有getBean()方法，因为它压根就没实现BeanFactory！！
+我相信，看到这大家都没发现一个问题：DefaultSingletonBeanRegistry 没有 getBean()方法，因为它压根就没实现 BeanFactory！！
 
-![img](https://pic1.zhimg.com/80/v2-51e0f7c9df60e3f8cb6849cc463fc2fc_720w.jpg)图中左侧都是和bean别名相关的，不是很重要
+![img](https://pic1.zhimg.com/80/v2-51e0f7c9df60e3f8cb6849cc463fc2fc_720w.jpg)图中左侧都是和 bean 别名相关的，不是很重要
 
-它实现的是SingletonBeanRegistry，专门管理单例bean的。
+它实现的是 SingletonBeanRegistry，专门管理单例 bean 的。
 
 ![img](https://pic1.zhimg.com/80/v2-ef23dc1ab30029ee6314715c676594e0_720w.jpg)
 
@@ -306,29 +306,29 @@ DefaultSingletonBeanRegistry提供了存取bean的一系列方法
 
 **于是，现在出现了一个矛盾！**
 
-我们已经基本确定单例bean就是存在DefaultSingletonBeanRegistry中，但是它却没有实现BeanFactory，没有提供getBean()。那么AnnotationConfigApplicationContext#getBean()最终通向何处？
+我们已经基本确定单例 bean 就是存在 DefaultSingletonBeanRegistry 中，但是它却没有实现 BeanFactory，没有提供 getBean()。那么 AnnotationConfigApplicationContext#getBean()最终通向何处？
 
-（这句话一部分读者可能看不懂，就是说，我们原以为AnnotationConfigApplicationContext的getBean()会直通Bean容器DefaultSingletonBeanRegistry的getBean()，最终取到bean实例）
+（这句话一部分读者可能看不懂，就是说，我们原以为 AnnotationConfigApplicationContext 的 getBean()会直通 Bean 容器 DefaultSingletonBeanRegistry 的 getBean()，最终取到 bean 实例）
 
 ![img](https://pic3.zhimg.com/80/v2-8b1f0627f86d54798de7b71cd5d8e716_720w.jpg)
 
-爱因斯坦曾说过，搞物理首先最重要的是想象力，要敢于大胆猜想。于是我们猜测，AnnotationConfigApplicationContext#getBean()不论怎么绕，最终都会来访问DefaultSingletonBeanRegistry的单例池singletonObjects：
+爱因斯坦曾说过，搞物理首先最重要的是想象力，要敢于大胆猜想。于是我们猜测，AnnotationConfigApplicationContext#getBean()不论怎么绕，最终都会来访问 DefaultSingletonBeanRegistry 的单例池 singletonObjects：
 
-![img](https://pic4.zhimg.com/80/v2-34a6d92d78be4f0f7da711359da33ce3_720w.jpg)singletonObjects是DefaultSingletonBeanRegistry定义的一个字段，俗称单例池，用来存储单例bean
+![img](https://pic4.zhimg.com/80/v2-34a6d92d78be4f0f7da711359da33ce3_720w.jpg)singletonObjects 是 DefaultSingletonBeanRegistry 定义的一个字段，俗称单例池，用来存储单例 bean
 
-我们在开头说过，一个字段需要通过方法才能访问。我们找了下，发现DefaultSingletonBeanRegistry有好几个getSingleton()方法：
+我们在开头说过，一个字段需要通过方法才能访问。我们找了下，发现 DefaultSingletonBeanRegistry 有好几个 getSingleton()方法：
 
 ![img](https://pic1.zhimg.com/80/v2-984760eba90a6a9c94512e38d9e9613c_720w.jpg)
 
-让我们debug试试吧。
+让我们 debug 试试吧。
 
-第一步，给applicationContext.getBean()打断点并开始运行：
+第一步，给 applicationContext.getBean()打断点并开始运行：
 
 ![img](https://pic1.zhimg.com/80/v2-eb95d5a169e1764ca3993f4471ca5608_720w.png)
 
-第二步，找到DefaultSingletonBeanRegistry#getSingleton(String beanName, boolean allowEarlyReference)打上点断，然后放开上面的断点，让程序停在getSingleton(...)方法：
+第二步，找到 DefaultSingletonBeanRegistry#getSingleton(String beanName, boolean allowEarlyReference)打上点断，然后放开上面的断点，让程序停在 getSingleton(...)方法：
 
-![img](https://pic4.zhimg.com/80/v2-0c11759915c2612bd347bebc29fcf237_720w.jpg)从单例池earlySingletonObjects中获得person
+![img](https://pic4.zhimg.com/80/v2-0c11759915c2612bd347bebc29fcf237_720w.jpg)从单例池 earlySingletonObjects 中获得 person
 
 整体图
 
@@ -336,21 +336,21 @@ DefaultSingletonBeanRegistry提供了存取bean的一系列方法
 
 ![img](https://pic1.zhimg.com/80/v2-94f2aeeaa748cb6819d334c4e47259e4_720w.jpg)
 
-我们发现，AnnotationConfigApplicationContext#getBean()方法，经过层层调用最终还是找到了DefaultSingletonBeanRegistry的earlySingletonObjects。
+我们发现，AnnotationConfigApplicationContext#getBean()方法，经过层层调用最终还是找到了 DefaultSingletonBeanRegistry 的 earlySingletonObjects。
 
-按我的猜想，必然是AnnotationConfigApplicationContext通过层层继承，最终继承了DefaultSingletonBeanRegistry，然后getBean()方法在某一处调用了getSingleton()，最终从earlySingletonObjects拿到bean。
+按我的猜想，必然是 AnnotationConfigApplicationContext 通过层层继承，最终继承了 DefaultSingletonBeanRegistry，然后 getBean()方法在某一处调用了 getSingleton()，最终从 earlySingletonObjects 拿到 bean。
 
 ![img](https://pic1.zhimg.com/80/v2-1c08f2e02c71fd70e728e17fb2d34000_720w.jpg)
 
-查看AnnotationConfigApplicationContext的类继承图应该可以看到它继承了DefaultSingletonBeanRegistry：
+查看 AnnotationConfigApplicationContext 的类继承图应该可以看到它继承了 DefaultSingletonBeanRegistry：
 
-![img](https://pic2.zhimg.com/80/v2-a60ef67886f271c24fc5aef8a0f7bcf9_720w.jpg)不用找了，图中根本没有DefaultSingletonBeanRegistry
+![img](https://pic2.zhimg.com/80/v2-a60ef67886f271c24fc5aef8a0f7bcf9_720w.jpg)不用找了，图中根本没有 DefaultSingletonBeanRegistry
 
-我去，AnnotationConfigApplicationContext和DefaultSingletonBeanRegistry竟然没有任何关系，这两个类互相不认识...一瞬间，线索全断了。**毫无关系的两个类，是如何调用到的？**
+我去，AnnotationConfigApplicationContext 和 DefaultSingletonBeanRegistry 竟然没有任何关系，这两个类互相不认识...一瞬间，线索全断了。**毫无关系的两个类，是如何调用到的？**
 
 冷静...冷静。
 
-仔细想了想，按我们最初的设想，这单例池最好应该直接放在AnnotationConfigApplicationContext中，但现在发现其实人家单例池是在DefaultSingletonBeanRegistry中。这是已成事实的东西，没法改变。我们要做的就是克服客观上的困难，让AnnotationConfigApplicationContext去DefaultSingletonBeanRegistry访问单例池中的bean。
+仔细想了想，按我们最初的设想，这单例池最好应该直接放在 AnnotationConfigApplicationContext 中，但现在发现其实人家单例池是在 DefaultSingletonBeanRegistry 中。这是已成事实的东西，没法改变。我们要做的就是克服客观上的困难，让 AnnotationConfigApplicationContext 去 DefaultSingletonBeanRegistry 访问单例池中的 bean。
 
 除了继承后使用父类方法访问父类变量，还有别的途径吗？
 
@@ -393,25 +393,25 @@ public class Student {
 }
 ```
 
-像上面这种情况，parent.getScore()虽然能得到学生的成绩，但是Parent本身和Student没有继承或实现关系，所以你在Parent的继承图上看不到Student。
+像上面这种情况，parent.getScore()虽然能得到学生的成绩，但是 Parent 本身和 Student 没有继承或实现关系，所以你在 Parent 的继承图上看不到 Student。
 
-那么，Spring的AnnotationConfigApplicationContext和DefaultSingletonBeanRegistry也是这种情况吗？
+那么，Spring 的 AnnotationConfigApplicationContext 和 DefaultSingletonBeanRegistry 也是这种情况吗？
 
-直接点进applicationContext.getBean()
+直接点进 applicationContext.getBean()
 
 ![img](https://pic1.zhimg.com/80/v2-4a8f2bfe590b2834f85d3609122d9014_720w.png)
 
-我们来到了AbstractApplicationContext
+我们来到了 AbstractApplicationContext
 
-![img](https://pic2.zhimg.com/80/v2-273d1e9d7e8487d0bbd8079d0cc58cd1_720w.png)翻译：ApplicationContext接口的抽象实现类，只是简单地实现了普通的上下文功能，使用模板方法模式，具体方法实现留给子类
+![img](https://pic2.zhimg.com/80/v2-273d1e9d7e8487d0bbd8079d0cc58cd1_720w.png)翻译：ApplicationContext 接口的抽象实现类，只是简单地实现了普通的上下文功能，使用模板方法模式，具体方法实现留给子类
 
-![img](https://pic2.zhimg.com/80/v2-7340ae0e068892b7842b7eb251ec88cd_720w.jpg)请注意getBean()方法上面的注释：Implementation of BeanFactory interface，意味着这些getBean()方法是对BeanFactory的实现
+![img](https://pic2.zhimg.com/80/v2-7340ae0e068892b7842b7eb251ec88cd_720w.jpg)请注意 getBean()方法上面的注释：Implementation of BeanFactory interface，意味着这些 getBean()方法是对 BeanFactory 的实现
 
-卧槽，这注释写得也太人性化了吧，生怕你不知道AbstractApplicationContext实现了BeanFactory
+卧槽，这注释写得也太人性化了吧，生怕你不知道 AbstractApplicationContext 实现了 BeanFactory
 
-![img](https://pic2.zhimg.com/80/v2-144e0ca3ced39a60c135b77ef39c3df5_720w.jpg)所以AnnotationConfigApplicationContext也算是间接实现了BeanFactory
+![img](https://pic2.zhimg.com/80/v2-144e0ca3ced39a60c135b77ef39c3df5_720w.jpg)所以 AnnotationConfigApplicationContext 也算是间接实现了 BeanFactory
 
-AbstractApplicationContext#getBean()（既然实现了BeanFactory，就有getBean()方法）
+AbstractApplicationContext#getBean()（既然实现了 BeanFactory，就有 getBean()方法）
 
 ```java
 @Override
@@ -422,27 +422,27 @@ public Object getBean(String name) throws BeansException {
 }
 ```
 
-查看AbstractApplicationContext#getBeanFactory()，看看具体组合了哪个BeanFactory
+查看 AbstractApplicationContext#getBeanFactory()，看看具体组合了哪个 BeanFactory
 
-![img](https://pic3.zhimg.com/80/v2-9428c1afe917aac935faa7295dc5efde_720w.jpg)结果发现这里用了模板方法模式，具体的实现留给了子类，AbstractApplicationContext本身并没有组合BeanFactory
+![img](https://pic3.zhimg.com/80/v2-9428c1afe917aac935faa7295dc5efde_720w.jpg)结果发现这里用了模板方法模式，具体的实现留给了子类，AbstractApplicationContext 本身并没有组合 BeanFactory
 
-继续点下去，我们来到了AbstractApplicationContext的**子类**GenericApplicationContext
+继续点下去，我们来到了 AbstractApplicationContext 的**子类**GenericApplicationContext
 
-![img](https://pic1.zhimg.com/80/v2-d778beb201de9828e2d2d3c481df8988_720w.jpg)GenericApplicationContext说自己包含了一个BeanFactory
+![img](https://pic1.zhimg.com/80/v2-d778beb201de9828e2d2d3c481df8988_720w.jpg)GenericApplicationContext 说自己包含了一个 BeanFactory
 
 GenericApplicationContext#getBeanFactory()
 
 ![img](https://pic3.zhimg.com/80/v2-0a94a5c36d9e20bf237b04f90c58bfb2_720w.jpg)
 
-查看GenericApplicationContext的字段，我们终于发现了一个BeanFactory的子类：
+查看 GenericApplicationContext 的字段，我们终于发现了一个 BeanFactory 的子类：
 
 ![img](https://pic4.zhimg.com/80/v2-57db5fb528a12b905e156a6f0b5384c3_720w.jpg)
 
 所以，AnnotationConfigApplicationContext#getBean()整个过程应该是这样的：
 
-![img](https://pic1.zhimg.com/80/v2-7ce6b220e4102c1a7f7875b6d0f248dc_720w.jpg)利用模板方法模式，把getBeanFactory()留给子类实现，最终GenericApplicationContext组合了一个DefaultListableBeanFactory
+![img](https://pic1.zhimg.com/80/v2-7ce6b220e4102c1a7f7875b6d0f248dc_720w.jpg)利用模板方法模式，把 getBeanFactory()留给子类实现，最终 GenericApplicationContext 组合了一个 DefaultListableBeanFactory
 
-至此，之前种种矛盾都由DefaultListableBeanFactory解决了：
+至此，之前种种矛盾都由 DefaultListableBeanFactory 解决了：
 
 > 【测试代码得到的结论】
 > ApplicationContext继承了BeanFactory，AnnotationConfigApplicationContext是ApplicationContext子类，通过getBean()得到了单例对象。
@@ -453,11 +453,11 @@ GenericApplicationContext#getBeanFactory()
 > 【矛盾】
 > 那么AnnotationConfigApplicationContext#getBean()怎么访问earlySingletonObjects？
 
-答案就在DefaultListableBeanFactory这个“中介”上：
+答案就在 DefaultListableBeanFactory 这个“中介”上：
 
 ![img](https://pic2.zhimg.com/80/v2-1c9696f05c7086d02ac2eac73f559fc1_720w.jpg)
 
-![img](https://pic2.zhimg.com/80/v2-97c82082a41c564f5566902c1a004cd1_720w.jpg)DefaultListableBeanFactory是ApplicationContext与SingletonBeanRegistry的中介
+![img](https://pic2.zhimg.com/80/v2-97c82082a41c564f5566902c1a004cd1_720w.jpg)DefaultListableBeanFactory 是 ApplicationContext 与 SingletonBeanRegistry 的中介
 
 小结：
 
@@ -467,18 +467,18 @@ GenericApplicationContext#getBeanFactory()
 
 ## ApplicationContext与BeanFactory
 
-按照上面的分析，ApplicationContext继承了BeanFactory，好像和BeanFactory没啥区别。其实不是的。有了上面的预热，我们再来重新审视文章开头那张继承体系图：
+按照上面的分析，ApplicationContext 继承了 BeanFactory，好像和 BeanFactory 没啥区别。其实不是的。有了上面的预热，我们再来重新审视文章开头那张继承体系图：
 
 ![img](https://pic3.zhimg.com/80/v2-ad8cedc4787bac98c5817dbd47b14ac2_720w.jpg)
 
-也就是说，除了BeanFactory，ApplicationContext还继承了很多乱七八糟的接口来**扩展自己的功能**，比如：
+也就是说，除了 BeanFactory，ApplicationContext 还继承了很多乱七八糟的接口来**扩展自己的功能**，比如：
 
-- ResourcePatternResolver接口，继承自ResourceLoader，我们常说的包扫描就是它负责的
-- ApplicationEventPublisher接口，关系着Spring的监听机制
-- EnvironmentCapable接口，提供了获取环境变量的方法。环境变量意味着什么？关系着@PropertySource、@Value、@Profile等注解
+- ResourcePatternResolver 接口，继承自 ResourceLoader，我们常说的包扫描就是它负责的
+- ApplicationEventPublisher 接口，关系着 Spring 的监听机制
+- EnvironmentCapable 接口，提供了获取环境变量的方法。环境变量意味着什么？关系着@PropertySource、@Value、@Profile 等注解
 - ...
 
-来看一下官方文档对ApplicationContext的解释：
+来看一下官方文档对 ApplicationContext 的解释：
 
 > The`org.springframework.beans`和`org.springframework.context`包是Spring Framework的IoC容器的基础。BeanFactory接口提供了能够管理任何类型对象的高级配置机制。ApplicationContext是BeanFactory的子接口，扩展了以下几点:
 >
@@ -495,7 +495,7 @@ GenericApplicationContext#getBeanFactory()
 
 
 
-博主耗费一年时间编写的Java进阶小册已经上线，覆盖日常开发所需大部分技术，且通俗易懂、深入浅出、图文丰富，需要的同学请戳：
+博主耗费一年时间编写的 Java 进阶小册已经上线，覆盖日常开发所需大部分技术，且通俗易懂、深入浅出、图文丰富，需要的同学请戳：
 
 
 
@@ -506,48 +506,48 @@ GenericApplicationContext#getBeanFactory()
 - BeanDefinition
 - BeanPostProcessor
 
-当然，我介绍得非常笼统，不论是BeanDefinition还是BeanPostProcessor其实都有着较为复杂的继承体系，种类也很多。作为Spring系列第一篇，主要目的还是帮大家摆脱对Spring的刻板认知，刷新你们的三观，毕竟太多人对Spring的理解仅限于所谓的IOC和AOP。现在Spring5都出来了，好多人还停留在Spring2.5、Spring3的年代，还在使用XML。
+当然，我介绍得非常笼统，不论是 BeanDefinition 还是 BeanPostProcessor 其实都有着较为复杂的继承体系，种类也很多。作为 Spring 系列第一篇，主要目的还是帮大家摆脱对 Spring 的刻板认知，刷新你们的三观，毕竟太多人对 Spring 的理解仅限于所谓的 IOC 和 AOP。现在 Spring5 都出来了，好多人还停留在 Spring2.5、Spring3 的年代，还在使用 XML。
 
-今天我将会带大家复习Spring的基础，大致流程是：
+今天我将会带大家复习 Spring 的基础，大致流程是：
 
-- 复习XML方式开发
-- 通过逐步暴露XML的弊端，引出Spring注解
-- 最终完全舍弃XML，采用Spring注解开发
+- 复习 XML 方式开发
+- 通过逐步暴露 XML 的弊端，引出 Spring 注解
+- 最终完全舍弃 XML，采用 Spring 注解开发
 
 之所以推荐注解开发，原因有两点：
 
-- XML配置太繁琐了
-- 掌握Spring注解开发有助于后期学习SpringBoot
+- XML 配置太繁琐了
+- 掌握 Spring 注解开发有助于后期学习 SpringBoot
 
-只有熟练使用Spring后，看源码时才能把应用和原理联系起来。
+只有熟练使用 Spring 后，看源码时才能把应用和原理联系起来。
 
 **文章篇幅较长，建议看的时候先把下方目录截图，放在一旁做引导，防止自己看着看着不知道看到哪了。**
 
 主要内容：
 
-- IOC与DI
-- Spring的3种编程风格与2种注入方式
-- 1️⃣XML配置开发：<bean>描述依赖关系
+- IOC 与 DI
+- Spring 的 3 种编程风格与 2 种注入方式
+- 1️⃣XML 配置开发：<bean>描述依赖关系
 - 自动装配：让<bean>职责单一化
 - 2️⃣XML+注解：XML+<context:component-scan>+@Component
-- @Autowired的小秘密
+- @Autowired 的小秘密
 - 2️⃣JavaConfig+注解：@Configuration+@ComponentScan+@Component
-- 3️⃣JavaConfig方式：@Configuration+@Bean
+- 3️⃣JavaConfig 方式：@Configuration+@Bean
 - 大乱斗：@ImportResource、@Component、@Bean
 
 ------
 
 ## IOC与DI
 
-关于IOC的好处，推荐一篇文章，个人觉得写得很好：[Spring IoC有什么好处呢？](https://www.zhihu.com/question/23277575/answer/169698662)
+关于 IOC 的好处，推荐一篇文章，个人觉得写得很好：[Spring IoC有什么好处呢？](https://www.zhihu.com/question/23277575/answer/169698662)
 
-大家不妨将IOC理解成一种思想，而DI是实现该思想的一种具体方式。Spring被称为IOC容器，它实现IOC的方式除了DI（Dependency Inject，依赖注入），其实还有DL（Dependency Look，依赖查找）。由于我们平时很少用到DL，所以这里只讨论DI（依赖注入）。
+大家不妨将 IOC 理解成一种思想，而 DI 是实现该思想的一种具体方式。Spring 被称为 IOC 容器，它实现 IOC 的方式除了 DI（Dependency Inject，依赖注入），其实还有 DL（Dependency Look，依赖查找）。由于我们平时很少用到 DL，所以这里只讨论 DI（依赖注入）。
 
-![img](https://pic1.zhimg.com/80/v2-2274a2f1e0a213f0e8cac33924a83e10_720w.jpg)IOC与DI
+![img](https://pic1.zhimg.com/80/v2-2274a2f1e0a213f0e8cac33924a83e10_720w.jpg)IOC 与 DI
 
 ### Spring依赖注入的做法
 
-首先，提供一些配置信息（比如XML）来描述类与类之间的关系，然后由IOC容器（Spring Context）去解析这些配置信息，继而维护好对象之间的关系。
+首先，提供一些配置信息（比如 XML）来描述类与类之间的关系，然后由 IOC 容器（Spring Context）去解析这些配置信息，继而维护好对象之间的关系。
 
 ```xml
 <!-- 配置信息：在XML中定义Bean -->
@@ -574,47 +574,47 @@ public class Person {
 
 总结起来就是：
 
-- 编写配置信息描述类与类之间的关系（XML/注解/Configuration配置类均可）
+- 编写配置信息描述类与类之间的关系（XML/注解/Configuration 配置类均可）
 - 对象之间的依赖关系必须在类中定义好（一般是把依赖的对象作为成员变量）
-- Spring会按照配置信息的指示，通过构造方法或者setter方法完成依赖注入
+- Spring 会按照配置信息的指示，通过构造方法或者 setter 方法完成依赖注入
 
-![img](https://pic1.zhimg.com/80/v2-888c8de8a20b3fc245fdeaa775639f00_720w.jpg)XML中bean标签的职责：1.定义bean 2.维护bean依赖关系，指导Spring完成依赖注入
+![img](https://pic1.zhimg.com/80/v2-888c8de8a20b3fc245fdeaa775639f00_720w.jpg)XML 中 bean 标签的职责：1.定义 bean 2.维护 bean 依赖关系，指导 Spring 完成依赖注入
 
 ------
 
 ## Spring的3种编程风格与2种注入方式
 
-按照Spring官方文档的说法，Spring的容器配置方式可以分为3种：
+按照 Spring 官方文档的说法，Spring 的容器配置方式可以分为 3 种：
 
-- Schema-based Container Configuration（XML配置）
+- Schema-based Container Configuration（XML 配置）
 - Annotation-based Container Configuration（注解）
-- Java-based Container Configuration（@Configuration配置类）
+- Java-based Container Configuration（@Configuration 配置类）
 
-Spring支持的2种注入方式：
+Spring 支持的 2 种注入方式：
 
 - 构造方法注入
-- setter方法注入
+- setter 方法注入
 
-在Spring4之前，Spring还支持接口注入（很少用），这里不提及。
+在 Spring4 之前，Spring 还支持接口注入（很少用），这里不提及。
 
 （这个分类还是有问题，后面分析源码时再解释）
 
-大家必须要明确，所谓3种编程风格和2种注入方式到底指什么，之间又有什么联系？
+大家必须要明确，所谓 3 种编程风格和 2 种注入方式到底指什么，之间又有什么联系？
 
-我们从2种注入方式开始分析。
+我们从 2 种注入方式开始分析。
 
 > Q：Spring注入的是什么？
 > A：是Bean。
 > Q：这些Bean怎么来的？
 > A：IOC容器里的。
 
-所以，所谓的3种编程风格其实指的是“将Bean交给Spring管理的3种方式”，可以理解为IOC，而2种注入方式即DI，是建立在IOC的基础上的。也就是说Spring的DI（依赖注入）其实是以IOC容器为前提。
+所以，所谓的 3 种编程风格其实指的是“将 Bean 交给 Spring 管理的 3 种方式”，可以理解为 IOC，而 2 种注入方式即 DI，是建立在 IOC 的基础上的。也就是说 Spring 的 DI（依赖注入）其实是以 IOC 容器为前提。
 
-![img](https://pic1.zhimg.com/80/v2-d1894656e55d9db98345b7f75c1c4260_720w.jpg)3种编程风格其实指的是3种把Bean交给Spring管理的方式，而DI有2种方式：setter方法注入/构造方法注入
+![img](https://pic1.zhimg.com/80/v2-d1894656e55d9db98345b7f75c1c4260_720w.jpg)3 种编程风格其实指的是 3 种把 Bean 交给 Spring 管理的方式，而 DI 有 2 种方式：setter 方法注入/构造方法注入
 
-接下来，我们把3种编程风格分别用代码实验一下。
+接下来，我们把 3 种编程风格分别用代码实验一下。
 
-Spring系列文章我都会贴出完整、可运行的代码，所以建议大家一边看一边复制到本地调试，这样学得更快。
+Spring 系列文章我都会贴出完整、可运行的代码，所以建议大家一边看一边复制到本地调试，这样学得更快。
 
 ------
 
@@ -634,7 +634,7 @@ pom.xml
     </dependencies>
 ```
 
-配置信息（setter方法注入）
+配置信息（setter 方法注入）
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -720,7 +720,7 @@ public class Test {
 
 测试结果
 
-![img](https://pic4.zhimg.com/80/v2-237e9fe9c7635146fdfacf5b7b08fff7_720w.jpg)由于XML中配置依赖信息时，使用了property标签，所以Spring会调用setter方法注入
+![img](https://pic4.zhimg.com/80/v2-237e9fe9c7635146fdfacf5b7b08fff7_720w.jpg)由于 XML 中配置依赖信息时，使用了 property 标签，所以 Spring 会调用 setter 方法注入
 
 ### 构造方法注入
 
@@ -746,16 +746,16 @@ public class Test {
 
 测试结果
 
-![img](https://pic2.zhimg.com/80/v2-30628c6abc75fa65308e1b053b18f059_720w.jpg)其他代码都没变，仅仅改变配置信息，由property标签变为constructor-arg标签，Spring就知道要改为构造器注入了
+![img](https://pic2.zhimg.com/80/v2-30628c6abc75fa65308e1b053b18f059_720w.jpg)其他代码都没变，仅仅改变配置信息，由 property 标签变为 constructor-arg 标签，Spring 就知道要改为构造器注入了
 
 
 
-至此，我们把XML配置下2种注入方式都实验过了，它们的区别是：
+至此，我们把 XML 配置下 2 种注入方式都实验过了，它们的区别是：
 
-- XML配置<property> + 对象提供对应的setter方法
-- XML配置<constructor-arg> + 对象提供对应的构造方法
+- XML 配置<property> + 对象提供对应的 setter 方法
+- XML 配置<constructor-arg> + 对象提供对应的构造方法
 
-改变XML配置的同时，需要对象提供对应的方法支持。如果你用了<property>，却没有在类中提供setter方法，则会报错。
+改变 XML 配置的同时，需要对象提供对应的方法支持。如果你用了<property>，却没有在类中提供 setter 方法，则会报错。
 
 
 
@@ -765,12 +765,12 @@ public class Test {
 
 我们会发现<bean>这个标签，其实承载着两个作用：
 
-- 定义bean，告诉Spring哪个Bean需要交给它管理（放入容器）
-- 维护bean与bean之间的依赖关系
+- 定义 bean，告诉 Spring 哪个 Bean 需要交给它管理（放入容器）
+- 维护 bean 与 bean 之间的依赖关系
 
 接下来我们思考这样一个问题：
 
-对于Person类
+对于 Person 类
 
 ```java
 public class Person {
@@ -784,16 +784,16 @@ public class Person {
 }
 ```
 
-上面代码其实已经很好地描述了Person和Car的依赖关系，此时在XML中继续用<property>或者<constructor-arg>反而成了累赘：
+上面代码其实已经很好地描述了 Person 和 Car 的依赖关系，此时在 XML 中继续用<property>或者<constructor-arg>反而成了累赘：
 
 - 既然类结构本身包含了依赖信息，<bean>再用<property>等去描述就显得多余了
-- 如果类结构变动，我们还需要额外维护<bean>的依赖信息，很麻烦。比如Person新增了一个shoes字段，那么<bean>又要写一个<property>表示shoes
+- 如果类结构变动，我们还需要额外维护<bean>的依赖信息，很麻烦。比如 Person 新增了一个 shoes 字段，那么<bean>又要写一个<property>表示 shoes
 
-所以，最好的做法是把让<bean>标签职责单一化，让它只负责定义bean，把bean与bean的依赖关系转交给类自身维护（有这个字段就说明有依赖）。
+所以，最好的做法是把让<bean>标签职责单一化，让它只负责定义 bean，把 bean 与 bean 的依赖关系转交给类自身维护（有这个字段就说明有依赖）。
 
-既然菜鸡的我们能想到，那么Spring肯定也想到了，于是它提出了“自动装配”的概念。很多人一听到自动装配，脑子里只有@Autowired。不算错，但其实XML也支持自动装配，而且真要论先来后到的话，肯定还是XML的自动装配在前。
+既然菜鸡的我们能想到，那么 Spring 肯定也想到了，于是它提出了“自动装配”的概念。很多人一听到自动装配，脑子里只有@Autowired。不算错，但其实 XML 也支持自动装配，而且真要论先来后到的话，肯定还是 XML 的自动装配在前。
 
-XML实现自动装配可以分为两种：全局、局部。
+XML 实现自动装配可以分为两种：全局、局部。
 
 ### **全局自动装配（XML根标签<beans>末尾加default-autowire配置）**
 
@@ -812,18 +812,18 @@ XML实现自动装配可以分为两种：全局、局部。
 </beans>
 ```
 
-所谓全局，就是在XML根标签末尾再加一个配置default-autowire="byName"，那么在此XML中配置的每一个<bean>都遵守这个自动装配模式，可选值有4个：
+所谓全局，就是在 XML 根标签末尾再加一个配置 default-autowire="byName"，那么在此 XML 中配置的每一个<bean>都遵守这个自动装配模式，可选值有 4 个：
 
 - byName
 - byType
 - constructor
 - no
 
-![img](https://pic4.zhimg.com/80/v2-6ebbfae929dc02b8431e0317c3455c43_720w.jpg)default其实就是no
+![img](https://pic4.zhimg.com/80/v2-6ebbfae929dc02b8431e0317c3455c43_720w.jpg)default 其实就是 no
 
 测试结果
 
-![img](https://pic2.zhimg.com/80/v2-05e1e827a09bb8aaffb991907a97f8b9_720w.jpg)我们会发现改用自动装配后，虽然没有了property标签，但是默认是调用setter方法
+![img](https://pic2.zhimg.com/80/v2-05e1e827a09bb8aaffb991907a97f8b9_720w.jpg)我们会发现改用自动装配后，虽然没有了 property 标签，但是默认是调用 setter 方法
 
 
 
@@ -849,8 +849,8 @@ XML实现自动装配可以分为两种：全局、局部。
 
 小结：
 
-- Spring支持自动装配（全局/局部），把原先<bean>标签的职责单一化，只定义bean，而依赖关系交给类本身维护
-- 自动装配共4种，除了no，其他3种各自对应两种注入方式：byName/byType对应setter方法注入，constructor对应构造方法注入 **（请自己动手证明）**
+- Spring 支持自动装配（全局/局部），把原先<bean>标签的职责单一化，只定义 bean，而依赖关系交给类本身维护
+- 自动装配共 4 种，除了 no，其他 3 种各自对应两种注入方式：byName/byType 对应 setter 方法注入，constructor 对应构造方法注入 **（请自己动手证明）**
 
 ![img](https://pic4.zhimg.com/80/v2-4e403a8b86914ee63164159976f1ae7b_720w.jpg)
 
@@ -864,12 +864,12 @@ XML实现自动装配可以分为两种：全局、局部。
 
 原本<bean>标签有两个职责：
 
-- 定义bean
+- 定义 bean
 - 描述依赖信息
 
-上面通过自动装配，把依赖信息交给类本身维护，从此<bean>只负责bean定义。
+上面通过自动装配，把依赖信息交给类本身维护，从此<bean>只负责 bean 定义。
 
-现在，我们想想办法，能不能干脆把bean定义也剥离出来？这样就不需要在XML中写任何<bean>标签了。我早就看<bean>标签不爽了，这么一大坨，要是bean多了，就很臃肿。
+现在，我们想想办法，能不能干脆把 bean 定义也剥离出来？这样就不需要在 XML 中写任何<bean>标签了。我早就看<bean>标签不爽了，这么一大坨，要是 bean 多了，就很臃肿。
 
 怎么做呢？
 
@@ -877,17 +877,17 @@ XML实现自动装配可以分为两种：全局、局部。
 
 ![img](https://pic3.zhimg.com/80/v2-15e5f9de666eed11e76188c5c3899926_720w.jpg)
 
-至此，我们已经成功调教Spring帮我们做了自动装配，也就是说IOC和DI中，DI已经实现自动化。我们接下来要考虑的是如何减少IOC配置的工作量。
+至此，我们已经成功调教 Spring 帮我们做了自动装配，也就是说 IOC 和 DI 中，DI 已经实现自动化。我们接下来要考虑的是如何减少 IOC 配置的工作量。
 
-原先是把<bean>写在XML中，再把XML喂给Spring：
+原先是把<bean>写在 XML 中，再把 XML 喂给 Spring：
 
 ```java
 ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring-context.xml");
 ```
 
-既然现在打算消灭XML中的<bean>，则说明即使把XML喂给Spring，它也吃不到bean定义了。所以，必须要告诉Spring去哪可以吃到bean。
+既然现在打算消灭 XML 中的<bean>，则说明即使把 XML 喂给 Spring，它也吃不到 bean 定义了。所以，必须要告诉 Spring 去哪可以吃到 bean。
 
-我们来看一下，当Spring吃下<bean>时，到底吃了什么：
+我们来看一下，当 Spring 吃下<bean>时，到底吃了什么：
 
 ```xml
 <!-- 在xml中只定义bean，无需配置依赖关系 -->
@@ -895,26 +895,26 @@ ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spri
 <bean id="car" class="com.bravo.xml.Car"></bean>
 ```
 
-是的，<bean>只指定了类名和自动装配的模式。也就是说，要定义一个bean，只需要最基本的两样东西：
+是的，<bean>只指定了类名和自动装配的模式。也就是说，要定义一个 bean，只需要最基本的两样东西：
 
 - 类名
-- 装配模式（其实这个也不是必须的，默认no，不自动装配）
+- 装配模式（其实这个也不是必须的，默认 no，不自动装配）
 
 而类名其实很好得到，我们自己写的类不就有吗？至于自动装配的模式，也完全可以在类中通过注解指定。于是，我们找到了改造的方向：用带注解的类代替<bean>标签。
 
-![img](https://pic1.zhimg.com/80/v2-97887d678b588f66b41d1193d4f2e6ac_720w.jpg)之前：XML中写好bean标签后，把XML喂给Spring，Spring就会把bean实例化加到容器
+![img](https://pic1.zhimg.com/80/v2-97887d678b588f66b41d1193d4f2e6ac_720w.jpg)之前：XML 中写好 bean 标签后，把 XML 喂给 Spring，Spring 就会把 bean 实例化加到容器
 
-![img](https://pic1.zhimg.com/80/v2-5f70b211457c79b00b0f3fd7bf89ce04_720w.jpg)现在：消灭bean标签后，XML中已经没有bean，Spring必须自己去找bean定义
+![img](https://pic1.zhimg.com/80/v2-5f70b211457c79b00b0f3fd7bf89ce04_720w.jpg)现在：消灭 bean 标签后，XML 中已经没有 bean，Spring 必须自己去找 bean 定义
 
-Spring2.5开始提供了一系列注解，比如@Component、@Service等，这些注解都是用来表示bean的。而@Service等注解底层其实还是@Component：
+Spring2.5 开始提供了一系列注解，比如@Component、@Service 等，这些注解都是用来表示 bean 的。而@Service 等注解底层其实还是@Component：
 
 ![img](https://pic3.zhimg.com/80/v2-0ffbaee64b32ed5ef47c4d30c1c5f4da_720w.jpg)
 
-之所以做一层封装，是为了赋予它特殊的语义：定义Service层的bean。其余的这里不再赘述。总之我们暂时理解为，如果要使用注解表示bean定义，我们能用的只有@Component。
+之所以做一层封装，是为了赋予它特殊的语义：定义 Service 层的 bean。其余的这里不再赘述。总之我们暂时理解为，如果要使用注解表示 bean 定义，我们能用的只有@Component。
 
 
 
-新建annotation包，把Car和Person移过去：
+新建 annotation 包，把 Car 和 Person 移过去：
 
 ![img](https://pic1.zhimg.com/80/v2-0f2d25eff0ba855807b0520124a84b90_720w.jpg)
 
@@ -946,7 +946,7 @@ public class Car {
 }
 ```
 
-XML（什么都没有配置，连自动装配模式也没指定，因为不在这里定义bean了）
+XML（什么都没有配置，连自动装配模式也没指定，因为不在这里定义 bean 了）
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -975,19 +975,19 @@ public class Test {
 
 测试结果
 
-![img](https://pic1.zhimg.com/80/v2-d2f5b98366e03ebdbdb5addf3291d5f8_720w.jpg)在Spring容器中找不到person
+![img](https://pic1.zhimg.com/80/v2-d2f5b98366e03ebdbdb5addf3291d5f8_720w.jpg)在 Spring 容器中找不到 person
 
-其实很好理解，我们传入了spring-context.xml告诉Spring去哪读取bean定义，但是实际上XML却没有配置任何<bean>，它是不可能把类实例化加入到容器的。
+其实很好理解，我们传入了 spring-context.xml 告诉 Spring 去哪读取 bean 定义，但是实际上 XML 却没有配置任何<bean>，它是不可能把类实例化加入到容器的。
 
-然而我们新定义的bean（@Component）Spring也没吃，怎么回事？
+然而我们新定义的 bean（@Component）Spring 也没吃，怎么回事？
 
-其实主要是因为我们的改变太突然了，Spring以前吃惯了XML中的<bean>，现在突然换成@Component这种注解类，它吃不惯，甚至不知道它能吃！
+其实主要是因为我们的改变太突然了，Spring 以前吃惯了 XML 中的<bean>，现在突然换成@Component 这种注解类，它吃不惯，甚至不知道它能吃！
 
-所以，必须通知Spring：
+所以，必须通知 Spring：
 
 > 老哥，我们改用注解了，有@Component注解的类就是bean，和以前<bean>一样一样的。
 
-如何通知？只要在XML中配置：
+如何通知？只要在 XML 中配置：
 
 ```xml
  <context:component-scan base-package="com.bravo.annotation"/>
@@ -1005,10 +1005,10 @@ public class Test {
 
 所以，最终</context:component-scan>标签的作用有两个：
 
-- 扫描：原先我们把写有bean定义的XML文件喂给Spring，现在则让Spring自己去指定路径下扫描bean定义
-- 解析：让Spring具备解析注解的功能
+- 扫描：原先我们把写有 bean 定义的 XML 文件喂给 Spring，现在则让 Spring 自己去指定路径下扫描 bean 定义
+- 解析：让 Spring 具备解析注解的功能
 
-所以，XML虽然不用配置<bean>标签，却要配置扫描（需要配置额外的名称空间）：
+所以，XML 虽然不用配置<bean>标签，却要配置扫描（需要配置额外的名称空间）：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1029,9 +1029,9 @@ public class Test {
 
 测试结果：
 
-![img](https://pic4.zhimg.com/80/v2-d6b3c2ceb0c80734004a6934d3a67b7f_720w.jpg)虽然能找到Person了，但是Car并没有被注入
+![img](https://pic4.zhimg.com/80/v2-d6b3c2ceb0c80734004a6934d3a67b7f_720w.jpg)虽然能找到 Person 了，但是 Car 并没有被注入
 
-又出幺蛾子了，怎么回事呢？我们回想一下XML的bean定义：
+又出幺蛾子了，怎么回事呢？我们回想一下 XML 的 bean 定义：
 
 ```xml
 <!-- 在xml中只定义bean，无需配置依赖关系 -->
@@ -1039,17 +1039,17 @@ public class Test {
 <bean id="car" class="com.bravo.xml.Car"></bean>
 ```
 
-我们设置了autowire属性，告诉Spring按什么方式自动装配。
+我们设置了 autowire 属性，告诉 Spring 按什么方式自动装配。
 
-现在我们改用注解了，@Component只是相当于<bean>标签，却没有指明自动装配的模式。如何在类中告诉Spring我们需要的装配方式呢？
+现在我们改用注解了，@Component 只是相当于<bean>标签，却没有指明自动装配的模式。如何在类中告诉 Spring 我们需要的装配方式呢？
 
 方法有很多种：
 
-- @Autowired（Spring提供的）
-- @Resource（JSR-250定义）
-- @Inject（JSR-330定义）
+- @Autowired（Spring 提供的）
+- @Resource（JSR-250 定义）
+- @Inject（JSR-330 定义）
 
-这里我们以@Autowired为例：
+这里我们以@Autowired 为例：
 
 ```java
 @Component
@@ -1080,16 +1080,16 @@ public class Person {
 
 ## @Autowired的小秘密
 
-上面我们有惊无险地从用@Component替换了<bean>，并且结识了@Autowired这个超棒的注解，用来完成自动装配。即：
+上面我们有惊无险地从用@Component 替换了<bean>，并且结识了@Autowired 这个超棒的注解，用来完成自动装配。即：
 
-- <context:component-scan>+@Component彻底解放IOC配置
-- @Autowired完成自动装配
+- <context:component-scan>+@Component 彻底解放 IOC 配置
+- @Autowired 完成自动装配
 
-但是细心的小伙伴会发现，相较于<bean>中的autowire="byName"，@Autowired虽然装配成功了，却没有显式地指定自动装配的模式。
+但是细心的小伙伴会发现，相较于<bean>中的 autowire="byName"，@Autowired 虽然装配成功了，却没有显式地指定自动装配的模式。
 
 只有一种解释：它有默认的装配方式。
 
-在探究@Autowire默认的装配模式之前，关于bean的名称，要和大家先交代一下：
+在探究@Autowire 默认的装配模式之前，关于 bean 的名称，要和大家先交代一下：
 
 ```xml
 <!-- 在xml中只定义bean，无需配置依赖关系 -->
@@ -1097,9 +1097,9 @@ public class Person {
 <bean id="car" class="com.bravo.xml.Car"></bean>
 ```
 
-在<bean>中，id即为最终bean在Spring容器的名字。
+在<bean>中，id 即为最终 bean 在 Spring 容器的名字。
 
-同样的，@Component也提供了给bean命名的方法：
+同样的，@Component 也提供了给 bean 命名的方法：
 
 ![img](https://pic1.zhimg.com/80/v2-8d59de0f23221437c07953ab90193630_720w.jpg)
 
@@ -1122,16 +1122,16 @@ public class Person {
 }
 ```
 
-如果不指定，则默认会把类名首字母小写后作为beanName。
+如果不指定，则默认会把类名首字母小写后作为 beanName。
 
-铺垫结束，我们开始探究@Autowired到底默认是哪种装配模式：
+铺垫结束，我们开始探究@Autowired 到底默认是哪种装配模式：
 
 - byName
 - byType
 - constructor
 - no（已经装配成功，排除）
 
-先来看看是不是byName
+先来看看是不是 byName
 
 ```java
 @Component
@@ -1156,11 +1156,11 @@ public class Person {
 
 ![img](https://pic2.zhimg.com/80/v2-2c1f64f6a6d7b8c0d12eae55cd1bb725_720w.jpg)
 
-Car在Spring中bean的名字应该是car，而我把Person中的Car变量名改为myCar，仍旧注入成功，说明不是byName。
+Car 在 Spring 中 bean 的名字应该是 car，而我把 Person 中的 Car 变量名改为 myCar，仍旧注入成功，说明不是 byName。
 
-再来看看是不是byType。
+再来看看是不是 byType。
 
-这个稍微有点麻烦，因为我需要弄出至少两个同类型的bean。所以我打算把Car变成接口，然后创建Bmw和Benz两个实现类。这个接口只是为了试验，没有实际意义：
+这个稍微有点麻烦，因为我需要弄出至少两个同类型的 bean。所以我打算把 Car 变成接口，然后创建 Bmw 和 Benz 两个实现类。这个接口只是为了试验，没有实际意义：
 
 Car
 
@@ -1207,9 +1207,9 @@ public class Person {
 
 ![img](https://pic4.zhimg.com/80/v2-ee3e0eaec1ee682c22fdda0dc5ebf35f_720w.png)熟悉的配方、熟悉的味道：expected single matching bean but found 2: BMW,benz
 
-很明显，@Autowired默认采用byType的方式注入，由于当前Spring容器中存在两个Car类型的bean，所以注入时报错了，因为Spring无法替我们决定注入哪一个。
+很明显，@Autowired 默认采用 byType 的方式注入，由于当前 Spring 容器中存在两个 Car 类型的 bean，所以注入时报错了，因为 Spring 无法替我们决定注入哪一个。
 
-但是，有个神奇的现象是，你如果把变量名改为bmw或者benz，就会注入对应的bean：
+但是，有个神奇的现象是，你如果把变量名改为 bmw 或者 benz，就会注入对应的 bean：
 
 ```java
 @Component
@@ -1232,11 +1232,11 @@ public class Person {
 
 **也就是说，@Autowired默认采用byType模式自动装配，如果找到多个同类型的，会根据名字匹配。都不匹配，则会报错。**
 
-当然，有些人可能有强迫症，觉得我Car类型的变量必须叫car，但又想指定注入bmw，怎么办？我们先看看@Autowired能不能指定名字吧：
+当然，有些人可能有强迫症，觉得我 Car 类型的变量必须叫 car，但又想指定注入 bmw，怎么办？我们先看看@Autowired 能不能指定名字吧：
 
-![img](https://pic2.zhimg.com/80/v2-f42aca33a4a14ce5a84f6aa484434a21_720w.jpg)不能指定名字，因为Autowired只有一个属性：required，表示当前bean是否必须被注入
+![img](https://pic2.zhimg.com/80/v2-f42aca33a4a14ce5a84f6aa484434a21_720w.jpg)不能指定名字，因为 Autowired 只有一个属性：required，表示当前 bean 是否必须被注入
 
-为了弥补@Autowired不能指定名字的缺憾，Spring提供了@Qualifier注解
+为了弥补@Autowired 不能指定名字的缺憾，Spring 提供了@Qualifier 注解
 
 ```java
 @Qualifier("benz")
@@ -1244,14 +1244,14 @@ public class Person {
 private Car car;
 ```
 
-即使Spring容器中有两个Car类型的bean，也只会按名字注入benz。
+即使 Spring 容器中有两个 Car 类型的 bean，也只会按名字注入 benz。
 
 
 
 其他的我就不测了，给个结论就好：
 
-- @Autowired：默认byType，type相同则byName
-- @Resource：和@Autowired几乎一样，但不能配合@Qualifier，因为它本身就可以指定beanName。但没有required属性
+- @Autowired：默认 byType，type 相同则 byName
+- @Resource：和@Autowired 几乎一样，但不能配合@Qualifier，因为它本身就可以指定 beanName。但没有 required 属性
 
 ```java
 @Resource(name = "benz")
@@ -1266,11 +1266,11 @@ private Car car;
 
 ## 2️⃣JavaConfig+注解：@Configuration+@ComponentScan+@Component
 
-有没有发现，上面标题还是2️⃣？因为接下来要介绍的，还是注解开发。
+有没有发现，上面标题还是 2️⃣？因为接下来要介绍的，还是注解开发。
 
 先复习一下前面两种方式：
 
-- 纯XML（<bean>负责定义bean，Java类负责定义依赖，Spring完成自动装配）
+- 纯 XML（<bean>负责定义 bean，Java 类负责定义依赖，Spring 完成自动装配）
 
 ```xml
 <!-- 在xml中只定义bean，无需配置依赖关系 -->
@@ -1280,7 +1280,7 @@ private Car car;
 
 ![img](https://pic4.zhimg.com/80/v2-83e8d4d47edd641d2ab5af1b4f320d97_720w.jpg)
 
-- 注解+XML（@Component+@Autowired，但我们发现注解并不能单独使用，必须要XML中配置开启注解扫描才能生效）
+- 注解+XML（@Component+@Autowired，但我们发现注解并不能单独使用，必须要 XML 中配置开启注解扫描才能生效）
 
 ```xml
  <context:component-scan base-package="com.bravo.annotation"/>
@@ -1288,21 +1288,21 @@ private Car car;
 
 ![img](https://pic1.zhimg.com/80/v2-fe247666bfa5ccb7a341205423f2227c_720w.jpg)
 
-之前我在[注解（上）](https://zhuanlan.zhihu.com/p/60941426)讲过，注解的使用必须包含三步：定义注解、使用注解、解析注解。@Component是Spring**定义**、我们**使用**，也肯定是由Spring**解析**。但是这个解析必须由我们手动开启。这就是<context:component-scan>标签的意义。
+之前我在[注解（上）](https://zhuanlan.zhihu.com/p/60941426)讲过，注解的使用必须包含三步：定义注解、使用注解、解析注解。@Component 是 Spring**定义**、我们**使用**，也肯定是由 Spring**解析**。但是这个解析必须由我们手动开启。这就是<context:component-scan>标签的意义。
 
 到了这一步我们已经把<bean>标签完全消灭了。但是这种模式有点不伦不类。
 
-你说它叫XML配置开发吧，它又有@Component注解。你说它是注解开发吧，XML中还有一个<context:component-scan>在那嘚瑟呢。所以如何才能完全消灭XML呢？
+你说它叫 XML 配置开发吧，它又有@Component 注解。你说它是注解开发吧，XML 中还有一个<context:component-scan>在那嘚瑟呢。所以如何才能完全消灭 XML 呢？
 
-究其根本，我们发现无法消灭XML的原因在于：注解的读取和解析必须依赖于<context:component-scan>标签！因为我们要帮Spring开启注解扫描，不然他不知道去哪读取bean。
+究其根本，我们发现无法消灭 XML 的原因在于：注解的读取和解析必须依赖于<context:component-scan>标签！因为我们要帮 Spring 开启注解扫描，不然他不知道去哪读取 bean。
 
-既然<bean>标签可以被@Component代替，那么<context:component-scan>标签应该也能找到对应的注解。
+既然<bean>标签可以被@Component 代替，那么<context:component-scan>标签应该也能找到对应的注解。
 
-不错！这个注解就是@ComponentScan！如此一来我们就再也不需要spring-context.xml了。
+不错！这个注解就是@ComponentScan！如此一来我们就再也不需要 spring-context.xml 了。
 
-但是转念一想，脊背发凉...ClassPathXmlApplicationContext这个类要求我们必须传一个XML，怎么办？别担心，Spring同样提供了一个注解@Configuration，目的是让我们可以把一个普通的Java类等同于一个XML文件，而这个Java类就是JavaConfig，我们习惯称之为配置类。
+但是转念一想，脊背发凉...ClassPathXmlApplicationContext 这个类要求我们必须传一个 XML，怎么办？别担心，Spring 同样提供了一个注解@Configuration，目的是让我们可以把一个普通的 Java 类等同于一个 XML 文件，而这个 Java 类就是 JavaConfig，我们习惯称之为配置类。
 
-新建一个javaconfig包，把annotation包下的所有类移过来，并且新建AppConfig配置类
+新建一个 javaconfig 包，把 annotation 包下的所有类移过来，并且新建 AppConfig 配置类
 
 ```java
 @Configuration //表示这个Java类充当XML配置文件
@@ -1313,7 +1313,7 @@ public class AppConfig {
 }
 ```
 
-这样，我们就可以把XML删除，用@ComponentScan来开启注解扫描。
+这样，我们就可以把 XML 删除，用@ComponentScan 来开启注解扫描。
 
 目录结构
 
@@ -1321,15 +1321,15 @@ public class AppConfig {
 
 准备测试时，发现了大麻烦：
 
-![img](https://pic2.zhimg.com/80/v2-ead1af2dea33f2cf63d6c5027b28b625_720w.jpg)ClassPathXmlApplicationContext无法接受AppConfig配置类，它只认XML
+![img](https://pic2.zhimg.com/80/v2-ead1af2dea33f2cf63d6c5027b28b625_720w.jpg)ClassPathXmlApplicationContext 无法接受 AppConfig 配置类，它只认 XML
 
-所以，用AppConfig配置类替代XML只是我们的一厢情愿吗？
+所以，用 AppConfig 配置类替代 XML 只是我们的一厢情愿吗？
 
-其实是我们选错了实现类。ApplicationContext的子类除了ClassPathXmlApplicationContext，还有一个专门针对注解开发的：AnnotationConfigApplicationContext。
+其实是我们选错了实现类。ApplicationContext 的子类除了 ClassPathXmlApplicationContext，还有一个专门针对注解开发的：AnnotationConfigApplicationContext。
 
 
 
-新的Test
+新的 Test
 
 ```java
 public class Test {
@@ -1347,15 +1347,15 @@ public class Test {
 
 ![img](https://pic4.zhimg.com/80/v2-f6a07e638f56acbceb104f8732523fcf_720w.jpg)稳得一批
 
-至此，XML已经被我们完全消灭了。
+至此，XML 已经被我们完全消灭了。
 
 ------
 
 ## 3️⃣JavaConfig方式：@Configuration+@Bean
 
-严格来说，上面的做法并不是所谓的Java-based Container Configuration（@Configuration配置类）风格。我们虽然用到了@Configuration，但只是为了让Java配置类替代XML，最终消灭XML。这也太大材小用了...本质上，这还是@Component+@Autowired注解开发，只是开启注解扫描的方式从<context:component-scan>标签变为@ComponentScan。
+严格来说，上面的做法并不是所谓的 Java-based Container Configuration（@Configuration 配置类）风格。我们虽然用到了@Configuration，但只是为了让 Java 配置类替代 XML，最终消灭 XML。这也太大材小用了...本质上，这还是@Component+@Autowired 注解开发，只是开启注解扫描的方式从<context:component-scan>标签变为@ComponentScan。
 
-实际上，真正的Java-based Container Configuration编程风格是这样的：
+实际上，真正的 Java-based Container Configuration 编程风格是这样的：
 
 AppConfig（如果你不扫描@Component，则不需要@ComponentScan）
 
@@ -1427,12 +1427,12 @@ public class Person {
 
 小结
 
-Java-based Container Configuration编程风格指的是：
+Java-based Container Configuration 编程风格指的是：
 
-- 用@Configuration把一个普通Java类变成配置类，充当XML
-- 在配置类中写多个方法，加上@Bean把返回值对象加到Spring容器中
-- 把配置类AppConfig喂给AnnotationConfigApplicationContext，让它像解析XML一样解析配置类
-- 无需加@Component注解，因为我们可以手动new之后通过@Bean加入容器
+- 用@Configuration 把一个普通 Java 类变成配置类，充当 XML
+- 在配置类中写多个方法，加上@Bean 把返回值对象加到 Spring 容器中
+- 把配置类 AppConfig 喂给 AnnotationConfigApplicationContext，让它像解析 XML 一样解析配置类
+- 无需加@Component 注解，因为我们可以手动 new 之后通过@Bean 加入容器
 
 
 
@@ -1442,17 +1442,17 @@ Java-based Container Configuration编程风格指的是：
 
 ## 大乱斗：@ImportResource、@Component、@Bean
 
-其实XML、注解、JavaConfig三种方式相互兼容，并不冲突。
+其实 XML、注解、JavaConfig 三种方式相互兼容，并不冲突。
 
-- XML的<bean>
-- @Component注解和扫描（不论是<context:component-scan>还是@ComponentScan）
-- @Configuration与@Bean
+- XML 的<bean>
+- @Component 注解和扫描（不论是<context:component-scan>还是@ComponentScan）
+- @Configuration 与@Bean
 
 为了证实它们确实不冲突，我搞了很变态的，一个项目里三种编程方式混用：
 
-- 两辆车子，bmw和benz交给@Bean（JavaConfig）
-- Person交给@Component和@ComponentScan（注解）
-- Student交给XML和@ImportResource（XML）
+- 两辆车子，bmw 和 benz 交给@Bean（JavaConfig）
+- Person 交给@Component 和@ComponentScan（注解）
+- Student 交给 XML 和@ImportResource（XML）
 
 目录结构
 
@@ -1488,21 +1488,21 @@ public interface Car {
 }
 ```
 
-Benz（JavaConfig方式：@Bean加入Spring）
+Benz（JavaConfig 方式：@Bean 加入 Spring）
 
 ```java
 public class Benz implements Car {
 }
 ```
 
-Bmw（JavaConfig方式：@Bean加入Spring）
+Bmw（JavaConfig 方式：@Bean 加入 Spring）
 
 ```java
 public class Bmw implements Car {
 }
 ```
 
-Person（注解方式：@ComponentScan扫描@Component加入Spring）
+Person（注解方式：@ComponentScan 扫描@Component 加入 Spring）
 
 ```java
 @Component
@@ -1524,7 +1524,7 @@ public class Person {
 }
 ```
 
-Student（XML方式：使用<bean>定义）
+Student（XML 方式：使用<bean>定义）
 
 ```java
 public class Student {
@@ -1583,7 +1583,7 @@ public class Test {
 
 ![img](https://pic3.zhimg.com/80/v2-d6806e51f27e7f9ae614bc511ad8027e_720w.jpg)
 
-通常来说，我们日常开发一般是注解+JavaConfig混用。也就是
+通常来说，我们日常开发一般是注解+JavaConfig 混用。也就是
 
 - @ComponentScan+@Configuration+@Component+@Bean
 
@@ -1595,28 +1595,28 @@ public class Test {
 
 ## 小结
 
-- 纯XML配置开发：没有注解，全部<bean>标签，但也可以配置自动装配
+- 纯 XML 配置开发：没有注解，全部<bean>标签，但也可以配置自动装配
 
 - 注解开发不能单独存在，需要**开启扫描**。自动装配一般用@Autowired
 
 - - XML+注解：XML+**<context:component-scan>**+@Component
     - JavaConfig+注解：@Configuration+**@ComponentScan**+@Component
 
-- JavaConfig方式：@Configuration+@Bean
+- JavaConfig 方式：@Configuration+@Bean
 
-通常我们都会两两混用，比如XML+注解，或者JavaConfig+注解，但很少三种一起用。
+通常我们都会两两混用，比如 XML+注解，或者 JavaConfig+注解，但很少三种一起用。
 
 本文目的是让大家知道：
 
-- 3种编程风格：XML、注解、JavaConfig
-- 2种注入方式：setter方法、构造方法
-- 4种装配模式：byType、byName、constructor、no
+- 3 种编程风格：XML、注解、JavaConfig
+- 2 种注入方式：setter 方法、构造方法
+- 4 种装配模式：byType、byName、constructor、no
 
-然后，有一点需要和大家说明，本文关于所谓的2种注入方式和4种装配方式，在宏观上来说是对的，但是在源码层面上来说，还是太笼统了。有机会的话，后面专门写一篇自动装配相关的文章。
+然后，有一点需要和大家说明，本文关于所谓的 2 种注入方式和 4 种装配方式，在宏观上来说是对的，但是在源码层面上来说，还是太笼统了。有机会的话，后面专门写一篇自动装配相关的文章。
 
 
 
-博主耗费一年时间编写的Java进阶小册已经上线，覆盖日常开发所需大部分技术，且通俗易懂、深入浅出、图文丰富，需要的同学请戳：
+博主耗费一年时间编写的 Java 进阶小册已经上线，覆盖日常开发所需大部分技术，且通俗易懂、深入浅出、图文丰富，需要的同学请戳：
 
 
 
@@ -1626,7 +1626,7 @@ public class Test {
 
 [bravo1988](https://www.zhihu.com/people/huangsunting)
 
-Java进阶小册已上线，详见动态置顶，助力野生程序员
+Java 进阶小册已上线，详见动态置顶，助力野生程序员
 
 52 人赞同了该文章
 
@@ -1634,31 +1634,31 @@ Java进阶小册已上线，详见动态置顶，助力野生程序员
 
 这一篇来总结一下，会稍微精简一些，但整体趣味性不如第二篇。
 
-(上一篇说过了，目前介绍的2种注入方式的说法其实不够准确，后面源码分析时再详细介绍)
+(上一篇说过了，目前介绍的 2 种注入方式的说法其实不够准确，后面源码分析时再详细介绍)
 
 主要内容：
 
-- 如何把对象交给Spring管理
+- 如何把对象交给 Spring 管理
 - 依赖注入
 - 自动装配
-- <bean>、@Component还是@Bean
+- <bean>、@Component 还是@Bean
 - 聊一聊@ComponentScan
 
 ------
 
 ## 如何把对象交给Spring管理
 
-首先明确2个概念：Spring Bean和Java Object。
+首先明确 2 个概念：Spring Bean 和 Java Object。
 
-在Spring官方文档中，Bean指的是交给Spring管理、且在Spring中经历完整生命周期（创建、赋值、各种后置处理）的Java对象。
+在 Spring 官方文档中，Bean 指的是交给 Spring 管理、且在 Spring 中经历完整生命周期（创建、赋值、各种后置处理）的 Java 对象。
 
-Object指的是我们自己new的、且没有加入Spring容器的Java对象。
+Object 指的是我们自己 new 的、且没有加入 Spring 容器的 Java 对象。
 
 ![img](https://pic2.zhimg.com/80/v2-580c144e31aed8b5f0b7f0b0902c95a5_720w.jpg)
 
-笼统地讲，要把对象交给Spring管理大概有3种方式（其他方式以后补充）：
+笼统地讲，要把对象交给 Spring 管理大概有 3 种方式（其他方式以后补充）：
 
-- XML配置：<bean>
+- XML 配置：<bean>
 - 注解开发：@Component
 - 配置类：@Configuration+@Bean
 
@@ -1666,7 +1666,7 @@ Object指的是我们自己new的、且没有加入Spring容器的Java对象。
 
 
 
-首先，XML配置方式必须搭配ClassPathXmlApplicationContext，并把XML配置文件喂给它
+首先，XML 配置方式必须搭配 ClassPathXmlApplicationContext，并把 XML 配置文件喂给它
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1702,20 +1702,20 @@ public class Test {
 
 
 
-其次，所谓的注解开发不是说只要打上@Component注解，Spring就会把这个注解类解析成BeanDefinition然后实例化放入容器，**必须配合注解扫描。**
+其次，所谓的注解开发不是说只要打上@Component 注解，Spring 就会把这个注解类解析成 BeanDefinition 然后实例化放入容器，**必须配合注解扫描。**
 
-开启扫描的方式有2种：
+开启扫描的方式有 2 种：
 
 - <context:component-scan>（XML+注解）
-- @ComponentScan（@Configuration配置类+注解）
+- @ComponentScan（@Configuration 配置类+注解）
 
-大家可以把注解开发等同于@Component，只不过这个注解的解析必须开启扫描。所以，在我眼中@Component其实只是半吊子，必须依附于XML或者@Configuration配置类。
+大家可以把注解开发等同于@Component，只不过这个注解的解析必须开启扫描。所以，在我眼中@Component 其实只是半吊子，必须依附于 XML 或者@Configuration 配置类。
 
 ![img](https://pic3.zhimg.com/80/v2-b0944f33559d5afaf0371e606a960782_720w.jpg)
 
 
 
-最后，狭隘的JavaConfig风格可以等同于@Configuration+@Bean。**此时，配置类上面的@ComponentScan并不是必须的。这取决于你是否要另外扫描@Component注解。一旦加了@ComponentScan，其实就是JavaConfig+注解了。**
+最后，狭隘的 JavaConfig 风格可以等同于@Configuration+@Bean。**此时，配置类上面的@ComponentScan并不是必须的。这取决于你是否要另外扫描@Component注解。一旦加了@ComponentScan，其实就是JavaConfig+注解了。**
 
 ```java
 @Configuration //表示这个Java类充当XML配置文件
@@ -1745,13 +1745,13 @@ public class Test {
 
 ![img](https://pic1.zhimg.com/80/v2-d1894656e55d9db98345b7f75c1c4260_720w.jpg)
 
-3种编程风格其实指的是把Bean交给Spring管理的3种方式：
+3 种编程风格其实指的是把 Bean 交给 Spring 管理的 3 种方式：
 
 - <bean>
 - @Component
 - @Configuration+@Bean
 
-至此，我们已经知道如何把Bean交给IOC。接下来，我们聊一聊DI。
+至此，我们已经知道如何把 Bean 交给 IOC。接下来，我们聊一聊 DI。
 
 ------
 
@@ -1759,7 +1759,7 @@ public class Test {
 
 虽然注入方式不止两种，但我们还是暂时按照两种方式复习
 
-- setter方法注入
+- setter 方法注入
 - 构造方法注入
 
 **setter方法注入**
@@ -1811,7 +1811,7 @@ public class Car {
 }
 ```
 
-<bean>中配置<property>，则类中必须提供setter方法。因为<property>等于告诉Spring调用setter方法注入。
+<bean>中配置<property>，则类中必须提供 setter 方法。因为<property>等于告诉 Spring 调用 setter 方法注入。
 
 **构造方法注入**
 
@@ -1855,7 +1855,7 @@ public class Person {
 }
 ```
 
-<bean>中配置<constructor-arg>，则类中必须提供**对应参数列表**的构造方法。因为<constructor-arg>等于告诉Spring调用对应的构造方法注入。
+<bean>中配置<constructor-arg>，则类中必须提供**对应参数列表**的构造方法。因为<constructor-arg>等于告诉 Spring 调用对应的构造方法注入。
 
 什么叫对应参数列表的构造方法？比如上面配置的
 
@@ -1871,13 +1871,13 @@ public Person(Car benz){
 }
 ```
 
-参数多一个、少一个都不行，Spring只会找这个构造方法，找不到就报错！
+参数多一个、少一个都不行，Spring 只会找这个构造方法，找不到就报错！
 
 ------
 
 ## 自动装配
 
-我们发现上面XML的依赖注入有点累赘。比如
+我们发现上面 XML 的依赖注入有点累赘。比如
 
 Person
 
@@ -1902,7 +1902,7 @@ public class Person {
 }
 ```
 
-其实类结构已经很好地描述了依赖关系：Person定义了Car字段，所以Person依赖Car。
+其实类结构已经很好地描述了依赖关系：Person 定义了 Car 字段，所以 Person 依赖 Car。
 
 此时在<bean>中再写一遍
 
@@ -1915,18 +1915,18 @@ public class Person {
 <bean id="car" class="com.bravo.xml.Car"></bean>
 ```
 
-就属于重复操作了。而且后期如果类结构发生改变，比如加了一个shoes字段，我们不仅要维护类结构本身，还要额外维护<bean>标签中的<property>。
+就属于重复操作了。而且后期如果类结构发生改变，比如加了一个 shoes 字段，我们不仅要维护类结构本身，还要额外维护<bean>标签中的<property>。
 
-针对这种情况，Spring提出了自动装配。我们分三种编程风格讨论。
+针对这种情况，Spring 提出了自动装配。我们分三种编程风格讨论。
 
 **1.XML的自动装配**
 
-在XML中，自动装配可以设置全局和局部，即：对所有bean起效，还是对单个bean起效
+在 XML 中，自动装配可以设置全局和局部，即：对所有 bean 起效，还是对单个 bean 起效
 
 - 全局：default-autowire="byName"
 - 局部：autowire="byName"
 
-全局（XML文件中每一个bean都遵守byName模式的自动装配）
+全局（XML 文件中每一个 bean 都遵守 byName 模式的自动装配）
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1959,27 +1959,27 @@ public class Person {
 </beans
 ```
 
-XML的自动装配，与之前的依赖注入相比，只有XML文件不同：
+XML 的自动装配，与之前的依赖注入相比，只有 XML 文件不同：
 
 - 去除之前依赖注入时配置的<property>或<constructor-arg>
 - 加上全局或局部的自动装配属性
 
-类结构要求还是和之前一样，该提供setter方法或者构造方法的，不能少。
+类结构要求还是和之前一样，该提供 setter 方法或者构造方法的，不能少。
 
-自动装配共4种模式：
+自动装配共 4 种模式：
 
 - byName
 - byType
 - constructor
 - no
 
-如果你选择byName或者byType，则需要提供setter方法。
+如果你选择 byName 或者 byType，则需要提供 setter 方法。
 
-如果你选择constructor，则需要提供给构造方法。
+如果你选择 constructor，则需要提供给构造方法。
 
 ![img](https://pic4.zhimg.com/80/v2-4e403a8b86914ee63164159976f1ae7b_720w.jpg)
 
-总之，对于XML而言，自动装配的作用是：只需写<bean>，不需要写<bean>里面的其他标签。
+总之，对于 XML 而言，自动装配的作用是：只需写<bean>，不需要写<bean>里面的其他标签。
 
 
 
@@ -2011,7 +2011,7 @@ public class Person {
 }
 ```
 
-@Configuration配置类要搭配AnnotationConfigApplicationContext
+@Configuration 配置类要搭配 AnnotationConfigApplicationContext
 
 ```java
 public class Test {
@@ -2025,17 +2025,17 @@ public class Test {
 }
 ```
 
-@Autowired默认是byType，如果找到多个相同的，会去匹配与当前字段同名的bean。没找到或者找到多个都会报错。
+@Autowired 默认是 byType，如果找到多个相同的，会去匹配与当前字段同名的 bean。没找到或者找到多个都会报错。
 
-上面演示的是@Autowired作用于成员变量上，其实我们也可以把@Autowired加在构造方法上，它也会自动注入bean。
+上面演示的是@Autowired 作用于成员变量上，其实我们也可以把@Autowired 加在构造方法上，它也会自动注入 bean。
 
 读完上面这句话两秒后，你意识到自己被骗了，于是反驳我：放你的屁，我从来没在构造方法上加@Autowired，而且即使不加，形参也能注入进来。
 
 是的，确实不加也注入进来了。
 
-在回答这个问题之前，我们先达成共识：不管我们new对象，还是Spring帮我们创建bean，都离不开构造方法。这一点没有异议吧？
+在回答这个问题之前，我们先达成共识：不管我们 new 对象，还是 Spring 帮我们创建 bean，都离不开构造方法。这一点没有异议吧？
 
-当你的类中只有一个默认无参构造方法时，Spring实例化时没得选，只能用无参构造创建bean。但是，如果类中有两个构造方法，比如：
+当你的类中只有一个默认无参构造方法时，Spring 实例化时没得选，只能用无参构造创建 bean。但是，如果类中有两个构造方法，比如：
 
 ```java
 @Component
@@ -2064,15 +2064,15 @@ public class Person {
  }
 ```
 
-此时，Spring会报错，因为它无法替你决定到底用哪个构造器创建bean。你要加上@Autowired，明确告诉Spring用哪个构造方法创建bean。
+此时，Spring 会报错，因为它无法替你决定到底用哪个构造器创建 bean。你要加上@Autowired，明确告诉 Spring 用哪个构造方法创建 bean。
 
-当然，放在setter方法上也可以注入进来。具体细节，会在分析自动装配底层源码时介绍。
+当然，放在 setter 方法上也可以注入进来。具体细节，会在分析自动装配底层源码时介绍。
 
 
 
 **3.JavaConfig的自动装配**
 
-其实没必要把JavaConfig再单独分出一类，因为它底层其实也是@Component。所以和在@Component里使用@Autowired是一样的。
+其实没必要把 JavaConfig 再单独分出一类，因为它底层其实也是@Component。所以和在@Component 里使用@Autowired 是一样的。
 
 AppConfig
 
@@ -2117,11 +2117,11 @@ public class Person {
 
 ## <bean>、@Component还是@Bean
 
-学习了把对象交给Spring管理的3种方式后，我们产生了疑惑：
+学习了把对象交给 Spring 管理的 3 种方式后，我们产生了疑惑：
 
-<bean>、@Component和@Bean该如何取舍呢？
+<bean>、@Component 和@Bean 该如何取舍呢？
 
-虽然@Bean和@Component都是注解，看起来是一家人，但其实@Bean和<bean>更接近。它俩的共同点是：
+虽然@Bean 和@Component 都是注解，看起来是一家人，但其实@Bean 和<bean>更接近。它俩的共同点是：
 
 > 类文件和bean定义分开
 
@@ -2129,23 +2129,23 @@ public class Person {
 
 打个比方：
 
-![img](https://pic4.zhimg.com/80/v2-fbeeffbc6f97c4d9b247e8326187d477_720w.jpg)@Component直接写在源码上，而bean标签和@Bean都是另写一个文件描述bean定义
+![img](https://pic4.zhimg.com/80/v2-fbeeffbc6f97c4d9b247e8326187d477_720w.jpg)@Component 直接写在源码上，而 bean 标签和@Bean 都是另写一个文件描述 bean 定义
 
 直接写源码上面，有什么不好吗？
 
 有好有坏。
 
-好处是：相对其他两种方式，@Component非常简洁。
+好处是：相对其他两种方式，@Component 非常简洁。
 
-坏处是，如果你想要交给Spring管理的对象是第三方提供的，那么你无法改动它的源码，即无法在上面加@Component。更甚者，人家连源码都没有，只给了你jar包，怎么搞？
+坏处是，如果你想要交给 Spring 管理的对象是第三方提供的，那么你无法改动它的源码，即无法在上面加@Component。更甚者，人家连源码都没有，只给了你 jar 包，怎么搞？
 
-网上花里胡哨的对比一大堆，但个人觉得就这个是最重要的。以后遇到不好加@Component的，能想到@Bean或者<bean>就行了。
+网上花里胡哨的对比一大堆，但个人觉得就这个是最重要的。以后遇到不好加@Component 的，能想到@Bean 或者<bean>就行了。
 
 ------
 
 ## 聊一聊@ComponentScan
 
-我们都知道，@ComponentScan和XML中的<context:component-scan>标签功能相同，都是开启注解扫描，而且可以指定扫描路径。
+我们都知道，@ComponentScan 和 XML 中的<context:component-scan>标签功能相同，都是开启注解扫描，而且可以指定扫描路径。
 
 AppConfig
 
@@ -2212,9 +2212,9 @@ public class Test {
 
 **实验一：不写@ComponentScan**
 
-这个别试了，直接报错，因为压根没开启扫描，找不到Person。
+这个别试了，直接报错，因为压根没开启扫描，找不到 Person。
 
-![img](https://pic4.zhimg.com/80/v2-90c444ee9bccd54abf10624a4e575edf_720w.png)报错：找不到Person，说明没扫描到
+![img](https://pic4.zhimg.com/80/v2-90c444ee9bccd54abf10624a4e575edf_720w.png)报错：找不到 Person，说明没扫描到
 
 **实验二：不指定路径，同包**
 
@@ -2246,13 +2246,13 @@ public class AppConfig {
 }
 ```
 
-把AppConfig类移到annotation包下，和Person等组件不同包：
+把 AppConfig 类移到 annotation 包下，和 Person 等组件不同包：
 
 ![img](https://pic3.zhimg.com/80/v2-f9358ee4e4e8ee5ab0fe723ca6922942_720w.jpg)
 
 测试结果
 
-![img](https://pic2.zhimg.com/80/v2-8fb5ea0e0e490ff501afd71e55ec0575_720w.jpg)还是扫描到了，身在曹营心在汉，虽然配置类在annotation包下，但是路径指定了javaconfig
+![img](https://pic2.zhimg.com/80/v2-8fb5ea0e0e490ff501afd71e55ec0575_720w.jpg)还是扫描到了，身在曹营心在汉，虽然配置类在 annotation 包下，但是路径指定了 javaconfig
 
 
 
@@ -2271,7 +2271,7 @@ public class AppConfig {
 ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
 ```
 
-AnnotationConfigApplicationContext吃了AppConfig这个配置类后，会尝试去拿类上面的@ComponentScan注解：
+AnnotationConfigApplicationContext 吃了 AppConfig 这个配置类后，会尝试去拿类上面的@ComponentScan 注解：
 
 - 有注解（开启扫描）
 
@@ -2293,7 +2293,7 @@ AnnotationConfigApplicationContext吃了AppConfig这个配置类后，会尝试�
 
 ### @ComponentScan在SpringBoot中的应用
 
-用过SpringBoot的朋友都知道，我们必须写一个启动类
+用过 SpringBoot 的朋友都知道，我们必须写一个启动类
 
 ```java
 @SpringBootApplication
@@ -2304,7 +2304,7 @@ public class SpringbootDemoApplication {
 }
 ```
 
-而SpringBoot有一个不成文的规定：
+而 SpringBoot 有一个不成文的规定：
 
 > 所有的组件必须在启动类所在包及其子包下，出了这个范围，组件就无效了。
 
@@ -2314,7 +2314,7 @@ public class SpringbootDemoApplication {
 
 ![img](https://pic2.zhimg.com/80/v2-a2aadd580317081d500a0d11db06f725_720w.jpg)
 
-@ComponentScan没有指定basePackages属性，也就是没有指定扫描路径。那么，按照上面的分析，默认扫描当前包及其子包下组件。
+@ComponentScan 没有指定 basePackages 属性，也就是没有指定扫描路径。那么，按照上面的分析，默认扫描当前包及其子包下组件。
 
 这就是上面不成文规定的背后原因。
 
@@ -2328,7 +2328,7 @@ public class SpringbootDemoApplication {
 
 [bravo1988](https://www.zhihu.com/people/huangsunting)
 
-Java进阶小册已上线，详见动态置顶，助力野生程序员
+Java 进阶小册已上线，详见动态置顶，助力野生程序员
 
 关注他
 
@@ -2346,11 +2346,11 @@ Java进阶小册已上线，详见动态置顶，助力野生程序员
 
 ## 必要的知识储备
 
-去年（2018）我花了很多时间在SSM上面，因为和大部分人一样，面对一大堆配置我感到手足无措，不知道什么是什么，也不知道它为什么起作用。
+去年（2018）我花了很多时间在 SSM 上面，因为和大部分人一样，面对一大堆配置我感到手足无措，不知道什么是什么，也不知道它为什么起作用。
 
-其实归根到底，我们之所以学不明白SSM，觉得隔靴搔痒，个人认为是因为“配置式开发”和我们之前“编码式开发”差别太大了。不论是xml还是注解，和我们平时写的业务代码相去甚远。作为一个开发人员，当你看到一个切实的功能被实现了，而自己却完全看不到for循环和if判断的身影，心里是不踏实的。对于一个“手艺人”，唯一能让我们感到踏实的，是if else for这样的编码，而不是@Aspect、@Controller这样的配置！
+其实归根到底，我们之所以学不明白 SSM，觉得隔靴搔痒，个人认为是因为“配置式开发”和我们之前“编码式开发”差别太大了。不论是 xml 还是注解，和我们平时写的业务代码相去甚远。作为一个开发人员，当你看到一个切实的功能被实现了，而自己却完全看不到 for 循环和 if 判断的身影，心里是不踏实的。对于一个“手艺人”，唯一能让我们感到踏实的，是 if else for 这样的编码，而不是@Aspect、@Controller 这样的配置！
 
-找到症结以后，我去重新学习了注解、反射、动态代理等知识，然后又学了一遍SSM框架，这回视野就开阔多了。下面是我复习时顺便写的博客，相信对有同样困扰的朋友有帮助：
+找到症结以后，我去重新学习了注解、反射、动态代理等知识，然后又学了一遍 SSM 框架，这回视野就开阔多了。下面是我复习时顺便写的博客，相信对有同样困扰的朋友有帮助：
 
 - [浅谈反射机制](https://zhuanlan.zhihu.com/p/66853751)
 - [注解（上）](https://zhuanlan.zhihu.com/p/60941426)
@@ -2365,13 +2365,13 @@ Java进阶小册已上线，详见动态置顶，助力野生程序员
 - [servlet的本质是什么，它是如何工作的？](https://www.zhihu.com/question/21416727/answer/690289895)
 - [Servlet（下）](https://zhuanlan.zhihu.com/p/65658315)
 
-但是当时仍然不敢去看Spring源码，因为我心里会觉得：哇，Spring源码诶，我才一年经验，肯定看不懂吧。
+但是当时仍然不敢去看 Spring 源码，因为我心里会觉得：哇，Spring 源码诶，我才一年经验，肯定看不懂吧。
 
 很多时候，一件事的失败并不是外部条件多么艰难，而仅仅是因为你怕，所以这个可能伟大的念头干脆都尚未发生就流产了。
 
-促使我发生改变的是尚硅谷雷丰阳老师的《Spring注解驱动开发》。原先我其实仅仅把它当做一个普通的Spring视频学习，因为我那会儿对Spring各种注解还是不是特别熟悉。这套视频前面确实都是基础内容，教你每个注解大概什么作用。但是到了中后期，突然笔锋一转分析起了源码。一开始当然不适应，但是整套视频看完，就对“源码”两个字麻木了...
+促使我发生改变的是尚硅谷雷丰阳老师的《Spring 注解驱动开发》。原先我其实仅仅把它当做一个普通的 Spring 视频学习，因为我那会儿对 Spring 各种注解还是不是特别熟悉。这套视频前面确实都是基础内容，教你每个注解大概什么作用。但是到了中后期，突然笔锋一转分析起了源码。一开始当然不适应，但是整套视频看完，就对“源码”两个字麻木了...
 
-于是开始将魔爪伸向了Spring。
+于是开始将魔爪伸向了 Spring。
 
 ------
 
@@ -2393,7 +2393,7 @@ Java进阶小册已上线，详见动态置顶，助力野生程序员
 
 举《破冰行动》并不是说它有多好看，而是想说：相较文字这种扁平化的信息流，我们的大脑更喜欢结构化、成片的东西，记忆更深刻。
 
-同样的，我在学习雷丰阳老师的《Spring注解驱动开发》时，一开始只是用txt做一些简单的记录。可是到了后面就跟不上了，而且发现之前做的笔记自己也看不懂了。因为写下那些文字的时候，基本就是照抄老师的，并没有在脑子做分类和结构化处理。
+同样的，我在学习雷丰阳老师的《Spring 注解驱动开发》时，一开始只是用 txt 做一些简单的记录。可是到了后面就跟不上了，而且发现之前做的笔记自己也看不懂了。因为写下那些文字的时候，基本就是照抄老师的，并没有在脑子做分类和结构化处理。
 
 后来第二次复习时，改用思维导图后感觉好多了：
 
@@ -2413,13 +2413,13 @@ Java进阶小册已上线，详见动态置顶，助力野生程序员
 
 我的专栏文章，随处可见这样的草图。个人觉得这些草图可以迅速直观地帮初学者建立对该知识点的第一印象，具体的细节留待后面再补充，而不是一开始就劈头盖脸甩过去一大堆概念。
 
-同样的，Spring源码做了很多层抽象，类与类之间有时层级非常深。如果非要在有限的篇幅里告诉读者各种继承关系，那会使得文章读起来味同嚼蜡，也会挫伤初学者的积极性。所以我还是选择用图来简化：
+同样的，Spring 源码做了很多层抽象，类与类之间有时层级非常深。如果非要在有限的篇幅里告诉读者各种继承关系，那会使得文章读起来味同嚼蜡，也会挫伤初学者的积极性。所以我还是选择用图来简化：
 
 ![img](https://pic4.zhimg.com/80/v2-8fa8557e1b66dba346fa2759e9c96f47_720w.jpg)
 
 具体的继承关系，他们自己去阅读源码时自然会注意到，无需我多嘴。
 
-不要让博客抢了API的活，这是我个人的观点。
+不要让博客抢了 API 的活，这是我个人的观点。
 
 
 
@@ -2443,15 +2443,15 @@ Java进阶小册已上线，详见动态置顶，助力野生程序员
 
 - 忌漫无目的
 
-Spring源码成百上千万行，你必须带着目的去看源码，不然看到一半可能都不知道这个方法是干嘛的。
+Spring 源码成百上千万行，你必须带着目的去看源码，不然看到一半可能都不知道这个方法是干嘛的。
 
-- 一定要Debug
+- 一定要 Debug
 
-Debug的好处是，随时随地观察内存中变量的情况。程序说到底是为了处理数据的，数据体现在一个个变量上。通过观察变量的改变，推测每个方法的大致作用，是非常有效的源码阅读技巧。
+Debug 的好处是，随时随地观察内存中变量的情况。程序说到底是为了处理数据的，数据体现在一个个变量上。通过观察变量的改变，推测每个方法的大致作用，是非常有效的源码阅读技巧。
 
 - 善用方法调用栈
 
-不论是Eclipse还是IDEA，Debug时左侧都会出现方法调用栈。在你感兴趣的地方打一个断点，就能知道程序经过了哪些类、几个方法到这里的。这对理清调用过程很有帮助。
+不论是 Eclipse 还是 IDEA，Debug 时左侧都会出现方法调用栈。在你感兴趣的地方打一个断点，就能知道程序经过了哪些类、几个方法到这里的。这对理清调用过程很有帮助。
 
 ![img](https://pic4.zhimg.com/80/v2-7b16be2175fa7a8155aab834a421e4af_720w.jpg)
 
@@ -2463,7 +2463,7 @@ Debug的好处是，随时随地观察内存中变量的情况。程序说到底
 
 
 
-最后，并不是所有人都需要阅读源码，也不是一定要看得非常非常精，不放过每一句，没必要。阅读源码的最终落脚点一定是：帮助我们更好地使用Spring。
+最后，并不是所有人都需要阅读源码，也不是一定要看得非常非常精，不放过每一句，没必要。阅读源码的最终落脚点一定是：帮助我们更好地使用 Spring。
 
 
 
