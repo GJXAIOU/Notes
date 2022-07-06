@@ -35,13 +35,13 @@ Kafka 中的消息以主题（Topic）为单位进行归类，生产者负责将
 
 同一主题下的不同分区包含的消息是不同的，**分区在存储层面可以看作一个可追加的日志（Log）文件**，消息在被追加到分区日志文件的时候都会分配一个特定的偏移量（offset）。**offset 是消息在分区中的唯一标识，Kafka 通过它来保证消息在分区内的顺序性，不过 offset 并不跨越分区，即 Kafka 保证的是分区有序而不是主题有序。**
 
-Kafka 中的分区可以分布在不同的服务器（broker）上，即一个主题可以横跨多个 broker，以此来提供比单个 broker 更强大的性能。
+**Kafka 中的分区可以分布在不同的服务器（broker）上，即一个主题可以横跨多个 broker，以此来提供比单个 broker 更强大的性能**。
 
 每条消息被发送到 broker 之前，会根据分区规则选择存储到哪个具体的分区。如果分区规则设定得合理，所有的消息都可以均匀地分配到不同的分区中。并且可以通过增加分区来实现水平拓展。
 
-Kafka 为分区引入了多副本（Replica）机制，通过增加副本数量可以提升容灾能力。同一分区的不同副本中保存的是相同的消息（在同一时刻，副本之间并非完全一样），副本之间是「一主多从」的关系，其中 leader 副本负责处理读写请求，follower 副本只负责与 leader 副本的消息同步。且副本处于不同 broker 中，当 leader 副本出现问题，则从 follower 副本中选举新的 leader 提供服务。通过多副本实现故障的自动转移，即当集群中某个 broker 失效但是保证服务可用。
+Kafka 为分区引入了多副本（Replica）机制，通过增加副本数量可以提升容灾能力。同一分区的不同副本中保存的是相同的消息（在同一时刻，副本之间并非完全一样），副本之间是「一主多从」的关系，其中 leader 副本负责处理读写请求，follower 副本只负责与 leader 副本的消息同步。且**副本处于不同 broker 中**，当 leader 副本出现问题，则从 follower 副本中选举新的 leader 提供服务。通过多副本实现故障的自动转移，即当集群中某个 broker 失效但是保证服务可用。
 
-![image-20220524211430395](一、初识Kafka.resource/image-20220524211430395.png)
+![image-20220627084240680](%E4%B8%80%E3%80%81%E5%88%9D%E8%AF%86Kafka.resource/image-20220627084240680.png)
 
 Kafka 消费端也具备一定的容灾能力。Consumer 使用拉（Pull）模式从服务端拉取消息，并且保存消费的具体位置，当消费者宕机后恢复上线时可以根据之前保存的消费位置重新拉取需要的消息进行消费，从而不会造成消息丢失。
 
@@ -101,10 +101,6 @@ bin/kafka-topic.sh --zookeeper localhost:2181 --create --topic topic-demo --repl
 >  Error processing create topic request CreatableTopic(name='t
 > opic-demo', numPartitions=4, replicationFactor=3, assignments=[], configs=[]) (kafka.server.ZkAdminManager)
 > org.apache.kafka.common.errors.InvalidReplicationFactorException: Replication factor: 3 larger than available brokers: 1
-
-
-
-
 
 ## 1.4 服务端参数配置
 
