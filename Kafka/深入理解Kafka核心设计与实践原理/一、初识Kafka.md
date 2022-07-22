@@ -45,7 +45,7 @@ Kafka 为分区引入了多副本（Replica）机制，通过增加副本数量�
 
 Kafka 消费端也具备一定的容灾能力。Consumer 使用拉（Pull）模式从服务端拉取消息，并且保存消费的具体位置，当消费者宕机后恢复上线时可以根据之前保存的消费位置重新拉取需要的消息进行消费，从而不会造成消息丢失。
 
-分区中的所有副本统称为 **AR**（Assigned Replicas）。所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内）组成 ISR（In-SyncReplicas），ISR 集合是 AR 集合中的一个子集。与 leader 副本同步滞后过多的副本（不包括leader副本）组成 OSR（Out-of-Sync Replicas），由此可见，AR=ISR+OSR。
+分区中的所有副本统称为 **AR**（Assigned Replicas）。所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内）组成 ISR（In-SyncReplicas），ISR 集合是 AR 集合中的一个子集。与 leader 副本同步滞后过多的副本（不包括 leader副本）组成 OSR（Out-of-Sync Replicas），由此可见，AR=ISR+OSR。
 
 > 正常所有 follower 都应该和 leader 保持一定程度的同步，即 AR = ISR。
 

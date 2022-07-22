@@ -1,10 +1,10 @@
 # 17理论三：里式替换（LSP）跟多态有何区别？哪些代码违背了 LSP？
 
-整体上来讲，SOLID 中的「L」对应的原则：里式替换原则是比较简单、容易理解和掌握的。以下主要通过几个反例，看看哪些代码是违反里式替换原则的？我们该如何将它们改造成满足里式替换原则？同时和「多态」对比一下。
+SOLID 中的「L」对应的原则：里式替换原则是比较简单、容易理解和掌握的。以下主要通过几个反例，看看哪些代码是违反里式替换原则的？我们该如何将它们改造成满足里式替换原则？同时和「多态」对比一下。
 
 ## 一、如何理解「里式替换原则」？
 
-里式替换原则的英文翻译是：Liskov Substitution Principle，缩写为 LSP。这个原则最早是在 1986 年由 Barbara Liskov 提出，他是这么描述这条原则的：
+里式替换原则的英文翻译是：Liskov Substitution Principle（ LSP）。这个原则最早是在 1986 年由 Barbara Liskov 提出，他是这么描述这条原则的：
 
 > If S is a subtype of T, then objects of type T may be replaced with objects of type S, without breaking the program。
 
@@ -12,7 +12,7 @@
 
 > Functions that use pointers of references to base classes must be able to use objects of derived classes without knowing it。
 
-综合两者描述得到：子类对象（object of subtype/derived class）能够替换程序（program）中父类对象（object of base/parent class）出现的任何地方，并且保证原来程序的逻辑行为（behavior）不变及正确性不被破坏。
+综合两者描述得到：**子类对象（object of subtype/derived class）能够替换程序（program）中父类对象（object of base/parent class）出现的任何地方，并且保证原来程序的逻辑行为（behavior）不变及正确性不被破坏。**
 
 这么说还是比较抽象，我们通过一个例子来解释一下。如下代码中，父类 Transporter 使用 org.apache.http 库中的 HttpClient 类来传输网络数据。子类 SecurityTransporter 继承父类 Transporter，增加了额外的功能，支持传输 appId 和 appToken 安全认证信息。
 
