@@ -1,20 +1,20 @@
 # 17理论三：里式替换（LSP）跟多态有何区别？哪些代码违背了 LSP？
 
-SOLID 中的「L」对应的原则：里式替换原则是比较简单、容易理解和掌握的。以下主要通过几个反例，看看哪些代码是违反里式替换原则的？我们该如何将它们改造成满足里式替换原则？同时和「多态」对比一下。
+SOLID 中的「L」对应里式替换原则（Liskov Substitution Principle（LSP）），其比较简单、容易理解和掌握的。以下主要通过几个反例，看看哪些代码是违反里式替换原则的？我们该如何将它们改造成满足里式替换原则？同时和「多态」对比一下。
 
-## 一、如何理解「里式替换原则」？
+## 一、如何理解「里式替换原则」
 
-里式替换原则的英文翻译是：Liskov Substitution Principle（ LSP）。这个原则最早是在 1986 年由 Barbara Liskov 提出，他是这么描述这条原则的：
-
+> - 最早是在 1986 年由 Barbara Liskov 提出
+>
 > If S is a subtype of T, then objects of type T may be replaced with objects of type S, without breaking the program。
-
-在 1996 年，Robert Martin 在他的 SOLID 原则中，重新描述了这个原则，英文原话是这样的：
-
+>
+> - 1996 年，Robert Martin 在他的 SOLID 原则中，重新描述了这个原则
+>
 > Functions that use pointers of references to base classes must be able to use objects of derived classes without knowing it。
 
 综合两者描述得到：**子类对象（object of subtype/derived class）能够替换程序（program）中父类对象（object of base/parent class）出现的任何地方，并且保证原来程序的逻辑行为（behavior）不变及正确性不被破坏。**
 
-这么说还是比较抽象，我们通过一个例子来解释一下。如下代码中，父类 Transporter 使用 org.apache.http 库中的 HttpClient 类来传输网络数据。子类 SecurityTransporter 继承父类 Transporter，增加了额外的功能，支持传输 appId 和 appToken 安全认证信息。
+如下示例代码中，父类 Transporter 使用 org.apache.http 库中的 HttpClient 类来传输网络数据。子类 SecurityTransporter 继承父类 Transporter，增加了额外的功能，支持传输 appId 和 appToken 安全认证信息。
 
 ```java
 public class Transporter {
@@ -35,6 +35,7 @@ public class SecurityTransporter extends Transporter {
         this.appId = appId;
         this.appToken = appToken;
     }
+    
     @Override
     public Response sendRequest(Request request) {
         if (StringUtils.isNotBlank(appId) && StringUtils.isNotBlank(appToken)) {
@@ -44,6 +45,7 @@ public class SecurityTransporter extends Transporter {
         return super.sendRequest(request);
     }
 } 
+
 public class Demo {
     public void demoFunction(Transporter transporter) {
         Reuqest request = new Request();
@@ -60,7 +62,7 @@ demo.demofunction(new SecurityTransporter(/* 省略参数 */););
 
 在上面的代码中，**子类 SecurityTransporter 的设计完全符合里式替换原则，可以替换父类出现的任何位置，并且原来代码的逻辑行为不变且正确性也没有被破坏**。
 
-不过，你可能会有这样的疑问，刚刚的代码设计不就是简单利用了面向对象的多态特性吗？ 多态和里式替换原则说的是不是一回事呢？从刚刚的例子和定义描述来看，里式替换原则跟多态看起来确实有点类似，但实际上它们完全是两回事。
+从刚刚的例子和定义描述来看，里式替换原则跟多态看起来确实有点类似，但实际上它们完全是两回事。
 
 还以刚刚的代码为例，不过，我们需要对 SecurityTransporter 类中 sendRequest() 函数稍加改造一下。改造前，如果 appId 或者 appToken 没有设置，我们就不做校验；改造后，如果 appId 或者 appToken 没有设置，则直接抛出 NoAuthorizationRuntimeException 未授权异常。
 
