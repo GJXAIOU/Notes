@@ -177,7 +177,7 @@ catalina.out 是 Tomcat 的标准输出（stdout）和标准错误（stderr）�
 
 为了演示用注解的方式来部署 Servlet，我们首先修改 Java 代码，给 Servlet 类加上**@WebServlet**注解，修改后的代码如下。
 
-```
+```java
 import java.io.IOException;
 import java.io.PrintWriter;
  
@@ -214,20 +214,13 @@ public class AnnotationServlet extends HttpServlet {
  
 }  
 ```
-
 这段代码里最关键的就是这个注解，它表明两层意思：第一层意思是 AnnotationServlet 这个 Java 类是一个 Servlet，第二层意思是这个 Servlet 对应的 URL 路径是 myAnnotationServlet。
 
-```
 @WebServlet("/myAnnotationServlet")
-复制代码
-```
 
 创建好 Java 类以后，同样经过编译，并放到 MyWebApp 的 class 目录下。这里要注意的是，你**需要删除原来的 web.xml**，因为我们不需要 web.xml 来配置 Servlet 了。然后重启 Tomcat，接下来我们验证一下这个新的 AnnotationServlet 有没有部署成功。在浏览器里输入：`http://localhost:8080/MyWebApp/myAnnotationServlet`，得到结果：
 
-```
-Annotation Servlet!
-复制代码
-```
+`Annotation Servlet!`
 
 这说明我们的 AnnotationServlet 部署成功了。可以通过注解完成 web.xml 所有的配置功能，包括 Servlet 初始化参数以及配置 Filter 和 Listener 等。
 
