@@ -34,21 +34,28 @@ Tomcat 的意思是，我扫描了你 Web 应用下的 JAR 包，发现 JAR 包�
 
 - 如果你的项目没有使用 JSP 作为 Web 页面模板，而是使用 Velocity 之类的模板引擎，你完全可以把 TLD 扫描禁止掉。方法是，找到 Tomcat 的`conf/`目录下的`context.xml`文件，在这个文件里 Context 标签下，加上**JarScanner**和**JarScanFilter**子标签，像下面这样。
 
-  ![image-20220815073904955](12%20%20%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BC%98%E5%8C%96%E5%B9%B6%E6%8F%90%E9%AB%98Tomcat%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6.resource/image-20220815073904955.png)
-
-  
+  ```xml
+  <Context>
+      <JarScanner>
+          <JarScanFilter defaultTIdScan="false"/>
+      </JarScanner>
+  </Context>
+  ```
 
 - 如果你的项目使用了 JSP 作为 Web 页面模块，意味着 TLD 扫描无法避免，但是我们可以通过配置来告诉 Tomcat，只扫描那些包含 TLD 文件的 JAR 包。方法是，找到 Tomcat 的`conf/`目录下的`catalina.properties`文件，在这个文件里的 jarsToSkip 配置项中，加上你的 JAR 包。
-
-```
-tomcat.util.scan.StandardJarScanFilter.jarsToSkip=xxx.jar
-```
+  ```xml
+  tomcat.util.scan.StandardJarScanFilter.jarsToSkip=xxx.jar
+  ```
 
 ## 关闭 WebSocket 支持
 
 Tomcat 会扫描 WebSocket 注解的 API 实现，比如`@ServerEndpoint`注解的类。我们知道，注解扫描一般是比较慢的，如果不需要使用 WebSockets 就可以关闭它。具体方法是，找到 Tomcat 的`conf/`目录下的`context.xml`文件，给 Context 标签加一个**containerSciFilter**的属性，像下面这样。
 
-![image-20220815074007397](12%20%20%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BC%98%E5%8C%96%E5%B9%B6%E6%8F%90%E9%AB%98Tomcat%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6.resource/image-20220815074007397.png)
+```xml
+<Context containerSciFilter="org.apache.tomcat.websocket.server.WsSci">
+...
+</Context>
+```
 
 更进一步，如果你不需要 WebSockets 这个功能，你可以把 Tomcat lib 目录下的`websocket-api.jar`和`tomcat-websocket.jar`这两个 JAR 文件删除掉，进一步提高性能。
 
@@ -56,17 +63,29 @@ Tomcat 会扫描 WebSocket 注解的 API 实现，比如`@ServerEndpoint`注解�
 
 跟关闭 WebSocket 一样，如果你不需要使用 JSP，可以通过类似方法关闭 JSP 功能，像下面这样。
 
-![image-20220815074026050](12%20%20%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BC%98%E5%8C%96%E5%B9%B6%E6%8F%90%E9%AB%98Tomcat%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6.resource/image-20220815074026050.png)
+```xml
+<Context containerSciFilter="org.apache.jasper.servlet.JasperInitializer">
+...
+</Context>
+```
 
 我们发现关闭 JSP 用的也是**containerSciFilter**属性，如果你想把 WebSocket 和 JSP 都关闭，那就这样配置：
 
-![image-20220815074040948](12%20%20%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BC%98%E5%8C%96%E5%B9%B6%E6%8F%90%E9%AB%98Tomcat%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6.resource/image-20220815074040948.png)
+```xml
+<Context containerSciFilter="org.apache.tomcat.websocket.server.WsSci|org.apache.jasper.servlet.JasperInitializer">
+...
+</Context>
+```
 
 ## 禁止 Servlet 注解扫描
 
 Servlet 3.0 引入了注解 Servlet，Tomcat 为了支持这个特性，会在 Web 应用启动时扫描你的类文件，因此如果你没有使用 Servlet 注解这个功能，可以告诉 Tomcat 不要去扫描 Servlet 注解。具体配置方法是，在你的 Web 应用的`web.xml`文件中，设置`<web-app>`元素的属性`metadata-complete="true"`，像下面这样。
 
-![image-20220815074055210](12%20%20%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BC%98%E5%8C%96%E5%B9%B6%E6%8F%90%E9%AB%98Tomcat%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6.resource/image-20220815074055210-16605204555197.png)
+```xml
+<web-app metadata-complete="true">
+...
+</web-app>
+```
 
 `metadata-complete`的意思是，`web.xml`里配置的 Servlet 是完整的，不需要再去库类中找 Servlet 的定义。
 
@@ -76,7 +95,13 @@ Servlet 3.0 还引入了“Web 模块部署描述符片段”的`web-fragment.xm
 
 你可以通过配置`web.xml`里面的`<absolute-ordering>`元素直接指定了哪些 JAR 包需要扫描`web fragment`，如果`<absolute-ordering/>`元素是空的， 则表示不需要扫描，像下面这样。
 
-![image-20220815074111163](12%20%20%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BC%98%E5%8C%96%E5%B9%B6%E6%8F%90%E9%AB%98Tomcat%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6.resource/image-20220815074111163.png)
+```xml
+<web-app>
+    ...
+    <absolute-ordering/>
+    ...
+</web-app>
+```
 
 ## 随机数熵源优化
 
@@ -91,7 +116,6 @@ Servlet 3.0 还引入了“Web 模块部署描述符片段”的`web-fragment.xm
 
 ```
  -Djava.security.egd=file:/dev/./urandom
-复制代码
 ```
 
 或者是设置`java.security`文件，位于`$JAVA_HOME/jre/lib/security`目录之下： `securerandom.source=file:/dev/./urandom`
@@ -102,7 +126,13 @@ Servlet 3.0 还引入了“Web 模块部署描述符片段”的`web-fragment.xm
 
 Tomcat 启动的时候，默认情况下 Web 应用都是一个一个启动的，等所有 Web 应用全部启动完成，Tomcat 才算启动完毕。如果在一个 Tomcat 下你有多个 Web 应用，为了优化启动速度，你可以配置多个应用程序并行启动，可以通过修改`server.xml`中 Host 元素的 startStopThreads 属性来完成。startStopThreads 的值表示你想用多少个线程来启动你的 Web 应用，如果设成 0 表示你要并行启动 Web 应用，像下面这样的配置。
 
-![image-20220815074128527](12%20%20%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BC%98%E5%8C%96%E5%B9%B6%E6%8F%90%E9%AB%98Tomcat%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6.resource/image-20220815074128527.png)
+```xml
+<Engine startStopThreads="0">
+    <Host startStopThreads="0">
+        ...
+    </Host>
+</Engine>
+```
 
 这里需要注意的是，Engine 元素里也配置了这个参数，这意味着如果你的 Tomcat 配置了多个 Host（虚拟主机），Tomcat 会以并行的方式启动多个 Host。
 

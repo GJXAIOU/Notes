@@ -31,11 +31,11 @@ WebSocket 的名字里带有 Socket，那 Socket 是什么呢？网络上的两�
 
 浏览器端 JavaScript 核心代码如下：
 
-```
+```javascript
 var Chat = {};
 Chat.socket = null;
 Chat.connect = (function(host) {
- 
+
     // 判断当前浏览器是否支持 WebSocket
     if ('WebSocket' in window) {
         // 如果支持则创建 WebSocket JS 类
@@ -46,7 +46,7 @@ Chat.connect = (function(host) {
         Console.log('WebSocket is not supported by this browser.');
         return;
     }
- 
+
     // 回调函数，当和服务器的 WebSocket 连接建立起来后，浏览器会回调这个方法
     Chat.socket.onopen = function () {
         Console.log('Info: WebSocket connection opened.');
@@ -56,13 +56,13 @@ Chat.connect = (function(host) {
             }
         };
     };
- 
+
     // 回调函数，当和服务器的 WebSocket 连接关闭后，浏览器会回调这个方法
     Chat.socket.onclose = function () {
         document.getElementById('chat').onkeydown = null;
         Console.log('Info: WebSocket closed.');
     };
- 
+
     // 回调函数，当服务器有新消息发送到浏览器，浏览器会回调这个方法
     Chat.socket.onmessage = function (message) {
         Console.log(message.data);
@@ -72,7 +72,7 @@ Chat.connect = (function(host) {
 
 上面的代码实现逻辑比较清晰，就是创建一个 WebSocket JavaScript 对象，然后实现了几个回调方法：onopen、onclose 和 onmessage。当连接建立、关闭和有新消息时，浏览器会负责调用这些回调方法。我们再来看服务器端 Tomcat 的实现代码：
 
-```
+```java
 //Tomcat 端的实现类加上 @ServerEndpoint 注解，里面的 value 是 URL 路径
 @ServerEndpoint(value = "/websocket/chat")
 public class ChatEndpoint {
@@ -155,7 +155,7 @@ public class ChatEndpoint {
 
 Tomcat 的 WebSocket 加载是通过 SCI 机制完成的。SCI 全称 ServletContainerInitializer，是 Servlet 3.0 规范中定义的用来**接收 Web 应用启动事件的接口**。那为什么要监听 Servlet 容器的启动事件呢？因为这样我们有机会在 Web 应用启动时做一些初始化工作，比如 WebSocket 需要扫描和加载 Endpoint 类。SCI 的使用也比较简单，将实现 ServletContainerInitializer 接口的类增加 HandlesTypes 注解，并且在注解内指定的一系列类和接口集合。比如 Tomcat 为了扫描和加载 Endpoint 而定义的 SCI 类如下：
 
-```
+```java
 @HandlesTypes({ServerEndpoint.class, ServerApplicationConfig.class, Endpoint.class})
 public class WsSci implements ServletContainerInitializer {
   

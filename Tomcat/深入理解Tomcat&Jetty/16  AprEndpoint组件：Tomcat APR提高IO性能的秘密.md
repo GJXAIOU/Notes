@@ -26,36 +26,35 @@ Tomcat 本身是 Java 编写的，为了调用 C 语言编写的 APR，需要通
 
 Accpetor 的功能就是监听连接，接收并建立连接。它的本质就是调用了四个操作系统 API：socket、bind、listen 和 accept。那 Java 语言如何直接调用 C 语言 API 呢？答案就是通过 JNI。具体来说就是两步：先封装一个 Java 类，在里面定义一堆用**native 关键字**修饰的方法，像下面这样。
 
-```
+```java
 public class Socket {
-  ...
-  // 用 native 修饰这个方法，表明这个函数是 C 语言实现
-  public static native long create(int family, int type,
-                                 int protocol, long cont)
-                                 
-  public static native int bind(long sock, long sa);
-  
-  public static native int listen(long sock, int backlog);
-  
-  public static native long accept(long sock)
+    ...
+        // 用 native 修饰这个方法，表明这个函数是 C 语言实现
+        public static native long create(int family, int type, int protocol, long cont);
+
+    public static native int bind(long sock, long sa);
+
+    public static native int listen(long sock, int backlog);
+
+    public static native long accept(long sock);
 }
 ```
 
 接着用 C 代码实现这些方法，比如 bind 函数就是这样实现的：
 
-```
+```c
 // 注意函数的名字要符合 JNI 规范的要求
 JNIEXPORT jint JNICALL 
-Java_org_apache_tomcat_jni_Socket_bind(JNIEnv *e, jlong sock,jlong sa)
-	{
-	    jint rv = APR_SUCCESS;
-	    tcn_socket_t *s = (tcn_socket_t *）sock;
-	    apr_sockaddr_t *a = (apr_sockaddr_t *) sa;
-	
-        // 调用 APR 库自己实现的 bind 函数
-	    rv = (jint)apr_socket_bind(s->sock, a);
-	    return rv;
-	}
+    Java_org_apache_tomcat_jni_Socket_bind(JNIEnv *e, jlong sock,jlong sa)
+{
+    jint rv = APR_SUCCESS;
+    tcn_socket_t *s = (tcn_socket_t *）sock;
+                       apr_sockaddr_t *a = (apr_sockaddr_t *) sa;
+
+                       // 调用 APR 库自己实现的 bind 函数
+                       rv = (jint)apr_socket_bind(s->sock, a);
+                       return rv;
+                       }
 ```
 
 专栏里我就不展开 JNI 的细节了，你可以[扩展阅读](http://jnicookbook.owsiak.org/contents/)获得更多信息和例子。我们要注意的是函数名字要符合 JNI 的规范，以及 Java 和 C 语言如何互相传递参数，比如在 C 语言有指针，Java 没有指针的概念，所以在 Java 中用 long 类型来表示指针。AprEndpoint 的 Acceptor 组件就是调用了 APR 实现的四个 API。
@@ -88,7 +87,7 @@ java my.class
 
 Tomcat 的 Endpoint 组件在接收网络数据时需要预先分配好一块 Buffer，所谓的 Buffer 就是字节数组`byte[]`，Java 通过 JNI 调用把这块 Buffer 的地址传给 C 代码，C 代码通过操作系统 API 读取 Socket 并把数据填充到这块 Buffer。Java NIO API 提供了两种 Buffer 来接收数据：HeapByteBuffer 和 DirectByteBuffer，下面的代码演示了如何创建两种 Buffer。
 
-```
+```java
 // 分配 HeapByteBuffer
 ByteBuffer buf = ByteBuffer.allocate(1024);
  
@@ -98,7 +97,7 @@ ByteBuffer buf = ByteBuffer.allocateDirect(1024);
 
 创建好 Buffer 后直接传给 Channel 的 read 或者 write 函数，最终这块 Buffer 会通过 JNI 调用传递给 C 程序。
 
-```
+```java
 // 将 buf 作为 read 函数的参数
 int bytesRead = socketChannel.read(buf);
 ```
@@ -129,9 +128,8 @@ Tomcat 中的 AprEndpoint 就是通过 DirectByteBuffer 来接收数据的，而
 
 而 Tomcat 的 AprEndpoint 通过操作系统层面的 sendfile 特性解决了这个问题，sendfile 系统调用方式非常简洁。
 
-```
+```java
 sendfile(socket, file, len);
-复制代码
 ```
 
 它带有两个关键参数：Socket 和文件句柄。将文件从磁盘写入 Socket 的过程只有两步：

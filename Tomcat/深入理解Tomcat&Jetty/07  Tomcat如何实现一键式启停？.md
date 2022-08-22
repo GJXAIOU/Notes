@@ -22,7 +22,7 @@
 
 为了解决这个问题，我们希望找到一种通用的、统一的方法来管理组件的生命周期，就像汽车“一键启动”那样的效果。
 
-## 一键式启停：LifeCycle 接口
+## 一、一键式启停：LifeCycle 接口
 
 我在前面说到过，设计就是要找到系统的变化点和不变点。这里的不变点就是每个组件都要经历创建、初始化、启动这几个过程，这些状态以及状态的转化是不变的。而变化点是每个具体组件的初始化方法，也就是启动方法是不一样的。
 
@@ -32,7 +32,7 @@
 
 ![image-20220814212617977](07%20%20Tomcat%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E4%B8%80%E9%94%AE%E5%BC%8F%E5%90%AF%E5%81%9C%EF%BC%9F.resource/image-20220814212617977.png)
 
-## 可扩展性：LifeCycle 事件
+## 二、可扩展性：LifeCycle 事件
 
 我们再来考虑另一个问题，那就是系统的可扩展性。因为各个组件 init() 和 start() 方法的具体实现是复杂多变的，比如在 Host 容器的启动方法里需要扫描 webapps 目录下的 Web 应用，创建相应的 Context 容器，如果将来需要增加新的逻辑，直接修改 start() 方法？这样会违反开闭原则，那如何解决这个问题呢？开闭原则说的是为了扩展系统的功能，你不能直接修改系统中已有的类，但是你可以定义新的类。
 
@@ -44,7 +44,7 @@
 
 从图上你可以看到，组件的生命周期有 NEW、INITIALIZING、INITIALIZED、STARTING_PREP、STARTING、STARTED 等，而一旦组件到达相应的状态就触发相应的事件，比如 NEW 状态表示组件刚刚被实例化；而当 init() 方法被调用时，状态就变成 INITIALIZING 状态，这个时候，就会触发 BEFORE_INIT_EVENT 事件，如果有监听器在监听这个事件，它的方法就会被调用。
 
-## 重用性：LifeCycleBase 抽象基类
+## 三、重用性：LifeCycleBase 抽象基类
 
 有了接口，我们就要用类去实现接口。一般来说实现类不止一个，不同的类在实现接口时往往会有一些相同的逻辑，如果让各个子类都去实现一遍，就会有重复代码。那子类如何重用这部分逻辑呢？其实就是定义一个基类来实现共同的逻辑，然后让各个子类去继承它，就达到了重用的目的。
 
@@ -60,7 +60,7 @@
 
 我们还是看一看代码，可以帮你加深理解，下面是 LifeCycleBase 的 init() 方法实现。
 
-```
+```java
 @Override
 public final synchronized void init() throws LifecycleException {
     //1. 状态检查
@@ -89,9 +89,8 @@ public final synchronized void init() throws LifecycleException {
 
 第二步，触发 INITIALIZING 事件的监听器：
 
-```
+```java
 setStateInternal(LifecycleState.INITIALIZING, null, false);
-复制代码
 ```
 
 在这个 setStateInternal 方法里，会调用监听器的业务方法。
@@ -100,9 +99,8 @@ setStateInternal(LifecycleState.INITIALIZING, null, false);
 
 第四步，子组件初始化后，触发 INITIALIZED 事件的监听器，相应监听器的业务方法就会被调用。
 
-```
+```java
 setStateInternal(LifecycleState.INITIALIZED, null, false);
-复制代码
 ```
 
 总之，LifeCycleBase 调用了抽象方法来实现骨架逻辑。讲到这里， 你可能好奇，LifeCycleBase 负责触发事件，并调用监听器的方法，那是什么时候、谁把监听器注册进来的呢？
@@ -112,7 +110,7 @@ setStateInternal(LifecycleState.INITIALIZED, null, false);
 - Tomcat 自定义了一些监听器，这些监听器是父组件在创建子组件的过程中注册到子组件的。比如 MemoryLeakTrackingListener 监听器，用来检测 Context 容器中的内存泄漏，这个监听器是 Host 容器在创建 Context 容器时注册到 Context 中的。
 - 我们还可以在 server.xml 中定义自己的监听器，Tomcat 在启动时会解析 server.xml，创建监听器并注册到容器组件。
 
-## 生周期管理总体类图
+## 四、生周期管理总体类图
 
 通过上面的学习，我相信你对 Tomcat 组件的生命周期的管理有了深入的理解，我们再来看一张总体类图继续加深印象。
 
@@ -122,7 +120,7 @@ setStateInternal(LifecycleState.INITIALIZED, null, false);
 
 StandardEngine、StandardHost、StandardContext 和 StandardWrapper 是相应容器组件的具体实现类，因为它们都是容器，所以继承了 ContainerBase 抽象基类，而 ContainerBase 实现了 Container 接口，也继承了 LifeCycleBase 类，它们的生命周期管理接口和功能接口是分开的，这也符合设计中**接口分离的原则**。
 
-## 本期精华
+## 五、本期精华
 
 Tomcat 为了实现一键式启停以及优雅的生命周期管理，并考虑到了可扩展性和可重用性，将面向对象思想和设计模式发挥到了极致，分别运用了**组合模式、观察者模式、骨架抽象类和模板方法**。
 
@@ -132,36 +130,20 @@ Tomcat 为了实现一键式启停以及优雅的生命周期管理，并考虑�
 
 而模板方法在抽象基类中经常用到，用来实现通用逻辑。
 
-## 课后思考
+## 六、课后思考
 
 从文中最后的类图上你会看到所有的容器组件都扩展了 ContainerBase，跟 LifeCycleBase 一样，ContainerBase 也是一个骨架抽象类，请你思考一下，各容器组件有哪些“共同的逻辑”需要 ContainerBase 由来实现呢？
 
 不知道今天的内容你消化得如何？如果还有疑问，请大胆的在留言区提问，也欢迎你把你的课后思考和心得记录下来，与我和其他同学一起讨论。如果你觉得今天有所收获，欢迎你把它分享给你的朋友。
 
-## 精选留言(24)
+## 七、精选留言
 
-- 
-
-  allean
-
-  2019-05-25
-
-  **11
-
-  原理理解之后特别想看看源码是怎么写的，不看源码总感觉不踏实🤣，老师在介绍组件原理之后可不可以指明怎么启动Tomcat源码，并debug啊，多谢
+- 原理理解之后特别想看看源码是怎么写的，不看源码总感觉不踏实🤣，老师在介绍组件原理之后可不可以指明怎么启动Tomcat源码，并debug啊，多谢
 
   作者回复: 建议跟SpringBoot那样，用嵌入式方式启动Tomcat，这里有例子：
   https://github.com/heroku/devcenter-embedded-tomcat
-
-- 
-
-  一路远行
-
-  2019-05-26
-
-  **10
-
-  ContainerBase提供了针对Container接口的通用实现，所以最重要的职责包含两个:
+  
+- ContainerBase提供了针对Container接口的通用实现，所以最重要的职责包含两个:
   \1) 维护容器通用的状态数据
   \2) 提供管理状态数据的通用方法
 
@@ -169,39 +151,27 @@ Tomcat 为了实现一键式启停以及优雅的生命周期管理，并考虑�
   \1) 父容器, 子容器列表
   getParent, setParent, getParentClassLoader, setParentClassLoader;
   getStartChildren, setStartChildren, addChild, findChild, findChildren, removeChild.
-
+  
   \2) 容器事件和属性监听者列表
   findContainerListeners, addContainerListener, removeContainerListener, fireContainerEvent;
   addPropertyChangeListener, removePropertyChangeListener.
-
+  
   \3) 当前容器对应的pipeline
   getPipeline, addValve.
-
+  
   除了以上三类状态数据和对应的接口，ContainerBase还提供了两类通用功能:
   \1) 容器的生命周期实现，从LifecycleBase继承而来，完成状态数据的初始化和销毁
   startInternal, stopInternal, destroyInternal
-
+  
   \2) 后台任务线程管理，比如容器周期性reload任务
   threadStart, threadStop，backgroundProcess.
-
+  
   想了解更多技术细节，可以参考源码org.apache.catalina.core.ContainerBase，有源码有真相。
-
+  
   展开**
-
+  
   作者回复: 👍
-
-- 
-
-  刘冬
-
-  2019-05-25
-
-  **5
-
-  老师太拼了，周末凌晨发新的课程。太感动了😹
-
-  展开**
-
+  
 - 
 
   Monday

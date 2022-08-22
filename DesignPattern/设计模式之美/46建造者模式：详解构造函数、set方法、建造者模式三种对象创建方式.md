@@ -1,12 +1,12 @@
 # 46建造者模式：详解构造函数、set方法、建造者模式三种对象创建方式
 
-今天，我们再来学习另外一个比较常用的创建型设计模式：**Builder 模式/建造者模式/构建者模式/生成器模式**。
+**Builder 模式/建造者模式/构建者模式/生成器模式** 也是一种创建型设计模式；
 
-实际上，建造者模式的原理和代码实现非常简单，掌握起来并不难，难点在于应用场景。比如，你有没有考虑过这样几个问题：直接使用构造函数或者配合 set 方法就能创建对象，为什么还需要建造者模式来创建呢？建造者模式和工厂模式都可以创建对象，那它们两个的区别在哪里呢？
+建造者模式的原理和代码实现非常简单，难点在于应用场景。比如，你有没有考虑过这样几个问题：直接使用构造函数或者配合 set 方法就能创建对象，为什么还需要建造者模式来创建呢？建造者模式和工厂模式都可以创建对象，那它们两个的区别在哪里呢？
 
 ## 一、为什么需要建造者模式？
 
-在平时的开发中，创建一个对象最常用的方式是，使用 new 关键字调用类的构造函数来完成。我的问题是，什么情况下这种方式就不适用了，就需要采用建造者模式来创建对象呢？ 下面我通过一个例子来带你看一下。
+创建一个对象最常用的方式是使用 new 关键字调用类的构造函数来完成。那什么情况下这种方式就不适用了，就需要采用建造者模式来创建对象呢？ 下面我通过一个例子来带你看一下。
 
 假设有这样一道设计面试题：我们需要定义一个资源池配置类 ResourcePoolConfig。这里的资源池，你可以简单理解为线程池、连接池、对象池等。在这个资源池配置类中，有以下几个成员变量，也就是可配置项。现在，请你编写代码实现这个 ResourcePoolConfig 类。
 
@@ -23,7 +23,8 @@ public class ResourcePoolConfig {
     private int maxTotal = DEFAULT_MAX_TOTAL;
     private int maxIdle = DEFAULT_MAX_IDLE;
     private int minIdle = DEFAULT_MIN_IDLE;
-    
+
+    // 构造函数
     public ResourcePoolConfig(String name, Integer maxTotal, Integer maxIdle, Integer minIdle){
         if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("name should not be empty.");
@@ -34,13 +35,13 @@ public class ResourcePoolConfig {
                 throw new IllegalArgumentException("maxTotal should be positive.");
             }
             this.maxTotal = maxTotal;
-        } 
+        }
         if (maxIdle != null) {
             if (maxIdle < 0) {
                 throw new IllegalArgumentException("maxIdle should not be negative.");
             }
             this.maxIdle = maxIdle;
-        } 
+        }
         if (minIdle != null) {
             if (minIdle < 0) {
                 throw new IllegalArgumentException("minIdle should not be negative.");
@@ -70,35 +71,37 @@ public class ResourcePoolConfig {
     private int maxTotal = DEFAULT_MAX_TOTAL;
     private int maxIdle = DEFAULT_MAX_IDLE;
     private int minIdle = DEFAULT_MIN_IDLE;
-    
+
+    // 必填参数使用构造方法
     public ResourcePoolConfig(String name) {
         if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("name should not be empty.");
         }
         this.name = name;
     }
-    
+
+    // 非必填参数使用 set 方法
     public void setMaxTotal(int maxTotal) {
         if (maxTotal <= 0) {
             throw new IllegalArgumentException("maxTotal should be positive.");
         }
         this.maxTotal = maxTotal;
-    } 
-    
+    }
+
     public void setMaxIdle(int maxIdle) {
         if (maxIdle < 0) {
             throw new IllegalArgumentException("maxIdle should not be negative.");
         }
         this.maxIdle = maxIdle;
     }
-    
+
     public void setMinIdle(int minIdle) {
         if (minIdle < 0) {
             throw new IllegalArgumentException("minIdle should not be negative.");
         }
         this.minIdle = minIdle;
     }
-    
+
     //...省略getter方法...
 }
 ```
@@ -112,7 +115,7 @@ config.setMaxTotal(16);
 config.setMaxIdle(8);
 ```
 
-至此，我们仍然没有用到建造者模式，通过构造函数设置必填项，通过 set() 方法设置可选配置项，就能实现我们的设计需求。如果我们把问题的难度再加大点，比如**，还需要解决下面这三个问题，那现在的设计思路就不能满足了**【可以作为使用建造者模式的条件】。
+至此，我们仍然没有用到建造者模式，通过构造函数设置必填项，通过 set() 方法设置可选配置项，就能实现我们的设计需求。如果我们把问题的难度再加大点，比如，**还需要解决下面这三个问题，那现在的设计思路就不能满足了**【可以作为使用建造者模式的条件】。
 
 - 如果**必填的配置项有很多**，把这些必填配置项都放到构造函数中设置，那构造函数就又会出现参数列表很长的问题。如果我们把必填项也通过 set() 方法设置，那校验这些必填项是否已经填写的逻辑就无处安放了。
 

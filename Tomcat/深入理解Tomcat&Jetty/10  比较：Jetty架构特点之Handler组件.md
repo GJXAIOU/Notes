@@ -12,17 +12,16 @@ Jetty 的 Handler 在设计上非常有意思，可以说是 Jetty 的灵魂，J
 
 **Handler 就是一个接口，它有一堆实现类**，Jetty 的 Connector 组件调用这些接口来处理 Servlet 请求，我们先来看看这个接口定义成什么样子。
 
-```
-public interface Handler extends LifeCycle, Destroyable
-{
+```java
+public interface Handler extends LifeCycle, Destroyable{
     // 处理请求的方法
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException;
-    
+
     // 每个 Handler 都关联一个 Server 组件，被 Server 管理
     public void setServer(Server server);
     public Server getServer();
- 
+
     // 销毁方法相关的资源
     public void destroy();
 }
@@ -68,7 +67,7 @@ Handler 接口之下有抽象类 AbstractHandler，这一点并不意外，因�
 
 上文提到，ServletHandler、ContextHandler 以及 WebAppContext 等，它们实现了 Servlet 规范，那具体是怎么实现的呢？为了帮助你理解，在这之前，我们还是来看看如何使用 Jetty 来启动一个 Web 应用。
 
-```
+```java
 // 新建一个 WebAppContext，WebAppContext 是一个 Handler
 WebAppContext webapp = new WebAppContext();
 webapp.setContextPath("/mywebapp");

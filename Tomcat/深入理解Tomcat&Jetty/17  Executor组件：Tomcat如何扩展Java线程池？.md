@@ -14,14 +14,14 @@
 
 我们先来看看 Java 线程池核心类 ThreadPoolExecutor 的构造函数，你需要知道 ThreadPoolExecutor 是如何使用这些参数的，这是理解 Java 线程工作原理的关键。
 
-```
+```java
 public ThreadPoolExecutor(int corePoolSize,
                           int maximumPoolSize,
                           long keepAliveTime,
                           TimeUnit unit,
                           BlockingQueue<Runnable> workQueue,
                           ThreadFactory threadFactory,
-                          RejectedExecutionHandler handler)
+                          RejectedExecutionHandler handler);
 ```
 
 每次提交任务时，如果线程数还没达到核心线程数**corePoolSize**，线程池就创建新线程来执行。当线程数达到**corePoolSize**后，新增的任务就放到工作队列**workQueue**里，而线程池中的线程则努力地从**workQueue**里拉活来干，也就是调用 poll 方法来获取任务。
@@ -36,7 +36,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 Java 提供了一些默认的线程池实现，比如 FixedThreadPool 和 CachedThreadPool，它们的本质就是给 ThreadPoolExecutor 设置了不同的参数，是定制版的 ThreadPoolExecutor。
 
-```
+```java
 public static ExecutorService newFixedThreadPool(int nThreads) {
     return new ThreadPoolExecutor(nThreads, nThreads,
                                   0L, TimeUnit.MILLISECONDS,
@@ -68,13 +68,13 @@ public static ExecutorService newCachedThreadPool() {
 
 对于 Tomcat 来说，这两个资源都需要限制，也就是说要对高并发进行控制，否则 CPU 和内存有资源耗尽的风险。因此 Tomcat 传入的参数是这样的：
 
-```
+```java
 // 定制版的任务队列
 taskqueue = new TaskQueue(maxQueueSize);
- 
+
 // 定制版的线程工厂
 TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
- 
+
 // 定制版的线程池
 executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
 ```
@@ -99,7 +99,7 @@ Tomcat 线程池扩展了原生的 ThreadPoolExecutor，通过重写 execute 方
 
 观察 Tomcat 线程池和 Java 原生线程池的区别，其实就是在第 3 步，Tomcat 在线程总数达到最大数时，不是立即执行拒绝策略，而是再尝试向任务队列添加任务，添加失败后再执行拒绝策略。那具体如何实现呢，其实很简单，我们来看一下 Tomcat 线程池的 execute 方法的核心代码。
 
-```
+```java
 public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor {
   
   ...
@@ -132,21 +132,19 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
 细心的你有没有发现，在 Tomcat 线程池的 execute 方法最开始有这么一行：
 
-```
+```java
 submittedCount.incrementAndGet();
-复制代码
 ```
 
 这行代码的意思把 submittedCount 这个原子变量加一，并且在任务执行失败，抛出拒绝异常时，将这个原子变量减一：
 
-```
+```java
 submittedCount.decrementAndGet();
-复制代码
 ```
 
 其实 Tomcat 线程池是用这个变量 submittedCount 来维护已经提交到了线程池，但是还没有执行完的任务个数。Tomcat 为什么要维护这个变量呢？这跟 Tomcat 的定制版的任务队列有关。Tomcat 的任务队列 TaskQueue 扩展了 Java 中的 LinkedBlockingQueue，我们知道 LinkedBlockingQueue 默认情况下长度是没有限制的，除非给它一个 capacity。因此 Tomcat 给了它一个 capacity，TaskQueue 的构造函数中有个整型的参数 capacity，TaskQueue 将 capacity 传给父类 LinkedBlockingQueue 的构造函数。
 
-```
+```java
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
  
   public TaskQueue(int capacity) {
@@ -160,7 +158,7 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
 为了解决这个问题，TaskQueue 重写了 LinkedBlockingQueue 的 offer 方法，在合适的时机返回 false，返回 false 表示任务添加失败，这时线程池会创建新的线程。那什么是合适的时机呢？请看下面 offer 方法的核心源码：
 
-```
+```java
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
  
   ...

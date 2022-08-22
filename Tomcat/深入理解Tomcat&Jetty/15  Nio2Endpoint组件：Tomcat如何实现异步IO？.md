@@ -24,25 +24,25 @@ NIO 和 NIO.2 最大的区别是，一个是同步一个是异步。我在上期
 
 今天我们会重点关注 Tomcat 是如何实现异步 I/O 模型的，但在这之前，我们先来简单回顾下如何用 Java 的 NIO.2 API 来编写一个服务端程序。
 
-```
+```java
 public class Nio2Server {
- 
-   void listen(){
-      //1. 创建一个线程池
-      ExecutorService es = Executors.newCachedThreadPool();
- 
-      //2. 创建异步通道群组
-      AsynchronousChannelGroup tg = AsynchronousChannelGroup.withCachedThreadPool(es, 1);
-      
-      //3. 创建服务端异步通道
-      AsynchronousServerSocketChannel assc = AsynchronousServerSocketChannel.open(tg);
- 
-      //4. 绑定监听端口
-      assc.bind(new InetSocketAddress(8080));
- 
-      //5. 监听连接，传入回调类处理连接请求
-      assc.accept(this, new AcceptHandler()); 
-   }
+
+    void listen(){
+        //1. 创建一个线程池
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        //2. 创建异步通道群组
+        AsynchronousChannelGroup tg = AsynchronousChannelGroup.withCachedThreadPool(es, 1);
+
+        //3. 创建服务端异步通道
+        AsynchronousServerSocketChannel assc = AsynchronousServerSocketChannel.open(tg);
+
+        //4. 绑定监听端口
+        assc.bind(new InetSocketAddress(8080));
+
+        //5. 监听连接，传入回调类处理连接请求
+        assc.accept(this, new AcceptHandler()); 
+    }
 }
 ```
 
@@ -58,32 +58,32 @@ public class Nio2Server {
 
 我们再来看看处理连接的回调类 AcceptHandler 是什么样的。
 
-```
+```java
 //AcceptHandler 类实现了 CompletionHandler 接口的 completed 方法。它还有两个模板参数，第一个是异步通道，第二个就是 Nio2Server 本身
 public class AcceptHandler implements CompletionHandler<AsynchronousSocketChannel, Nio2Server> {
- 
-   // 具体处理连接请求的就是 completed 方法，它有两个参数：第一个是异步通道，第二个就是上面传入的 NioServer 对象
-   @Override
-   public void completed(AsynchronousSocketChannel asc, Nio2Server attachment) {      
-      // 调用 accept 方法继续接收其他客户端的请求
-      attachment.assc.accept(attachment, this);
-      
-      //1. 先分配好 Buffer，告诉内核，数据拷贝到哪里去
-      ByteBuffer buf = ByteBuffer.allocate(1024);
-      
-      //2. 调用 read 函数读取数据，除了把 buf 作为参数传入，还传入读回调类
-      channel.read(buf, buf, new ReadHandler(asc)); 
- 
-}
+
+    // 具体处理连接请求的就是 completed 方法，它有两个参数：第一个是异步通道，第二个就是上面传入的 NioServer 对象
+    @Override
+    public void completed(AsynchronousSocketChannel asc, Nio2Server attachment) {      
+        // 调用 accept 方法继续接收其他客户端的请求
+        attachment.assc.accept(attachment, this);
+
+        //1. 先分配好 Buffer，告诉内核，数据拷贝到哪里去
+        ByteBuffer buf = ByteBuffer.allocate(1024);
+
+        //2. 调用 read 函数读取数据，除了把 buf 作为参数传入，还传入读回调类
+        channel.read(buf, buf, new ReadHandler(asc)); 
+
+    }
 ```
 
 我们看到它实现了 CompletionHandler 接口，下面我们先来看看 CompletionHandler 接口的定义。
 
-```
+```java
 public interface CompletionHandler<V,A> {
- 
+
     void completed(V result, A attachment);
- 
+
     void failed(Throwable exc, A attachment);
 }
 ```
@@ -94,7 +94,7 @@ CompletionHandler 有两个方法：completed 和 failed，分别在 I/O 操作�
 
 下面我们再来看看处理读的回调类 ReadHandler 长什么样子。
 
-```
+```java
 public class ReadHandler implements CompletionHandler<Integer, ByteBuffer> {   
     // 读取到消息后的处理  
     @Override  
@@ -104,7 +104,7 @@ public class ReadHandler implements CompletionHandler<Integer, ByteBuffer> {
         // 读取数据
         ... 
     }  
- 
+
     void failed(Throwable exc, A attachment){
         ...
     }
@@ -135,35 +135,34 @@ Executor 在执行 SocketProcessor 时，SocketProcessor 的 run 方法会调用
 
 和 NioEndpint 一样，Nio2Endpoint 的基本思路是用 LimitLatch 组件来控制连接数，但是 Nio2Acceptor 的监听连接的过程不是在一个死循环里不断的调 accept 方法，而是通过回调函数来完成的。我们来看看它的连接监听方法：
 
-```
+```java
 serverSock.accept(null, this);
-复制代码
 ```
 
 其实就是调用了 accept 方法，注意它的第二个参数是 this，表明 Nio2Acceptor 自己就是处理连接的回调类，因此 Nio2Acceptor 实现了 CompletionHandler 接口。那么它是如何实现 CompletionHandler 接口的呢？
 
-```
+```java
 protected class Nio2Acceptor extends Acceptor<AsynchronousSocketChannel>
     implements CompletionHandler<AsynchronousSocketChannel, Void> {
-    
-@Override
-public void completed(AsynchronousSocketChannel socket,
-        Void attachment) {
-        
-    if (isRunning() && !isPaused()) {
-        if (getMaxConnections() == -1) {
-            // 如果没有连接限制，继续接收新的连接
-            serverSock.accept(null, this);
-        } else {
-            // 如果有连接限制，就在线程池里跑 Run 方法，Run 方法会检查连接数
-            getExecutor().execute(this);
-        }
-        // 处理请求
-        if (!setSocketOptions(socket)) {
-            closeSocket(socket);
-        }
-    } 
-}
+
+    @Override
+    public void completed(AsynchronousSocketChannel socket,
+                          Void attachment) {
+
+        if (isRunning() && !isPaused()) {
+            if (getMaxConnections() == -1) {
+                // 如果没有连接限制，继续接收新的连接
+                serverSock.accept(null, this);
+            } else {
+                // 如果有连接限制，就在线程池里跑 Run 方法，Run 方法会检查连接数
+                getExecutor().execute(this);
+            }
+            // 处理请求
+            if (!setSocketOptions(socket)) {
+                closeSocket(socket);
+            }
+        } 
+    }
 ```
 
 可以看到 CompletionHandler 的两个模板参数分别是 AsynchronousServerSocketChannel 和 Void，我在前面说过第一个参数就是 accept 方法的返回值，第二个参数是附件类，由用户自己决定，这里为 Void。completed 方法的处理逻辑比较简单：
@@ -184,14 +183,14 @@ Nio2SocketWrapper 的主要作用是封装 Channel，并提供接口给 Http11Pr
 
 这个回调类 readCompletionHandler 的源码如下，最关键的一点是，**Nio2SocketWrapper 是作为附件类来传递的**，这样在回调函数里能拿到所有的上下文。
 
-```
+```java
 this.readCompletionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
     public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
         ...
-        // 通过附件类 SocketWrapper 拿到所有的上下文
-        Nio2SocketWrapper.this.getEndpoint().processSocket(attachment, SocketEvent.OPEN_READ, false);
+            // 通过附件类 SocketWrapper 拿到所有的上下文
+            Nio2SocketWrapper.this.getEndpoint().processSocket(attachment, SocketEvent.OPEN_READ, false);
     }
- 
+
     public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
         ...
     }

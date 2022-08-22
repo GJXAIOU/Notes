@@ -38,7 +38,7 @@ Selector 可以用来检测 Channel 上的 I/O 事件，比如读就绪、写就
 
 首先，创建服务端 Channel，绑定监听端口并把 Channel 设置为非阻塞方式。
 
-```
+```java
 ServerSocketChannel server = ServerSocketChannel.open();
 server.socket().bind(new InetSocketAddress(port));
 server.configureBlocking(false);
@@ -46,7 +46,7 @@ server.configureBlocking(false);
 
 然后，创建 Selector，并在 Selector 中注册 Channel 感兴趣的事件 OP_ACCEPT，告诉 Selector 如果客户端有新的连接请求到这个端口就通知我。
 
-```
+```java
 Selector selector = Selector.open();
 server.register(selector, SelectionKey.OP_ACCEPT);
 ```
@@ -55,23 +55,23 @@ server.register(selector, SelectionKey.OP_ACCEPT);
 
 比如下面这个例子，如果有新的连接请求，就会建立一个新的连接。连接建立后，再注册 Channel 的可读事件到 Selector 中，告诉 Selector 我对这个 Channel 上是否有新的数据到达感兴趣。
 
-```
- while (true) {
-        selector.select();// 查询 I/O 事件
-        for (Iterator<SelectionKey> i = selector.selectedKeys().iterator(); i.hasNext();) { 
-            SelectionKey key = i.next(); 
-            i.remove(); 
- 
-            if (key.isAcceptable()) { 
-                // 建立一个新连接 
-                SocketChannel client = server.accept(); 
-                client.configureBlocking(false); 
-                
-                // 连接建立后，告诉 Selector，我现在对 I/O 可读事件感兴趣
-                client.register(selector, SelectionKey.OP_READ);
-            } 
-        }
-    } 
+```java
+while (true) {
+    selector.select();// 查询 I/O 事件
+    for (Iterator<SelectionKey> i = selector.selectedKeys().iterator(); i.hasNext();) { 
+        SelectionKey key = i.next(); 
+        i.remove(); 
+
+        if (key.isAcceptable()) { 
+            // 建立一个新连接 
+            SocketChannel client = server.accept(); 
+            client.configureBlocking(false); 
+
+            // 连接建立后，告诉 Selector，我现在对 I/O 可读事件感兴趣
+            client.register(selector, SelectionKey.OP_READ);
+        } 
+    }
+} 
 ```
 
 简单回顾完服务端 NIO 编程之后，你会发现服务端在 I/O 通信上主要完成了三件事情：**监听连接、I/O 事件查询以及数据读写**。因此 Jetty 设计了**Acceptor、SelectorManager 和 Connection 来分别做这三件事情**，下面我分别来说说这三个组件。
@@ -80,11 +80,10 @@ server.register(selector, SelectionKey.OP_ACCEPT);
 
 顾名思义，Acceptor 用于接受请求，跟 Tomcat 一样，Jetty 也有独立的 Acceptor 线程组用于处理连接请求。在 Connector 的实现类 ServerConnector 中，有一个`_acceptors`的数组，在 Connector 启动的时候, 会根据`_acceptors`数组的长度创建对应数量的 Acceptor，而 Acceptor 的个数可以配置。
 
-```
-for (int i = 0; i < _acceptors.length; i++)
-{
-  Acceptor a = new Acceptor(i);
-  getExecutor().execute(a);
+```java
+for (int i = 0; i < _acceptors.length; i++){
+    Acceptor a = new Acceptor(i);
+    getExecutor().execute(a);
 }
 ```
 
@@ -92,25 +91,22 @@ Acceptor 是 ServerConnector 中的一个内部类，同时也是一个 Runnable
 
 Acceptor 通过阻塞的方式来接受连接，这一点跟 Tomcat 也是一样的。
 
-```
-public void accept(int acceptorID) throws IOException
-{
-  ServerSocketChannel serverChannel = _acceptChannel;
-  if (serverChannel != null && serverChannel.isOpen())
-  {
-    // 这里是阻塞的
-    SocketChannel channel = serverChannel.accept();
-    // 执行到这里时说明有请求进来了
-    accepted(channel);
-  }
+```java
+public void accept(int acceptorID) throws IOException{
+    ServerSocketChannel serverChannel = _acceptChannel;
+    if (serverChannel != null && serverChannel.isOpen()){
+        // 这里是阻塞的
+        SocketChannel channel = serverChannel.accept();
+        // 执行到这里时说明有请求进来了
+        accepted(channel);
+    }
 }
 ```
 
 接受连接成功后会调用 accepted() 函数，accepted() 函数中会将 SocketChannel 设置为非阻塞模式，然后交给 Selector 去处理，因此这也就到了 Selector 的地界了。
 
-```
-private void accepted(SocketChannel channel) throws IOException
-{
+```java
+private void accepted(SocketChannel channel) throws IOException{
     channel.configureBlocking(false);
     Socket socket = channel.socket();
     configure(socket);
@@ -123,13 +119,12 @@ private void accepted(SocketChannel channel) throws IOException
 
 Jetty 的 Selector 由 SelectorManager 类管理，而被管理的 Selector 叫作 ManagedSelector。SelectorManager 内部有一个 ManagedSelector 数组，真正干活的是 ManagedSelector。咱们接着上面分析，看看在 SelectorManager 在 accept 方法里做了什么。
 
-```
-public void accept(SelectableChannel channel, Object attachment)
-{
-  // 选择一个 ManagedSelector 来处理 Channel
-  final ManagedSelector selector = chooseSelector();
-  // 提交一个任务 Accept 给 ManagedSelector
-  selector.submit(selector.new Accept(channel, attachment));
+```java
+public void accept(SelectableChannel channel, Object attachment){
+    // 选择一个 ManagedSelector 来处理 Channel
+    final ManagedSelector selector = chooseSelector();
+    // 提交一个任务 Accept 给 ManagedSelector
+    selector.submit(selector.new Accept(channel, attachment));
 }
 ```
 
@@ -137,26 +132,24 @@ SelectorManager 从本身的 Selector 数组中选择一个 Selector 来处理�
 
 第一步，调用 Selector 的 register 方法把 Channel 注册到 Selector 上，拿到一个 SelectionKey。
 
-```
+```java
  _key = _channel.register(selector, SelectionKey.OP_ACCEPT, this);
-复制代码
 ```
 
 第二步，创建一个 EndPoint 和 Connection，并跟这个 SelectionKey（Channel）绑在一起：
 
-```
-private void createEndPoint(SelectableChannel channel, SelectionKey selectionKey) throws IOException
-{
+```java
+private void createEndPoint(SelectableChannel channel, SelectionKey selectionKey) throws IOException{
     //1. 创建 Endpoint
     EndPoint endPoint = _selectorManager.newEndPoint(channel, this, selectionKey);
-    
+
     //2. 创建 Connection
     Connection connection = _selectorManager.newConnection(channel, endPoint, selectionKey.attachment());
-    
+
     //3. 把 Endpoint、Connection 和 SelectionKey 绑在一起
     endPoint.setConnection(connection);
     selectionKey.attach(endPoint);
-    
+
 }
 ```
 
@@ -170,9 +163,8 @@ private void createEndPoint(SelectableChannel channel, SelectionKey selectionKey
 
 **请求处理**：HttpConnection 并不会主动向 EndPoint 读取数据，而是向在 EndPoint 中注册一堆回调方法：
 
-```
+```java
 getEndPoint().fillInterested(_readCallback);
-复制代码
 ```
 
 这段代码就是告诉 EndPoint，数据到了你就调我这些回调方法 _readCallback 吧，有点异步 I/O 的感觉，也就是说 Jetty 在应用层面模拟了异步 I/O 模型。

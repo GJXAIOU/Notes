@@ -41,9 +41,9 @@ Tomcat 的 NioEndPoint 组件实现了 I/O 多路复用模型，接下来我会�
 
 我们知道，对于 Java 的多路复用器的使用，无非是两步：
 
-\1. 创建一个 Seletor，在它身上注册各种感兴趣的事件，然后调用 select 方法，等待感兴趣的事情发生。
+1. 创建一个 Seletor，在它身上注册各种感兴趣的事件，然后调用 select 方法，等待感兴趣的事情发生。
 
-\2. 感兴趣的事情发生了，比如可以读了，这时便创建一个新的线程从 Channel 中读数据。
+2. 感兴趣的事情发生了，比如可以读了，这时便创建一个新的线程从 Channel 中读数据。
 
 Tomcat 的 NioEndpoint 组件虽然实现比较复杂，但基本原理就是上面两步。我们先来看看它有哪些组件，它一共包含 LimitLatch、Acceptor、Poller、SocketProcessor 和 Executor 共 5 个组件，它们的工作过程如下图所示。
 
@@ -63,10 +63,10 @@ Executor 就是线程池，负责运行 SocketProcessor 任务类，SocketProces
 
 LimitLatch 用来控制连接个数，当连接数到达最大时阻塞线程，直到后续组件处理完一个连接后将连接数减 1。请你注意到达最大连接数后操作系统底层还是会接收客户端连接，但用户层已经不再接收。LimitLatch 的核心代码如下：
 
-```
+```java
 public class LimitLatch {
     private class Sync extends AbstractQueuedSynchronizer {
-     
+
         @Override
         protected int tryAcquireShared() {
             long newCount = count.incrementAndGet();
@@ -77,29 +77,29 @@ public class LimitLatch {
                 return 1;
             }
         }
- 
+
         @Override
         protected boolean tryReleaseShared(int arg) {
             count.decrementAndGet();
             return true;
         }
     }
- 
+
     private final Sync sync;
     private final AtomicLong count;
     private volatile long limit;
-    
+
     // 线程调用这个方法来获得接收新连接的许可，线程可能被阻塞
     public void countUpOrAwait() throws InterruptedException {
-      sync.acquireSharedInterruptibly(1);
+        sync.acquireSharedInterruptibly(1);
     }
- 
+
     // 调用这个方法来释放一个连接许可，那么前面阻塞的线程可能被唤醒
     public long countDown() {
-      sync.releaseShared(0);
-      long result = getCount();
-      return result;
-   }
+        sync.releaseShared(0);
+        long result = getCount();
+        return result;
+    }
 }
 ```
 
@@ -107,9 +107,9 @@ public class LimitLatch {
 
 理解上面的代码时有两个要点：
 
-\1. 用户线程通过调用 LimitLatch 的 countUpOrAwait 方法来拿到锁，如果暂时无法获取，这个线程会被阻塞到 AQS 的队列中。那 AQS 怎么知道是阻塞还是不阻塞用户线程呢？其实这是由 AQS 的使用者来决定的，也就是内部类 Sync 来决定的，因为 Sync 类重写了 AQS 的**tryAcquireShared() 方法**。它的实现逻辑是如果当前连接数 count 小于 limit，线程能获取锁，返回 1，否则返回 -1。
+1. 用户线程通过调用 LimitLatch 的 countUpOrAwait 方法来拿到锁，如果暂时无法获取，这个线程会被阻塞到 AQS 的队列中。那 AQS 怎么知道是阻塞还是不阻塞用户线程呢？其实这是由 AQS 的使用者来决定的，也就是内部类 Sync 来决定的，因为 Sync 类重写了 AQS 的**tryAcquireShared() 方法**。它的实现逻辑是如果当前连接数 count 小于 limit，线程能获取锁，返回 1，否则返回 -1。
 
-\2. 如何用户线程被阻塞到了 AQS 的队列，那什么时候唤醒呢？同样是由 Sync 内部类决定，Sync 重写了 AQS 的**releaseShared() 方法**，其实就是当一个连接请求处理完了，这时又可以接收一个新连接了，这样前面阻塞的线程将会被唤醒。
+2. 如何用户线程被阻塞到了 AQS 的队列，那什么时候唤醒呢？同样是由 Sync 内部类决定，Sync 重写了 AQS 的**releaseShared() 方法**，其实就是当一个连接请求处理完了，这时又可以接收一个新连接了，这样前面阻塞的线程将会被唤醒。
 
 其实你会发现 AQS 就是一个骨架抽象类，它帮我们搭了个架子，用来控制线程的阻塞和唤醒。具体什么时候阻塞、什么时候唤醒由你来决定。我们还注意到，当前线程数被定义成原子变量 AtomicLong，而 limit 变量用 volatile 关键字来修饰，这些并发编程的实际运用。
 
@@ -117,7 +117,7 @@ public class LimitLatch {
 
 Acceptor 实现了 Runnable 接口，因此可以跑在单独线程里。一个端口号只能对应一个 ServerSocketChannel，因此这个 ServerSocketChannel 是在多个 Acceptor 线程之间共享的，它是 Endpoint 的属性，由 Endpoint 完成初始化和端口绑定。初始化过程如下：
 
-```
+```java
 serverSock = ServerSocketChannel.open();
 serverSock.socket().bind(addr,getAcceptCount());
 serverSock.configureBlocking(true);
@@ -135,9 +135,8 @@ ServerSocketChannel 通过 accept() 接受新的连接，accept() 方法返回�
 
 Poller 本质是一个 Selector，它内部维护一个 Queue，这个 Queue 定义如下：
 
-```
+```java
 private final SynchronizedQueue<PollerEvent> events = new SynchronizedQueue<>();
-复制代码
 ```
 
 SynchronizedQueue 的方法比如 offer、poll、size 和 clear 方法，都使用了 Synchronized 关键字进行修饰，用来保证同一时刻只有一个 Acceptor 线程对 Queue 进行读写。同时有多个 Poller 线程在运行，每个 Poller 线程都有自己的 Queue。每个 Poller 线程可能同时被多个 Acceptor 线程调用来注册 PollerEvent。同样 Poller 的个数可以通过 pollers 参数配置。

@@ -34,7 +34,7 @@ Engine 则是研发部经理，因为 Engine 是最顶层的容器组件。
 
 Catalina 的主要任务就是创建 Server，它不是直接 new 一个 Server 实例就完事了，而是需要解析 server.xml，把在 server.xml 里配置的各种组件一一创建出来，接着调用 Server 组件的 init 方法和 start 方法，这样整个 Tomcat 就启动起来了。作为“管理者”，Catalina 还需要处理各种“异常”情况，比如当我们通过“Ctrl + C”关闭 Tomcat 时，Tomcat 将如何优雅的停止并且清理资源呢？因此 Catalina 在 JVM 中注册一个“关闭钩子”。
 
-```
+```java
 public void start() {
     //1. 如果持有的 Server 实例为空，就解析 server.xml 创建出来
     if (getServer() == null) {
@@ -71,7 +71,7 @@ public void start() {
 
 那什么是“关闭钩子”，它又是做什么的呢？如果我们需要在 JVM 关闭时做一些清理工作，比如将缓存数据刷到磁盘上，或者清理一些临时文件，可以向 JVM 注册一个“关闭钩子”。“关闭钩子”其实就是一个线程，JVM 在停止之前会尝试执行这个线程的 run 方法。下面我们来看看 Tomcat 的“关闭钩子”CatalinaShutdownHook 做了些什么。
 
-```
+```java
 protected class CatalinaShutdownHook extends Thread {
  
     @Override
@@ -93,7 +93,7 @@ protected class CatalinaShutdownHook extends Thread {
 
 Server 组件的具体实现类是 StandardServer，我们来看下 StandardServer 具体实现了哪些功能。Server 继承了 LifeCycleBase，它的生命周期被统一管理，并且它的子组件是 Service，因此它还需要管理 Service 的生命周期，也就是说在启动时调用 Service 组件的启动方法，在停止时调用它们的停止方法。Server 在内部维护了若干 Service 组件，它是以数组来保存的，那 Server 是如何添加一个 Service 到数组中的呢？
 
-```
+```java
 @Override
 public void addService(Service service) {
  
@@ -134,7 +134,7 @@ public void addService(Service service) {
 
 Service 组件的具体实现类是 StandardService，我们先来看看它的定义以及关键的成员变量。
 
-```
+```java
 public class StandardService extends LifecycleBase implements Service {
     // 名字
     private String name = null;
@@ -152,6 +152,7 @@ public class StandardService extends LifecycleBase implements Service {
     // 映射器及其监听器
     protected final Mapper mapper = new Mapper();
     protected final MapperListener mapperListener = new MapperListener(this);
+}
 ```
 
 StandardService 继承了 LifecycleBase 抽象类，此外 StandardService 中还有一些我们熟悉的组件，比如 Server、Connector、Engine 和 Mapper。
@@ -160,7 +161,7 @@ StandardService 继承了 LifecycleBase 抽象类，此外 StandardService 中�
 
 作为“管理”角色的组件，最重要的是维护其他组件的生命周期。此外在启动各种组件时，要注意它们的依赖关系，也就是说，要注意启动的顺序。我们来看看 Service 启动方法：
 
-```
+```java
 protected void startInternal() throws LifecycleException {
  
     //1. 触发启动监听器
@@ -193,21 +194,20 @@ protected void startInternal() throws LifecycleException {
 
 最后我们再来看看顶层的容器组件 Engine 具体是如何实现的。Engine 本质是一个容器，因此它继承了 ContainerBase 基类，并且实现了 Engine 接口。
 
-```
+```java
 public class StandardEngine extends ContainerBase implements Engine {
 }
 ```
 
 我们知道，Engine 的子容器是 Host，所以它持有了一个 Host 容器的数组，这些功能都被抽象到了 ContainerBase 中，ContainerBase 中有这样一个数据结构：
 
-```
+```java
 protected final HashMap<String, Container> children = new HashMap<>();
-复制代码
 ```
 
 ContainerBase 用 HashMap 保存了它的子容器，并且 ContainerBase 还实现了子容器的“增删改查”，甚至连子组件的启动和停止都提供了默认实现，比如 ContainerBase 会用专门的线程池来启动子容器。
 
-```
+```java
 for (int i = 0; i < children.length; i++) {
    results.add(startStopExecutor.submit(new StartChild(children[i])));
 }
@@ -219,7 +219,7 @@ for (int i = 0; i < children.length; i++) {
 
 通过专栏前面的学习，我们知道每一个容器组件都有一个 Pipeline，而 Pipeline 中有一个基础阀（Basic Valve），而 Engine 容器的基础阀定义如下：
 
-```
+```java
 final class StandardEngineValve extends ValveBase {
  
     public final void invoke(Request request, Response response)

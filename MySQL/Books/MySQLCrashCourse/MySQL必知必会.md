@@ -6,11 +6,17 @@
 
 ### 一、检索数据
 - SQL 语句不区分大小写；
-- 使用`distinct`进行去重的时候，作用范围是**所有列**，不仅仅是前置它的列；
-- 使用`select`检索的结果中，第一行为行 0，即从 0 开始计数；
-- 使用`limit`限制显示行数，如果结果中没有足够的行，则只返回能返回的所有结果；
 
-- `desc`关键字**只应用在直接位于其前面的列名**；
+- 使用 `distinct` 进行去重的时候，作用范围是**所有列**，不仅仅是前置它的列；
+
+    即保证 distinct 后的所有列组合的结果是唯一的，不保证每列的结果是唯一的；
+
+- 使用 `select` 检索的结果中，第一行为行 0，即从 0 开始计数；
+
+- 使用 `limit` 限制显示行数，如果结果中没有足够的行，则只返回能返回的所有结果；
+
+- `desc` 关键字**只应用在直接位于其前面的列名**；
+
 - 子句的位置：从前往后：from -> order by -> limit
 
 ### 二、过滤数据
@@ -36,8 +42,8 @@
 
 ### 三、用通配符进行过滤
 
-- `like` 是谓词不是操作符
-- 注意尾空格，例如使用 `%hello`，注意文章中 hello 后面是有空格的，造成无法匹配，可以使用：`%hello%`或者使用函数进行去除空格；
+- `like` 是谓词不是操作符，其中谓词主要包括：IN、BETWEEN、LIKE，逻辑操作符主要包括：OR 和 AND。
+- 注意尾空格，例如使用 `%hello`，注意文章中 hello 后面是有空格的，造成无法匹配，可以使用：`%hello%` 或者使用函数进行去除空格；
 - **通配符不会匹配 `null`；**
 - 不要在搜索模式的开始处使用通配符，会造成搜索变慢；
 
@@ -123,25 +129,36 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
 
 - `AS` 赋予别名；
 
-    `SELECT quantity * item_price AS expanded_price FROM orderitems WHERE order_num = 20005;`  # 计算总价 expanded_price
+    `SELECT quantity * item_price AS expanded_price FROM orderitems WHERE order_num = 20005;`  
+    
 - 支持的算术操作符：`+` 和 `-` 和 `*` 和 `/`
 
-### 六、使用数据处理函数
+    注：MySQL 中的 `+` 只有运算符作用，没有连接符的作用：
 
-#### （一）文本处理函数
+    - 如果两个操作符都是数值型，则做加法运算；
+    
+    - 如果其中一方为字符型数值（如 ’124’/'00.2'/‘002’ 会被转换为 124/0.2/2），则将字符型转换为数值型，如果转换成功则做加法运算，失败则将字符型数值转换为 0；
+    
+        注意：`select 1 + '0.03.2';`结果为 1.03，所以这里的转换算法可以再看看；
+    
+    - 如果任何一方为 null 则结果为 null；
 
-| 函数        | 说明                                                      |
-| ----------- | --------------------------------------------------------- |
-| LEFT()      | 返回串左边的字符                                          |
-| length()    | 返回串的长度                                              |
-| locate()    | 找出串的一个子串                                          |
-| lower()     | 将串转换为小写                                            |
-| ltrim()     | 去掉串左边的空格                                          |
-| RIGHT()     | 返回串右边的字符                                          |
-| rtrim()     | 去掉串右边的空格                                          |
-| soundex()   | 返回串的soundex值，根据串的发音进行比较而不是根据字母比较 |
-| substring() | 返回子串的字符                                            |
-| upper()     | 将串转换为大写                                            |
+###  六、使用数据处理函数
+
+#### （一）文本字符串处理函数
+
+| 函数                 | 说明                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| LEFT(str,length)     | 返回指定长度的字段串的左边部分；str 是要提取子字符串的字符串。`length`是一个正整数，指定将从左边返回的字符数（就是个数）。`LEFT()`函数返回`str`字符串中最左边的长度字符。如果`str`或`length`参数为`NULL`，则返回`NULL`值。 如果`length`为`0`或为负，则`LEFT`函数返回一个空字符串。如果`length`大于`str`字符串的长度，则`LEFT`函数返回整个`str`字符串。  </br> 功能等同于 substring() |
+| RIGHT()              | 同上                                                         |
+| length(str)          | 返回串的字节长度，数字、字母算 1 个，汉字算 3 个；英文标点算 1 个，中文标点算 3 个； |
+| locate(subStr,str)   | 返回 subStr 在 str 中出现的第一个位置（如果存在，最小从 1 开始），即如果返回值大于 0 则表示 str 包含 subStr，反之不包含就是等于 0； |
+| lower()              | 将串转换为小写                                               |
+| ltrim()              | 去掉串左边的空格                                             |
+| rtrim()              | 去掉串右边的空格                                             |
+| soundex()            | 返回串的soundex值，根据串的发音进行比较而不是根据字母比较    |
+| substring()/substr() | 返回子串的字符                                               |
+| upper()              | 将串转换为大写                                               |
 
 示例：`SELECT cust_name FROM customers WHERE soundex(contact) = soundex('Y. Lie');` # 按发音搜索
 
@@ -187,22 +204,21 @@ SELECT now() AS now1,sysdate() AS date1,   sleep(4),    now() AS now2,sysdate() 
 
 `sysdate()` 返回的时间是函数执行的时间，比如以上的一条 SQL 语句中执行了 2 次，第二次就是 `sysdate()` 执行的时间，即 `sysdate()` 执行的时间。
 
-
-
 #### （三）数值处理函数
 
 仅仅用于处理数值数据
 
-| 函数   | 说明               |
-| ------ | ------------------ |
-| abs()  | 返回一个数的绝对值 |
-| cos()  | 返回一个角度的余弦 |
-| exp()  | 返回一个数的指数值 |
-| mod()  | 返回除操作的余数   |
-| pi()   | 返回圆周率         |
-| sin()  | 返回一个角度的正弦 |
-| sqrt() | 返回一个数的平方根 |
-| tan()  | 返回一个角度的正切 |
+| 函数    | 说明                                                         |
+| ------- | ------------------------------------------------------------ |
+| abs()   | 返回一个数的绝对值                                           |
+| round() | 把数值字段舍入为指定的小数位数。ROUND(X)：返回参数X的四舍五入的一个整数。**ROUND(X,D)：** 返回参数X的四舍五入的有 D 位小数的一个数字。如果D为0，结果将没有小数点或小数部分。 |
+| cos()   | 返回一个角度的余弦                                           |
+| exp()   | 返回一个数的指数值                                           |
+| mod()   | 返回除操作的余数                                             |
+| pi()    | 返回圆周率                                                   |
+| sin()   | 返回一个角度的正弦                                           |
+| sqrt()  | 返回一个数的平方根                                           |
+| tan()   | 返回一个角度的正切                                           |
 
 ### 七、汇总数据
 
@@ -242,6 +258,19 @@ SELECT now() AS now1,sysdate() AS date1,   sleep(4),    now() AS now2,sysdate() 
     - DISTINCT 只能作用于 `COUNT()`，不能用于 `COUNT(*)`。
     - DISTINCT 同 `max()`, `min()` 的结合使用，没有意义 。
 
+- COALESCE 函数使用方式：
+
+    用途：将空值替换成其他值，同时返回第一个非空值
+
+    表达式
+    `COALESCE(expression_1, expression_2, ...,expression_n)` 依次参考各参数表达式，遇到非 null 值即停止并返回该值。如果所有的表达式都是空值，最终将返回一个空值。
+
+    示例：`select coalesce(success_cnt, 1) from tableA`
+    当 success_cnt 为 null 值的时候，将返回 1，否则将返回 success_cnt 的真实值。
+
+    `select coalesce(success_cnt,period,1) from tableA`
+    当 success_cnt 不为 null，那么无论 period 是否为 null，都将返回 success_cnt 的真实值（因为success_cnt 是第一个参数），当 success_cnt 为 null，而 period 不为 null 的时候，返回 period 的真实值。只有当 success_cnt 和 period 均为 null 的时候，将返回1。
+
 - 组合聚类函数 
     4 个聚集计算:物品的数目，产品价格的最高、最低以及平均值 
 
@@ -255,8 +284,31 @@ SELECT now() AS now1,sysdate() AS date1,   sleep(4),    now() AS now2,sysdate() 
         products;
     ```
 
+### MySQL 高级函数
 
-### 八、分组计算    
+| 函数名                                                       | 描述                                                         | 实例                                                         |
+| :----------------------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
+| BIN(x)                                                       | 返回 x 的二进制编码                                          | 15 的 2 进制编码:`SELECT BIN(15); -- 1111`                   |
+| BINARY(s)                                                    | 将字符串 s 转换为二进制字符串                                | `SELECT BINARY "RUNOOB"; -> RUNOOB`                          |
+| `CASE expression              WHEN condition1 THEN result1    WHEN condition2 THEN result2   ...                           WHEN conditionN THEN resultN    ELSE result                         END` | CASE 表示函数开始，END 表示函数结束。如果 condition1 成立，则返回 result1, 如果 condition2 成立，则返回 result2，当全部不成立则返回 result，而当有一个成立之后，后面的就不执行了。 | `SELECT CASE  　WHEN 1 > 0 　THEN '1 > 0' 　WHEN 2 > 0 　THEN '2 > 0' 　ELSE '3 > 0' 　END ->1 > 0` |
+| CAST(x AS type)                                              | 转换数据类型                                                 | 字符串日期转换为日期：`SELECT CAST("2017-08-29" AS DATE); -> 2017-08-29` |
+| COALESCE(expr1, expr2, ...., expr_n)                         | 返回参数中的第一个非空表达式（从左向右）                     | `SELECT COALESCE(NULL, NULL, NULL, 'runoob.com', NULL, 'google.com'); -> runoob.com` |
+| CONNECTION_ID()                                              | 返回唯一的连接 ID                                            | `SELECT CONNECTION_ID(); -> 4292835`                         |
+| CONV(x,f1,f2)                                                | 返回 f1 进制数变成 f2 进制数                                 | `SELECT CONV(15, 10, 2); -> 1111`                            |
+| CONVERT(s USING cs)                                          | 函数将字符串 s 的字符集变成 cs                               | `SELECT CHARSET('ABC') ->utf-8     SELECT CHARSET(CONVERT('ABC' USING gbk)) ->gbk` |
+| CURRENT_USER()                                               | 返回当前用户                                                 | `SELECT CURRENT_USER(); -> guest@%`                          |
+| DATABASE()                                                   | 返回当前数据库名                                             | `SELECT DATABASE();    -> runoob`                            |
+| IF(expr,v1,v2)                                               | 如果表达式 expr 成立，返回结果 v1；否则，返回结果 v2。       | `SELECT IF(1 > 0,'正确','错误')     ->正确`                  |
+| [IFNULL(v1,v2)](https://www.runoob.com/mysql/mysql-func-ifnull.html) | 如果 v1 的值不为 NULL，则返回 v1，否则返回 v2。              | `SELECT IFNULL(null,'Hello Word') ->Hello Word`              |
+| ISNULL(expression)                                           | 判断表达式是否为 NULL                                        | `SELECT ISNULL(NULL); ->1`                                   |
+| LAST_INSERT_ID()                                             | 返回最近生成的 AUTO_INCREMENT 值                             | `SELECT LAST_INSERT_ID(); ->6`                               |
+| NULLIF(expr1, expr2)                                         | 比较两个字符串，如果字符串 expr1 与 expr2 相等 返回 NULL，否则返回 expr1 | `SELECT NULLIF(25, 25); ->`                                  |
+| SESSION_USER()                                               | 返回当前用户                                                 | `SELECT SESSION_USER(); -> guest@%`                          |
+| SYSTEM_USER()                                                | 返回当前用户                                                 | `SELECT SYSTEM_USER(); -> guest@%`                           |
+| USER()                                                       | 返回当前用户                                                 | `SELECT USER(); -> guest@%`                                  |
+| VERSION()                                                    | 返回数据库的版本号                                           | `SELECT VERSION() -> 5.6.34`                                 |
+
+### 八、分组计算
 
 允许将数据分为多个逻辑组，以便能对每个组进行聚集计算；
 主要有：GROUP BY 和 HAVING 子句；**WHERE 过滤行，HAVING 过滤分组 **, **WHERE 在数据分组前进行过滤，HAVING 在数据分组后进行过滤**。
