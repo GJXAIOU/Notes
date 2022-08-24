@@ -6,7 +6,7 @@
 
 为了能让咱们快速达成共识，我选择剖析 gRPC 源码（源码地址：https://github.com/grpc/grpc-java）。通过分析 gRPC 的通信过程，我们可以清楚地知道在 gRPC 里面这些知识点是怎么落地到具体代码上的。
 
-gRPC 是由 Google 开发并且开源的一款高性能、跨语言的 RPC 框架，当前支持 C、Java 和 Go 等语言，当前 Java 版本最新 Release 版为 1.27.0。gRPC 有很多特点，比如跨语言，通信协议是基于标准的 HTTP/2 设计的，序列化支持 PB（Protocol Buffer）和JSON，整个调用示例如下图所示：
+gRPC 是由 Google 开发并且开源的一款高性能、跨语言的 RPC 框架，当前支持 C、Java 和 Go 等语言，当前 Java 版本最新 Release 版为 1.48.1。gRPC 有很多特点，比如跨语言，通信协议是基于标准的 HTTP/2 设计的，序列化支持 PB（Protocol Buffer）和 JSON，整个调用示例如下图所示：
 
 ![image-20220821183754102](06%20%20RPC%E5%AE%9E%E6%88%98%EF%BC%9A%E5%89%96%E6%9E%90gRPC%E6%BA%90%E7%A0%81%EF%BC%8C%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E7%9A%84RPC.resource/image-20220821183754102.png)
 
@@ -42,7 +42,7 @@ message HelloReply {
 
 有了这段代码，我们就可以为客户端和服务器端生成消息对象和 RPC 基础代码。我们可以利用 Protocol Buffer 的编译器 protoc，再配合 gRPC Java 插件（protoc-gen-grpc- java），通过命令行 protoc3 加上 plugin 和 proto 目录地址参数，我们就可以生成消息对象和 gRPC 通信所需要的基础代码。如果你的项目是 Maven 工程的话，你还可以直接选择使用 Maven 插件来生成同样的代码。
 
-# 发送原理
+## 一、发送原理
 
 生成完基础代码以后，我们就可以基于生成的代码写下调用端代码，具体如下：
 
@@ -52,9 +52,9 @@ package io.grpc.hello;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder; 
 import io.grpc.StatusRuntimeException;
+import java.util.concurrent.TimeUnit; 
 
-
-import java.util.concurrent.TimeUnit; public class HelloWorldClient {
+public class HelloWorldClient {
     private final ManagedChannel channel;
     private final HelloServiceGrpc.HelloServiceBlockingStub blockingStub;
     /**
