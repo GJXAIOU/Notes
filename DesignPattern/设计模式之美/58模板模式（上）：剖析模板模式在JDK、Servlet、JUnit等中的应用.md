@@ -2,7 +2,7 @@
 
 上两节课我们学习了第一个行为型设计模式，观察者模式。针对不同的应用场景，我们讲解了不同的实现方式，有同步阻塞、异步非阻塞的实现方式，也有进程内、进程间的实现方式。除此之外，我还带你手把手实现了一个简单的 EventBus 框架。
 
-今天，我们再学习另外一种行为型设计模式，模板模式。我们多次强调，绝大部分设计模式的原理和实现，都非常简单，难的是掌握应用场景，搞清楚能解决什么问题。模板模式也不例外。模板模式主要是用来解决复用和扩展两个问题。我们今天会结合 Java Servlet、JUnit TestCase、Java InputStream、Java AbstractList 四个例子来具体讲解这两个作用。
+今天，我们再学习另外一种行为型设计模式，模板模式。我们多次强调，绝大部分设计模式的原理和实现，都非常简单，难的是掌握应用场景，搞清楚能解决什么问题。模板模式也不例外。**模板模式主要是用来解决复用和扩展两个问题**。我们今天会结合 Java Servlet、JUnit TestCase、Java InputStream、Java AbstractList 四个例子来具体讲解这两个作用。
 
 # 模板模式的原理与实现
 
@@ -10,7 +10,7 @@
 
 > Define the skeleton of an algorithm in an operation, deferring some steps to subclasses. Template Method lets subclasses redefine certain steps of an algorithm without changing the algorithm’s structure.
 
-翻译成中文就是：模板方法模式在一个方法中定义一个算法骨架，并将某些步骤推迟到子类中实现。模板方法模式可以让子类在不改变算法整体结构的情况下，重新定义算法中的某些步骤。
+翻译成中文就是：**模板方法模式在一个方法中定义一个算法骨架，并将某些步骤推迟到子类中实现。模板方法模式可以让子类在不改变算法整体结构的情况下，重新定义算法中的某些步骤。**
 
 这里的“算法”，我们可以理解为广义上的“业务逻辑”，并不特指数据结构和算法中的“算法”。这里的算法骨架就是“模板”，包含算法骨架的方法就是“模板方法”，这也是模板方法模式名字的由来。
 
@@ -110,7 +110,7 @@ public class ByteArrayInputStream extends InputStream {
 
 ## Java AbstractList
 
-在 Java AbstractList 类中，addAll() 函数可以看作模板方法，add() 是子类需要重写的方法，尽管没有声明为 abstract 的，但函数实现直接抛出了UnsupportedOperationException 异常。前提是，如果子类不重写是不能使用的。
+在 Java AbstractList 类中，addAll() 函数可以看作模板方法，add() 是子类需要重写的方法，**尽管没有声明为 abstract 的，但函数实现直接抛出了UnsupportedOperationException 异常。即如果子类不重写是不能使用的。**
 
 ```java
 public boolean addAll(int index, Collection<? extends E> c) {
@@ -130,7 +130,7 @@ public void add(int index, E element) {
 
 # 模板模式作用二：扩展
 
-模板模式的第二大作用的是扩展。这里所说的扩展，并不是指代码的扩展性，而是指框架的扩展性，有点类似我们之前讲到的控制反转，你可以结合 第 19 节来一块理解。基于这个作用，模板模式常用在框架的开发中，让框架用户可以在不修改框架源码的情况下，定制化框架的功能。我们通过 Junit TestCase、Java Servlet 两个例子来解释一下。
+模板模式的第二大作用的是扩展。这里所说的扩展，并不是指代码的扩展性，而是指**框架的扩展性**，有点类似我们之前讲到的控制反转，你可以结合 第 19 节来一块理解。基于这个作用，模板模式常用在框架的开发中，**让框架用户可以在不修改框架源码的情况下，定制化框架的功能**。我们通过 Junit TestCase、Java Servlet 两个例子来解释一下。
 
 ## Java Servlet
 
@@ -164,7 +164,7 @@ public class HelloServlet extends HttpServlet {
 </servlet-mapping>
 ```
 
-当我们在浏览器中输入网址（比如，http://127.0.0.1:8080/hello ）的时候，Servlet 容器会接收到相应的请求，并且根据 URL 和 Servlet 之间的映射关系，找到相应的Servlet（HelloServlet），然后执行它的 service() 方法。service() 方法定义在父类HttpServlet 中，它会调用 doGet() 或 doPost() 方法，然后输出数据（“Hello world”）到网页。
+当我们在浏览器中输入网址（比如，http://127.0.0.1:8080/hello ）的时候，Servlet 容器会接收到相应的请求，并且根据 URL 和 Servlet 之间的映射关系，找到相应的 Servlet（HelloServlet），然后执行它的 service() 方法。**service() 方法定义在父类 HttpServlet 中，它会调用 doGet() 或 doPost() 方法**，然后输出数据（“Hello world”）到网页。
 
 我们现在来看，HttpServlet 的 service() 函数长什么样子。
 
@@ -281,7 +281,7 @@ public abstract class TestCase extends Assert implements Test {
 
 模板方法模式在一个方法中定义一个算法骨架，并将某些步骤推迟到子类中实现。模板方法模式可以让子类在不改变算法整体结构的情况下，重新定义算法中的某些步骤。这里的“算法”，我们可以理解为广义上的“业务逻辑”，并不特指数据结构和算法中的“算法”。这里的算法骨架就是“模板”，包含算法骨架的方法就是“模板方法”，这也是模板方法模式名字的由来。
 
-在模板模式经典的实现中，模板方法定义为 final，可以避免被子类重写。需要子类重写的方法定义为 abstract，可以强迫子类去实现。不过，在实际项目开发中，模板模式的实现比较灵活，以上两点都不是必须的。
+**在模板模式经典的实现中，模板方法定义为 final，可以避免被子类重写。需要子类重写的方法定义为 abstract，可以强迫子类去实现。不过，在实际项目开发中，模板模式的实现比较灵活，以上两点都不是必须的。**
 
 模板模式有两大作用：复用和扩展。其中，复用指的是，所有的子类可以复用父类中提供的模板方法的代码。扩展指的是，框架通过模板模式提供功能扩展点，让框架用户可以在不修改框架源码的情况下，基于扩展点定制化框架的功能。
 
@@ -316,9 +316,9 @@ public abstract class AbstractClass {
 
 ## 精选留言
 
-> ![](media/image13.png)**rayjun**
->
-> 2020-03-16
+
+
+
 >
 > 如果两个模版方法没有耦合，可以拆分成两个类，如果不能拆分，那就为每个方法提供默认实现
 
