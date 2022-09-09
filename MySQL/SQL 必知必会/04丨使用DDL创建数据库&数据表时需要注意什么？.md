@@ -27,7 +27,6 @@ DROP DATABASE nba; // 删除一个名为 nba 的数据库
 
 ```
 CREATE TABLE table_name
-复制代码
 ```
 
 ### 创建表结构
