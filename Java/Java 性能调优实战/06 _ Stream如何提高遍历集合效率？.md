@@ -1,17 +1,5 @@
 # 06 \| Stream如何提高遍历集合效率？
 
-作者: 刘超
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/39/93/39bb9aa6d3ddde6747313cebd9f9fc93.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/69/4a/6930c5ea8503c9740ca43e84fa38574a.mp3" type="audio/mpeg"></audio>
-
-你好，我是刘超。
-
 上一讲中，我在讲List集合类，那我想你一定也知道集合的顶端接口Collection。在Java8中，Collection新增了两个流方法，分别是Stream()和parallelStream()。
 
 通过英文名不难猜测，这两个方法肯定和Stream有关，那进一步猜测，是不是和我们熟悉的InputStream和OutputStream也有关系呢？集合类中新增的两个Stream方法到底有什么作用？今天，我们就来深入了解下Stream。
@@ -28,8 +16,6 @@
 
 在Java8之前，我们通常是通过for循环或者Iterator迭代来重新排序合并数据，又或者通过重新定义Collections.sorts的Comparator方法来实现，这两种方式对于大数据量系统来说，效率并不是很理想。
 
-<!-- [[[read_end]]] -->
-
 Java8中添加了一个新的接口类Stream，他和我们之前接触的字节流概念不太一样，Java8集合中的Stream相当于高级版的Iterator，他可以通过Lambda 表达式对集合进行各种非常便利、高效的聚合操作（Aggregate Operation），或者大批量数据操作 (Bulk Data Operation)。
 
 Stream的聚合操作与数据库SQL的聚合操作sorted、filter、map等类似。我们在应用层就可以高效地实现类似数据库SQL的聚合操作了，而在数据操作方面，Stream不仅可以通过串行的方式实现数据操作，还可以通过并行的方式处理大批量数据，提高数据的处理效率。
@@ -38,7 +24,7 @@ Stream的聚合操作与数据库SQL的聚合操作sorted、filter、map等类�
 
 这个Demo的需求是过滤分组一所中学里身高在160cm以上的男女同学，我们先用传统的迭代方式来实现，代码如下：
 
-```
+```java
 Map<String, List<Student>> stuMap = new HashMap<String, List<Student>>();
         for (Student stu: studentsList) {
             if (stu.getHeight() > 160) { //如果身高大于160
@@ -57,13 +43,13 @@ Map<String, List<Student>> stuMap = new HashMap<String, List<Student>>();
 
 1\.串行实现
 
-```
+```java
 Map<String, List<Student>> stuMap = stuList.stream().filter((Student s) -> s.getHeight() > 160) .collect(Collectors.groupingBy(Student ::getSex));
 ```
 
 2\.并行实现
 
-```
+```java
 Map<String, List<Student>> stuMap = stuList.parallelStream().filter((Student s) -> s.getHeight() > 160) .collect(Collectors.groupingBy(Student ::getSex));
 ```
 
@@ -111,7 +97,7 @@ Head类主要用来定义数据源操作，在我们初次调用names.stream()�
 
 **下面我们再通过一个例子来感受下Stream的操作分类是如何实现高效迭代大数据集合的。**
 
-```
+```java
 List<String> names = Arrays.asList("张三", "李四", "王老五", "李三", "刘老四", "王小二", "张四", "张五六七");
 
 String maxLenStartWithZ = names.stream()
@@ -127,7 +113,7 @@ String maxLenStartWithZ = names.stream()
 
 首先 ，因为names是ArrayList集合，所以names.stream()方法将会调用集合类基础接口Collection的Stream方法：
 
-```
+```java
 default Stream<E> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
@@ -135,7 +121,7 @@ default Stream<E> stream() {
 
 然后，Stream方法就会调用StreamSupport类的Stream方法，方法中初始化了一个ReferencePipeline的Head内部类对象：
 
-```
+```java
 public static <T> Stream<T> stream(Spliterator<T> spliterator, boolean parallel) {
         Objects.requireNonNull(spliterator);
         return new ReferencePipeline.Head<>(spliterator,
@@ -148,7 +134,7 @@ public static <T> Stream<T> stream(Spliterator<T> spliterator, boolean parallel)
 
 而通常情况下Stream的操作又需要一个回调函数，所以一个完整的Stage是由数据来源、操作、回调函数组成的三元组来表示。如下图所示，分别是ReferencePipeline的filter方法和map方法：
 
-```
+```java
 @Override
     public final Stream<P_OUT> filter(Predicate<? super P_OUT> predicate) {
         Objects.requireNonNull(predicate);
@@ -173,7 +159,7 @@ public static <T> Stream<T> stream(Spliterator<T> spliterator, boolean parallel)
     }
 ```
 
-```
+```java
 @Override
     @SuppressWarnings("unchecked")
     public final <R> Stream<R> map(Function<? super P_OUT, ? extends R> mapper) {
@@ -195,7 +181,7 @@ public static <T> Stream<T> stream(Spliterator<T> spliterator, boolean parallel)
 
 new StatelessOp将会调用父类AbstractPipeline的构造函数，这个构造函数将前后的Stage联系起来，生成一个Stage链表：
 
-```
+```java
 AbstractPipeline(AbstractPipeline<?, E_IN, ?> previousStage, int opFlags) {
         if (previousStage.linkedOrConsumed)
             throw new IllegalStateException(MSG_STREAM_LINKED);
@@ -216,7 +202,7 @@ AbstractPipeline(AbstractPipeline<?, E_IN, ?> previousStage, int opFlags) {
 
 当执行max方法时，会调用ReferencePipeline的max方法，此时由于max方法是终结操作，所以会创建一个TerminalOp操作，同时创建一个ReducingSink，并且将操作封装在Sink类中。
 
-```
+```java
 @Override
     public final Optional<P_OUT> max(Comparator<? super P_OUT> comparator) {
         return reduce(BinaryOperator.maxBy(comparator));
@@ -225,7 +211,7 @@ AbstractPipeline(AbstractPipeline<?, E_IN, ?> previousStage, int opFlags) {
 
 最后，调用AbstractPipeline的wrapSink方法，该方法会调用opWrapSink生成一个Sink链表，Sink链表中的每一个Sink都封装了一个操作的具体实现。
 
-```
+```java
 @Override
     @SuppressWarnings("unchecked")
     final <P_IN> Sink<P_IN> wrapSink(Sink<E_OUT> sink) {
@@ -240,7 +226,7 @@ AbstractPipeline(AbstractPipeline<?, E_IN, ?> previousStage, int opFlags) {
 
 当Sink链表生成完成后，Stream开始执行，通过spliterator迭代集合，执行Sink链表中的具体操作。
 
-```
+```java
 @Override
     final <P_IN> void copyInto(Sink<P_IN> wrappedSink, Spliterator<P_IN> spliterator) {
         Objects.requireNonNull(wrappedSink);
@@ -264,7 +250,7 @@ Java8中的Spliterator的forEachRemaining会迭代集合，每迭代一次，都
 
 Stream处理数据的方式有两种，串行处理和并行处理。要实现并行处理，我们只需要在例子的代码中新增一个Parallel()方法，代码如下所示：
 
-```
+```java
 List<String> names = Arrays.asList("张三", "李四", "王老五", "李三", "刘老四", "王小二", "张四", "张五六七");
 
 String maxLenStartWithZ = names.stream()
@@ -277,7 +263,7 @@ String maxLenStartWithZ = names.stream()
 
 Stream的并行处理在执行终结操作之前，跟串行处理的实现是一样的。而在调用终结方法之后，实现的方式就有点不太一样，会调用TerminalOp的evaluateParallel方法进行并行处理。
 
-```
+```java
 final <R> R evaluate(TerminalOp<E_OUT, R> terminalOp) {
         assert getOutputShape() == terminalOp.inputShape();
         if (linkedOrConsumed)
@@ -316,8 +302,6 @@ ForkJoin框架和估算算法，在这里我就不具体讲解了，如果感兴
 - Stream并行迭代<常规的迭代<Stream串行迭代
 - 常规的迭代<Stream串行迭代<Stream并行迭代
 
-<!-- -->
-
 通过以上测试结果，我们可以看到：在循环迭代次数较少的情况下，常规的迭代方式性能反而更好；在单核CPU服务器配置环境中，也是常规迭代方式更有优势；而在大数据循环迭代中，如果服务器是多核CPU的情况下，Stream的并行迭代优势明显。所以我们在平时处理大数据的集合时，应该尽量考虑将应用部署在多核CPU环境下，并且使用Stream的并行迭代方式进行处理。
 
 用事实说话，我们看到其实使用Stream未必可以使系统性能更佳，还是要结合应用场景进行选择，也就是合理地使用Stream。
@@ -336,7 +320,7 @@ ForkJoin框架和估算算法，在这里我就不具体讲解了，如果感兴
 
 这里有一个简单的并行处理案例，请你找出其中存在的问题。
 
-```
+```java
 //使用一个容器装载100个数字，通过Stream并行处理的方式将容器中为单数的数字转移到容器parallelList
 List<Integer> integerList= new ArrayList<Integer>();
 

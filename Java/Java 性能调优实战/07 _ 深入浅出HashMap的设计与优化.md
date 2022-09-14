@@ -1,17 +1,5 @@
 # 07 \| 深入浅出HashMap的设计与优化
 
-作者: 刘超
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/d3/ce/d32b34a63447b3694357ac9173c5ffce.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/52/bc/52d774c8a6b9659ecb2543e3357a58bc.mp3" type="audio/mpeg"></audio>
-
-你好，我是刘超。
-
 在上一讲中我提到过Collection接口，那么在Java容器类中，除了这个接口之外，还定义了一个很重要的Map接口，主要用来存储键值对数据。
 
 HashMap作为我们日常使用最频繁的容器之一，相信你一定不陌生了。今天我们就从HashMap的底层实现讲起，深度了解下它的设计与优化。
@@ -27,8 +15,6 @@ HashMap作为我们日常使用最频繁的容器之一，相信你一定不陌�
 链表由一系列结点（链表中每一个元素）组成，结点可以在运行时动态生成。每个结点都包含“存储数据单元的数据域”和“存储下一个结点地址的指针域”这两个部分。
 
 由于链表不用必须按顺序存储，所以链表在插入的时候可以达到O(1)的复杂度，但查找一个结点或者访问特定编号的结点需要O(n)的时间。
-
-<!-- [[[read_end]]] -->
 
 **哈希表**：根据关键码值（Key value）直接进行访问的数据结构。通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做哈希函数，存放记录的数组就叫做哈希表。
 
@@ -60,7 +46,7 @@ transient Node<K,V>[] table;
 
 Node类作为HashMap中的一个内部类，除了key、value两个属性外，还定义了一个next指针。当有哈希冲突时，HashMap会用之前数组当中相同哈希值对应存储的Node对象，通过指针指向新增的相同哈希值的Node对象的引用。
 
-```
+```java
 static class Node<K,V> implements Map.Entry<K,V> {
         final int hash;
         final K key;
@@ -78,7 +64,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 HashMap还有两个重要的属性：加载因子（loadFactor）和边界值（threshold）。在初始化HashMap时，就会涉及到这两个关键初始化参数。
 
-```
+```java
 int threshold;
 
     final float loadFactor;
@@ -96,20 +82,20 @@ Entry数组的Threshold是通过初始容量和LoadFactor计算所得，在初�
 
 初始化完成后，HashMap就可以使用put()方法添加键值对了。从下面源码可以看出，当程序将一个key-value对添加到HashMap中，程序首先会根据该key的hashCode()返回值，再通过hash()方法计算出hash值，再通过putVal方法中的(n - 1) & hash决定该Node的存储位置。
 
-```
+```java
 public V put(K key, V value) {
         return putVal(hash(key), key, value, false, true);
     }
 ```
 
-```
+```java
 static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 ```
 
-```
+```java
 if ((tab = table) == null || (n = tab.length) == 0)
             n = (tab = resize()).length;
         //通过putVal方法中的(n - 1) & hash决定该Node的存储位置
@@ -117,7 +103,7 @@ if ((tab = table) == null || (n = tab.length) == 0)
             tab[i] = newNode(hash, key, value, null);
 ```
 
-<span class="orange">如果你不太清楚hash()以及(n-1)&amp;hash的算法，就请你看下面的详述。</span>
+如果你不太清楚hash()以及(n-1)&amp;hash的算法，就请你看下面的详述。
 
 我们先来了解下hash()方法中的算法。如果我们没有使用hash()方法计算hashCode，而是直接使用对象的hashCode值，会出现什么问题呢？
 
@@ -137,7 +123,7 @@ if ((tab = table) == null || (n = tab.length) == 0)
 
 以下就是put的实现源码:
 
-```
+```java
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
         Node<K,V>[] tab; Node<K,V> p; int n, i;
