@@ -1,30 +1,18 @@
 # 02｜Spring Bean 依赖注入常见错误（上）
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/9c/0b/9cd890e775e4e33a75be8fc7bf26960b.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/d8/d7/d895b3b7fd9bb04343689dc1e3ff3fd7.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健，这节课我们来聊聊 Spring @Autowired。
-
-提及Spring的优势或特性，我们都会立马想起“**控制反转、依赖注入**”这八字真言。而@Autowired正是用来支持依赖注入的核心利器之一。表面上看，它仅仅是一个注解，在使用上不应该出错。但是，在实际使用中，我们仍然会出现各式各样的错误，而且都堪称经典。所以这节课我就带着你学习下这些经典错误及其背后的原因，以防患于未然。
+提及 Spring 的优势或特性，我们都会立马想起“**控制反转、依赖注入**”这八字真言。而 @Autowired 正是用来支持依赖注入的核心利器之一。表面上看，它仅仅是一个注解，在使用上不应该出错。但是，在实际使用中，我们仍然会出现各式各样的错误，而且都堪称经典。所以这节课我就带着你学习下这些经典错误及其背后的原因，以防患于未然。
 
 ## 案例1：过多赠予，无所适从
 
-在使用@Autowired时，不管你是菜鸟级还是专家级的Spring使用者，都应该制造或者遭遇过类似的错误：
+在使用 @Autowired 时，不管你是菜鸟级还是专家级的 Spring 使用者，都应该制造或者遭遇过类似的错误：
 
 > required a single bean, but 2 were found
 
-顾名思义，我们仅需要一个Bean，但实际却提供了2个（这里的“2”在实际错误中可能是其它大于1的任何数字）。
+顾名思义，我们仅需要一个 Bean，但实际却提供了 2 个（这里的“2”在实际错误中可能是其它大于 1 的任何数字）。
 
-为了重现这个错误，我们可以先写一个案例来模拟下。假设我们在开发一个学籍管理系统案例，需要提供一个API根据学生的学号（ID）来移除学生，学生的信息维护肯定需要一个数据库来支撑，所以大体上可以实现如下：
+为了重现这个错误，我们可以先写一个案例来模拟下。假设我们在开发一个学籍管理系统案例，需要提供一个 API 根据学生的学号（ID）来移除学生，学生的信息维护肯定需要一个数据库来支撑，所以大体上可以实现如下：
 
-```
+```java
 @RestController
 @Slf4j
 @Validated
@@ -41,7 +29,7 @@ public class StudentController {
 
 其中DataService是一个接口，其实现依托于Oracle，代码示意如下：
 
-```
+```java
 public interface DataService {
     void deleteStudent(int id);
 }
@@ -56,11 +44,9 @@ public class OracleDataService implements DataService{
 }
 ```
 
-<!-- [[[read_end]]] -->
-
 截止目前，运行并测试程序是毫无问题的。但是需求往往是源源不断的，某天我们可能接到节约成本的需求，希望把一些部分非核心的业务从Oracle迁移到社区版Cassandra，所以我们自然会先添加上一个新的DataService实现，代码如下：
 
-```
+```java
 @Repository
 @Slf4j
 public class CassandraDataService implements DataService{
@@ -79,18 +65,16 @@ public class CassandraDataService implements DataService{
 
 ### 案例解析
 
-要找到这个问题的根源，我们就需要对@Autowired实现的依赖注入的原理有一定的了解。首先，我们先来了解下 @Autowired 发生的位置和核心过程。
+要找到这个问题的根源，我们就需要对 @Autowired 实现的依赖注入的原理有一定的了解。首先，我们先来了解下 @Autowired 发生的位置和核心过程。
 
-当一个Bean被构建时，核心包括两个基本步骤：
+**当一个 Bean 被构建时，核心包括两个基本步骤**：
 
-1. 执行AbstractAutowireCapableBeanFactory#createBeanInstance方法：通过构造器反射构造出这个Bean，在此案例中相当于构建出StudentController的实例；
-2. 执行AbstractAutowireCapableBeanFactory#populate方法：填充（即设置）这个Bean，在本案例中，相当于设置StudentController实例中被@Autowired标记的dataService属性成员。
+1. 执行AbstractAutowireCapableBeanFactory#createBeanInstance 方法：通过构造器反射构造出这个 Bean，在此案例中相当于构建出StudentController 的实例；
+2. 执行 AbstractAutowireCapableBeanFactory#populate 方法：填充（即设置）这个 Bean，在本案例中，相当于设置 StudentController实例中被 @Autowired 标记的 dataService 属性成员。
 
-<!-- -->
+在步骤2中，“填充”过程的关键就是执行各种 BeanPostProcessor 处理器，关键代码如下：
 
-在步骤2中，“填充”过程的关键就是执行各种BeanPostProcessor处理器，关键代码如下：
-
-```
+```java
 protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
       //省略非关键代码
       for (BeanPostProcessor bp : getBeanPostProcessors()) {
@@ -104,21 +88,17 @@ protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable B
 }
 ```
 
-在上述代码执行过程中，因为StudentController含有标记为Autowired的成员属性dataService，所以会使用到AutowiredAnnotationBeanPostProcessor（BeanPostProcessor中的一种）来完成“装配”过程：找出合适的DataService的bean并设置给StudentController#dataService。如果深究这个装配过程，又可以细分为两个步骤：
+**在上述代码执行过程中，因为 StudentController 含有标记为Autowired 的成员属性 dataService，所以会使用到AutowiredAnnotationBeanPostProcessor（BeanPostProcessor中的一种）来完成“装配”过程：找出合适的 DataService 的 bean 并设置给 StudentController#dataService。如果深究这个装配过程，又可以细分为两个步骤**：
 
 1. 寻找出所有需要依赖注入的字段和方法，参考AutowiredAnnotationBeanPostProcessor#postProcessProperties中的代码行：
 
-<!-- -->
-
-```
+```java
 InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 ```
 
 2. 根据依赖信息寻找出依赖并完成注入，以字段注入为例，参考AutowiredFieldElement#inject方法：
 
-<!-- -->
-
-```
+```java
 @Override
 protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
    Field field = (Field) this.member;
@@ -140,19 +120,17 @@ protected void inject(Object bean, @Nullable String beanName, @Nullable Property
 }
 ```
 
-说到这里，我们基本了解了@Autowired过程发生的位置和过程。而且很明显，我们案例中的错误就发生在上述“寻找依赖”的过程中（上述代码的第9行），那么到底是怎么发生的呢？我们可以继续刨根问底。
+说到这里，我们基本了解了 @Autowired 过程发生的位置和过程。而且很明显，我们案例中的错误就发生在上述“寻找依赖”的过程中（上述代码的第9行），那么到底是怎么发生的呢？我们可以继续刨根问底。
 
-为了更清晰地展示错误发生的位置，我们可以采用调试的视角展示其位置（即DefaultListableBeanFactory#doResolveDependency中代码片段），参考下图：
+为了更清晰地展示错误发生的位置，我们可以采用调试的视角展示其位置（即DefaultListableBeanFactory#doResolveDependency 中代码片段），参考下图：
 
 ![](<https://static001.geekbang.org/resource/image/4c/f9/4cb99e17967847995bfe1d7ec0fe75f9.png?wh=1426*358>)
 
-如上图所示，当我们根据DataService这个类型来找出依赖时，我们会找出2个依赖，分别为CassandraDataService和OracleDataService。在这样的情况下，如果同时满足以下两个条件则会抛出本案例的错误：
+如上图所示，当我们根据 DataService 这个类型来找出依赖时，我们会找出 2 个依赖，分别为 CassandraDataService 和OracleDataService。在这样的情况下，如果同时满足以下两个条件则会抛出本案例的错误：
 
-1. 调用determineAutowireCandidate方法来选出优先级最高的依赖，但是发现并没有优先级可依据。具体选择过程可参考DefaultListableBeanFactory#determineAutowireCandidate：
+1. 调用 determineAutowireCandidate 方法来选出优先级最高的依赖，但是发现并没有优先级可依据。具体选择过程可参考DefaultListableBeanFactory#determineAutowireCandidate：
 
-<!-- -->
-
-```
+```java
 protected String determineAutowireCandidate(Map<String, Object> candidates, DependencyDescriptor descriptor) {
    Class<?> requiredType = descriptor.getDependencyType();
    String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);
@@ -176,11 +154,9 @@ protected String determineAutowireCandidate(Map<String, Object> candidates, Depe
 }
 ```
 
-如代码所示，优先级的决策是先根据@Primary来决策，其次是@Priority决策，最后是根据Bean名字的严格匹配来决策。如果这些帮助决策优先级的注解都没有被使用，名字也不精确匹配，则返回null，告知无法决策出哪种最合适。
+**如代码所示，优先级的决策是先根据 @Primary 来决策，其次是@Priority 决策，最后是根据 Bean 名字的严格匹配来决策。如果这些帮助决策优先级的注解都没有被使用，名字也不精确匹配，则返回null，告知无法决策出哪种最合适。**
 
-2. @Autowired要求是必须注入的（即required保持默认值为true），或者注解的属性类型并不是可以接受多个Bean的类型，例如数组、Map、集合。这点可以参考DefaultListableBeanFactory#indicatesMultipleBeans的实现：
-
-<!-- -->
+2. @Autowired 要求是必须注入的（即 required 保持默认值为true），或者注解的属性类型并不是可以接受多个 Bea n的类型，例如数组、Map、集合。这点可以参考DefaultListableBeanFactory#indicatesMultipleBeans的实现：
 
 ```
 private boolean indicatesMultipleBeans(Class<?> type) {

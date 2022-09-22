@@ -1,17 +1,5 @@
 # 导读｜5分钟轻松了解一个HTTP请求的处理过程
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/c6/yy/c6e9f8dcf379d358d76d3d93dc42cbyy.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/c9/fa/c989d3797f4ff57a89611196c6a6fffa.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 上一章节我们学习了自动注入、AOP 等 Spring 核心知识运用上的常见错误案例。然而，我们**使用 Spring 大多还是为了开发一个 Web 应用程序**，所以从这节课开始，我们将学习Spring Web 的常见错误案例。
 
 在这之前，我想有必要先给你简单介绍一下 Spring Web 最核心的流程，这可以让我们后面的学习进展更加顺利一些。

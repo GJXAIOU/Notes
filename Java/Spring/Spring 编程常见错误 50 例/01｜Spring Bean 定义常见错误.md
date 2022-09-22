@@ -1,17 +1,5 @@
 # 01｜Spring Bean 定义常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/04/49/04119cbf5d42794a6bebf48a0d3d9e49.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/dd/02/dd84yyf22495ed8ed1de64ae94eaf402.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 从导读中我们已知，Spring 的核心是围绕 Bean 进行的。不管是 Spring Boot 还是 Spring Cloud，只要名称中带有Spring关键字的技术都脱离不了 Bean，而要使用一个 Bean 少不了要先定义出来，所以**定义一个Bean 就变得格外重要了**。
 
 当然，对于这么重要的工作，Spring 自然给我们提供了很多简单易用的方式。然而，这种简单易用得益于 Spring 的“**约定大于配置**”，但我们往往不见得会对所有的约定都了然于胸，所以仍然会在 Bean 的定义上犯一些经典的错误。
@@ -26,7 +14,7 @@
 
 其中，负责启动程序的 Application 类定义如下：
 
-```
+```java
 package com.spring.puzzle.class1.example1.application
 //省略 import
 @SpringBootApplication
@@ -39,7 +27,7 @@ public class Application {
 
 提供接口的 HelloWorldController 代码如下：
 
-```
+```java
 package com.spring.puzzle.class1.example1.application
 //省略 import
 @RestController
@@ -65,7 +53,7 @@ public class HelloWorldController {
 
 要了解 HelloWorldController 为什么会失效，就需要先了解之前是如何生效的。对于 Spring Boot 而言，关键点在于 Application.java 中使用了 SpringBootApplication 注解。而这个注解继承了另外一些注解，具体定义如下：
 
-```
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -85,7 +73,7 @@ public @interface SpringBootApplication {
 
 当 Spring Boot 启动时，ComponentScan 的启用意味着会去扫描出所有定义的 Bean，那么扫描什么位置呢？这是由 ComponentScan 注解的 basePackages 属性指定的，具体可参考如下定义：
 
-```
+```java
 public @interface ComponentScan {
 
 /**
@@ -101,7 +89,7 @@ String[] basePackages() default {};
 }
 ```
 
-而在我们的案例中，我们直接使用的是 SpringBootApplication 注解定义的 ComponentScan，它的 basePackages 没有指定，所以默认为空（即{}）。此时扫描的是什么包？这里不妨带着这个问题去调试下（调试位置参考 ComponentScanAnnotationParser#parse 方法），调试视图如下：
+而在我们的案例中，**我们直接使用的是 SpringBootApplication 注解定义的 ComponentScan，它的 basePackages 没有指定，所以默认为空（即{}）**。此时扫描的是什么包？这里不妨带着这个问题去调试下（调试位置参考 ComponentScanAnnotationParser#parse 方法），调试视图如下：
 
 ![](<https://static001.geekbang.org/resource/image/75/c6/75a8abe6d5854f4f4a8d6c9a5655f3c6.png?wh=1153*476>)
 
@@ -115,7 +103,7 @@ String[] basePackages() default {};
 
 针对这个案例，有了源码的剖析，我们可以快速找到解决方案了。当然了，我们所谓的解决方案肯定不是说把 HelloWorldController 移动回原来的位置，而是**真正去满足需求**。在这里，真正解决问题的方式是显式配置@ComponentScan。具体修改方式如下：
 
-```
+```java
 @SpringBootApplication
 @ComponentScan("com.spring.puzzle.class1.example1.controller")
 public class Application {
@@ -137,7 +125,7 @@ public class Application {
 
 初学 Spring 时，我们往往不能快速转化思维。例如，在程序开发过程中，有时候，一方面我们把一个类定义成 Bean，同时又觉得这个 Bean 的定义除了加了一些 Spring 注解外，并没有什么不同。所以在后续使用时，有时候我们会不假思索地去随意定义它，例如我们会写出下面这样的代码：
 
-```
+```java
 @Service
 public class ServiceImpl {
 
@@ -150,7 +138,7 @@ public class ServiceImpl {
 }
 ```
 
-ServiceImpl 因为标记为@Service而成为一个 Bean。另外我们ServiceImpl 显式定义了一个构造器。但是，上面的代码不是永远都能正确运行的，有时候会报下面这种错误：
+ServiceImpl 因为标记为 @Service 而成为一个 Bean。另外我们ServiceImpl 显式定义了一个构造器。但是，上面的代码不是永远都能正确运行的，有时候会报下面这种错误：
 
 > Parameter 0 of constructor in com.spring.puzzle.class1.example2.ServiceImpl required a bean of type 'java.lang.String' that could not be found.
 
@@ -158,9 +146,9 @@ ServiceImpl 因为标记为@Service而成为一个 Bean。另外我们ServiceImp
 
 ### 案例解析
 
-当创建一个 Bean 时，调用的方法是 AbstractAutowireCapableBeanFactory#createBeanInstance。它主要包含两大基本步骤：寻找构造器和通过反射调用构造器创建实例。对于这个案例，最核心的代码执行，你可以参考下面的代码片段：
+**当创建一个 Bean 时，调用的方法是 AbstractAutowireCapableBeanFactory#createBeanInstance。它主要包含两大基本步骤：寻找构造器和通过反射调用构造器创建实例**。对于这个案例，最核心的代码执行，你可以参考下面的代码片段：
 
-```
+```java
 // Candidate constructors for autowiring?
 Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
@@ -169,29 +157,29 @@ if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 }
 ```
 
-Spring 会先执行 determineConstructorsFromBeanPostProcessors 方法来获取构造器，然后通过 autowireConstructor 方法带着构造器去创建实例。很明显，在本案例中只有一个构造器，所以非常容易跟踪这个问题。
+**Spring 会先执行 determineConstructorsFromBeanPostProcessors 方法来获取构造器，然后通过 autowireConstructor 方法带着构造器去创建实例**。很明显，在本案例中只有一个构造器，所以非常容易跟踪这个问题。
 
 autowireConstructor 方法要创建实例，不仅需要知道是哪个构造器，还需要知道构造器对应的参数，这点从最后创建实例的方法名也可以看出，参考如下（即 ConstructorResolver#instantiate）：
 
-```
+```java
 private Object instantiate(
       String beanName, RootBeanDefinition mbd, Constructor<?> constructorToUse, Object[] argsToUse)
 ```
 
 那么上述方法中存储构造参数的 argsToUse 如何获取呢？换言之，当我们已经知道构造器ServiceImpl(String serviceName)，要创建出 ServiceImpl 实例，如何确定 serviceName 的值是多少？
 
-很明显，这里是在使用 Spring，我们**不能直接显式使用 new 关键字来创建实例**。Spring只能是去寻找依赖来作为构造器调用参数。
+很明显，这里是在使用 Spring，我们**不能直接显式使用 new 关键字来创建实例**。Spring 只能是去寻找依赖来作为构造器调用参数。
 
 那么这个参数如何获取呢？可以参考下面的代码片段（即 ConstructorResolver#autowireConstructor）：
 
-```
+```java
 argsHolder = createArgumentArray(beanName, mbd, resolvedValues, bw, paramTypes, paramNames,
       getUserDeclaredConstructor(candidate), autowiring, candidates.length == 1);
 ```
 
 我们可以调用 createArgumentArray 方法来构建调用构造器的参数数组，而这个方法的最终实现是从 BeanFactory 中获取 Bean，可以参考下述调用：
 
-```
+```java
 return this.beanFactory.resolveDependency(
       new DependencyDescriptor(param, true), beanName, autowiredBeanNames, typeConverter);
 ```
@@ -204,11 +192,11 @@ return this.beanFactory.resolveDependency(
 
 ### 问题修正
 
-从源码级别了解了错误的原因后，现在反思为什么会出现这个错误。追根溯源，正如开头所述，因为不了解很多隐式的规则：我们定义一个类为 Bean，如果再显式定义了构造器，那么这个 Bean 在构建时，会自动根据构造器参数定义寻找对应的 Bean，然后反射创建出这个 Bean。
+从源码级别了解了错误的原因后，现在反思为什么会出现这个错误。追根溯源，正如开头所述，因为不了解很多隐式的规则：**我们定义一个类为 Bean，如果再显式定义了构造器，那么这个 Bean 在构建时，会自动根据构造器参数定义寻找对应的 Bean，然后反射创建出这个 Bean**。
 
-了解了这个隐式规则后，解决这个问题就简单多了。我们可以直接定义一个能让 Spring 装配给 ServiceImpl 构造器参数的 Bean，例如定义如下：
+**了解了这个隐式规则后，解决这个问题就简单多了。我们可以直接定义一个能让 Spring 装配给 ServiceImpl 构造器参数的 Bean，例如定义如下**：
 
-```
+```java
 //这个bean装配给ServiceImpl的构造器参数“serviceName”
 @Bean
 public String serviceName(){
@@ -218,11 +206,11 @@ public String serviceName(){
 
 再次运行程序，发现一切正常了。
 
-所以，我们在使用 Spring 时，**不要总想着定义的Bean 也可以在非 Spring 场合直接用 new 关键字显式使用，这种思路是不可取的**。
+所以，我们在使用 Spring 时，**不要总想着定义的 Bean 也可以在非 Spring 场合直接用 new 关键字显式使用，这种思路是不可取的**。
 
 另外，类似的，假设我们不了解 Spring 的隐式规则，在修正问题后，我们可能写出更多看似可以运行的程序，代码如下：
 
-```
+```java
 @Service
 public class ServiceImpl {
     private String serviceName;
@@ -243,7 +231,7 @@ public class ServiceImpl {
 
 接下来，我们再来看另外一个关于 Bean 定义不生效的案例。在定义 Bean 时，有时候我们会使用原型 Bean，例如定义如下：
 
-```
+```java
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ServiceImpl {
@@ -252,7 +240,7 @@ public class ServiceImpl {
 
 然后我们按照下面的方式去使用它：
 
-```
+```java
 @RestController
 public class HelloWorldController {
 
@@ -274,13 +262,13 @@ public class HelloWorldController {
 
 ### 案例解析
 
-当一个属性成员 serviceImpl 声明为@Autowired 后，那么在创建 HelloWorldController 这个 Bean 时，会先使用构造器反射出实例，然后来装配各个标记为@Autowired 的属性成员（装配方法参考 AbstractAutowireCapableBeanFactory#populateBean）。
+当一个属性成员 serviceImpl 声明为 @Autowired 后，那么**在创建 HelloWorldController 这个 Bean 时，会先使用构造器反射出实例，然后来装配各个标记为@Autowired 的属性成员（装配方法参考 AbstractAutowireCapableBeanFactory#populateBean）**。
 
 具体到执行过程，它会使用很多 BeanPostProcessor 来做完成工作，其中一种是 AutowiredAnnotationBeanPostProcessor，它会通过 DefaultListableBeanFactory#findAutowireCandidates 寻找到 ServiceImpl 类型的 Bean，然后设置给对应的属性（即 serviceImpl成员）。
 
 关键执行步骤可参考 AutowiredAnnotationBeanPostProcessor.AutowiredFieldElement#inject：
 
-```
+```java
 protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
    Field field = (Field) this.member;
    Object value;
@@ -308,11 +296,11 @@ protected void inject(Object bean, @Nullable String beanName, @Nullable Property
 
 通过上述源码分析，我们可以知道要修正这个问题，肯定是不能将 ServiceImpl 的 Bean 固定到属性上的，而应该是每次使用时都会重新获取一次。所以这里我提供了两种修正方式：
 
-**1\. 自动注入 Context**
+**1. 自动注入 Context**
 
 即自动注入 ApplicationContext，然后定义 getServiceImpl() 方法，在方法中获取一个新的 ServiceImpl 类型实例。修正代码如下：
 
-```
+```java
 @RestController
 public class HelloWorldController {
 
@@ -335,7 +323,7 @@ public class HelloWorldController {
 
 类似修正方法 1，也添加一个 getServiceImpl 方法，不过这个方法是被 Lookup 标记的。修正代码如下：
 
-```
+```java
 @RestController
 public class HelloWorldController {
  
