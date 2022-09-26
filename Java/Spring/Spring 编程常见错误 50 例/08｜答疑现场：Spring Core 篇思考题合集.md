@@ -1,17 +1,5 @@
 # 08｜答疑现场：Spring Core 篇思考题合集
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/9d/8f/9d72ac30bcfe71504946160fdfaeec8f.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/f2/15/f285d5312613a58052cf4993bd7a7615.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 如果你看到这篇文章，那么我真的非常开心，这说明第一章节的内容你都跟下来了，并且对于课后的思考题也有研究，在这我要手动给你点个赞。繁忙的工作中，还能为自己持续充电，保持终身学习的心态，我想我们一定是同路人。
 
 那么到今天为止，我们已经学习了 17 个案例，解决的问题也不算少了，不知道你的感受如何？收获如何呢？
@@ -24,11 +12,9 @@
 
 在案例 2 中，显示定义构造器，这会发生根据构造器参数寻找对应 Bean 的行为。这里请你思考一个问题，假设寻找不到对应的 Bean，一定会如案例 2 那样直接报错么？
 
-<!-- [[[read_end]]] -->
-
 实际上，答案是否定的。这里我们不妨修改下案例 2 的代码，修改后如下：
 
-```
+```java
 @Service
 public class ServiceImpl {
     private List<String> serviceNames;
@@ -39,41 +25,41 @@ public class ServiceImpl {
 }
 ```
 
-参考上述代码，我们的构造器参数由普通的String改成了一个List<string>，最终运行程序会发现这并不会报错，而是输出 []。</string>
+参考上述代码，我们的构造器参数由普通的String改成了一个 `List<string>`，最终运行程序会发现这并不会报错，而是输出 []。
 
 要了解这个现象，我们可以直接定位构建构造器调用参数的代码所在地（即 ConstructorResolver#resolveAutowiredArgument）：
 
-```
+```java
 @Nullable
 protected Object resolveAutowiredArgument(MethodParameter param, String beanName,
-      @Nullable Set<String> autowiredBeanNames, TypeConverter typeConverter, boolean fallback) {
+                                          @Nullable Set<String> autowiredBeanNames, TypeConverter typeConverter, boolean fallback) {
 
-   //省略非关键代码
-   try {
-      //根据构造器参数寻找 bean
-      return this.beanFactory.resolveDependency(
+    //省略非关键代码
+    try {
+        //根据构造器参数寻找 bean
+        return this.beanFactory.resolveDependency(
             new DependencyDescriptor(param, true), beanName, autowiredBeanNames, typeConverter);
-   }
-   catch (NoUniqueBeanDefinitionException ex) {
-      throw ex;
-   }
-   catch (NoSuchBeanDefinitionException ex) {
-      //找不到 “bean” 进行fallback
-      if (fallback) {
-         // Single constructor or factory method -> let's return an empty array/collection
-         // for e.g. a vararg or a non-null List/Set/Map parameter.
-         if (paramType.isArray()) {
-            return Array.newInstance(paramType.getComponentType(), 0);
-         }
-         else if (CollectionFactory.isApproximableCollectionType(paramType)) {
-            return CollectionFactory.createCollection(paramType, 0);
-         }
-         else if (CollectionFactory.isApproximableMapType(paramType)) {
-            return CollectionFactory.createMap(paramType, 0);
-         }
-      }
-      throw ex;
-   }
+    }
+    catch (NoUniqueBeanDefinitionException ex) {
+        throw ex;
+    }
+    catch (NoSuchBeanDefinitionException ex) {
+        //找不到 “bean” 进行fallback
+        if (fallback) {
+            // Single constructor or factory method -> let's return an empty array/collection
+            // for e.g. a vararg or a non-null List/Set/Map parameter.
+            if (paramType.isArray()) {
+                return Array.newInstance(paramType.getComponentType(), 0);
+            }
+            else if (CollectionFactory.isApproximableCollectionType(paramType)) {
+                return CollectionFactory.createCollection(paramType, 0);
+            }
+            else if (CollectionFactory.isApproximableMapType(paramType)) {
+                return CollectionFactory.createMap(paramType, 0);
+            }
+        }
+        throw ex;
+    }
 }
 ```
 
@@ -91,7 +77,7 @@ protected Object resolveAutowiredArgument(MethodParameter param, String beanName
 
 我们知道了通过@Qualifier可以引用想匹配的Bean，也可以直接命名属性的名称为Bean的名称来引用，这两种方式如下：
 
-```
+```java
 //方式1：属性命名为要装配的bean名称
 @Autowired
 DataService oracleDataService;
@@ -104,9 +90,10 @@ DataService dataService;
 
 那么对于案例3的内部类引用，你觉得可以使用第1种方式做到么？例如使用如下代码：
 
-> @Autowired<br>
-> 
->  DataService studentController.InnerClassDataService;
+```java
+@Autowired
+DataService studentController.InnerClassDataService;
+```
 
 实际上，如果你动动手或者我们稍微敏锐点就会发现，代码本身就不能编译，因为中间含有“.”。那么还有办法能通过这种方式引用到内部类么？
 
@@ -132,43 +119,43 @@ DataService dataService;
 
 实际上，在案例2中，我们收集的目标类型是List，而List是可排序的，那么到底是如何排序的？在案例2的解析中，我们给出了DefaultListableBeanFactory#resolveMultipleBeans方法的代码，不过省略了一些非关键的代码，这其中就包括了排序工作，代码如下：
 
-```
+```java
 if (result instanceof List) {
-   Comparator<Object> comparator = adaptDependencyComparator(matchingBeans);
-   if (comparator != null) {
-      ((List<?>) result).sort(comparator);
-   }
+    Comparator<Object> comparator = adaptDependencyComparator(matchingBeans);
+    if (comparator != null) {
+        ((List<?>) result).sort(comparator);
+    }
 }
 ```
 
 而针对本案例最终排序执行的是OrderComparator#doCompare方法，关键代码如下：
 
-```
+```java
 private int doCompare(@Nullable Object o1, @Nullable Object o2, @Nullable OrderSourceProvider sourceProvider) {
-   boolean p1 = (o1 instanceof PriorityOrdered);
-   boolean p2 = (o2 instanceof PriorityOrdered);
-   if (p1 && !p2) {
-      return -1;
-   }
-   else if (p2 && !p1) {
-      return 1;
-   }
+    boolean p1 = (o1 instanceof PriorityOrdered);
+    boolean p2 = (o2 instanceof PriorityOrdered);
+    if (p1 && !p2) {
+        return -1;
+    }
+    else if (p2 && !p1) {
+        return 1;
+    }
 
-   int i1 = getOrder(o1, sourceProvider);
-   int i2 = getOrder(o2, sourceProvider);
-   return Integer.compare(i1, i2);
+    int i1 = getOrder(o1, sourceProvider);
+    int i2 = getOrder(o2, sourceProvider);
+    return Integer.compare(i1, i2);
 }
 ```
 
 其中getOrder的执行，获取到的order值（相当于优先级）是通过AnnotationAwareOrderComparator#findOrder来获取的：
 
-```
+```java
 protected Integer findOrder(Object obj) {
-   Integer order = super.findOrder(obj);
-   if (order != null) {
-      return order;
-   }
-   return findOrderFromAnnotation(obj);
+    Integer order = super.findOrder(obj);
+    if (order != null) {
+        return order;
+    }
+    return findOrderFromAnnotation(obj);
 }
 ```
 
@@ -176,26 +163,22 @@ protected Integer findOrder(Object obj) {
 
 1. 从@Order获取值，参考AnnotationAwareOrderComparator#findOrderFromAnnotation：
 
-<!-- -->
-
-```
+```java
 @Nullable
 private Integer findOrderFromAnnotation(Object obj) {
-   AnnotatedElement element = (obj instanceof AnnotatedElement ? (AnnotatedElement) obj : obj.getClass());
-   MergedAnnotations annotations = MergedAnnotations.from(element, SearchStrategy.TYPE_HIERARCHY);
-   Integer order = OrderUtils.getOrderFromAnnotations(element, annotations);
-   if (order == null && obj instanceof DecoratingProxy) {
-      return findOrderFromAnnotation(((DecoratingProxy) obj).getDecoratedClass());
-   }
-   return order;
+    AnnotatedElement element = (obj instanceof AnnotatedElement ? (AnnotatedElement) obj : obj.getClass());
+    MergedAnnotations annotations = MergedAnnotations.from(element, SearchStrategy.TYPE_HIERARCHY);
+    Integer order = OrderUtils.getOrderFromAnnotations(element, annotations);
+    if (order == null && obj instanceof DecoratingProxy) {
+        return findOrderFromAnnotation(((DecoratingProxy) obj).getDecoratedClass());
+    }
+    return order;
 }
 ```
 
 2. 从Ordered 接口实现方法获取值，参考OrderComparator#findOrder：
 
-<!-- -->
-
-```
+```java
 protected Integer findOrder(Object obj) {
    return (obj instanceof Ordered ? ((Ordered) obj).getOrder() : null);
 }
@@ -203,7 +186,7 @@ protected Integer findOrder(Object obj) {
 
 通过上面的分析，如果我们不能改变类继承关系（例如让Student实现Ordered接口），则可以通过使用@Order来调整顺序，具体修改代码如下：
 
-```
+```java
 @Bean
 @Order(2)
 public Student student1(){

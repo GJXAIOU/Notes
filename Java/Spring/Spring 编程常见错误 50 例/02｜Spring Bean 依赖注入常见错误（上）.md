@@ -4,7 +4,7 @@
 
 ## 案例1：过多赠予，无所适从
 
-在使用 @Autowired 时，不管你是菜鸟级还是专家级的 Spring 使用者，都应该制造或者遭遇过类似的错误：
+在使用 @Autowired 时，都可能制造或者遭遇过类似的错误：
 
 > required a single bean, but 2 were found
 
@@ -156,9 +156,9 @@ protected String determineAutowireCandidate(Map<String, Object> candidates, Depe
 
 **如代码所示，优先级的决策是先根据 @Primary 来决策，其次是@Priority 决策，最后是根据 Bean 名字的严格匹配来决策。如果这些帮助决策优先级的注解都没有被使用，名字也不精确匹配，则返回null，告知无法决策出哪种最合适。**
 
-2. @Autowired 要求是必须注入的（即 required 保持默认值为true），或者注解的属性类型并不是可以接受多个 Bea n的类型，例如数组、Map、集合。这点可以参考DefaultListableBeanFactory#indicatesMultipleBeans的实现：
+2. @Autowired 要求是必须注入的（即 required 保持默认值为true），或者注解的属性类型并不是可以接受多个 Bean 的类型，例如数组、Map、集合。这点可以参考DefaultListableBeanFactory#indicatesMultipleBeans的实现：
 
-```
+```java
 private boolean indicatesMultipleBeans(Class<?> type) {
    return (type.isArray() || (type.isInterface() &&
          (Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type))));
@@ -169,9 +169,9 @@ private boolean indicatesMultipleBeans(Class<?> type) {
 
 ### 问题修正
 
-针对这个案例，有了源码的剖析，我们可以很快找到解决问题的方法：**打破上述两个条件中的任何一个即可，即让候选项具有优先级或压根可以不去选择。**不过需要你注意的是，不是每一种条件的打破都满足实际需求，例如我们可以通过使用标记@Primary的方式来让被标记的候选者有更高优先级，从而避免报错，但是它并不一定符合业务需求，这就好比我们本身需要两种数据库都能使用，而不是顾此失彼。
+针对这个案例，有了源码的剖析，我们可以很快找到解决问题的方法：**打破上述两个条件中的任何一个即可，即让候选项具有优先级或压根可以不去选择。** 不过需要你注意的是，不是每一种条件的打破都满足实际需求，例如我们可以通过使用标记@Primary的方式来让被标记的候选者有更高优先级，从而避免报错，但是它并不一定符合业务需求，这就好比我们本身需要两种数据库都能使用，而不是顾此失彼。
 
-```
+```java
 @Repository
 @Primary
 @Slf4j
@@ -187,7 +187,7 @@ public class OracleDataService implements DataService{
 DataService oracleDataService;
 ```
 
-如代码所示，修改方式的精髓在于将属性名和Bean名字精确匹配，这样就可以让注入选择不犯难：需要Oracle时指定属性名为oracleDataService，需要Cassandra时则指定属性名为cassandraDataService。
+如代码所示，**修改方式的精髓在于将属性名和Bean名字精确匹配，这样就可以让注入选择不犯难：需要Oracle时指定属性名为oracleDataService，需要Cassandra时则指定属性名为cassandraDataService。**
 
 ## 案例 2：显式引用Bean时首字母忽略大小写
 
@@ -201,7 +201,7 @@ DataService dataService;
 
 这种方式之所以能解决问题，在于它能让寻找出的Bean只有一个（即精确匹配），所以压根不会出现后面的决策过程，可以参考DefaultListableBeanFactory#doResolveDependency：
 
-```
+```java
 @Nullable
 public Object doResolveDependency(DependencyDescriptor descriptor, @Nullable String beanName,
       @Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
@@ -222,11 +222,11 @@ public Object doResolveDependency(DependencyDescriptor descriptor, @Nullable Str
 }
 ```
 
-我们会使用@Qualifier指定的名称去匹配，最终只找到了唯一一个。
+我们会使用 @Qualifier 指定的名称去匹配，最终只找到了唯一一个。
 
-不过在使用@Qualifier时，我们有时候会犯另一个经典的小错误，就是我们可能会忽略Bean的名称首字母大小写。这里我们把校正后的案例稍稍变形如下：
+不过在使用 @Qualifier 时，我们有时候会犯另一个经典的小错误，就是我们可能会忽略 Bean 的名称首字母大小写。这里我们把校正后的案例稍稍变形如下：
 
-```
+```java
 @Autowired
 @Qualifier("CassandraDataService")
 DataService dataService;
@@ -236,39 +236,39 @@ DataService dataService;
 
 > Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'studentController': Unsatisfied dependency expressed through field 'dataService'; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.spring.puzzle.class2.example2.DataService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true), @org.springframework.beans.factory.annotation.Qualifier(value=CassandraDataService)}
 
-这里我们很容易得出一个结论：**对于Bean的名字，如果没有显式指明，就应该是类名，不过首字母应该小写。**但是这个轻松得出的结论成立么？
+这里我们很容易得出一个结论：**对于 Bean 的名字，如果没有显式指明，就应该是类名，不过首字母应该小写。**但是这个轻松得出的结论成立么？
 
-不妨再测试下，假设我们需要支持SQLite这种数据库，我们定义了一个命名为SQLiteDataService的实现，然后借鉴之前的经验，我们很容易使用下面的代码来引用这个实现：
+不妨再测试下，假设我们需要支持 SQLite 这种数据库，我们定义了一个命名为 SQLiteDataService 的实现，然后借鉴之前的经验，我们很容易使用下面的代码来引用这个实现：
 
-```
+```java
 @Autowired
 @Qualifier("sQLiteDataService")
 DataService dataService;
 ```
 
-满怀信心运行完上面的程序，依然会出现之前的错误，而如果改成SQLiteDataService，则运行通过了。这和之前的结论又矛盾了。所以，显式引用Bean时，首字母到底是大写还是小写呢？
+满怀信心运行完上面的程序，依然会出现之前的错误，而如果改成SQLiteDataService，则运行通过了。这和之前的结论又矛盾了。所以，显式引用 Bean 时，首字母到底是大写还是小写呢？
 
 ### 案例解析
 
 对于这种错误的报错位置，其实我们正好在本案例的开头就贴出了（即第二段代码清单的第9行）：
 
-```
+```java
 raiseNoMatchingBeanFound(type, descriptor.getResolvableType(), descriptor);
 ```
 
-即当因为名称问题（例如引用Bean首字母搞错了）找不到Bean时，会直接抛出NoSuchBeanDefinitionException。
+即当因为名称问题（例如引用 Bean 首字母搞错了）找不到 Bean 时，会直接抛出 NoSuchBeanDefinitionException。
 
-在这里，我们真正需要关心的问题是：不显式设置名字的Bean，其默认名称首字母到底是大写还是小写呢？
+在这里，我们真正需要关心的问题是：不显式设置名字的 Bean，其默认名称首字母到底是大写还是小写呢？
 
-看案例的话，当我们启动基于Spring Boot的应用程序时，会自动扫描我们的Package，以找出直接或间接标记了@Component的Bean的定义（即BeanDefinition）。例如CassandraDataService、SQLiteDataService都被标记了@Repository，而Repository本身被@Component标记，所以它们都是间接标记了@Component。
+看案例的话，当我们启动基于 Spring Boot 的应用程序时，会自动扫描我们的 Package，以找出直接或间接标记了 @Component 的 Bean的定义（即 BeanDefinition）。例如 CassandraDataService、SQLiteDataService 都被标记了 @Repository，而 Repository 本身被@Component 标记，所以它们都是间接标记了 @Component。
 
-一旦找出这些Bean的信息，就可以生成这些Bean的名字，然后组合成一个个BeanDefinitionHolder返回给上层。这个过程关键步骤可以查看下图的代码片段（ClassPathBeanDefinitionScanner#doScan）：
+一旦找出这些 Bean 的信息，就可以生成这些 Bean 的名字，然后组合成一个个 BeanDefinitionHolder 返回给上层。这个过程关键步骤可以查看下图的代码片段（ClassPathBeanDefinitionScanner#doScan）：
 
 ![](<https://static001.geekbang.org/resource/image/27/49/277f3b2421a0e173a0eee56b7d65f849.png?wh=1270*418>)
 
-基本匹配我们前面描述的过程，其中方法调用BeanNameGenerator#generateBeanName即用来产生Bean的名字，它有两种实现方式。因为DataService的实现都是使用注解标记的，所以Bean名称的生成逻辑最终调用的其实是AnnotationBeanNameGenerator#generateBeanName这种实现方式，我们可以看下它的具体实现，代码如下：
+基本匹配我们前面描述的过程，其中方法调用BeanNameGenerator#generateBeanName 即用来产生 Bean 的名字，它有两种实现方式。**因为 DataService 的实现都是使用注解标记的，所以 Bean 名称的生成逻辑最终调用的其实是AnnotationBeanNameGenerator#generateBeanName这种实现方式，我们可以看下它的具体实现**，代码如下：
 
-```
+```java
 @Override
 public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
    if (definition instanceof AnnotatedBeanDefinition) {
@@ -283,9 +283,9 @@ public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry
 }
 ```
 
-大体流程只有两步：看Bean有没有显式指明名称，如果有则用显式名称，如果没有则产生一个默认名称。很明显，在我们的案例中，是没有给Bean指定名字的，所以产生的Bean的名称就是生成的默认名称，查看默认名的产生方法buildDefaultBeanName，其实现如下：
+大体流程只有两步：看 Bean 有没有显式指明名称，如果有则用显式名称，如果没有则产生一个默认名称。很明显，在我们的案例中，是没有给 Bean 指定名字的，所以产生的 Bean 的名称就是生成的默认名称，查看默认名的产生方法 buildDefaultBeanName，其实现如下：
 
-```
+```java
 protected String buildDefaultBeanName(BeanDefinition definition) {
    String beanClassName = definition.getBeanClassName();
    Assert.state(beanClassName != null, "No bean class name set");
@@ -294,10 +294,10 @@ protected String buildDefaultBeanName(BeanDefinition definition) {
 }
 ```
 
-首先，获取一个简短的ClassName，然后调用Introspector#decapitalize方法，设置首字母大写或小写，具体参考下面的代码实现：
+首先，获取一个简短的 ClassName，然后调用Introspector#decapitalize 方法，设置首字母大写或小写，具体参考下面的代码实现：
 
-```
-public static String decapitalize(String name) {
+```java
+public  static String decapitalize(String name) {
     if (name == null || name.length() == 0) {
         return name;
     }
@@ -311,27 +311,21 @@ public static String decapitalize(String name) {
 }
 ```
 
-到这，我们很轻松地明白了前面两个问题出现的原因：**如果一个类名是以两个大写字母开头的，则首字母不变，其它情况下默认首字母变成小写。**结合我们之前的案例，SQLiteDataService的Bean，其名称应该就是类名本身，而CassandraDataService的Bean名称则变成了首字母小写（cassandraDataService）。
+到这，我们很轻松地明白了前面两个问题出现的原因：**如果一个类名是以两个大写字母开头的，则首字母不变，其它情况下默认首字母变成小写**｡结合我们之前的案例，SQLiteDataService的Bean，其名称应该就是类名本身，而CassandraDataService的Bean名称则变成了首字母小写（cassandraDataService）。
 
 ### 问题修正
 
-现在我们已经从源码级别了解了Bean名字产生的规则，就可以很轻松地修正案例中的两个错误了。以引用CassandraDataService类型的Bean的错误修正为例，可以采用下面这两种修改方式：
+现在我们已经从源码级别了解了 Bean 名字产生的规则，就可以很轻松地修正案例中的两个错误了。以引用 CassandraDataService 类型的Bean的错误修正为例，可以采用下面这两种修改方式：
 
 1. 引用处纠正首字母大小写问题：
-
-<!-- -->
-
-```
+```java
 @Autowired
 @Qualifier("cassandraDataService")
 DataService dataService;
 ```
 
-2. 定义处显式指定Bean名字，我们可以保持引用代码不变，而通过显式指明CassandraDataService 的Bean名称为CassandraDataService来纠正这个问题。
-
-<!-- -->
-
-```
+2. 定义处显式指定 Bean 名字，我们可以保持引用代码不变，而通过显式指明 CassandraDataService 的 Bean 名称为CassandraDataService 来纠正这个问题。
+```java
 @Repository("CassandraDataService")
 @Slf4j
 public class CassandraDataService implements DataService {
@@ -343,9 +337,9 @@ public class CassandraDataService implements DataService {
 
 ## 案例 3：引用内部类的Bean遗忘类名
 
-解决完案例2，是不是就意味着我们能搞定所有Bean的显式引用，不再犯错了呢？天真了。我们可以沿用上面的案例，稍微再添加点别的需求，例如我们需要定义一个内部类来实现一种新的DataService，代码如下：
+解决完案例2，是不是就意味着我们能搞定所有 Bean 的显式引用，不再犯错了呢？天真了。我们可以沿用上面的案例，稍微再添加点别的需求，例如我们需要定义一个内部类来实现一种新的DataService，代码如下：
 
-```
+```java
 public class StudentController {
     @Repository
     public static class InnerClassDataService implements DataService{
@@ -360,23 +354,25 @@ public class StudentController {
 
 遇到这种情况，我们一般都会很自然地用下面的方式直接去显式引用这个Bean：
 
-```
+```java
 @Autowired
 @Qualifier("innerClassDataService")
 DataService innerClassDataService;
 ```
 
-很明显，有了案例2的经验，我们上来就直接采用了**首字母小写**以避免案例2中的错误，但这样的代码是不是就没问题了呢？实际上，仍然会报错“找不到Bean”，这是为什么？
+很明显，有了案例 2 的经验，我们上来就直接采用了**首字母小写**以避免案例 2 中的错误，但这样的代码是不是就没问题了呢？实际上，仍然会报错“找不到 Bean”，这是为什么？
 
 ### 案例解析
 
-实际上，我们遭遇的情况是“如何引用内部类的Bean”。解析案例2的时候，我曾经贴出了如何产生默认Bean名的方法（即AnnotationBeanNameGenerator#buildDefaultBeanName），当时我们只关注了首字母是否小写的代码片段，而在最后变换首字母之前，有一行语句是对class名字的处理，代码如下：
+实际上，我们遭遇的情况是“如何引用内部类的 Bean”。解析案例2的时候，我曾经贴出了如何产生默认 Bean名的方法（即AnnotationBeanNameGenerator#buildDefaultBeanName），当时我们只关注了首字母是否小写的代码片段，而在最后变换首字母之前，有一行语句是对class名字的处理，代码如下：
 
 > String shortClassName = ClassUtils.getShortName(beanClassName);
 
-我们可以看下它的实现，参考ClassUtils#getShortName方法：
+我们可以看下它的实现，参考 ClassUtils#getShortName 方法：
 
-```
+==这里的代的逻辑需安看看=
+
+```java
 public static String getShortName(String className) {
    Assert.hasLength(className, "Class name must not be empty");
    int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
@@ -406,9 +402,9 @@ public static String getShortName(String className) {
 
 ### 问题修正
 
-通过案例解析，我们很快就找到了这个内部类，Bean的引用问题顺手就修正了，如下：
+通过案例解析，我们很快就找到了这个内部类，Bean 的引用问题顺手就修正了，如下：
 
-```
+```java
 @Autowired
 @Qualifier("studentController.InnerClassDataService")
 DataService innerClassDataService;
@@ -420,17 +416,17 @@ DataService innerClassDataService;
 
 ## 重点回顾
 
-看完这三个案例，我们会发现，这些错误的直接结果都是找不到合适的Bean，但是原因却不尽相同。例如案例1是因为提供的Bean过多又无法决策选择谁；案例2和案例3是因为指定的名称不规范导致引用的Bean找不到。
+看完这三个案例，我们会发现，这些错误的直接结果都是找不到合适的 Bean，但是原因却不尽相同。例如案例 1 是因为提供的 Bean 过多又无法决策选择谁；案例 2 和案例 3 是因为指定的名称不规范导致引用的 Bean 找不到。
 
-实际上，这些错误在一些“聪明的”IDE会被提示出来，但是它们在其它一些不太智能的主流IDE中并不能被告警出来。不过悲剧的是，即使聪明的IDE也存在误报的情况，所以**完全依赖IDE是不靠谱的**，毕竟这些错误都能编译过去。
+实际上，这些错误在一些“聪明的”IDE会被提示出来，但是它们在其它一些不太智能的主流 IDE 中并不能被告警出来。不过悲剧的是，即使聪明的 IDE 也存在误报的情况，所以**完全依赖 IDE 是不靠谱的**，毕竟这些错误都能编译过去。
 
 另外，我们的案例都是一些简化的场景，很容易看出和发现问题，而真实的场景往往复杂得多。例如对于案例1，我们的同种类型的实现，可能不是同时出现在自己的项目代码中，而是有部分实现出现在依赖的Jar库中。所以你一定要对案例背后的源码实现有一个扎实的了解，这样才能在复杂场景中去规避这些问题。
 
 ## 思考题
 
-我们知道了通过@Qualifier可以引用想匹配的Bean，也可以直接命名属性的名称为Bean的名称来引用，这两种方式如下：
+我们知道了通过 @Qualifier 可以引用想匹配的 Bean，也可以直接命名属性的名称为 Bean 的名称来引用，这两种方式如下：
 
-```
+```java
 //方式1：属性命名为要装配的bean名称
 @Autowired
 DataService oracleDataService;

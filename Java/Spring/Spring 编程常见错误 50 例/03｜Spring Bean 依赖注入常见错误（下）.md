@@ -1,26 +1,13 @@
 # 03｜Spring Bean 依赖注入常见错误（下）
+上一讲我们介绍了 3 个 Spring 编程中关于依赖注入的错误案例，这些错误都是比较常见的。如果你仔细分析的话，你会发现它们大多都是围绕着 @Autowired、@Qualifier 的使用而发生，而且自动注入的类型也都是普通对象类型。
 
-作者: 傅健
+那在实际应用中，我们也会使用 @Value 等不太常见的注解来完成自动注入，同时也存在注入到集合、数组等复杂类型的场景。这些情况下，我们也会遇到一些问题。所以这一讲我们不妨来梳理下。
 
-完成时间:
+## 案例1：@Value 没有注入预期的值
 
-总结时间:
+在装配对象成员属性时，我们常常会使用 @Autowired 来装配。但是，有时候我们也使用 @Value 进行装配。**不过这两种注解使用风格不同，使用 @Autowired 一般都不会设置属性值，而 @Value 必须指定一个字符串值，因为其定义做了要求**，定义代码如下：
 
-![](<https://static001.geekbang.org/resource/image/c3/d6/c303c1766a1cb90bd1e3f4d2e1ed17d6.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/15/8a/15363de02655604db4d3e0f4ccca978a.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健，这节课我们接着聊Spring的自动注入。
-
-上一讲我们介绍了3个Spring编程中关于依赖注入的错误案例，这些错误都是比较常见的。如果你仔细分析的话，你会发现它们大多都是围绕着@Autowired、@Qualifier的使用而发生，而且自动注入的类型也都是普通对象类型。
-
-那在实际应用中，我们也会使用@Value等不太常见的注解来完成自动注入，同时也存在注入到集合、数组等复杂类型的场景。这些情况下，我们也会遇到一些问题。所以这一讲我们不妨来梳理下。
-
-## 案例1：@Value没有注入预期的值
-
-在装配对象成员属性时，我们常常会使用@Autowired来装配。但是，有时候我们也使用@Value进行装配。不过这两种注解使用风格不同，使用@Autowired一般都不会设置属性值，而@Value必须指定一个字符串值，因为其定义做了要求，定义代码如下：
-
-```
+```java
 public @interface Value {
 
    /**
@@ -31,18 +18,16 @@ public @interface Value {
 }
 ```
 
-另外在比较这两者的区别时，**我们一般都会因为@Value常用于String类型的装配而误以为@Value不能用于非内置对象的装配，实际上这是一个常见的误区**。例如，我们可以使用下面这种方式来Autowired一个属性成员：
+另外在比较这两者的区别时，**我们一般都会因为 @Value 常用于String 类型的装配而误以为@Value不能用于非内置对象的装配，实际上这是一个常见的误区**。例如，我们可以使用下面这种方式来Autowired 一个属性成员：
 
-```
+```java
 @Value("#{student}")
 private Student student;
 ```
 
-<!-- [[[read_end]]] -->
-
 其中student这个Bean定义如下：
 
-```
+```java
 @Bean
 public Student student(){
     Student student = createStudent(1, "xie");
@@ -50,9 +35,9 @@ public Student student(){
 }
 ```
 
-当然，正如前面提及，我们使用@Value更多是用来装配String，而且它支持多种强大的装配方式，典型的方式参考下面的示例：
+当然，正如前面提及，我们使用 @Value 更多是用来装配 String，而且它支持多种强大的装配方式，典型的方式参考下面的示例：
 
-```
+```java
 //注册正常字符串
 @Value("我是字符串")
 private String text; 
@@ -66,18 +51,18 @@ private String ip
 private String name;
 ```
 
-上面我给你简单介绍了@Value的强大功能，以及它和@Autowired的区别。那么在使用@Value时可能会遇到那些错误呢？这里分享一个最为典型的错误，即使用@Value可能会注入一个不是预期的值。
+上面我给你简单介绍了 @Value 的强大功能，以及它和 @Autowired的区别。那么在使用 @Value 时可能会遇到那些错误呢？这里分享一个最为典型的错误，即使用 @Value 可能会注入一个不是预期的值。
 
-我们可以模拟一个场景，我们在配置文件application.properties配置了这样一个属性：
+我们可以模拟一个场景，我们在配置文件 application.properties 配置了这样一个属性：
 
-```
+```java
 username=admin
 password=pass
 ```
 
 然后我们在一个Bean中，分别定义两个属性来引用它们：
 
-```
+```java
 @RestController
 @Slf4j
 public class ValueTestController {
@@ -93,15 +78,15 @@ public class ValueTestController {
 }
 ```
 
-当我们去打印上述代码中的username和password时，我们会发现password正确返回了，但是username返回的并不是配置文件中指明的admin，而是运行这段程序的计算机用户名。很明显，使用@Value装配的值没有完全符合我们的预期。
+当我们去打印上述代码中的 username 和 password 时，我们会发 现password 正确返回了，但是 username 返回的并不是配置文件中指明的 admin，而是运行这段程序的计算机用户名。很明显，使用@Value 装配的值没有完全符合我们的预期。
 
 ### 案例解析
 
-通过分析运行结果，我们可以知道@Value的使用方式应该是没有错的，毕竟password这个字段装配上了，但是为什么username没有生效成正确的值？接下来我们就来具体解析下。
+通过分析运行结果，我们可以知道 @Value 的使用方式应该是没有错的，毕竟 password 这个字段装配上了，但是为什么 username 没有生效成正确的值？接下来我们就来具体解析下。
 
-我们首先了解下对于@Value，Spring是如何根据@Value来查询“值”的。我们可以先通过方法DefaultListableBeanFactory#doResolveDependency来了解@Value的核心工作流程，代码如下：
+我们首先了解下对于 @Value，Spring 是如何根据 @Value 来查询“值”的。我们可以先通过方法DefaultListableBeanFactory#doResolveDependency 来了解 @Value的核心工作流程，代码如下：
 
-```
+```java
 @Nullable
 public Object doResolveDependency(DependencyDescriptor descriptor, @Nullable String beanName,
       @Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {

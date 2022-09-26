@@ -1,16 +1,6 @@
 # 07｜Spring事件常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/8a/28/8aabdbacf6534db3df8543b86f62f328.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/29/83/298ec04b83a2e5d9d0306a7a0c224483.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健，这节课我们聊聊Spring事件上的常见错误。
+这节课我们聊聊Spring事件上的常见错误。
 
 前面的几讲中，我们介绍了Spring依赖注入、AOP等核心功能点上的常见错误。而作为Spring 的关键功能支撑，Spring事件是一个相对独立的点。或许你从没有在自己的项目中使用过Spring事件，但是你一定见过它的相关日志。而且在未来的编程实践中，你会发现，一旦你用上了Spring事件，往往完成的都是一些有趣的、强大的功能，例如动态配置。那么接下来我就来讲讲Spring事件上都有哪些常见的错误。
 
@@ -26,28 +16,24 @@ Spring事件的设计比较简单。说白了，就是监听器设计模式在Sp
 2. 事件广播器（Multicaster）：负责发布上述定义的事件。例如，负责发布ApplicationEvent 的ApplicationEventMulticaster就是Spring中一种常见的广播器。
 3. 事件监听器（Listener）：负责监听和处理广播器发出的事件，例如ApplicationListener就是用来处理ApplicationEventMulticaster发布的ApplicationEvent，它继承于JDK的 EventListener，我们可以看下它的定义来验证这个结论：
 
-<!-- -->
-
-<!-- [[[read_end]]] -->
-
-> public interface ApplicationListener<E extends ApplicationEvent> extends EventListener {<br>
-> 
->  void onApplicationEvent(E event);<br>
-> 
->  }
+```java
+public interface ApplicationListener<E extends ApplicationEvent> extends EventListener {
+    void onApplicationEvent(E event);
+}
+```
 
 当然，虽然在上述组件中，任何一个都是缺一不可的，但是功能模块命名不见得完全贴合上述提及的关键字，例如发布AutoConfigurationImportEvent的广播器就不含有Multicaster字样。它的发布是由AutoConfigurationImportSelector来完成的。
 
 对这些基本概念和实现有了一定的了解后，我们就可以开始解析那些常见的错误。闲话少说，我们先来看下面这段基于Spring Boot技术栈的代码：
 
-```
+```java
 @Slf4j
 @Component
 public class MyContextStartedEventListener implements ApplicationListener<ContextStartedEvent> {
 
-  public void onApplicationEvent(final ContextStartedEvent event) {
-    log.info("{} received: {}", this.toString(), event);
-  }
+    public void onApplicationEvent(final ContextStartedEvent event) {
+        log.info("{} received: {}", this.toString(), event);
+    }
 
 }
 ```
@@ -64,34 +50,34 @@ public class MyContextStartedEventListener implements ApplicationListener<Contex
 
 答案明显是否定的，我们首先看下要抛出这个事件需要调用的方法是什么？在Spring Boot中，这个事件的抛出只发生在一处，即位于方法AbstractApplicationContext#start中。
 
-```
+```java
 @Override
 public void start() {
-   getLifecycleProcessor().start();
-   publishEvent(new ContextStartedEvent(this));
+    getLifecycleProcessor().start();
+    publishEvent(new ContextStartedEvent(this));
 }
 ```
 
 也就是说，只有上述方法被调用，才会抛出ContextStartedEvent，但是这个方法在Spring Boot启动时会被调用么？我们可以查看Spring启动方法中围绕Context的关键方法调用，代码如下：
 
-```
+```java
 public ConfigurableApplicationContext run(String... args) {
-      //省略非关键代码
-      context = createApplicationContext();
-      //省略非关键代码
-      prepareContext(context, environment, listeners, applicationArguments, printedBanner);
-      refreshContext(context);
-      //省略非关键代码 
-      return context;
+    //省略非关键代码
+    context = createApplicationContext();
+    //省略非关键代码
+    prepareContext(context, environment, listeners, applicationArguments, printedBanner);
+    refreshContext(context);
+    //省略非关键代码 
+    return context;
 }
 ```
 
 我们发现围绕Context、Spring Boot的启动只做了两个关键工作：创建Context和Refresh Context。其中Refresh的关键代码如下：
 
-```
+```java
 protected void refresh(ApplicationContext applicationContext) {
-   Assert.isInstanceOf(AbstractApplicationContext.class, applicationContext);
-   ((AbstractApplicationContext) applicationContext).refresh();
+    Assert.isInstanceOf(AbstractApplicationContext.class, applicationContext);
+    ((AbstractApplicationContext) applicationContext).refresh();
 }
 ```
 
@@ -105,28 +91,27 @@ protected void refresh(ApplicationContext applicationContext) {
 
 针对这种情况，往往是因为我们确实想在Spring Boot启动时拦截一个启动事件，但是我们粗略扫视相关事件后，误以为ContextStartedEvent就是我们想要的。针对这种情况，我们只需要把监听事件的类型修改成真正发生的事件即可，例如在本案例中，我们可以修正如下：
 
-```
+```java
 @Component
 public class MyContextRefreshedEventListener implements ApplicationListener<ContextRefreshedEvent> {
 
-  public void onApplicationEvent(final ContextRefreshedEvent event) {
-    log.info("{} received: {}", this.toString(), event);
-  }
-
+    public void onApplicationEvent(final ContextRefreshedEvent event) {
+        log.info("{} received: {}", this.toString(), event);
+    }
 }
 ```
 
 我们监听ContextRefreshedEvent而非ContextStartedEvent。ContextRefreshedEvent的抛出可以参考方法AbstractApplicationContext#finishRefresh，它本身正好是Refresh操作中的一步。
 
-```
+```java
 protected void finishRefresh() {
-   //省略非关键代码
-   initLifecycleProcessor();
-   // Propagate refresh to lifecycle processor first.
-   getLifecycleProcessor().onRefresh();
-   // Publish the final event.
-   publishEvent(new ContextRefreshedEvent(this));
-   //省略非关键代码
+    //省略非关键代码
+    initLifecycleProcessor();
+    // Propagate refresh to lifecycle processor first.
+    getLifecycleProcessor().onRefresh();
+    // Publish the final event.
+    publishEvent(new ContextRefreshedEvent(this));
+    //省略非关键代码
 }
 ```
 
@@ -134,7 +119,7 @@ protected void finishRefresh() {
 
 这种情况下，我们真的需要去调用AbstractApplicationContext#start方法。例如，我们可以使用下面的代码来让这个事件抛出：
 
-```
+```java
 @RestController
 public class HelloWorldController {
 
@@ -155,34 +140,34 @@ public class HelloWorldController {
 
 如果我们去翻阅这个方法，我们会发现start()是org.springframework.context.Lifecycle定义的方法，而它在Spring Boot的默认实现中是去执行所有Lifecycle Bean的启动方法，这点可以参考DefaultLifecycleProcessor#startBeans方法来验证：
 
-```
+```java
 private void startBeans(boolean autoStartupOnly) {
-   Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
-   Map<Integer, LifecycleGroup> phases = new HashMap<>();
-   lifecycleBeans.forEach((beanName, bean) -> {
-      if (!autoStartupOnly || (bean instanceof SmartLifecycle && ((SmartLifecycle) bean).isAutoStartup())) {
-         int phase = getPhase(bean);
-         LifecycleGroup group = phases.get(phase);
-         if (group == null) {
-            group = new LifecycleGroup(phase, this.timeoutPerShutdownPhase, lifecycleBeans, autoStartupOnly);
-            phases.put(phase, group);
-         }
-         group.add(beanName, bean);
-      }
-   });
-   if (!phases.isEmpty()) {
-      List<Integer> keys = new ArrayList<>(phases.keySet());
-      Collections.sort(keys);
-      for (Integer key : keys) {
-         phases.get(key).start();
-      }
-   }
+    Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
+    Map<Integer, LifecycleGroup> phases = new HashMap<>();
+    lifecycleBeans.forEach((beanName, bean) -> {
+        if (!autoStartupOnly || (bean instanceof SmartLifecycle && ((SmartLifecycle) bean).isAutoStartup())) {
+            int phase = getPhase(bean);
+            LifecycleGroup group = phases.get(phase);
+            if (group == null) {
+                group = new LifecycleGroup(phase, this.timeoutPerShutdownPhase, lifecycleBeans, autoStartupOnly);
+                phases.put(phase, group);
+            }
+            group.add(beanName, bean);
+        }
+    });
+    if (!phases.isEmpty()) {
+        List<Integer> keys = new ArrayList<>(phases.keySet());
+        Collections.sort(keys);
+        for (Integer key : keys) {
+            phases.get(key).start();
+        }
+    }
 }
 ```
 
 说起来比较抽象，我们可以去写一个Lifecycle Bean，代码如下：
 
-```
+```java
 @Component
 @Slf4j
 public class MyLifeCycle implements Lifecycle {
@@ -191,14 +176,14 @@ public class MyLifeCycle implements Lifecycle {
 
     @Override
     public void start() {
-       log.info("lifecycle start");
-       running = true;
+        log.info("lifecycle start");
+        running = true;
     }
 
     @Override
     public void stop() {
-       log.info("lifecycle stop");
-       running = false;
+        log.info("lifecycle stop");
+        running = false;
     }
 
     @Override
@@ -219,7 +204,7 @@ public class MyLifeCycle implements Lifecycle {
 
 通过案例1的学习，我们可以保证事件的抛出，但是抛出的事件就一定能被我们监听到么？我们再来看这样一个案例，首先上代码：
 
-```
+```java
 @Slf4j
 @Component
 public class MyApplicationEnvironmentPreparedEventListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent > {
@@ -227,7 +212,6 @@ public class MyApplicationEnvironmentPreparedEventListener implements Applicatio
     public void onApplicationEvent(final ApplicationEnvironmentPreparedEvent event) {
         log.info("{} received: {}", this.toString(), event);
     }
-
 }
 ```
 
@@ -237,11 +221,11 @@ public class MyApplicationEnvironmentPreparedEventListener implements Applicatio
 
 有了案例1的经验，首先我们就可以查看下这个事件的抛出会不会存在问题。这个事件在Spring中是由EventPublishingRunListener#environmentPrepared方法抛出，代码如下：
 
-```
+```java
 @Override
 public void environmentPrepared(ConfigurableEnvironment environment) {
-   this.initialMulticaster
-         .multicastEvent(new ApplicationEnvironmentPreparedEvent(this.application, this.args, environment));
+    this.initialMulticaster
+        .multicastEvent(new ApplicationEnvironmentPreparedEvent(this.application, this.args, environment));
 }
 ```
 
@@ -257,26 +241,22 @@ public void environmentPrepared(ConfigurableEnvironment environment) {
 
 1. 广播器：这个事件的广播器是EventPublishingRunListener的initialMulticaster，代码参考如下：
 
-<!-- -->
-
-```
+```java
 public class EventPublishingRunListener implements SpringApplicationRunListener, Ordered {
-   //省略非关键代码
-   private final SimpleApplicationEventMulticaster initialMulticaster;
+    //省略非关键代码
+    private final SimpleApplicationEventMulticaster initialMulticaster;
 
-   public EventPublishingRunListener(SpringApplication application, String[] args) {
-      //省略非关键代码
-      this.initialMulticaster = new SimpleApplicationEventMulticaster();
-      for (ApplicationListener<?> listener : application.getListeners()) {
-         this.initialMulticaster.addApplicationListener(listener);
-      }
-   }
- }
+    public EventPublishingRunListener(SpringApplication application, String[] args) {
+        //省略非关键代码
+        this.initialMulticaster = new SimpleApplicationEventMulticaster();
+        for (ApplicationListener<?> listener : application.getListeners()) {
+            this.initialMulticaster.addApplicationListener(listener);
+        }
+    }
+}
 ```
 
 2. 监听器：这个事件的监听器同样位于EventPublishingRunListener中，获取方式参考关键代码行：
-
-<!-- -->
 
 > this.initialMulticaster.addApplicationListener(listener);
 
@@ -298,7 +278,7 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 
 我们可以寻找下这样的文件（spring.factories），确实可以发现类似的定义：
 
-```
+```java
 org.springframework.context.ApplicationListener=\
 org.springframework.boot.ClearCachesApplicationListener,\
 org.springframework.boot.builder.ParentContextCloserApplicationListener,\
@@ -311,8 +291,6 @@ org.springframework.boot.cloud.CloudFoundryVcapEnvironmentPostProcessor,\
 1. 广播器：即AbstractApplicationContext#applicationEventMulticaster；
 2. 监听器：由上述提及的META-INF/spring.factories中加载的监听器以及扫描到的 ApplicationListener类型的Bean共同组成。
 
-<!-- -->
-
 这样比较后，我们可以得出一个结论：**我们定义的监听器并不能监听到initialMulticaster广播出的ApplicationEnvironmentPreparedEvent。**
 
 ### 问题修正
@@ -321,9 +299,7 @@ org.springframework.boot.cloud.CloudFoundryVcapEnvironmentPostProcessor,\
 
 1. 在构建Spring Boot时，添加MyApplicationEnvironmentPreparedEventListener：
 
-<!-- -->
-
-```
+```java
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {
@@ -335,8 +311,6 @@ public class Application {
 ```
 
 2. 使用META-INF/spring.factories，即在/src/main/resources下面新建目录META-INF，然后新建一个对应的spring.factories文件：
-
-<!-- -->
 
 ```
 org.springframework.context.ApplicationListener=\
@@ -351,7 +325,7 @@ com.spring.puzzle.listener.example2.MyApplicationEnvironmentPreparedEventListene
 
 通过前面案例的解析，我们可以确保事件在合适的时机被合适的监听器所捕获。但是理想总是与现实有差距，有些时候，我们可能还会发现部分事件监听器一直失效或偶尔失效。这里我们可以写一段代码来模拟偶尔失效的场景，首先我们完成一个自定义事件和两个监听器，代码如下：
 
-```
+```java
 public class MyEvent extends ApplicationEvent {
     public MyEvent(Object source) {
         super(source);
@@ -385,7 +359,7 @@ public class MySecondEventListener implements ApplicationListener<MyEvent> {
 
 这里监听器MyFirstEventListener的优先级稍高，且执行过程中会有50%的概率抛出异常。然后我们再写一个Controller来触发事件的发送：
 
-```
+```java
 @RestController
 @Slf4j
 public class HelloWorldController {
@@ -410,51 +384,51 @@ public class HelloWorldController {
 
 具体而言，当广播一个事件，执行的方法参考 SimpleApplicationEventMulticaster#multicastEvent(ApplicationEvent)：
 
-```
+```java
 @Override
 public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
-   ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
-   Executor executor = getTaskExecutor();
-   for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
-      if (executor != null) {
-         executor.execute(() -> invokeListener(listener, event));
-      }
-      else {
-         invokeListener(listener, event);
-      }
-   }
+    ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+    Executor executor = getTaskExecutor();
+    for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
+        if (executor != null) {
+            executor.execute(() -> invokeListener(listener, event));
+        }
+        else {
+            invokeListener(listener, event);
+        }
+    }
 }
 ```
 
 上述方法通过Event类型等信息调用getApplicationListeners获取了具有执行资格的所有监听器（在本案例中，即为MyFirstEventListener和MySecondEventListener），然后按顺序去执行。最终每个监听器的执行是通过invokeListener()来触发的，调用的是接口方法 ApplicationListener#onApplicationEvent。执行逻辑可参考如下代码：
 
-```
+```java
 protected void invokeListener(ApplicationListener<?> listener, ApplicationEvent event) {
-   ErrorHandler errorHandler = getErrorHandler();
-   if (errorHandler != null) {
-      try {
-         doInvokeListener(listener, event);
-      }
-      catch (Throwable err) {
-         errorHandler.handleError(err);
-      }
-   }
-   else {
-      doInvokeListener(listener, event);
-   }
+    ErrorHandler errorHandler = getErrorHandler();
+    if (errorHandler != null) {
+        try {
+            doInvokeListener(listener, event);
+        }
+        catch (Throwable err) {
+            errorHandler.handleError(err);
+        }
+    }
+    else {
+        doInvokeListener(listener, event);
+    }
 }
 
 private void doInvokeListener(ApplicationListener listener, ApplicationEvent event) {
-   try {
-      listener.onApplicationEvent(event);
-   }
-   catch (ClassCastException ex) {
+    try {
+        listener.onApplicationEvent(event);
+    }
+    catch (ClassCastException ex) {
         //省略非关键代码
-      }
-      else {
-         throw ex;
-      }
-   }
+    }
+    else {
+        throw ex;
+    }
+}
 }
 ```
 
@@ -468,14 +442,14 @@ private void doInvokeListener(ApplicationListener listener, ApplicationEvent eve
 
 既然我们使用多个监听器，我们肯定是希望它们都能执行的，所以我们一定要保证每个监听器的执行不会被其他监听器影响。基于这个思路，我们修改案例代码如下：
 
-```
+```java
 @Component
 @Order(1)
 public class MyFirstEventListener implements ApplicationListener<MyEvent> {
     @Override
     public void onApplicationEvent(MyEvent event) {
         try {
-          // 省略事件处理相关代码
+            // 省略事件处理相关代码
         }catch(Throwable throwable){
             //write error/metric to alert
         }
@@ -488,33 +462,33 @@ public class MyFirstEventListener implements ApplicationListener<MyEvent> {
 
 通过上面的案例解析，我们发现，假设我们设置了一个ErrorHandler，那么就可以用这个ErrorHandler去处理掉异常，从而保证后续事件监听器处理不受影响。我们可以使用下面的代码来修正问题：
 
-```
+```java
 SimpleApplicationEventMulticaster simpleApplicationEventMulticaster = applicationContext.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, SimpleApplicationEventMulticaster.class);
     simpleApplicationEventMulticaster.setErrorHandler(TaskUtils.LOG_AND_SUPPRESS_ERROR_HANDLER);
 ```
 
 其中LOG\_AND\_SUPPRESS\_ERROR\_HANDLER的实现如下：
 
-```
+```java
 public static final ErrorHandler LOG_AND_SUPPRESS_ERROR_HANDLER = new LoggingErrorHandler();
 
 private static class LoggingErrorHandler implements ErrorHandler {
 
-   private final Log logger = LogFactory.getLog(LoggingErrorHandler.class);
+    private final Log logger = LogFactory.getLog(LoggingErrorHandler.class);
 
-   @Override
-   public void handleError(Throwable t) {
-      logger.error("Unexpected error occurred in scheduled task", t);
-   }
+    @Override
+    public void handleError(Throwable t) {
+        logger.error("Unexpected error occurred in scheduled task", t);
+    }
 }
 ```
 
 对比下方案1，使用ErrorHandler有一个很大的优势，就是我们不需要在某个监听器中都重复类似下面的代码了：
 
-```
+```java
 try {
     //省略事件处理过程
-    }catch(Throwable throwable){
+}catch(Throwable throwable){
     //write error/metric to alert
 }
 ```
@@ -529,8 +503,6 @@ try {
 2. 监听错了事件的传播系统；
 3. 事件处理之间互相影响，导致部分事件处理无法完成。
 
-<!-- -->
-
 这三种错误正好对应了我们这节课讲解的三个案例。
 
 此外，在Spring事件处理过程中，我们也学习到了监听器加载的特殊方式，即使用SPI的方式直接从配置文件META-INF/spring.factories中加载。这种方式或者说思想非常值得你去学习，因为它在许多Java应用框架中都有所使用，例如Dubbo，就是使用增强版的SPI来配置编解码器的。
@@ -539,7 +511,7 @@ try {
 
 在案例3中，我们提到默认的事件执行是在同一个线程中执行的，即事件发布者使用的线程。参考如下日志佐证这个结论：
 
-> 2021-03-09 09:10:33.052 INFO 18104 --- [nio-8080-exec-1] c.s.p.listener.HelloWorldController : start to publish event<br>
+> 2021-03-09 09:10:33.052 INFO 18104 --- [nio-8080-exec-1] c.s.p.listener.HelloWorldController : start to publish event
 > 
 >  2021-03-09 09:10:33.055 INFO 18104 --- [nio-8080-exec-1] c.s.p.l.example3.MyFirstEventListener : com.spring.puzzle.class7.example3.MyFirstEventListener@18faf0 received: com.spring.puzzle.class7.example3.MyEvent[source=df42b08f-8ee2-44df-a957-d8464ff50c88]
 

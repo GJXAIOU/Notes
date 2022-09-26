@@ -1,17 +1,5 @@
 # 06｜Spring AOP 常见错误（下）
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/68/21/68b932f09d66f19646e249b8b0758c21.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/38/61/38a05d0d652ec8ae40959310f4dc7261.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 上一节课，我们介绍了 Spring AOP 常遇到的几个问题，通过具体的源码解析，相信你对 Spring AOP 的基本原理已经有所了解了。不过，AOP 毕竟是 Spring 的核心功能之一，不可能规避那零散的两三个问题就一劳永逸了。所以这节课，我们继续聊聊 Spring AOP 中还会有哪些易错点。实际上，当一个系统采用的切面越来越多时，因为执行顺序而导致的问题便会逐步暴露出来，下面我们就重点看一下。
 
 ## 案例1：错乱混合不同类型的增强
@@ -20,7 +8,7 @@
 
 这里我们先回顾下，你就不用去翻代码了。这个宿舍管理系统保护了一个电费充值模块，它包含了一个负责电费充值的类 ElectricService，还有一个充电方法 charge()：
 
-```
+```java
 @Service
 public class ElectricService {
     public void charge() throws Exception {
@@ -31,32 +19,30 @@ public class ElectricService {
 
 为了在执行 charge() 之前，鉴定下调用者的权限，我们增加了针对于 Electric 的切面类 AopConfig，其中包含一个 @Before 增强。这里的增强没有做任何事情，仅仅是打印了一行日志，然后模拟执行权限校验功能（占用 1 秒钟）。
 
-```
+```java
 //省略 imports
 @Aspect
 @Service
 @Slf4j
 public class AspectService {
-  @Before("execution(* com.spring.puzzle.class6.example1.ElectricService.charge()) ")
-  public void checkAuthority(JoinPoint pjp) throws Throwable {
-      System.out.println("validating user authority");
-      Thread.sleep(1000);
-  }
+    @Before("execution(* com.spring.puzzle.class6.example1.ElectricService.charge()) ")
+    public void checkAuthority(JoinPoint pjp) throws Throwable {
+        System.out.println("validating user authority");
+        Thread.sleep(1000);
+    }
 }
 ```
 
 执行后，我们得到以下 log，接着一切按照预期继续执行：
 
-```
+```json
 validating user authority
 Electric charging ...
 ```
 
 一段时间后，由于业务发展，ElectricService 中的 charge() 逻辑变得更加复杂了，我们需要仅仅针对 ElectricService 的 charge() 做性能统计。为了不影响原有的业务逻辑，我们在 AopConfig 中添加了另一个增强，代码更改后如下：
 
-<!-- [[[read_end]]] -->
-
-```
+```java
 //省略 imports
 @Aspect
 @Service
@@ -79,9 +65,9 @@ public class AopConfig {
 
 执行后得到日志如下：
 
-> validating user authority<br>
+> validating user authority
 > 
->  Electric charging …<br>
+>  Electric charging …
 > 
 >  charge method time cost 1022 (ms)
 
@@ -97,47 +83,47 @@ public class AopConfig {
 
 而如果我们的代码里使用了 Spring AOP，doCreateBean() 最终会返回一个代理对象。至于代理对象如何创建，大体流程我们在上一讲已经概述过了。如果你记忆力比较好的话，应该记得在代理对象的创建过程中，我们贴出过这样一段代码（参考 AbstractAutoProxyCreator#createProxy）：
 
-```
+```java
 protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
-      @Nullable Object[] specificInterceptors, TargetSource targetSource) {
-   //省略非关键代码
-   Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
-   proxyFactory.addAdvisors(advisors);
-   proxyFactory.setTargetSource(targetSource);
-   //省略非关键代码
-   return proxyFactory.getProxy(getProxyClassLoader());
+                             @Nullable Object[] specificInterceptors, TargetSource targetSource) {
+    //省略非关键代码
+    Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
+    proxyFactory.addAdvisors(advisors);
+    proxyFactory.setTargetSource(targetSource);
+    //省略非关键代码
+    return proxyFactory.getProxy(getProxyClassLoader());
 }
 ```
 
 其中 advisors 就是增强方法对象，它的顺序决定了面临多个增强时，到底先执行谁。而这个集合对象本身是由 specificInterceptors 构建出来的，而 specificInterceptors 又是由 AbstractAdvisorAutoProxyCreator#getAdvicesAndAdvisorsForBean 方法构建：
 
-```
+```java
 @Override
 @Nullable
 protected Object[] getAdvicesAndAdvisorsForBean(
-      Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
-   List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
-   if (advisors.isEmpty()) {
-      return DO_NOT_PROXY;
-   }
-   return advisors.toArray();
-  }
+    Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
+    List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
+    if (advisors.isEmpty()) {
+        return DO_NOT_PROXY;
+    }
+    return advisors.toArray();
+}
 ```
 
 简单说，其实就是根据当前的 beanClass、beanName 等信息，结合所有候选的 advisors，最终找出匹配（Eligible）的 Advisor，为什么如此？毕竟 AOP 拦截点可能会配置多个，而我们执行的方法不见得会被所有的拦截配置拦截。寻找匹配 Advisor 的逻辑参考 AbstractAdvisorAutoProxyCreator#findEligibleAdvisors：
 
-```
+```java
 protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
-   //寻找候选的 Advisor
-   List<Advisor> candidateAdvisors = findCandidateAdvisors();
-   //根据候选的 Advisor 和当前 bean 算出匹配的 Advisor
-   List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
-   extendAdvisors(eligibleAdvisors);
-   if (!eligibleAdvisors.isEmpty()) {
-      //排序
-      eligibleAdvisors = sortAdvisors(eligibleAdvisors);
-   }
-   return eligibleAdvisors;
+    //寻找候选的 Advisor
+    List<Advisor> candidateAdvisors = findCandidateAdvisors();
+    //根据候选的 Advisor 和当前 bean 算出匹配的 Advisor
+    List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+    extendAdvisors(eligibleAdvisors);
+    if (!eligibleAdvisors.isEmpty()) {
+        //排序
+        eligibleAdvisors = sortAdvisors(eligibleAdvisors);
+    }
+    return eligibleAdvisors;
 }
 ```
 
@@ -145,8 +131,6 @@ protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName
 
 1. candidateAdvisors 的顺序；
 2. sortAdvisors 进行的排序。
-
-<!-- -->
 
 这里我们可以重点看下对本案例起关键作用的 candidateAdvisors 排序。实际上，它的顺序是在 @Aspect 标记的 AopConfig Bean 构建时就决定了。具体而言，就是在初始化过程中会排序自己配置的 Advisors，并把排序结果存入了缓存（BeanFactoryAspectJAdvisorsBuilder#advisorsCache）。
 
@@ -156,18 +140,18 @@ protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName
 
 可以看到，排序是在 Bean 的构建中进行的，而最后排序执行的关键代码位于下面的方法中（参考 ReflectiveAspectJAdvisorFactory#getAdvisorMethods）：
 
-```
+```java
 private List<Method> getAdvisorMethods(Class<?> aspectClass) {
-   final List<Method> methods = new ArrayList<>();
-   ReflectionUtils.doWithMethods(aspectClass, method -> {
-      // Exclude pointcuts
-      if (AnnotationUtils.getAnnotation(method, Pointcut.class) == null) {
-         methods.add(method);
-      }
-   }, ReflectionUtils.USER_DECLARED_METHODS);
-   // 排序
-   methods.sort(METHOD_COMPARATOR);
-   return methods;
+    final List<Method> methods = new ArrayList<>();
+    ReflectionUtils.doWithMethods(aspectClass, method -> {
+        // Exclude pointcuts
+        if (AnnotationUtils.getAnnotation(method, Pointcut.class) == null) {
+            methods.add(method);
+        }
+    }, ReflectionUtils.USER_DECLARED_METHODS);
+    // 排序
+    methods.sort(METHOD_COMPARATOR);
+    return methods;
 }
 ```
 
@@ -175,19 +159,19 @@ private List<Method> getAdvisorMethods(Class<?> aspectClass) {
 
 我们来查看 METHOD\_COMPARATOR 的代码，会发现它是定义在 ReflectiveAspectJAdvisorFactory 类中的静态方法块，代码如下：
 
-```
+```java
 static {
-   Comparator<Method> adviceKindComparator = new ConvertingComparator<>(
-         new InstanceComparator<>(
-               Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class),
-         (Converter<Method, Annotation>) method -> {
+    Comparator<Method> adviceKindComparator = new ConvertingComparator<>(
+        new InstanceComparator<>(
+            Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class),
+        (Converter<Method, Annotation>) method -> {
             AspectJAnnotation<?> annotation =
-               AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
+                AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
             return (annotation != null ? annotation.getAnnotation() : null);
-         });
-   Comparator<Method> methodNameComparator = new ConvertingComparator<>(Method::getName);
-   //合并上面两者比较器
-   METHOD_COMPARATOR = adviceKindComparator.thenComparing(methodNameComparator);
+        });
+    Comparator<Method> methodNameComparator = new ConvertingComparator<>(Method::getName);
+    //合并上面两者比较器
+    METHOD_COMPARATOR = adviceKindComparator.thenComparing(methodNameComparator);
 }
 ```
 
@@ -198,68 +182,66 @@ METHOD\_COMPARATOR 本质上是一个连续比较器，由 adviceKindComparator 
 - 第一个参数是基准比较器，即在 adviceKindComparator 中最终要调用的比较器，在构造函数中赋值于 this.comparator；
 - 第二个参数是一个 lambda 回调函数，用来将传递的参数转化为基准比较器需要的参数类型，在构造函数中赋值于 this.converter。
 
-<!-- -->
-
 查看 ConvertingComparator 比较器核心方法 compare 如下：
 
-```
+```java
 public int compare(S o1, S o2) {
-   T c1 = this.converter.convert(o1);
-   T c2 = this.converter.convert(o2);
-   return this.comparator.compare(c1, c2);
+    T c1 = this.converter.convert(o1);
+    T c2 = this.converter.convert(o2);
+    return this.comparator.compare(c1, c2);
 }
 ```
 
 可知，这里是先调用从构造函数中获取到的 lambda 回调函数 this.converter，将需要比较的参数进行转化。我们可以从之前的代码中找出这个转化工作：
 
-```
+```java
 (Converter<Method, Annotation>) method -> {
-   AspectJAnnotation<?> annotation =
-      AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
-   return (annotation != null ? annotation.getAnnotation() : null);
+    AspectJAnnotation<?> annotation =
+        AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
+    return (annotation != null ? annotation.getAnnotation() : null);
 });
 ```
 
 转化功能的代码逻辑较为简单，就是返回传入方法（method）上标记的增强注解（Pointcut,Around,Before,After,AfterReturning 以及 AfterThrowing）：
 
-```
+```java
 private static final Class<?>[] ASPECTJ_ANNOTATION_CLASSES = new Class<?>[] {
-      Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class};
+    Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class};
 
 protected static AspectJAnnotation<?> findAspectJAnnotationOnMethod(Method method) {
-   for (Class<?> clazz : ASPECTJ_ANNOTATION_CLASSES) {
-      AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) clazz);
-      if (foundAnnotation != null) {
-         return foundAnnotation;
-      }
-   }
-   return null;
+    for (Class<?> clazz : ASPECTJ_ANNOTATION_CLASSES) {
+        AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) clazz);
+        if (foundAnnotation != null) {
+            return foundAnnotation;
+        }
+    }
+    return null;
 }
 ```
 
 经过转化后，我们获取到的待比较的数据其实就是注解了。而它们的排序依赖于 ConvertingComparator 的第一个参数，即最终会调用的基准比较器，以下是它的关键实现代码：
 
-```
+```java
 new InstanceComparator<>(
       Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class)
 ```
 
 最终我们要调用的基准比较器本质上就是一个 InstanceComparator 类，我们先重点注意下这几个增强注解的传递顺序。继续查看它的构造方法如下：
 
-```
+```java
 public InstanceComparator(Class<?>... instanceOrder) {
-   Assert.notNull(instanceOrder, "'instanceOrder' array must not be null");
-   this.instanceOrder = instanceOrder;
+    Assert.notNull(instanceOrder, "'instanceOrder' array must not be null");
+    this.instanceOrder = instanceOrder;
 }
 ```
 
 构造方法也是较为简单的，只是将传递进来的 instanceOrder 赋予了类成员变量，继续查看 InstanceComparator 比较器核心方法 compare 如下，也就是最终要调用的比较方法：
 
-```
+```java
 public int compare(T o1, T o2) {
-   int i1 = getOrder(o1);
-   int i2 = getOrder(o2);
-   return (i1 < i2 ? -1 : (i1 == i2 ? 0 : 1));
+    int i1 = getOrder(o1);
+    int i2 = getOrder(o2);
+    return (i1 < i2 ? -1 : (i1 == i2 ? 0 : 1));
 }
 ```
 
@@ -267,17 +249,17 @@ public int compare(T o1, T o2) {
 
 查看 getOrder() 的逻辑如下：
 
-```
+```java
 private int getOrder(@Nullable T object) {
-   if (object != null) {
-      for (int i = 0; i < this.instanceOrder.length; i++) {
-         //instance 在 instanceOrder 中的“排号”
-         if (this.instanceOrder[i].isInstance(object)) {
-            return i;
-         }
-      }
-   }
-   return this.instanceOrder.length;
+    if (object != null) {
+        for (int i = 0; i < this.instanceOrder.length; i++) {
+            //instance 在 instanceOrder 中的“排号”
+            if (this.instanceOrder[i].isInstance(object)) {
+                return i;
+            }
+        }
+    }
+    return this.instanceOrder.length;
 }
 ```
 
@@ -297,11 +279,9 @@ private int getOrder(@Nullable T object) {
 2. 性能统计只需要拦截 doCharge()；
 3. 权限统计增强保持不变，依然拦截 charge()。
 
-<!-- -->
-
 ElectricService 类代码更改如下：
 
-```
+```java
 @Service
 public class ElectricService {
     @Autowired
@@ -317,7 +297,7 @@ public class ElectricService {
 
 切面代码更改如下：
 
-```
+```java
 //省略 imports
 @Aspect
 @Service
@@ -330,11 +310,11 @@ public class AopConfig {
 
     @Around("execution(* com.spring.puzzle.class6.example1.ElectricService.doCharge()) ")
     public void recordPerformance(ProceedingJoinPoint pjp) throws Throwable {
-    long start = System.currentTimeMillis();
-    pjp.proceed();
-    long end = System.currentTimeMillis();
-    System.out.println("charge method time cost: " + (end - start));
-  }
+        long start = System.currentTimeMillis();
+        pjp.proceed();
+        long end = System.currentTimeMillis();
+        System.out.println("charge method time cost: " + (end - start));
+    }
 }
 ```
 
@@ -344,7 +324,7 @@ public class AopConfig {
 
 这里业务逻辑类 ElectricService 没有任何变化，仅包含一个 charge()：
 
-```
+```java
 import org.springframework.stereotype.Service;
 @Service
 public class ElectricService {
@@ -358,25 +338,25 @@ public class ElectricService {
 
 第一个方法 logBeforeMethod()，目的是在 run() 执行之前希望能输入日志，表示当前方法被调用一次，方便后期统计。另一个方法 validateAuthority()，目的是做权限验证，其作用是在调用此方法之前做权限验证，如果不符合权限限制要求，则直接抛出异常。这里为了方便演示，此方法将直接抛出异常：
 
-```
+```java
 //省略 imports
 @Aspect
 @Service
 public class AopConfig {
-  @Before("execution(* com.spring.puzzle.class5.example2.ElectricService.charge())")
-  public void logBeforeMethod(JoinPoint pjp) throws Throwable {
-      System.out.println("step into ->"+pjp.getSignature());
-  }
-  @Before("execution(* com.spring.puzzle.class5.example2.ElectricService.charge()) ")
-  public void validateAuthority(JoinPoint pjp) throws Throwable {
-      throw new RuntimeException("authority check failed");
-  }
+    @Before("execution(* com.spring.puzzle.class5.example2.ElectricService.charge())")
+    public void logBeforeMethod(JoinPoint pjp) throws Throwable {
+        System.out.println("step into ->"+pjp.getSignature());
+    }
+    @Before("execution(* com.spring.puzzle.class5.example2.ElectricService.charge()) ")
+    public void validateAuthority(JoinPoint pjp) throws Throwable {
+        throw new RuntimeException("authority check failed");
+    }
 }
 ```
 
 我们对代码的执行预期为：当鉴权失败时，由于 ElectricService.charge() 没有被调用，那么 run() 的调用日志也不应该被输出，即 logBeforeMethod() 不应该被调用，但事实总是出乎意料，执行结果如下：
 
-> step into ->void com.spring.puzzle.class6.example2.Electric.charge()<br>
+> step into ->void com.spring.puzzle.class6.example2.Electric.charge()
 > 
 >  Exception in thread “main” java.lang.RuntimeException: authority check failed
 
@@ -390,52 +370,52 @@ public class AopConfig {
 
 METHOD\_COMPARATOR 本质是一个连续比较器，而上个案例中我们仅仅只看了第一个比较器，细心的你肯定发现了这里还有第二个比较器 methodNameComparator，任意两个比较器都可以通过其内置的 thenComparing() 连接形成一个连续比较器，从而可以让我们按照比较器的连接顺序依次比较：
 
-```
+```java
 static {
-   //第一个比较器，用来按照增强类型排序
-   Comparator<Method> adviceKindComparator = new ConvertingComparator<>(
-         new InstanceComparator<>(
-               Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class),
-         (Converter<Method, Annotation>) method -> {
+    //第一个比较器，用来按照增强类型排序
+    Comparator<Method> adviceKindComparator = new ConvertingComparator<>(
+        new InstanceComparator<>(
+            Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class),
+        (Converter<Method, Annotation>) method -> {
             AspectJAnnotation<?> annotation =
-               AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
+                AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
             return (annotation != null ? annotation.getAnnotation() : null);
-         })
-   //第二个比较器，用来按照方法名排序
-   Comparator<Method> methodNameComparator = new ConvertingComparator<>(Method::getName);
-   METHOD_COMPARATOR = adviceKindComparator.thenComparing(methodNameComparator);
+        })
+        //第二个比较器，用来按照方法名排序
+        Comparator<Method> methodNameComparator = new ConvertingComparator<>(Method::getName);
+    METHOD_COMPARATOR = adviceKindComparator.thenComparing(methodNameComparator);
 }
 ```
 
 我们可以看到，在第 12 行代码中，第 2 个比较器 methodNameComparator 依然使用的是 ConvertingComparator，传递了方法名作为参数。我们基本可以猜测出该比较器是按照方法名进行排序的，这里可以进一步查看构造器方法及构造器调用的内部 comparable()：
 
-```
+```java
 public ConvertingComparator(Converter<S, T> converter) {
-   this(Comparators.comparable(), converter);
+    this(Comparators.comparable(), converter);
 }
 // 省略非关键代码
 public static <T> Comparator<T> comparable() {
-   return ComparableComparator.INSTANCE;
+    return ComparableComparator.INSTANCE;
 }
 ```
 
 上述代码中的 ComparableComparator 实例其实极其简单，代码如下：
 
-```
+```java
 public class ComparableComparator<T extends Comparable<T>> implements Comparator<T> {
- 
-   public static final ComparableComparator INSTANCE = new ComparableComparator();
 
-   @Override
-   public int compare(T o1, T o2) {
-      return o1.compareTo(o2);
-   }
+    public static final ComparableComparator INSTANCE = new ComparableComparator();
+
+    @Override
+    public int compare(T o1, T o2) {
+        return o1.compareTo(o2);
+    }
 }
 ```
 
 答案和我们的猜测完全一致，methodNameComparator 最终调用了 String 类自身的 compareTo()，代码如下：
 
-```
+```java
 public int compareTo(String anotherString) {
     int len1 = value.length;
     int len2 = anotherString.value.length;
@@ -462,19 +442,19 @@ public int compareTo(String anotherString) {
 
 从上述分析我们得知，在同一个切面配置类中，针对同一个方法存在多个同类型增强时，其执行顺序仅和当前增强方法的名称有关，而不是由谁代码在先、谁代码在后来决定。了解了这点，我们就可以直接通过调整方法名的方式来修正程序：
 
-```
+```java
 //省略 imports
 @Aspect
 @Service
 public class AopConfig {
-  @Before("execution(* com.spring.puzzle.class6.example2.ElectricService.charge())")
-  public void logBeforeMethod(JoinPoint pjp) throws Throwable {
-      System.out.println("step into ->"+pjp.getSignature());
-  }
-  @Before("execution(* com.spring.puzzle.class6.example2.ElectricService.charge()) ")
-  public void checkAuthority(JoinPoint pjp) throws Throwable {
-      throw new RuntimeException("authority check failed");
-  }
+    @Before("execution(* com.spring.puzzle.class6.example2.ElectricService.charge())")
+    public void logBeforeMethod(JoinPoint pjp) throws Throwable {
+        System.out.println("step into ->"+pjp.getSignature());
+    }
+    @Before("execution(* com.spring.puzzle.class6.example2.ElectricService.charge()) ")
+    public void checkAuthority(JoinPoint pjp) throws Throwable {
+        throw new RuntimeException("authority check failed");
+    }
 }
 ```
 
@@ -487,14 +467,10 @@ public class AopConfig {
 - 在同一个切面配置中，如果存在多个不同类型的增强，那么其执行优先级是按照增强类型的特定顺序排列，依次的增强类型为 Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class；
 - 在同一个切面配置中，如果存在多个相同类型的增强，那么其执行优先级是按照该增强的方法名排序，排序方式依次为比较方法名的每一个字母，直到发现第一个不相同且 ASCII 码较小的字母。
 
-<!-- -->
-
 同时，这节课我们也拓展了一些比较器相关的知识：
 
 - 任意两个比较器（Comparator）可以通过 thenComparing() 连接合成一个新的连续比较器；
 - 比较器的比较规则有一个简单的方法可以帮助你理解，就是最终一定需要对象两两比较，而比较的过程一定是比较这两个对象的同种属性。你只要抓住这两点：比较了什么属性以及比较的结果是什么就可以了，若比较结果为正数，则按照该属性的升序排列；若为负数，则按属性降序排列。
-
-<!-- -->
 
 ## 思考题
 

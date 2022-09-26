@@ -1,16 +1,6 @@
 # 05｜Spring AOP 常见错误（上）
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/8a/a6/8a00f20e920a70b28255914b16307aa6.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/b5/e2/b5def29f36db744c283fff8d7066c2e2.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。这节课开始，我们聊聊Spring AOP使用中常遇到的一些问题。
+这节课开始，我们聊聊Spring AOP使用中常遇到的一些问题。
 
 Spring AOP是Spring中除了依赖注入外（DI）最为核心的功能，顾名思义，AOP即Aspect Oriented Programming，翻译为面向切面编程。
 
@@ -22,9 +12,7 @@ Spring AOP是Spring中除了依赖注入外（DI）最为核心的功能，顾�
 
 假设我们正在开发一个宿舍管理系统，这个模块包含一个负责电费充值的类ElectricService，它含有一个充电方法charge()：
 
-<!-- [[[read_end]]] -->
-
-```
+```java
 @Service
 public class ElectricService {
 
@@ -45,7 +33,7 @@ public class ElectricService {
 
 但是因为支付宝支付是第三方接口，我们需要记录下接口调用时间。这时候我们就引入了一个@Around的增强 ，分别记录在pay()方法执行前后的时间，并计算出执行pay()方法的耗时。
 
-```
+```java
 @Aspect
 @Service
 @Slf4j
@@ -62,7 +50,7 @@ public class AopConfig {
 
 最后我们再通过定义一个Controller来提供电费充值接口，定义如下：
 
-```
+```java
 @RestController
 public class HelloWorldController {
     @Autowired
@@ -106,13 +94,12 @@ Spring AOP的底层是动态代理。而创建代理的方式有两种，**JDK�
 
 在Spring Boot中，我们一般只要添加以下依赖就可以直接使用AOP功能：
 
-> <dependency><br>
-> 
->  <groupId>org.springframework.boot</groupId><br>
-> 
->  <artifactId>spring-boot-starter-aop</artifactId><br>
-> 
->  </dependency>
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+```
 
 而对于非Spring Boot程序，除了添加相关AOP依赖项外，我们还常常会使用@EnableAspectJAutoProxy来开启AOP功能。这个注解类引入（Import）AspectJAutoProxyRegistrar，它通过实现ImportBeanDefinitionRegistrar的接口方法来完成AOP相关Bean的准备工作。
 
@@ -122,7 +109,7 @@ Spring AOP的底层是动态代理。而创建代理的方式有两种，**JDK�
 
 创建代理对象的时机就是创建一个Bean的时候，而创建的的关键工作其实是由AnnotationAwareAspectJAutoProxyCreator完成的。它本质上是一种BeanPostProcessor。所以它的执行是在完成原始Bean构建后的初始化Bean（initializeBean）过程中。而它到底完成了什么工作呢？我们可以看下它的postProcessAfterInitialization方法：
 
-```
+```java
 public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
    if (bean != null) {
       Object cacheKey = getCacheKey(bean.getClass(), beanName);
@@ -136,7 +123,7 @@ public Object postProcessAfterInitialization(@Nullable Object bean, String beanN
 
 上述代码中的关键方法是wrapIfNecessary，顾名思义，**在需要使用AOP时，它会把创建的原始的Bean对象wrap成代理对象作为Bean返回**。具体到这个wrap过程，可参考下面的关键代码行：
 
-```
+```java
 protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
    // 省略非关键代码
    Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
@@ -153,7 +140,7 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
 
 上述代码中，第6行的createProxy调用是创建代理对象的关键。具体到执行过程，它首先会创建一个代理工厂，然后将通知器（advisors）、被代理对象等信息加入到代理工厂，最后通过这个代理工厂来获取代理对象。一些关键过程参考下面的方法：
 
-```
+```java
 protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
       @Nullable Object[] specificInterceptors, TargetSource targetSource) {
   // 省略非关键代码
@@ -183,7 +170,7 @@ protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
 
 有两种。一种是被@Autowired注解的，于是我们的代码可以改成这样，即通过@Autowired的方式，在类的内部，自己引用自己：
 
-```
+```java
 @Service
 public class ElectricService {
     @Autowired
@@ -208,7 +195,7 @@ public class ElectricService {
 
 按这个思路，我们修改下相关代码：
 
-```
+```java
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 @Service
@@ -227,7 +214,7 @@ public class ElectricService {
 
 同时，不要忘记修改EnableAspectJAutoProxy注解的exposeProxy属性，示例如下：
 
-```
+```java
 @SpringBootApplication
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class Application {
@@ -237,7 +224,7 @@ public class Application {
 
 这两种方法的效果其实是一样的，最终我们打印出了期待的日志，到这，问题顺利解决了。
 
-```
+```java
 Electric charging ...
 Pay with alipay ...
 Pay method time cost(ms): 1005
@@ -249,7 +236,7 @@ Pay method time cost(ms): 1005
 
 User类，包含用户的付款编号信息：
 
-```
+```java
 public class User {
     private String payNum;
     public User(String payNum) {
@@ -266,7 +253,7 @@ public class User {
 
 AdminUserService类，包含一个管理员用户（User），其付款编号为202101166；另外，这个服务类有一个login()方法，用来登录系统。
 
-```
+```java
 @Service
 public class AdminUserService {
     public final User adminUser = new User("202101166");
@@ -279,7 +266,7 @@ public class AdminUserService {
 
 我们需要修改ElectricService类实现这个需求：在电费充值时，需要管理员登录并使用其编号进行结算。完整代码如下：
 
-```
+```java
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 @Service
@@ -303,7 +290,7 @@ public class ElectricService {
 
 代码完成后，执行charge()操作，一切正常：
 
-```
+```java
 Electric charging ...
 admin user login...
 User pay num : 202101166
@@ -312,7 +299,7 @@ Pay with alipay ...
 
 这时候，由于安全需要，就需要管理员在登录时，记录一行日志以便于以后审计管理员操作。所以我们添加一个AOP相关配置类，具体如下：
 
-```
+```java
 @Aspect
 @Service
 @Slf4j
@@ -352,13 +339,11 @@ $xxxx。
 - 创建Enhance并设置Callback为上述MethodInterceptor；
 - enhancer.create()创建代理。
 
-<!-- -->
-
 接下来，我们来具体分析一下Spring的相关实现源码。
 
 在上个案例分析里，我们简要提及了Spring的动态代理对象的初始化机制。在得到Advisors之后，会通过ProxyFactory.getProxy获取代理对象：
 
-```
+```java
 public Object getProxy(ClassLoader classLoader) {
 	return createAopProxy().getProxy(classLoader);
 }
@@ -366,7 +351,7 @@ public Object getProxy(ClassLoader classLoader) {
 
 在这里，我们以CGLIB的Proxy的实现类CglibAopProxy为例，来看看具体的流程：
 
-```
+```java
 public Object getProxy(@Nullable ClassLoader classLoader) {
     // 省略非关键代码
     // 创建及配置 Enhancer
@@ -383,7 +368,7 @@ public Object getProxy(@Nullable ClassLoader classLoader) {
 
 上述代码中的几个关键步骤大体符合之前提及的三个步骤，其中最后一步一般都会执行到CglibAopProxy子类ObjenesisCglibAopProxy的createProxyClassAndInstance()方法：
 
-```
+```java
 protected Object createProxyClassAndInstance(Enhancer enhancer, Callback[] callbacks) {
    //创建代理类Class
    Class<?> proxyClass = enhancer.createClass();
@@ -430,8 +415,6 @@ protected Object createProxyClassAndInstance(Enhancer enhancer, Callback[] callb
 - java.lang.reflect.Constructor.newInstance()
 - sun.reflect.ReflectionFactory.newConstructorForSerialization().newInstance()
 
-<!-- -->
-
 前两种初始化方式都会同时初始化类成员变量，但是最后一种通过ReflectionFactory.newConstructorForSerialization().newInstance()实例化类则不会初始化类成员变量，这就是当前问题的最终答案了。
 
 ### 问题修正
@@ -440,7 +423,7 @@ protected Object createProxyClassAndInstance(Enhancer enhancer, Callback[] callb
 
 我们在AdminUserService里加了个getUser()方法：
 
-```
+```java
 public User getUser() {
     return user;
 }
@@ -448,17 +431,17 @@ public User getUser() {
 
 在ElectricService里通过getUser()获取User对象：
 
-> //原来出错的方式：<br>
-> 
->  //String payNum = = adminUserService.adminUser.getPayNum();<br>
-> 
->  //修改后的方式：<br>
-> 
->  String payNum = adminUserService.getAdminUser().getPayNum();
+```java
+//原来出错的方式：
+//String payNum = = adminUserService.adminUser.getPayNum();
+
+//修改后的方式：
+String payNum = adminUserService.getAdminUser().getPayNum();
+```
 
 运行下来，一切正常，可以看到管理员登录日志了：
 
-```
+```java
 Electric charging ...
 ! admin login ...
 admin user login...
@@ -470,7 +453,7 @@ Pay with alipay ...
 
 我们再次回顾createProxyClassAndInstance的代码逻辑，创建代理类后，我们会调用setCallbacks来设置拦截后需要注入的代码：
 
-```
+```java
 protected Object createProxyClassAndInstance(Enhancer enhancer, Callback[] callbacks) {
    Class<?> proxyClass = enhancer.createClass();
    Object proxyInstance = null;
@@ -486,7 +469,7 @@ protected Object createProxyClassAndInstance(Enhancer enhancer, Callback[] callb
 
 通过代码调试和分析，我们可以得知上述的callbacks中会存在一种服务于AOP的DynamicAdvisedInterceptor，它的接口是MethodInterceptor（callback的子接口），实现了拦截方法intercept()。我们可以看下它是如何实现这个方法的：
 
-```
+```java
 public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
    // 省略非关键代码
     TargetSource targetSource = this.advised.getTargetSource();
@@ -528,9 +511,6 @@ public Object intercept(Object proxy, Method method, Object[] args, MethodProxy 
 
 3. 我们一般不能直接从代理类中去拿被代理类的属性，这是因为除非我们显示设置spring.objenesis.ignore为true，否则代理类的属性是不会被Spring初始化的，我们可以通过在被代理类中增加一个方法来间接获取其属性。
 
-
-<!-- -->
-
 ## 思考题
 
 第二个案例中，我们提到了通过反射来实例化类的三种方式：
@@ -538,8 +518,6 @@ public Object intercept(Object proxy, Method method, Object[] args, MethodProxy 
 - java.lang.Class.newInsance()
 - java.lang.reflect.Constructor.newInstance()
 - sun.reflect.ReflectionFactory.newConstructorForSerialization().newInstance()
-
-<!-- -->
 
 其中第三种方式不会初始化类属性，你能够写一个例子来证明这一点吗？
 
