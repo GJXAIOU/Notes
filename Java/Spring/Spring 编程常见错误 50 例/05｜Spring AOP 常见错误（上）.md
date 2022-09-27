@@ -1,16 +1,13 @@
 # 05｜Spring AOP 常见错误（上）
+Spring AOP 是 Spring 中除了依赖注入外（DI）最为核心的功能，顾名思义，AOP 即 Aspect Oriented Programming，翻译为面向切面编程。
 
-这节课开始，我们聊聊Spring AOP使用中常遇到的一些问题。
+**而 Spring AOP 则利用 CGlib 和 JDK 动态代理等方式来实现运行期动态方法增强，其目的是将与业务无关的代码单独抽离出来，使其逻辑不再与业务代码耦合，从而降低系统的耦合性，提高程序的可重用性和开发效率**。因而 AOP 便成为了日志记录、监控管理、性能统计、异常处理、权限管理、统一认证等各个方面被广泛使用的技术。
 
-Spring AOP是Spring中除了依赖注入外（DI）最为核心的功能，顾名思义，AOP即Aspect Oriented Programming，翻译为面向切面编程。
-
-而Spring AOP则利用CGlib和JDK动态代理等方式来实现运行期动态方法增强，其目的是将与业务无关的代码单独抽离出来，使其逻辑不再与业务代码耦合，从而降低系统的耦合性，提高程序的可重用性和开发效率。因而AOP便成为了日志记录、监控管理、性能统计、异常处理、权限管理、统一认证等各个方面被广泛使用的技术。
-
-追根溯源，我们之所以能无感知地在容器对象方法前后任意添加代码片段，那是由于Spring在运行期帮我们把切面中的代码逻辑动态“织入”到了容器对象方法内，所以说**AOP本质上就是一个代理模式**。然而在使用这种代理模式时，我们常常会用不好，那么这节课我们就来解析下有哪些常见的问题，以及背后的原理是什么。
+追根溯源，我们之所以能无感知地在容器对象方法前后任意添加代码片段，那是由于 Spring 在运行期帮我们把切面中的代码逻辑动态“织入”到了容器对象方法内，所以说**AOP 本质上就是一个代理模式**。然而在使用这种代理模式时，我们常常会用不好，那么这节课我们就来解析下有哪些常见的问题，以及背后的原理是什么。
 
 ## 案例1：this调用的当前类方法无法被拦截
 
-假设我们正在开发一个宿舍管理系统，这个模块包含一个负责电费充值的类ElectricService，它含有一个充电方法charge()：
+假设我们正在开发一个宿舍管理系统，这个模块包含一个负责电费充值的类 ElectricService，它含有一个充电方法 charge()：
 
 ```java
 @Service
@@ -29,9 +26,9 @@ public class ElectricService {
 }
 ```
 
-在这个电费充值方法charge()中，我们会使用支付宝进行充值。因此在这个方法中，我加入了pay()方法。为了模拟pay()方法调用耗时，代码执行了休眠1秒，并在charge()方法里使用 this.pay()的方式调用这种支付方法。
+在这个电费充值方法 charge() 中，我们会使用支付宝进行充值。因此在这个方法中，我加入了 pay() 方法。为了模拟 pay() 方法调用耗时，代码执行了休眠 1秒，并在 charge() 方法里使用 this.pay() 的方式调用这种支付方法。
 
-但是因为支付宝支付是第三方接口，我们需要记录下接口调用时间。这时候我们就引入了一个@Around的增强 ，分别记录在pay()方法执行前后的时间，并计算出执行pay()方法的耗时。
+ 但是因为支付宝支付是第三方接口，我们需要记录下接口调用时间。这时候我们就引入了一个 @Around 的增强 ，分别记录在 pay() 方法执行前后的时间，并计算出执行 pay() 方法的耗时。
 
 ```java
 @Aspect
@@ -76,23 +73,23 @@ public class HelloWorldController {
 
 ![](<https://static001.geekbang.org/resource/image/e0/5f/e0f4b047228fac437d57f56dcd18185f.png?wh=700*332>)
 
-可以看到，this对应的就是一个普通的ElectricService对象，并没有什么特别的地方。再看看在Controller层中自动装配的ElectricService对象是什么样：
+可以看到，this 对应的就是一个普通的 ElectricService 对象，并没有什么特别的地方。再看看在 Controller 层中自动装配的 ElectricService 对象是什么样：
 
 ![](<https://static001.geekbang.org/resource/image/b2/f9/b24f00b4b96c46983295da05180174f9.png?wh=1112*258>)
 
-可以看到，这是一个被Spring增强过的Bean，所以执行charge()方法时，会执行记录接口调用时间的增强操作。而this对应的对象只是一个普通的对象，并没有做任何额外的增强。
+可以看到，**这是一个被 Spring 增强过的 Bean，所以执行 charge() 方法时，会执行记录接口调用时间的增强操作。而 this 对应的对象只是一个普通的对象，并没有做任何额外的增强**。
 
-为什么this引用的对象只是一个普通对象呢？这还要从Spring AOP增强对象的过程来看。但在此之前，有些基础我需要在这里强调下。
+为什么 this 引用的对象只是一个普通对象呢？这还要从 Spring AOP增强对象的过程来看。但在此之前，有些基础我需要在这里强调下。
 
-**1\. Spring AOP的实现**
+**1. Spring AOP的实现**
 
-Spring AOP的底层是动态代理。而创建代理的方式有两种，**JDK的方式和CGLIB的方式**。JDK动态代理只能对实现了接口的类生成代理，而不能针对普通类。而CGLIB是可以针对类实现代理，主要是对指定的类生成一个子类，覆盖其中的方法，来实现代理对象。具体区别可参考下图：
+Spring AOP 的底层是动态代理。而创建代理的方式有两种，**JDK 的方式和 CGLIB 的方式**。**JDK 动态代理只能对实现了接口的类生成代理，而不能针对普通类。而 CGLIB 是可以针对类实现代理，主要是对指定的类生成一个子类，覆盖其中的方法，来实现代理对象**。具体区别可参考下图：
 
 ![](<https://static001.geekbang.org/resource/image/99/a1/99c74d82d811ec567b28a24ccd6e85a1.png?wh=1191*573>)
 
 **2\. 如何使用Spring AOP**
 
-在Spring Boot中，我们一般只要添加以下依赖就可以直接使用AOP功能：
+在 Spring Boot 中，我们一般只要添加以下依赖就可以直接使用 AOP功能：
 
 ```xml
 <dependency>
@@ -101,13 +98,13 @@ Spring AOP的底层是动态代理。而创建代理的方式有两种，**JDK�
 </dependency>
 ```
 
-而对于非Spring Boot程序，除了添加相关AOP依赖项外，我们还常常会使用@EnableAspectJAutoProxy来开启AOP功能。这个注解类引入（Import）AspectJAutoProxyRegistrar，它通过实现ImportBeanDefinitionRegistrar的接口方法来完成AOP相关Bean的准备工作。
+而对于非 Spring Boot 程序，除了添加相关 AOP 依赖项外，我们还常常会使用 @EnableAspectJAutoProxy 来开启 AOP 功能。这个注解类引入（Import）AspectJAutoProxyRegistrar，它通过实现ImportBeanDefinitionRegistrar 的接口方法来完成 AOP 相关 Bean 的准备工作。
 
-补充完最基本的Spring底层知识和使用知识后，我们具体看下创建代理对象的过程。先来看下调用栈：
+补充完最基本的 Spring 底层知识和使用知识后，我们具体看下创建代理对象的过程。先来看下调用栈：
 
 ![](<https://static001.geekbang.org/resource/image/1f/2a/1fb3735e51a8e06833f065a175517c2a.png?wh=1565*570>)
 
-创建代理对象的时机就是创建一个Bean的时候，而创建的的关键工作其实是由AnnotationAwareAspectJAutoProxyCreator完成的。它本质上是一种BeanPostProcessor。所以它的执行是在完成原始Bean构建后的初始化Bean（initializeBean）过程中。而它到底完成了什么工作呢？我们可以看下它的postProcessAfterInitialization方法：
+**创建代理对象的时机就是创建一个 Bean 的时候，而创建的的关键工作其实是由 AnnotationAwareAspectJAutoProxyCreator 完成的。它本质上是一种 BeanPostProcessor。所以它的执行是在完成原始 Bean 构建后的初始化 Bean（initializeBean）过程中**。而它到底完成了什么工作呢？我们可以看下它的postProcessAfterInitialization 方法：
 
 ```java
 public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
@@ -121,7 +118,7 @@ public Object postProcessAfterInitialization(@Nullable Object bean, String beanN
 }
 ```
 
-上述代码中的关键方法是wrapIfNecessary，顾名思义，**在需要使用AOP时，它会把创建的原始的Bean对象wrap成代理对象作为Bean返回**。具体到这个wrap过程，可参考下面的关键代码行：
+上述代码中的关键方法是 wrapIfNecessary，顾名思义，**在需要使用 AOP 时，它会把创建的原始的 Bean 对象 wrap 成代理对象作为 Bean 返回**。具体到这个 wrap 过程，可参考下面的关键代码行：
 
 ```java
 protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
@@ -138,7 +135,7 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
 }
 ```
 
-上述代码中，第6行的createProxy调用是创建代理对象的关键。具体到执行过程，它首先会创建一个代理工厂，然后将通知器（advisors）、被代理对象等信息加入到代理工厂，最后通过这个代理工厂来获取代理对象。一些关键过程参考下面的方法：
+上述代码中，第 6 行的 **createProxy 调用是创建代理对象的关键。具体到执行过程，它首先会创建一个代理工厂，然后将通知器（advisors）、被代理对象等信息加入到代理工厂，最后通过这个代理工厂来获取代理对象**。一些关键过程参考下面的方法：
 
 ```java
 protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
@@ -162,13 +159,13 @@ protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
 }
 ```
 
-经过这样一个过程，一个代理对象就被创建出来了。我们从Spring中获取到的对象都是这个代理对象，所以具有AOP功能。而之前直接使用this引用到的只是一个普通对象，自然也就没办法实现AOP的功能了。
+经过这样一个过程，一个代理对象就被创建出来了。我们从 Spring 中获取到的对象都是这个代理对象，所以具有 AOP 功能。而之前直接使用 this 引用到的只是一个普通对象，自然也就没办法实现 AOP的功能了。
 
 ### 问题修正
 
-从上述案例解析中，我们知道，**只有引用的是被动态代理创建出来的对象，才会被Spring增强，具备AOP该有的功能**。那什么样的对象具备这样的条件呢？
+从上述案例解析中，我们知道，**只有引用的是被动态代理创建出来的对象，才会被 Spring 增强，具备 AOP 该有的功能**。那什么样的对象具备这样的条件呢？
 
-有两种。一种是被@Autowired注解的，于是我们的代码可以改成这样，即通过@Autowired的方式，在类的内部，自己引用自己：
+有两种。一种是被 @Autowired 注解的，于是我们的代码可以改成这样，即通过 @Autowired 的方式，在类的内部，自己引用自己：
 
 ```java
 @Service
@@ -187,9 +184,9 @@ public class ElectricService {
 }
 ```
 
-另一种方法就是直接从AopContext获取当前的Proxy。那你可能会问了，AopContext是什么？简单说，它的核心就是通过一个ThreadLocal来将Proxy和线程绑定起来，这样就可以随时拿出当前线程绑定的Proxy。
+另一种方法就是直接从 AopContext 获取当前的 Proxy。那你可能会问了，AopContext 是什么？简单说，它的核心就是通过一个ThreadLocal 来将 Proxy 和线程绑定起来，这样就可以随时拿出当前线程绑定的 Proxy。
 
-不过使用这种方法有个小前提，就是需要在@EnableAspectJAutoProxy里加一个配置项exposeProxy = true，表示将代理对象放入到ThreadLocal，这样才可以直接通过 AopContext.currentProxy()的方式获取到，否则会报错如下：
+不过使用这种方法有个小前提，就是需要在@EnableAspectJAutoProxy 里加一个配置项 exposeProxy = true，表示将代理对象放入到 ThreadLocal，这样才可以直接通过 AopContext.currentProxy() 的方式获取到，否则会报错如下：
 
 ![](<https://static001.geekbang.org/resource/image/0e/98/0e42f3129e1c098b0f860f1f7f2e6298.png?wh=1489*563>)
 
@@ -212,7 +209,7 @@ public class ElectricService {
 }
 ```
 
-同时，不要忘记修改EnableAspectJAutoProxy注解的exposeProxy属性，示例如下：
+同时，不要忘记修改 EnableAspectJAutoProxy 注解的 exposeProxy 属性，示例如下：
 
 ```java
 @SpringBootApplication
@@ -232,7 +229,7 @@ Pay method time cost(ms): 1005
 
 ## 案例2：直接访问被拦截类的属性抛空指针异常
 
-接上一个案例，在宿舍管理系统中，我们使用了charge()方法进行支付。在统一结算的时候我们会用到一个管理员用户付款编号，这时候就用到了几个新的类。
+接上一个案例，在宿舍管理系统中，我们使用了 charge() 方法进行支付。在统一结算的时候我们会用到一个管理员用户付款编号，这时候就用到了几个新的类。
 
 User类，包含用户的付款编号信息：
 

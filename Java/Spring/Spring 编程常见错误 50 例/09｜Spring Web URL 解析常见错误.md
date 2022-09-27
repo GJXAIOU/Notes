@@ -1,33 +1,21 @@
 # 09｜Spring Web URL 解析常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/78/y5/7881023187f29b225285e5a274047yy5.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/f6/60/f6d5eb2743c77f06fb192f97ec0d9460.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 上一章节我们讲解了各式各样的错误案例，这些案例都是围绕 Spring 的核心功能展开的，例如依赖注入、AOP 等诸多方面。然而，从现实情况来看，在使用上，我们更多地是使用 Spring 来构建一个 Web 服务，所以从这节课开始，我们会重点解析在 Spring Web 开发中经常遇到的一些错误，帮助你规避这些问题。
 
 不言而喻，这里说的 Web 服务就是指使用 HTTP 协议的服务。而对于 HTTP 请求，首先要处理的就是 URL，所以今天我们就先来介绍下，在 URL 的处理上，Spring 都有哪些经典的案例。闲话少叙，下面我们直接开始演示吧。
 
-## 案例 1：当@PathVariable 遇到 /
+## 案例 1：当 @PathVariable 遇到 /
 
 在解析一个 URL 时，我们经常会使用 @PathVariable 这个注解。例如我们会经常见到如下风格的代码：
 
-```
+```java
 @RestController
 @Slf4j
 public class HelloWorldController {
     @RequestMapping(path = "/hi1/{name}", method = RequestMethod.GET)
     public String hello1(@PathVariable("name") String name){
         return name;
-        
+
     };  
 }
 ```
@@ -35,8 +23,6 @@ public class HelloWorldController {
 当我们使用 [http://localhost:8080/hi1/xiaoming](<http://localhost:8080/hi1/xiaoming>) 访问这个服务时，会返回"xiaoming"，即 Spring 会把 name 设置为 URL 中对应的值。
 
 看起来顺风顺水，但是假设这个 name 中含有特殊字符/时（例如[http://localhost:8080/hi1/xiao/ming](<http://localhost:8080/hi1/xiaoming>) ），会如何？如果我们不假思索，或许答案是"xiao/ming"？然而稍微敏锐点的程序员都会判定这个访问是会报错的，具体错误参考：
-
-<!-- [[[read_end]]] -->
 
 ![](<https://static001.geekbang.org/resource/image/92/64/92a3c8894b88eec937139f3c858bf664.png?wh=1578*426>)
 
@@ -50,40 +36,40 @@ public class HelloWorldController {
 
 实际上，这两种错误都是 URL 匹配执行方法的相关问题，所以我们有必要先了解下 URL 匹配执行方法的大致过程。参考 AbstractHandlerMethodMapping#lookupHandlerMethod：
 
-```
+```java
 @Nullable
 protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
-   List<Match> matches = new ArrayList<>();
-   //尝试按照 URL 进行精准匹配
-   List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
-   if (directPathMatches != null) {
-      //精确匹配上，存储匹配结果
-      addMatchingMappings(directPathMatches, matches, request);
-   }
-   if (matches.isEmpty()) {
-      //没有精确匹配上，尝试根据请求来匹配
-      addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
-   }
+    List<Match> matches = new ArrayList<>();
+    //尝试按照 URL 进行精准匹配
+    List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
+    if (directPathMatches != null) {
+        //精确匹配上，存储匹配结果
+        addMatchingMappings(directPathMatches, matches, request);
+    }
+    if (matches.isEmpty()) {
+        //没有精确匹配上，尝试根据请求来匹配
+        addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
+    }
 
-   if (!matches.isEmpty()) {
-      Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
-      matches.sort(comparator);
-      Match bestMatch = matches.get(0);
-      if (matches.size() > 1) {
-         //处理多个匹配的情况
-      }
-      //省略其他非关键代码
-      return bestMatch.handlerMethod;
-   }
-   else {
-      //匹配不上，直接报错
-      return handleNoMatch(this.mappingRegistry.getMappings().keySet(), lookupPath, request);
-   }
+    if (!matches.isEmpty()) {
+        Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
+        matches.sort(comparator);
+        Match bestMatch = matches.get(0);
+        if (matches.size() > 1) {
+            //处理多个匹配的情况
+        }
+        //省略其他非关键代码
+        return bestMatch.handlerMethod;
+    }
+    else {
+        //匹配不上，直接报错
+        return handleNoMatch(this.mappingRegistry.getMappings().keySet(), lookupPath, request);
+    }
 ```
 
 大体分为这样几个基本步骤。
 
-**1\. 根据 Path 进行精确匹配**
+**1. 根据 Path 进行精确匹配**
 
 这个步骤执行的代码语句是"this.mappingRegistry.getMappingsByUrl(lookupPath)"，实际上，它是查询 MappingRegistry#urlLookup，它的值可以用调试视图查看，如下图所示：
 
@@ -91,7 +77,7 @@ protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletReques
 
 查询 urlLookup 是一个精确匹配 Path 的过程。很明显，[http://localhost:8080/hi1/xiao/ming](<http://localhost:8080/hi1/xiaoming>) 的 lookupPath 是"/hi1/xiao/ming"，并不能得到任何精确匹配。这里需要补充的是，"/hi1/{name}"这种定义本身也没有出现在 urlLookup 中。
 
-**2\. 假设 Path 没有精确匹配上，则执行模糊匹配**
+**2. 假设 Path 没有精确匹配上，则执行模糊匹配**
 
 在步骤 1 匹配失败时，会根据请求来尝试模糊匹配，待匹配的匹配方法可参考下图：
 
@@ -99,24 +85,24 @@ protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletReques
 
 显然，"/hi1/{name}"这个匹配方法已经出现在待匹配候选中了。具体匹配过程可以参考方法 RequestMappingInfo#getMatchingCondition：
 
-```
+```java
 public RequestMappingInfo getMatchingCondition(HttpServletRequest request) {
-   RequestMethodsRequestCondition methods = this.methodsCondition.getMatchingCondition(request);
-   if (methods == null) {
-      return null;
-   }
-   ParamsRequestCondition params = this.paramsCondition.getMatchingCondition(request);
-   if (params == null) {
-      return null;
-   }
-   //省略其他匹配条件
-   PatternsRequestCondition patterns = this.patternsCondition.getMatchingCondition(request);
-   if (patterns == null) {
-      return null;
-   }
-   //省略其他匹配条件
-   return new RequestMappingInfo(this.name, patterns,
-         methods, params, headers, consumes, produces, custom.getCondition());
+    RequestMethodsRequestCondition methods = this.methodsCondition.getMatchingCondition(request);
+    if (methods == null) {
+        return null;
+    }
+    ParamsRequestCondition params = this.paramsCondition.getMatchingCondition(request);
+    if (params == null) {
+        return null;
+    }
+    //省略其他匹配条件
+    PatternsRequestCondition patterns = this.patternsCondition.getMatchingCondition(request);
+    if (patterns == null) {
+        return null;
+    }
+    //省略其他匹配条件
+    return new RequestMappingInfo(this.name, patterns,
+                                  methods, params, headers, consumes, produces, custom.getCondition());
 }
 ```
 
@@ -128,7 +114,7 @@ public RequestMappingInfo getMatchingCondition(HttpServletRequest request) {
 
 但是当我们使用 [http://localhost:8080/hi1/xiao/ming](<http://localhost:8080/hi1/xiaoming>) 来访问时，AntPathMatcher 执行的结果是"/hi1/xiao/ming"匹配不上"/hi1/{name}"。
 
-**3\. 根据匹配情况返回结果**
+**3. 根据匹配情况返回结果**
 
 如果找到匹配的方法，则返回方法；如果没有，则返回 null。
 
@@ -136,19 +122,19 @@ public RequestMappingInfo getMatchingCondition(HttpServletRequest request) {
 
 另外，我们再回头思考 [http://localhost:8080/hi1/xiaoming/](<http://localhost:8080/hi1/xiaoming/>) 为什么没有报错而是直接去掉了/。这里我直接贴出了负责执行 AntPathMatcher 匹配的 PatternsRequestCondition#getMatchingPattern 方法的部分关键代码：
 
-```
+```java
 private String getMatchingPattern(String pattern, String lookupPath) {
-   //省略其他非关键代码
-   if (this.pathMatcher.match(pattern, lookupPath)) {
-      return pattern;
-   }
-   //尝试加一个/来匹配
-   if (this.useTrailingSlashMatch) {
-      if (!pattern.endsWith("/") && this.pathMatcher.match(pattern + "/", lookupPath)) {
-         return pattern + "/";
-      }
-   }
-   return null;
+    //省略其他非关键代码
+    if (this.pathMatcher.match(pattern, lookupPath)) {
+        return pattern;
+    }
+    //尝试加一个/来匹配
+    if (this.useTrailingSlashMatch) {
+        if (!pattern.endsWith("/") && this.pathMatcher.match(pattern + "/", lookupPath)) {
+            return pattern + "/";
+        }
+    }
+    return null;
 }
 ```
 
@@ -160,7 +146,7 @@ private String getMatchingPattern(String pattern, String lookupPath) {
 
 针对这个案例，有了源码的剖析，我们可能会想到可以先用"\*\*"匹配上路径，等进入方法后再尝试去解析，这样就可以万无一失吧。具体修改代码如下：
 
-```
+```java
 @RequestMapping(path = "/hi1/**", method = RequestMethod.GET)
 public String hi1(HttpServletRequest request){
     String requestURI = request.getRequestURI();
@@ -170,7 +156,7 @@ public String hi1(HttpServletRequest request){
 
 但是这种修改方法还是存在漏洞，假设我们路径的 name 中刚好又含有"/hi1/"，则 split 后返回的值就并不是我们想要的。实际上，更合适的修订代码示例如下：
 
-```
+```java
 private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
 @RequestMapping(path = "/hi1/**", method = RequestMethod.GET)
@@ -184,9 +170,9 @@ public String hi1(HttpServletRequest request){
 
 经过修改，两个错误都得以解决了。当然也存在一些其他的方案，例如对传递的参数进行 URL 编码以避免出现/，或者干脆直接把这个变量作为请求参数、Header 等，而不是作为 URL 的一部分。你完全可以根据具体情况来选择合适的方案。
 
-## 案例 2：错误使用@RequestParam、@PathVarible 等注解
+## 案例 2：错误使用 @RequestParam、@PathVarible 等注解
 
-我们常常使用@RequestParam 和@PathVarible 来获取请求参数（request parameters）以及 path 中的部分。但是在频繁使用这些参数时，不知道你有没有觉得它们的使用方式并不友好，例如我们去获取一个请求参数 name，我们会定义如下：
+我们常常使用 @RequestParam 和 @PathVarible 来获取请求参数（request parameters）以及 path 中的部分。但是在频繁使用这些参数时，不知道你有没有觉得它们的使用方式并不友好，例如我们去获取一个请求参数 name，我们会定义如下：
 
 > @RequestParam("name") String name
 
@@ -196,7 +182,7 @@ public String hi1(HttpServletRequest request){
 
 这种方式确实是可以的，本地测试也能通过。这里我还给出了完整的代码，你可以感受下这两者的区别。
 
-```
+```java
 @RequestMapping(path = "/hi1", method = RequestMethod.GET)
 public String hi1(@RequestParam("name") String name){
     return name;
@@ -216,11 +202,11 @@ public String hi2(@RequestParam String name){
 
 要理解这个问题出现的原因，首先我们需要把这个问题复现出来。例如我们可以修改下 pom.xml 来关掉两个选项：
 
-```
+```xml
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-compiler-plugin</artifactId>
-   <configuration>
+    <configuration>
         <debug>false</debug>
         <parameters>false</parameters>
     </configuration>
@@ -245,19 +231,19 @@ debug 参数开启的部分信息就是 LocalVaribleTable，而 paramters 参数
 
 答案是否定的，这里我们可以顺带说下 Spring 解析请求参数名称的过程，参考代码 AbstractNamedValueMethodArgumentResolver#updateNamedValueInfo：
 
-```
+```java
 private NamedValueInfo updateNamedValueInfo(MethodParameter parameter, NamedValueInfo info) {
-   String name = info.name;
-   if (info.name.isEmpty()) {
-      name = parameter.getParameterName();
-      if (name == null) {
-         throw new IllegalArgumentException(
-               "Name for argument type [" + parameter.getNestedParameterType().getName() +
-               "] not available, and parameter name information not found in class file either.");
-      }
-   }
-   String defaultValue = (ValueConstants.DEFAULT_NONE.equals(info.defaultValue) ? null : info.defaultValue);
-   return new NamedValueInfo(name, info.required, defaultValue);
+    String name = info.name;
+    if (info.name.isEmpty()) {
+        name = parameter.getParameterName();
+        if (name == null) {
+            throw new IllegalArgumentException(
+                "Name for argument type [" + parameter.getNestedParameterType().getName() +
+                "] not available, and parameter name information not found in class file either.");
+        }
+    }
+    String defaultValue = (ValueConstants.DEFAULT_NONE.equals(info.defaultValue) ? null : info.defaultValue);
+    return new NamedValueInfo(name, info.required, defaultValue);
 }
 ```
 
@@ -287,7 +273,7 @@ private NamedValueInfo updateNamedValueInfo(MethodParameter parameter, NamedValu
 
 在上面的案例中，我们提到了 @RequestParam 的使用。而对于它的使用，我们常常会遇到另外一个问题。当需要特别多的请求参数时，我们往往会忽略其中一些参数是否可选。例如存在类似这样的代码：
 
-```
+```java
 @RequestMapping(path = "/hi4", method = RequestMethod.GET)
 public String hi4(@RequestParam("name") String name, @RequestParam("address") String address){
     return name + ":" + address;
@@ -312,25 +298,25 @@ public String hi4(@RequestParam("name") String name, @RequestParam("address") St
 
 接下来我们看下 RequestParamMethodArgumentResolver 对参数解析的一些关键操作，参考其父类方法 AbstractNamedValueMethodArgumentResolver#resolveArgument：
 
-```
+```java
 public final Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-      NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
-   NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
-   MethodParameter nestedParameter = parameter.nestedIfOptional();
-   //省略其他非关键代码
-   //获取请求参数
-   Object arg = resolveName(resolvedName.toString(), nestedParameter, webRequest);
-   if (arg == null) {
-      if (namedValueInfo.defaultValue != null) {
-         arg = resolveStringValue(namedValueInfo.defaultValue);
-      }
-      else if (namedValueInfo.required && !nestedParameter.isOptional()) {
-         handleMissingValue(namedValueInfo.name, nestedParameter, webRequest);
-      }
-      arg = handleNullValue(namedValueInfo.name, arg, nestedParameter.getNestedParameterType());
-   }
-   //省略后续代码：类型转化等工作
-   return arg;
+                                    NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+    NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
+    MethodParameter nestedParameter = parameter.nestedIfOptional();
+    //省略其他非关键代码
+    //获取请求参数
+    Object arg = resolveName(resolvedName.toString(), nestedParameter, webRequest);
+    if (arg == null) {
+        if (namedValueInfo.defaultValue != null) {
+            arg = resolveStringValue(namedValueInfo.defaultValue);
+        }
+        else if (namedValueInfo.required && !nestedParameter.isOptional()) {
+            handleMissingValue(namedValueInfo.name, nestedParameter, webRequest);
+        }
+        arg = handleNullValue(namedValueInfo.name, arg, nestedParameter.getNestedParameterType());
+    }
+    //省略后续代码：类型转化等工作
+    return arg;
 }
 ```
 
@@ -340,11 +326,11 @@ public final Object resolveArgument(MethodParameter parameter, @Nullable ModelAn
 
 这个变量实际是通过下面的方法来获取的，参考 RequestParamMethodArgumentResolver#createNamedValueInfo：
 
-```
+```java
 @Override
 protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
-   RequestParam ann = parameter.getParameterAnnotation(RequestParam.class);
-   return (ann != null ? new RequestParamNamedValueInfo(ann) : new RequestParamNamedValueInfo());
+    RequestParam ann = parameter.getParameterAnnotation(RequestParam.class);
+    return (ann != null ? new RequestParamNamedValueInfo(ann) : new RequestParamNamedValueInfo());
 }
 ```
 
@@ -362,12 +348,12 @@ protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
 
 我们可以通过 MethodParameter#isOptional 方法看下可选的具体含义：
 
-```
+```java
 public boolean isOptional() {
-   return (getParameterType() == Optional.class || hasNullableAnnotation() ||
-         (KotlinDetector.isKotlinReflectPresent() &&
-               KotlinDetector.isKotlinType(getContainingClass()) &&
-               KotlinDelegate.isOptional(this)));
+    return (getParameterType() == Optional.class || hasNullableAnnotation() ||
+            (KotlinDetector.isKotlinReflectPresent() &&
+             KotlinDetector.isKotlinType(getContainingClass()) &&
+             KotlinDelegate.isOptional(this)));
 }
 ```
 
@@ -379,10 +365,10 @@ public boolean isOptional() {
 
 结合我们的案例，我们的参数符合步骤 2 中判定为必选的条件，所以最终会执行方法 AbstractNamedValueMethodArgumentResolver#handleMissingValue：
 
-```
+```java
 protected void handleMissingValue(String name, MethodParameter parameter) throws ServletException {
-   throw new ServletRequestBindingException("Missing argument '" + name +
-         "' for method parameter of type " + parameter.getNestedParameterType().getSimpleName());
+    throw new ServletRequestBindingException("Missing argument '" + name +
+                                             "' for method parameter of type " + parameter.getNestedParameterType().getSimpleName());
 }
 ```
 
@@ -406,9 +392,9 @@ protected void handleMissingValue(String name, MethodParameter parameter) throws
 
 修改代码如下：
 
-> [//org.springframework.lang.Nullable](<//org.springframework.lang.Nullable>) 可以<br>
+> [//org.springframework.lang.Nullable](<//org.springframework.lang.Nullable>) 可以
 > 
-> [//edu.umd.cs.findbugs.annotations.Nullable](<//edu.umd.cs.findbugs.annotations.Nullable>) 可以<br>
+> [//edu.umd.cs.findbugs.annotations.Nullable](<//edu.umd.cs.findbugs.annotations.Nullable>) 可以
 > 
 >  @RequestParam(value = "address") @Nullable String address
 
@@ -416,7 +402,7 @@ protected void handleMissingValue(String name, MethodParameter parameter) throws
 
 修改代码如下：
 
-> @RequestParam(value = "address") Optional<string> address</string>
+> @RequestParam(value = "address") Optional<string> address
 
 从这些修正方法不难看出：假设你不学习源码，解决方法就可能只局限于一两种，但是深入源码后，解决方法就变得格外多了。这里要特别强调的是：**在Spring Web 中，默认情况下，请求参数是必选项。**
 
@@ -424,7 +410,7 @@ protected void handleMissingValue(String name, MethodParameter parameter) throws
 
 当我们使用 Spring URL 相关的注解，会发现 Spring 是能够完成自动转化的。例如在下面的代码中，age 可以被直接定义为 int 这种基本类型（Integer 也可以），而不是必须是 String 类型。
 
-```
+```java
 @RequestMapping(path = "/hi5", method = RequestMethod.GET)
 public String hi5(@RequestParam("name") String name, @RequestParam("age") int age){
     return name + " is " + age + " years old";
@@ -433,7 +419,7 @@ public String hi5(@RequestParam("name") String name, @RequestParam("age") int ag
 
 鉴于 Spring 的强大转化功能，我们断定 Spring 也支持日期类型的转化（也确实如此），于是我们可能会写出类似下面这样的代码：
 
-```
+```java
 @RequestMapping(path = "/hi6", method = RequestMethod.GET)
 public String hi6(@RequestParam("Date") Date date){
     return "date is " + date ;
@@ -452,17 +438,17 @@ public String hi6(@RequestParam("Date") Date date){
 
 不管是使用 @PathVarible 还是 @RequetParam，我们一般解析出的结果都是一个 String 或 String 数组。例如，使用 @RequetParam 解析的关键代码参考 RequestParamMethodArgumentResolver#resolveName 方法：
 
-```
+```java
 @Nullable
 protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
-   //省略其他非关键代码
-   if (arg == null) {
-      String[] paramValues = request.getParameterValues(name);
-      if (paramValues != null) {
-         arg = (paramValues.length == 1 ? paramValues[0] : paramValues);
-      }
-   }
-   return arg;
+    // 省略其他非关键代码
+    if (arg == null) {
+        String[] paramValues = request.getParameterValues(name);
+        if (paramValues != null) {
+            arg = (paramValues.length == 1 ? paramValues[0] : paramValues);
+        }
+    }
+    return arg;
 }
 ```
 
@@ -470,21 +456,21 @@ protected Object resolveName(String name, MethodParameter parameter, NativeWebRe
 
 所以很明显，在这个测试程序中，我们给上层返回的是一个 String，这个 String 的值最终是需要做转化才能赋值给其他类型。例如对于案例中的"int age"定义，是需要转化为 int 基本类型的。这个基本流程可以通过 AbstractNamedValueMethodArgumentResolver#resolveArgument 的关键代码来验证：
 
-```
+```java
 public final Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-      NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
-   //省略其他非关键代码
-   Object arg = resolveName(resolvedName.toString(), nestedParameter, webRequest);
-   //以此为界，前面代码为解析请求参数,后续代码为转化解析出的参数
-   if (binderFactory != null) {
-      WebDataBinder binder = binderFactory.createBinder(webRequest, null, namedValueInfo.name);
-      try {
-         arg = binder.convertIfNecessary(arg, parameter.getParameterType(), parameter);
-      }
-      //省略其他非关键代码
-   }
-   //省略其他非关键代码
-   return arg;
+                                    NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+    //省略其他非关键代码
+    Object arg = resolveName(resolvedName.toString(), nestedParameter, webRequest);
+    //以此为界，前面代码为解析请求参数,后续代码为转化解析出的参数
+    if (binderFactory != null) {
+        WebDataBinder binder = binderFactory.createBinder(webRequest, null, namedValueInfo.name);
+        try {
+            arg = binder.convertIfNecessary(arg, parameter.getParameterType(), parameter);
+        }
+        //省略其他非关键代码
+    }
+    //省略其他非关键代码
+    return arg;
 }
 ```
 
@@ -492,37 +478,37 @@ public final Object resolveArgument(MethodParameter parameter, @Nullable ModelAn
 
 在这里你只需要回忆出它是需要**根据源类型和目标类型寻找转化器来执行转化的**。在这里，对于 age 而言，最终找出的转化器是 StringToNumberConverterFactory。而对于 Date 型的 Date 变量，在本案例中，最终找到的是 ObjectToObjectConverter。它的转化过程参考下面的代码：
 
-```
+```java
 public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-   if (source == null) {
-      return null;
-   }
-   Class<?> sourceClass = sourceType.getType();
-   Class<?> targetClass = targetType.getType();
-   //根据源类型去获取构建出目标类型的方法：可以是工厂方法（例如 valueOf、from 方法）也可以是构造器
-   Member member = getValidatedMember(targetClass, sourceClass);
-   try {
-      if (member instanceof Method) {
-         //如果是工厂方法，通过反射创建目标实例
-      }
-      else if (member instanceof Constructor) {
-         //如果是构造器，通过反射创建实例
-         Constructor<?> ctor = (Constructor<?>) member;
-         ReflectionUtils.makeAccessible(ctor);
-         return ctor.newInstance(source);
-      }
-   }
-   catch (InvocationTargetException ex) {
-      throw new ConversionFailedException(sourceType, targetType, source, ex.getTargetException());
-   }
-   catch (Throwable ex) {
-      throw new ConversionFailedException(sourceType, targetType, source, ex);
-   }
+    if (source == null) {
+        return null;
+    }
+    Class<?> sourceClass = sourceType.getType();
+    Class<?> targetClass = targetType.getType();
+    //根据源类型去获取构建出目标类型的方法：可以是工厂方法（例如 valueOf、from 方法）也可以是构造器
+    Member member = getValidatedMember(targetClass, sourceClass);
+    try {
+        if (member instanceof Method) {
+            //如果是工厂方法，通过反射创建目标实例
+        }
+        else if (member instanceof Constructor) {
+            //如果是构造器，通过反射创建实例
+            Constructor<?> ctor = (Constructor<?>) member;
+            ReflectionUtils.makeAccessible(ctor);
+            return ctor.newInstance(source);
+        }
+    }
+    catch (InvocationTargetException ex) {
+        throw new ConversionFailedException(sourceType, targetType, source, ex.getTargetException());
+    }
+    catch (Throwable ex) {
+        throw new ConversionFailedException(sourceType, targetType, source, ex);
+    }
 ```
 
 当使用 ObjectToObjectConverter 进行转化时，是根据反射机制带着源目标类型来查找可能的构造目标实例方法，例如构造器或者工厂方法，然后再次通过反射机制来创建一个目标对象。所以对于 Date 而言，最终调用的是下面的 Date 构造器：
 
-```
+```java
 public Date(String s) {
     this(parse(s));
 }
@@ -534,13 +520,13 @@ public Date(String s) {
 
 那么怎么解决呢？提供两种方法。
 
-**1\. 使用 Date 支持的格式**
+**1. 使用 Date 支持的格式**
 
 例如下面的测试 URL 就可以工作起来：
 
 > [http://localhost:8080/hi6?date=Sat](<http://localhost:8080/hi6?date=Sat>), 12 Aug 1995 13:30:00 GMT
 
-**2\. 使用好内置格式转化器**
+**2. 使用好内置格式转化器**
 
 实际上，在Spring中，要完成 String 对于 Date 的转化，ObjectToObjectConverter 并不是最好的转化器。我们可以使用更强大的AnnotationParserConverter。**在Spring 初始化时，会构建一些针对日期型的转化器，即相应的一些 AnnotationParserConverter 的实例。**但是为什么有时候用不上呢？
 
@@ -552,7 +538,7 @@ public Date(String s) {
 
 annototationType 的作用正是为了帮助判断是否能用这个转化器，这一点可以参考代码 AnnotationParserConverter#matches：
 
-```
+```java
 @Override
 public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
    return targetType.hasAnnotation(this.annotationType);
@@ -578,9 +564,7 @@ public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
 1. 当我们使用@PathVariable时，一定要注意传递的值是不是含有 / ;
 2. 当我们使用@RequestParam、@PathVarible等注解时，一定要意识到一个问题，虽然下面这两种方式（以@RequestParam使用示例）都可以，但是后者在一些项目中并不能正常工作，因为很多产线的编译配置会去掉不是必须的调试信息。
 
-<!-- -->
-
-```
+```java
 @RequestMapping(path = "/hi1", method = RequestMethod.GET)
 public String hi1(@RequestParam("name") String name){
     return name;
@@ -594,8 +578,6 @@ public String hi2(@RequestParam String name){
 
 3. 任何一个参数，我们都需要考虑它是可选的还是必须的。同时，你一定要想到参数类型的定义到底能不能从请求中自动转化而来。Spring本身给我们内置了很多转化器，但是我们要以合适的方式使用上它。另外，Spring对很多类型的转化设计都很贴心，例如使用下面的注解就能解决自定义日期格式参数转化问题。
 
-<!-- -->
-
 ```
 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date
 ```
@@ -606,7 +588,7 @@ public String hi2(@RequestParam String name){
 
 关于 URL 解析，其实还有许多让我们惊讶的地方，例如案例 2 的部分代码：
 
-```
+```java
 @RequestMapping(path = "/hi2", method = RequestMethod.GET)
 public String hi2(@RequestParam("name") String name){
     return name;

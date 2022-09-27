@@ -1,16 +1,6 @@
 # 12｜Spring Web 参数验证常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/ab/e4/ab38f0d731c3b85345e4c318a4e12ce4.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/9c/37/9c2f87183eeb7733d371ee1176f73a37.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健，这节课我们来聊聊 Spring Web 开发中的参数检验（Validation）。
+这节课我们来聊聊 Spring Web 开发中的参数检验（Validation）。
 
 参数检验是我们在Web编程时经常使用的技术之一，它帮助我们完成请求的合法性校验，可以有效拦截无效请求，从而达到节省系统资源、保护系统的目的。
 
@@ -22,7 +12,7 @@
 
 当开发一个学籍管理系统时，我们会提供了一个 API 接口去添加学生的相关信息，其对象定义参考下面的代码：
 
-```
+```java
 import lombok.Data;
 import javax.validation.constraints.Size;
 @Data
@@ -37,14 +27,13 @@ public class Student {
 
 定义完对象后，我们再定义一个 Controller 去使用它，使用方法如下：
 
-<!-- [[[read_end]]] -->
-
-```
+```java
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @Slf4j
 @Validated
@@ -59,7 +48,7 @@ public class StudentController {
 
 我们提供了一个支持学生信息添加的接口。启动服务后，使用 IDEA 自带的 HTTP Client 工具来发送下面的请求以添加一个学生，当然，这个学生的姓名会远超想象（即this\_is\_my\_name\_which\_is\_too\_long）：
 
-```
+```json
 POST http://localhost:8080/students
 Content-Type: application/json
 {
@@ -70,7 +59,7 @@ Content-Type: application/json
 
 很明显，发送这样的请求（name 超长）是期待 Spring Validation 能拦截它的，我们的预期响应如下（省略部分响应字段）：
 
-```
+```json
 HTTP/1.1 400 
 Content-Type: application/json
 
@@ -104,16 +93,15 @@ Content-Type: application/json
 
 如上图所示，当一个请求来临时，都会进入 DispatcherServlet，执行其 doDispatch()，此方法会根据 Path、Method 等关键信息定位到负责处理的 Controller 层方法（即 addStudent 方法），然后通过反射去执行这个方法，具体反射执行过程参考下面的代码（InvocableHandlerMethod#invokeForRequest）：
 
-```
-public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
-      Object... providedArgs) throws Exception {
-   //根据请求内容和方法定义获取方法参数实例
-   Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
-   if (logger.isTraceEnabled()) {
-      logger.trace("Arguments: " + Arrays.toString(args));
-   }
-   //携带方法参数实例去“反射”调用方法
-   return doInvoke(args);
+```java
+public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,Object... providedArgs) throws Exception {
+    //根据请求内容和方法定义获取方法参数实例
+    Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
+    if (logger.isTraceEnabled()) {
+        logger.trace("Arguments: " + Arrays.toString(args));
+    }
+    //携带方法参数实例去“反射”调用方法
+    return doInvoke(args);
 }
 ```
 
@@ -129,28 +117,28 @@ public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewC
 
 当试图构建出一个方法参数时，会遍历所有支持的解析器（Resolver）以找出适合的解析器，查找代码参考HandlerMethodArgumentResolverComposite#getArgumentResolver：
 
-```
+```java
 @Nullable
 private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
-   HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
-   if (result == null) {
-      //轮询所有的HandlerMethodArgumentResolver
-      for (HandlerMethodArgumentResolver resolver : this.argumentResolvers) {
-         //判断是否匹配当前HandlerMethodArgumentResolver 
-         if (resolver.supportsParameter(parameter)) {
-            result = resolver;            
-            this.argumentResolverCache.put(parameter, result);
-            break;
-         }
-      }
-   }
-   return result;
+    HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
+    if (result == null) {
+        //轮询所有的HandlerMethodArgumentResolver
+        for (HandlerMethodArgumentResolver resolver : this.argumentResolvers) {
+            //判断是否匹配当前HandlerMethodArgumentResolver 
+            if (resolver.supportsParameter(parameter)) {
+                result = resolver;            
+                this.argumentResolverCache.put(parameter, result);
+                break;
+            }
+        }
+    }
+    return result;
 }
 ```
 
 对于 student 参数而言，它被标记为@RequestBody，当遍历到 RequestResponseBodyMethodProcessor 时就会匹配上。匹配代码参考其 RequestResponseBodyMethodProcessor 的supportsParameter 方法：
 
-```
+```java
 @Override
 public boolean supportsParameter(MethodParameter parameter) {
    return parameter.hasParameterAnnotation(RequestBody.class);
@@ -159,20 +147,20 @@ public boolean supportsParameter(MethodParameter parameter) {
 
 找到 Resolver 后，就会执行 HandlerMethodArgumentResolver#resolveArgument 方法。它首先会根据当前的请求（NativeWebRequest）组装出 Student 对象并对这个对象进行必要的校验，校验的执行参考AbstractMessageConverterMethodArgumentResolver#validateIfApplicable：
 
-```
+```java
 protected void validateIfApplicable(WebDataBinder binder, MethodParameter parameter) {
-   Annotation[] annotations = parameter.getParameterAnnotations();
-   for (Annotation ann : annotations) {
-      Validated validatedAnn = AnnotationUtils.getAnnotation(ann, Validated.class);
-      //判断是否需要校验
-      if (validatedAnn != null || ann.annotationType().getSimpleName().startsWith("Valid")) {
-         Object hints = (validatedAnn != null ? validatedAnn.value() : AnnotationUtils.getValue(ann));
-         Object[] validationHints = (hints instanceof Object[] ? (Object[]) hints : new Object[] {hints});
-         //执行校验
-         binder.validate(validationHints);
-         break;
-      }
-   }
+    Annotation[] annotations = parameter.getParameterAnnotations();
+    for (Annotation ann : annotations) {
+        Validated validatedAnn = AnnotationUtils.getAnnotation(ann, Validated.class);
+        //判断是否需要校验
+        if (validatedAnn != null || ann.annotationType().getSimpleName().startsWith("Valid")) {
+            Object hints = (validatedAnn != null ? validatedAnn.value() : AnnotationUtils.getValue(ann));
+            Object[] validationHints = (hints instanceof Object[] ? (Object[]) hints : new Object[] {hints});
+            //执行校验
+            binder.validate(validationHints);
+            break;
+        }
+    }
 }
 ```
 
@@ -180,8 +168,6 @@ protected void validateIfApplicable(WebDataBinder binder, MethodParameter parame
 
 1. 标记了 org.springframework.validation.annotation.Validated 注解；
 2. 标记了其他类型的注解，且注解名称以Valid关键字开头。
-
-<!-- -->
 
 因此，结合案例程序，我们知道：student 方法参数并不符合这两个条件，所以即使它的内部成员添加了校验（即@Size(max = 10)），也不能生效。
 
@@ -191,25 +177,22 @@ protected void validateIfApplicable(WebDataBinder binder, MethodParameter parame
 
 1. 标记 @Validated
 
-<!-- -->
-
 修正后关键代码行如下：
 
 > public void addStudent(**@Validated** @RequestBody Student student)
 
-2. 标记@Valid关键字开头的注解
+2. 标记 @Valid 关键字开头的注解
 
-<!-- -->
-
-这里我们可以直接使用熟识的 javax.validation.Valid 注解，它就是一种以@Valid关键字开头的注解，修正后关键代码行如下：
+这里我们可以直接使用熟识的 javax.validation.Valid 注解，它就是一种以 @Valid 关键字开头的注解，修正后关键代码行如下：
 
 > public void addStudent(**@Valid** @RequestBody Student student)
 
-另外，我们也可以自定义一个以Valid关键字开头的注解，定义如下：
+另外，我们也可以自定义一个以 Valid 关键字开头的注解，定义如下：
 
-```
+```java
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidCustomized {
 }
@@ -219,7 +202,7 @@ public @interface ValidCustomized {
 
 > public void addStudent(**@**ValidCustomized @RequestBody Student student)
 
-通过上述2种策略、3种具体修正方法，我们最终让参数校验生效且符合预期，不过需要提醒你的是：当使用第3种修正方法时，一定要注意自定义的注解要显式标记@Retention(RetentionPolicy.RUNTIME)，否则校验仍不生效。这也是另外一个容易疏忽的地方，究其原因，不显式标记RetentionPolicy 时，默认使用的是 RetentionPolicy.CLASS，而这种类型的注解信息虽然会被保留在字节码文件（.class）中，但在加载进 JVM 时就会丢失了。所以在运行时，依据这个注解来判断是否校验，肯定会失效。
+通过上述2种策略、3种具体修正方法，我们最终让参数校验生效且符合预期，不过需要提醒你的是：当使用第3种修正方法时，一定要注意自定义的注解要显式标记 @Retention(RetentionPolicy.RUNTIME)，否则校验仍不生效。这也是另外一个容易疏忽的地方，究其原因，不显式标记 RetentionPolicy 时，默认使用的是 RetentionPolicy.CLASS，而这种类型的注解信息虽然会被保留在字节码文件（.class）中，但在加载进 JVM 时就会丢失了。所以在运行时，依据这个注解来判断是否校验，肯定会失效。
 
 ## 案例2：嵌套校验失效
 
@@ -227,13 +210,14 @@ public @interface ValidCustomized {
 
 学生可能还需要一个联系电话信息，所以我们可以定义一个 Phone 对象，然后关联上学生对象，代码如下：
 
-```
+```java
 public class Student {
     @Size(max = 10)
     private String name;
     private short age;   
     private Phone phone;
 }
+
 @Data
 class Phone {
     @Size(max = 10)
@@ -243,7 +227,7 @@ class Phone {
 
 这里我们也给 Phone 对象做了合法性要求（@Size(max = 10)），当我们使用下面的请求（请求 body 携带一个联系电话信息超过 10 位），测试校验会发现这个约束并不生效。
 
-```
+```json
 POST http://localhost:8080/students
 Content-Type: application/json
 {
@@ -261,21 +245,21 @@ Content-Type: application/json
 
 在校验执行时，首先会根据 Student 的类型定义找出所有的校验点，然后对 Student 对象实例执行校验，这个逻辑过程可以参考代码 ValidatorImpl#validate：
 
-```
+```java
 @Override
 public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
-   //省略部分非关键代码
-   Class<T> rootBeanClass = (Class<T>) object.getClass();
-   //获取校验对象类型的“信息”（包含“约束”）
-   BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+    //省略部分非关键代码
+    Class<T> rootBeanClass = (Class<T>) object.getClass();
+    //获取校验对象类型的“信息”（包含“约束”）
+    BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
-   if ( !rootBeanMetaData.hasConstraints() ) {
-      return Collections.emptySet();
-   }
+    if ( !rootBeanMetaData.hasConstraints() ) {
+        return Collections.emptySet();
+    }
 
-   //省略部分非关键代码
-   //执行校验
-   return validateInContext( validationContext, valueContext, validationOrder );
+    //省略部分非关键代码
+    //执行校验
+    return validateInContext( validationContext, valueContext, validationOrder );
 }
 ```
 
@@ -283,11 +267,10 @@ public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... grou
 
 在组装 BeanMetaData 过程中，会根据成员字段是否标记了@Valid 来决定（记录）这个字段以后是否做级联校验，参考代码 AnnotationMetaDataProvider#getCascadingMetaData：
 
-```
-private CascadingMetaDataBuilder getCascadingMetaData(Type type, AnnotatedElement annotatedElement,
-      Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData) {
-   return CascadingMetaDataBuilder.annotatedObject( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
-               getGroupConversions( annotatedElement ) );
+```java
+private CascadingMetaDataBuilder getCascadingMetaData(Type type, AnnotatedElement annotatedElement,Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData) {
+    return CascadingMetaDataBuilder.annotatedObject( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
+                                                    getGroupConversions( annotatedElement ) );
 }
 ```
 
@@ -299,9 +282,10 @@ private CascadingMetaDataBuilder getCascadingMetaData(Type type, AnnotatedElemen
 
 从源码级别了解了嵌套 Validation 失败的原因后，我们会发现，要让嵌套校验生效，解决的方法只有一种，就是加上@Valid，修正代码如下：
 
-> @Valid<br>
-> 
->  private Phone phone;
+```java
+@Valid
+private Phone phone;
+```
 
 当修正完问题后，我们会发现校验生效了。而如果此时去调试修正后的案例代码，会看到 phone 字段 MetaData 信息中的 cascading 确实为 true 了，参考下图：
 
@@ -309,11 +293,13 @@ private CascadingMetaDataBuilder getCascadingMetaData(Type type, AnnotatedElemen
 
 另外，假设我们不去解读源码，我们很可能会按照案例 1 所述的其他修正方法去修正这个问题。例如，使用 @Validated 来修正这个问题，但是此时你会发现，不考虑源码是否支持，代码本身也编译不过，这主要在于 @Validated 的定义是不允许修饰一个 Field 的：
 
-```
+```java
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Validated {
+
+}
 ```
 
 通过上述方法修正问题，最终我们让嵌套验证生效了。但是你可能还是会觉得这个错误看起来不容易犯，那么可以试想一下，我们的案例仅仅是嵌套一层，而产品代码往往都是嵌套 n 层，此时我们是否能保证每一级都不会疏忽漏加@Valid呢？所以这仍然是一个典型的错误，需要你格外注意。
@@ -324,14 +310,14 @@ public @interface Validated {
 
 之前我们定义的学生对象的姓名要求是小于 10 字节的（即@Size(max = 10)）。此时我们可能想完善校验，例如，我们希望姓名不能是空，此时你可能很容易想到去修改关键行代码如下：
 
-```
+```java
 @Size(min = 1, max = 10)
 private String name;
 ```
 
 然后，我们以下面的 JSON Body 做测试：
 
-```
+```json
 {
   "name": "",
   "age": 10,
@@ -341,7 +327,7 @@ private String name;
 
 测试结果符合我们的预期，但是假设更进一步，用下面的 JSON Body（去除 name 字段）做测试呢？
 
-```
+```json
 {
   "age": 10,
   "phone": {"number":"12306"}
@@ -360,14 +346,14 @@ private String name;
 
 这里我们找到了完成@Size 约束的执行方法，参考 SizeValidatorForCharSequence#isValid 方法：
 
-```
+```java
 public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
-      if ( charSequence == null ) {
-         return true;
-      }
-      int length = charSequence.length();
-      return length >= min && length <= max;
-   }
+    if ( charSequence == null ) {
+        return true;
+    }
+    int length = charSequence.length();
+    return length >= min && length <= max;
+}
 ```
 
 如代码所示，当字符串为 null 时，直接通过了校验，而不会做任何进一步的约束检查。
@@ -376,7 +362,7 @@ public boolean isValid(CharSequence charSequence, ConstraintValidatorContext con
 
 关于这个问题的修正，其实很简单，我们可以使用其他的注解（@NotNull 或@NotEmpty）来加强约束，修正代码如下：
 
-```
+```java
 @NotEmpty
 @Size(min = 1, max = 10)
 private String name;
@@ -396,7 +382,7 @@ private String name;
 
 在上面的学籍管理系统中，我们还存在一个接口，负责根据学生的学号删除他的信息，代码如下：
 
-```
+```java
 @RequestMapping(path = "students/{id}", method = RequestMethod.DELETE)
 public void deleteStudent(@PathVariable("id") @Range(min = 1,max = 10000) String id){
     log.info("delete student: {}",id);

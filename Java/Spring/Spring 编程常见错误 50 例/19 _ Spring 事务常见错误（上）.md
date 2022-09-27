@@ -1,17 +1,5 @@
 # 19 \| Spring 事务常见错误（上）
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/a4/18/a4533fefa92599f597ee59f58e1c2c18.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/93/82/935ca57caaaa5caab75321937022a682.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 通过上节课的学习，我们了解了 Spring Data 操作数据库的一些常见问题。这节课我们聊一聊数据库操作中的一个非常重要的话题——事务管理。
 
 Spring 事务管理包含两种配置方式，第一种是使用 XML 进行模糊匹配，绑定事务管理；第二种是使用注解，这种方式可以对每个需要进行事务处理的方法进行单独配置，你只需要添加上@Transactional，然后在注解内添加属性配置即可。在我们的错误案例示范中，我们统一使用更为方便的注解式方式。
@@ -22,9 +10,7 @@ Spring 事务管理包含两种配置方式，第一种是使用 XML 进行模�
 
 1. 数据库配置文件 jdbc.properties，配置了数据连接信息。
 
-<!-- -->
-
-```
+```json
 jdbc.driver=com.mysql.cj.jdbc.Driver
 
 jdbc.url=jdbc:mysql://localhost:3306/spring?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false
@@ -35,11 +21,7 @@ jdbc.password=pass
 
 2. JDBC 的配置类，从上述 jdbc.properties 加载相关配置项，并创建 JdbcTemplate、DataSource、TransactionManager 相关的 Bean 等。
 
-<!-- -->
-
-<!-- [[[read_end]]] -->
-
-```
+```java
 public class JdbcConfig {
     @Value("${jdbc.driver}")
     private String driver;
@@ -77,9 +59,7 @@ public class JdbcConfig {
 
 3. 应用配置类，通过注解的方式，配置了数据源、MyBatis Mapper 的扫描路径以及事务等。
 
-<!-- -->
-
-```
+```java
 @Configuration
 @ComponentScan
 @Import({JdbcConfig.class})
@@ -103,7 +83,7 @@ public class AppConfig {
 
 其中，Student 定义如下：
 
-```
+```java
 public class Student implements Serializable {
     private Integer id;
     private String realname;
@@ -124,7 +104,7 @@ public class Student implements Serializable {
 
 Student 对应的 Mapper 类定义如下：
 
-```
+```java
 @Mapper
 public interface StudentMapper {
     @Insert("INSERT INTO `student`(`realname`) VALUES (#{realname})")
@@ -134,7 +114,7 @@ public interface StudentMapper {
 
 对应数据库表的 Schema 如下：
 
-```
+```mysql
 CREATE TABLE `student` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `realname` varchar(255) DEFAULT NULL,
@@ -146,7 +126,7 @@ CREATE TABLE `student` (
 
 接下来，我们想要测试一下这个事务会不会回滚，于是就写了这样一段逻辑：如果发现用户名是小明，就直接抛出异常，触发事务的回滚操作。
 
-```
+```java
 @Service
 public class StudentService {
     @Autowired
@@ -166,7 +146,7 @@ public class StudentService {
 
 然后使用下面的代码来测试一下，保存一个叫小明的学生，看会不会触发事务的回滚。
 
-```
+```java
 public class AppConfig {
     public static void main(String[] args) throws Exception {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
@@ -197,10 +177,10 @@ Exception in thread "main" java.lang.Exception: 该学生已存在
 
 首先，TransactionInterceptor 继承类 TransactionAspectSupport，实现了接口 MethodInterceptor。当执行代理类的目标方法时，会触发invoke()。由于我们的关注重点是在异常处理上，所以直奔主题，跳到异常处理相关的部分。当它 catch 到异常时，会调用 completeTransactionAfterThrowing 方法做进一步处理。
 
-```
+```java
 protected Object invokeWithinTransaction(Method method, @Nullable Class<?> targetClass,
       final InvocationCallback invocation) throws Throwable {
-      //省略非关键代码
+      // 省略非关键代码
       Object retVal;
       try {
          retVal = invocation.proceedWithInvocation();
@@ -212,13 +192,13 @@ protected Object invokeWithinTransaction(Method method, @Nullable Class<?> targe
       finally {
          cleanupTransactionInfo(txInfo);
       }
-      //省略非关键代码
+      // 省略非关键代码
 }
 ```
 
 在 completeTransactionAfterThrowing 的代码中，有这样一个方法 rollbackOn()，这是事务的回滚的关键判断条件。当这个条件满足时，会触发 rollback 操作，事务回滚。
 
-```
+```java
 protected void completeTransactionAfterThrowing(@Nullable TransactionInfo txInfo, Throwable ex) {
     //省略非关键代码
     //判断是否需要回滚
@@ -241,7 +221,7 @@ txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());
 
 rollbackOn()其实包括了两个层级，具体可参考如下代码：
 
-```
+```java
 public boolean rollbackOn(Throwable ex) {
    // 层级 1：根据"rollbackRules"及当前捕获异常来判断是否需要回滚
    RollbackRuleAttribute winner = null;
@@ -266,19 +246,15 @@ public boolean rollbackOn(Throwable ex) {
 
 1. RuleBasedTransactionAttribute 自身的 rollbackOn()
 
-<!-- -->
-
 当我们在 @Transactional 中配置了 rollbackFor，这个方法就会用捕获到的异常和 rollbackFor 中配置的异常做比较。如果捕获到的异常是 rollbackFor 配置的异常或其子类，就会直接 rollback。在我们的案例中，由于在事务的注解中没有加任何规则，所以这段逻辑处理其实找不到规则（即 winner == null），进而走到下一步。
 
 2. RuleBasedTransactionAttribute 父类 DefaultTransactionAttribute 的 rollbackOn()
-
-<!-- -->
 
 如果没有在 @Transactional 中配置 rollback 属性，或是捕获到的异常和所配置异常的类型不一致，就会继续调用父类的 rollbackOn() 进行处理。
 
 而在父类的 rollbackOn() 中，我们发现了一个重要的线索，只有在异常类型为 RuntimeException 或者 Error 的时候才会返回 true，此时，会触发 completeTransactionAfterThrowing 方法中的 rollback 操作，事务被回滚。
 
-```
+```java
 public boolean rollbackOn(Throwable ex) {
    return (ex instanceof RuntimeException || ex instanceof Error);
 }
@@ -292,7 +268,7 @@ public boolean rollbackOn(Throwable ex) {
 
 这么看来，修改方法也可以很简单，只需要把抛出的异常类型改成 RuntimeException 就可以了。于是这部分代码就可以修改如下：
 
-```
+```java
 @Service
 public class StudentService {
     @Autowired
@@ -317,7 +293,7 @@ public class StudentService {
 
 于是我们可以完善下案例中的注解，修改后代码如下：
 
-```
+```java
 @Transactional(rollbackFor = Exception.class)
 ```
 
@@ -327,7 +303,7 @@ public class StudentService {
 
 接着上一个案例，我们已经实现了保存学生信息的功能。接下来，我们来优化一下逻辑，让学生的创建和保存逻辑分离，于是我就对代码做了一些重构，把Student的实例创建和保存逻辑拆到两个方法中分别进行。然后，把事务的注解 @Transactional 加在了保存数据库的方法上。
 
-```
+```java
 @Service
 public class StudentService {
     @Autowired
@@ -364,7 +340,7 @@ public class StudentService {
 
 前一段是 Spring 创建 Bean 的过程。当 Bean 初始化之后，开始尝试代理操作，这个过程是从 AbstractAutoProxyCreator 里的 postProcessAfterInitialization 方法开始处理的：
 
-```
+```java
 public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
    if (bean != null) {
       Object cacheKey = getCacheKey(bean.getClass(), beanName);
@@ -378,47 +354,47 @@ public Object postProcessAfterInitialization(@Nullable Object bean, String beanN
 
 我们一路往下找，暂且略过那些非关键要素的代码，直到到了 AopUtils 的 canApply 方法。这个方法就是针对切面定义里的条件，确定这个方法是否可以被应用创建成代理。其中有一段 methodMatcher.matches(method, targetClass) 是用来判断这个方法是否符合这样的条件：
 
-```
+```java
 public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
-   //省略非关键代码
-   for (Class<?> clazz : classes) {
-      Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
-      for (Method method : methods) {
-         if (introductionAwareMethodMatcher != null ?
-               introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
-               methodMatcher.matches(method, targetClass)) {
-            return true;
-         }
-      }
-   }
-   return false;
+    // 省略非关键代码
+    for (Class<?> clazz : classes) {
+        Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
+        for (Method method : methods) {
+            if (introductionAwareMethodMatcher != null ?
+                introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
+                methodMatcher.matches(method, targetClass)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 ```
 
 从 matches() 调用到了 AbstractFallbackTransactionAttributeSource 的 getTransactionAttribute：
 
-```
+```java
 public boolean matches(Method method, Class<?> targetClass) {
-   //省略非关键代码
-   TransactionAttributeSource tas = getTransactionAttributeSource();
-   return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
+    //省略非关键代码
+    TransactionAttributeSource tas = getTransactionAttributeSource();
+    return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
 }
 ```
 
 其中，getTransactionAttribute 这个方法是用来获取注解中的事务属性，根据属性确定事务采用什么样的策略。
 
-```
+```java
 public TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
-      //省略非关键代码
-      TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
-      //省略非关键代码
-   }
+    //省略非关键代码
+    TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
+    //省略非关键代码
+}
 }
 ```
 
 接着调用到 computeTransactionAttribute 这个方法，其主要功能是根据方法和类的类型确定是否返回事务属性，执行代码如下：
 
-```
+```java
 protected TransactionAttribute computeTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
    //省略非关键代码
    if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
@@ -434,7 +410,7 @@ protected TransactionAttribute computeTransactionAttribute(Method method, @Nulla
 
 allowPublicMethodsOnly 返回了 AnnotationTransactionAttributeSource 的 publicMethodsOnly 属性。
 
-```
+```java
 protected boolean allowPublicMethodsOnly() {
    return this.publicMethodsOnly;
 }
@@ -442,7 +418,7 @@ protected boolean allowPublicMethodsOnly() {
 
 而这个 publicMethodsOnly 属性是通过 AnnotationTransactionAttributeSource 的构造方法初始化的，默认为 true。
 
-```
+```java
 public AnnotationTransactionAttributeSource() {
    this(true);
 }
@@ -452,7 +428,7 @@ public AnnotationTransactionAttributeSource() {
 
 这个方法根据传入的 method.getModifiers() 获取方法的修饰符。该修饰符是 java.lang.reflect.Modifier 的静态属性，对应的几类修饰符分别是：PUBLIC: 1，PRIVATE: 2，PROTECTED: 4。这里面做了一个位运算，只有当传入的方法修饰符是 public 类型的时候，才返回 true。
 
-```
+```java
 public static boolean isPublic(int mod) {
     return (mod & PUBLIC) != 0;
 }
@@ -466,7 +442,7 @@ public static boolean isPublic(int mod) {
 
 不过需要额外补充的是，我们调用这个加了事务注解的方法，必须是调用被 Spring AOP 代理过的方法，也就是不能通过类的内部调用或者通过 this 的方式调用。所以我们的案例的StudentService，它含有一个自动装配（Autowired）了自身（StudentService）的实例来完成代理方法的调用。这个问题我们在之前 Spring AOP 的代码解析中重点强调过，此处就不再详述了。
 
-```
+```java
 @Service
 public class StudentService {
     @Autowired
@@ -505,8 +481,6 @@ Exception in thread "main" java.lang.RuntimeException: 该学生已存在
 - Spring 支持声明式事务机制，它通过在方法上加上@Transactional，表明该方法需要事务支持。于是，在加载的时候，根据 @Transactional 中的属性，决定对该事务采取什么样的策略；
 - @Transactional 对 private 方法不生效，所以我们应该把需要支持事务的方法声明为 public 类型；
 - Spring 处理事务的时候，默认只对 RuntimeException 和 Error 回滚，不会对Exception 回滚，如果有特殊需要，需要额外声明，例如指明 Transactional 的属性 rollbackFor 为Exception.class。
-
-<!-- -->
 
 ## 思考题
 

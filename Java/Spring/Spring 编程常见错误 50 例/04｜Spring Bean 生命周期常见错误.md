@@ -6,8 +6,6 @@
 
 这会导致这样一些状况发生：有些错误，我们可以在 Spring 的异常提示下快速解决，但却不理解背后的原理；而另一些错误，并不容易在开发环境下被发现，从而在产线上造成较为严重的后果。
 
-接下来我们就具体解析下这些常见案例及其背后的原理。
-
 ## 案例 1：构造器内抛空指针异常
 
 先看个例子。在构建宿舍管理系统时，有 LightMgrService 来管理 LightService，从而控制宿舍灯的开启和关闭。我们希望在 LightMgrService 初始化时能够自动调用 LightService 的 check 方法来检查所有宿舍灯的电路是否正常，代码如下：
@@ -44,21 +42,19 @@ public class LightService {
 
 以上代码定义了 LightService 对象的原始类。
 
-从整个案例代码实现来看，我们的期待是在 LightMgrService 初始化过程中，LightService 因为标记为 @Autowired，所以能被自动装配好；然后在 LightMgrService 的构造器执行中，LightService 的 shutdown() 方法能被自动调用；最终打印出 check all lights。
+从整个案例代码实现来看，我们的期待是在 LightMgrService 初始化过程中，LightService 因为标记为 @Autowired，所以能被自动装配好；然后在 LightMgrService 的构造器执行中，LightService 的 check() 方法能被自动调用；最终打印出 check all lights。
 
 然而事与愿违，我们得到的只会是 NullPointerException，错误示例如下：
 
 ![](<https://static001.geekbang.org/resource/image/4d/4e/4d4cecc9c82abaaa4f04cdb274c05e4e.png?wh=1589*293>)
 
-这是为什么呢？
-
 ### 案例解析
 
-显然这是新手最常犯的错误，但是问题的根源，是我们**对Spring类初始化过程没有足够的了解**。下面这张时序图描述了 Spring 启动时的一些关键结点：
+显然这是新手最常犯的错误，但是问题的根源，是我们**对 Spring 类初始化过程没有足够的了解**。
 
 ![](<https://static001.geekbang.org/resource/image/6f/8a/6ff70ab627711065bc17c54c001ef08a.png?wh=3321*1068>)
 
-这个图初看起来复杂，我们不妨将其分为三部分：
+**上面这张时序图描述了 Spring 启动时的一些关键结点**：
 
 - 第一部分，将一些必要的系统类，比如 Bean 的后置处理器类，注册到 Spring 容器，其中就包括我们这节课关注的 CommonAnnotationBeanPostProcessor 类；
 - 第二部分，将这些后置处理器实例化，并注册到 Spring 的容器中；
@@ -71,31 +67,31 @@ public class LightService {
 1. 很多必要的系统类，尤其是 Bean 后置处理器（比如CommonAnnotationBeanPostProcessor、AutowiredAnnotationBeanPostProcessor 等），都是被 Spring 统一加载和管理的，并在 Spring 中扮演了非常重要的角色；
 2. 通过 Bean 后置处理器，Spring 能够非常灵活地在不同的场景调用不同的后置处理器，比如接下来我会讲到示例问题如何修正，修正方案中提到的 PostConstruct 注解，它的处理逻辑就需要用到 CommonAnnotationBeanPostProcessor（继承自 InitDestroyAnnotationBeanPostProcessor）这个后置处理器。
 
-现在我们重点看下第三部分，即 Spring 初始化单例类的一般过程，基本都是 getBean()->doGetBean()->getSingleton()，如果发现 Bean 不存在，则调用 createBean()->doCreateBean() 进行实例化。
+现在我们重点看下第三部分，**即 Spring 初始化单例类的一般过程，基本都是 getBean()->doGetBean()->getSingleton()，如果发现 Bean 不存在，则调用 createBean()->doCreateBean() 进行实例化**。
 
 查看 doCreateBean() 的源代码如下：
 
 ```java
 protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final @Nullable Object[] args)
 		throws BeanCreationException {
-    //省略非关键代码
+    // 省略非关键代码
 	if (instanceWrapper == null) {
 		instanceWrapper = createBeanInstance(beanName, mbd, args);
 	}
 	final Object bean = instanceWrapper.getWrappedInstance();
 
-    //省略非关键代码
+    // 省略非关键代码
     Object exposedObject = bean;
     try {
        populateBean(beanName, mbd, instanceWrapper);
        exposedObject = initializeBean(beanName, exposedObject, mbd);
     }
     catch (Throwable ex) {
-    //省略非关键代码
+    // 省略非关键代码
 }
 ```
 
-上述代码完整地展示了 Bean 初始化的三个关键步骤，按执行顺序分别是第 5 行的 createBeanInstance，第 12 行的 populateBean，以及第 13 行的 initializeBean，分别对应实例化 Bean，注入 Bean 依赖，以及初始化 Bean （例如执行 @PostConstruct 标记的方法 ）这三个功能，这也和上述时序图的流程相符。
+上述代码完整地展示了 **Bean 初始化的三个关键步骤**，按执行顺序分别是第 5 行的 createBeanInstance，第 12 行的 populateBean，以及第 13 行的 initializeBean，**分别对应实例化 Bean，注入 Bean 依赖，以及初始化 Bean** （例如执行 @PostConstruct 标记的方法 ）这三个功能，这也和上述时序图的流程相符。
 
 而用来实例化 Bean 的 createBeanInstance 方法通过依次调用DefaultListableBeanFactory.instantiateBean() >SimpleInstantiationStrategy.instantiate()，最终执行到 BeanUtils.instantiateClass()，其代码如下：
 

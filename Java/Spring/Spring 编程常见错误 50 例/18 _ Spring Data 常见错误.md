@@ -1,63 +1,49 @@
 # 18 \| Spring Data 常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/3b/2f/3bbba61589941035f2ee75b52bea3a2f.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/b5/15/b5110a301c1542f4bfb621a92da7c215.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 上一章节我们学习了 Spring Web 开发的常见错误。那么从这节课开始，我们将重点关注其他的一些 Spring 工具使用上的错误。
 
 实际上，除了 Spring Web 外，Spring 还提供了很多其他好用的工具集，Spring Data 就是这样的存在。众所周知，基本上所有的项目都会用到数据库，所以 Spring 提供了对市场上主流数据库的贴心支持，我们不妨通过下面的列表快速浏览下：
 
-> Spring Data Commons<br>
+> Spring Data Commons
 > 
->  Spring Data JPA<br>
+>  Spring Data JPA
 > 
->  Spring Data KeyValue<br>
+>  Spring Data KeyValue
 > 
->  Spring Data LDAP<br>
+>  Spring Data LDAP
 > 
->  Spring Data MongoDB<br>
+>  Spring Data MongoDB
 > 
->  Spring Data Redis<br>
+>  Spring Data Redis
 > 
->  Spring Data REST<br>
+>  Spring Data REST
 > 
->  Spring Data for Apache Cassandra<br>
+>  Spring Data for Apache Cassandra
 > 
->  Spring Data for Apache Geode<br>
+>  Spring Data for Apache Geode
 > 
->  Spring Data for Apache Solr<br>
+>  Spring Data for Apache Solr
 > 
->  Spring Data for Pivotal GemFire<br>
+>  Spring Data for Pivotal GemFire
 > 
->  Spring Data Couchbase (community module)<br>
+>  Spring Data Couchbase (community module)
 > 
->  Spring Data Elasticsearch (community module)<br>
+>  Spring Data Elasticsearch (community module)
 > 
 >  Spring Data Neo4j (community module)
 
-<!-- [[[read_end]]] -->
-
-而在你使用这些各种各样的数据库时，难免会遇到问题，接下来我会选取3个典型案例，为你总结下那些高频问题。
+而在你使用这些各种各样的数据库时，难免会遇到问题，接下来我会选取 3 个典型案例，为你总结下那些高频问题。
 
 ## 案例 1：注意读与取的一致性
 
 当使用 Spring Data Redis 时，我们有时候会在项目升级的过程中，发现存储后的数据有读取不到的情况；另外，还会出现解析出错的情况。这里我们不妨直接写出一个错误案例来模拟下：
 
-```
+```java
 @SpringBootApplication
 public class SpringdataApplication {
 
     SpringdataApplication(RedisTemplate redisTemplate,
-            StringRedisTemplate stringRedisTemplate){
+                          StringRedisTemplate stringRedisTemplate){
         String key = "mykey";
         stringRedisTemplate.opsForValue().set(key, "myvalue");
 
@@ -77,7 +63,7 @@ public class SpringdataApplication {
 
 在上述代码中，我们使用了 Redis 提供的两种 Template，一种 RedisTemplate，一种 stringRedisTemplate。但是当我们使用后者去存一个数据后，你会发现使用前者是取不到对应的数据的。输出结果如下：
 
-> myvalue<br>
+> myvalue
 > 
 >  null
 
@@ -93,7 +79,7 @@ public class SpringdataApplication {
 
 具体到我们的案例而言，当带着key去存取数据时，它会执行 AbstractOperations#rawKey，使得在执行存储 key-value 到 Redis，或从 Redis 读取数据之前，对 key 进行序列化操作：
 
-```
+```java
 byte[] rawKey(Object key) {
 
    Assert.notNull(key, "non null key required");
@@ -108,43 +94,39 @@ byte[] rawKey(Object key) {
 
 从上述代码可以看出，假设存在 keySerializer，则利用它将 key 序列化。而对于 StringRedisSerializer 来说，它指定的其实是 StringRedisSerializer。具体实现如下：
 
-```
+```java
 public class StringRedisSerializer implements RedisSerializer<String> {
 
    private final Charset charset;
 
-   
    @Override
    public byte[] serialize(@Nullable String string) {
       return (string == null ? null : string.getBytes(charset));
    }
- 
 }
 ```
 
 而如果我们使用的是 RedisTemplate，则使用的是 JDK 序列化，具体序列化操作参考下面的实现：
 
-```
+```java
 public class JdkSerializationRedisSerializer implements RedisSerializer<Object> {
-
-  
-   @Override
-   public byte[] serialize(@Nullable Object object) {
-      if (object == null) {
-         return SerializationUtils.EMPTY_ARRAY;
-      }
-      try {
-         return serializer.convert(object);
-      } catch (Exception ex) {
-         throw new SerializationException("Cannot serialize", ex);
-      }
-   }
+    @Override
+    public byte[] serialize(@Nullable Object object) {
+        if (object == null) {
+            return SerializationUtils.EMPTY_ARRAY;
+        }
+        try {
+            return serializer.convert(object);
+        } catch (Exception ex) {
+            throw new SerializationException("Cannot serialize", ex);
+        }
+    }
 }
 ```
 
 很明显，上面对 key 的处理，采用的是 JDK 的序列化，最终它调用的方法如下：
 
-```
+```java
 public interface Serializer<T> {
     void serialize(T var1, OutputStream var2) throws IOException;
 
@@ -160,15 +142,14 @@ public interface Serializer<T> {
 
 至于它们是如何指定 RedisSerializer 的，我们可以以 StringRedisSerializer 为例简单看下。查看下面的代码，它是 StringRedisSerializer 的构造器，在构造器中，它直接指定了KeySerializer为 RedisSerializer.string()：
 
-```
+```java
 public class StringRedisTemplate extends RedisTemplate<String, String> {
-
-   public StringRedisTemplate() {
-      setKeySerializer(RedisSerializer.string());
-      setValueSerializer(RedisSerializer.string());
-      setHashKeySerializer(RedisSerializer.string());
-      setHashValueSerializer(RedisSerializer.string());
-   }
+    public StringRedisTemplate() {
+        setKeySerializer(RedisSerializer.string());
+        setValueSerializer(RedisSerializer.string());
+        setHashKeySerializer(RedisSerializer.string());
+        setHashValueSerializer(RedisSerializer.string());
+    }
 }
 ```
 
@@ -194,7 +175,7 @@ public class StringRedisTemplate extends RedisTemplate<String, String> {
 
 我们可以看下它存在很多默认的配置，其中一项很重要的配置是 Consistency，在 driver 中默认为 LOCAL\_ONE，具体如下：
 
-```
+```java
 basic.request {
  
 
@@ -229,7 +210,7 @@ basic.request {
 
 我们看下如何修改它：
 
-```
+```java
 @Override
 protected SessionBuilderConfigurer getSessionBuilderConfigurer() {
     return cqlSessionBuilder -> {
@@ -265,7 +246,7 @@ Spring Data Cassandra 在连接 Cassandra 之后，会获取 Cassandra 的 Metad
 
 现在我们定义一个 MyService 类，当它构造时，会输出它的名称信息：
 
-```
+```java
 public class MyService {
 
     public MyService(String name){
@@ -276,7 +257,7 @@ public class MyService {
 
 然后我们定义两个 Configuration 类，同时让它们是继承关系，其中父 Configuration 命名如下：
 
-```
+```java
 @Configuration
 public class BaseConfig {
 
@@ -289,7 +270,7 @@ public class BaseConfig {
 
 子 Configuration 命名如下：
 
-```
+```java
 @Configuration
 public class Config extends BaseConfig {
 
@@ -302,14 +283,13 @@ public class Config extends BaseConfig {
 
 子类的 service() 实现覆盖了父类对应的方法。最后，我们书写一个启动程序：
 
-```
+```java
 @SpringBootApplication
 public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-
 }
 ```
 
@@ -325,7 +305,7 @@ public class Application {
 
 但是假设我们不小心在子类实现时，没有意识到父类方法的存在，定义如下呢？
 
-```
+```java
 @Configuration
 public class Config extends BaseConfig {
 
@@ -338,38 +318,38 @@ public class Config extends BaseConfig {
 
 经过上述的不小心修改，再次运行程序，你会发现有 2 个 MyService 的 Bean 产生：
 
-> myservice defined from config<br>
+> myservice defined from config
 > 
 >  myservice defined from base config
 
 说到这里你可能想到一个造成内存翻倍的原因。我们去查看案例程序的代码，可能会发现存在这样的问题：
 
-```
+```java
 @Configuration
 @EnableCassandraRepositories
-public class CassandraConfig extends AbstractCassandraConfiguration
-     @Bean
-     @Primary
-     public CqlSessionFactoryBean session() {
-         log.info("init session");
-         CqlSessionFactoryBean cqlSessionFactoryBean = new CqlSessionFactoryBean();
-         //省略其他非关键代码    
-         return cqlSessionFactoryBean ;
-     }
-     //省略其他非关键代码
+public class CassandraConfig extends AbstractCassandraConfiguration{
+    @Bean
+    @Primary
+    public CqlSessionFactoryBean session() {
+        log.info("init session");
+        CqlSessionFactoryBean cqlSessionFactoryBean = new CqlSessionFactoryBean();
+        // 省略其他非关键代码    
+        return cqlSessionFactoryBean;
+    }
+    // 省略其他非关键代码
 }
 ```
 
 CassandraConfig 继承于 AbstractSessionConfiguration，它已经定义了一个 CqlSessionFactoryBean，代码如下：
 
-```
+```java
 @Configuration
-public abstract class AbstractSessionConfiguration implements BeanFactoryAware
+public abstract class AbstractSessionConfiguration implements BeanFactoryAware{
     @Bean
     public CqlSessionFactoryBean cassandraSession() {
-       CqlSessionFactoryBean bean = new CqlSessionFactoryBean();
-       bean.setContactPoints(getContactPoints());
-       //省略其他非关键代码
+        CqlSessionFactoryBean bean = new CqlSessionFactoryBean();
+        bean.setContactPoints(getContactPoints());
+        //省略其他非关键代码
         return bean;
     }
     //省略其他非关键代码
@@ -378,7 +358,7 @@ public abstract class AbstractSessionConfiguration implements BeanFactoryAware
 
 而比较这两段的 CqlSessionFactoryBean 的定义方法，你会发现它们的方法名是不同的：
 
-> cassandraSession()<br>
+> cassandraSession()
 > 
 >  session()
 
@@ -388,16 +368,16 @@ public abstract class AbstractSessionConfiguration implements BeanFactoryAware
 
 我们只要几秒钟就能解决这个问题。我们可以把原始案例代码修改如下：
 
-```
+```java
 @Configuration
 @EnableCassandraRepositories
-public class CassandraConfig extends AbstractCassandraConfiguration
-     @Bean
-     @Primary
-     public CqlSessionFactoryBean cassandraSession() {
-        //省略其他非关键代码
-     }
-     //省略其他非关键代码
+public class CassandraConfig extends AbstractCassandraConfiguration{
+    @Bean
+    @Primary
+    public CqlSessionFactoryBean cassandraSession() {
+        // 省略其他非关键代码
+    }
+    // 省略其他非关键代码
 }
 ```
 
@@ -405,23 +385,22 @@ public class CassandraConfig extends AbstractCassandraConfiguration
 
 实际上，这是因为使用 Spring Data Cassandra 会创建两个Session，它们都会获取metadata。具体可参考代码CqlSessionFactoryBean#afterPropertiesSet：
 
-```
+```java
 @Override
 public void afterPropertiesSet() {
+    CqlSessionBuilder sessionBuilder = buildBuilder();
+    // system session 的创建
+    this.systemSession = buildSystemSession(sessionBuilder);
 
-   CqlSessionBuilder sessionBuilder = buildBuilder();
-   // system session 的创建
-   this.systemSession = buildSystemSession(sessionBuilder);
+    initializeCluster(this.systemSession);
+    // normal session 的创建
+    this.session = buildSession(sessionBuilder);
 
-   initializeCluster(this.systemSession);
-   // normal session 的创建
-   this.session = buildSession(sessionBuilder);
+    executeCql(getStartupScripts().stream(), this.session);
+    performSchemaAction();
 
-   executeCql(getStartupScripts().stream(), this.session);
-   performSchemaAction();
-
-   this.systemSession.refreshSchema();
-   this.session.refreshSchema();
+    this.systemSession.refreshSchema();
+    this.session.refreshSchema();
 }
 ```
 
@@ -435,9 +414,7 @@ public void afterPropertiesSet() {
 
 1. 一定要注意一致性，例如读写的序列化方法需要一致；
 2. 一定要重新检查下所有的默认配置是什么，是否符合当前的需求，例如在 Spring Data Cassandra 中，默认的一致性级别在大多情况下都不适合；
-3. 如果你自定义自己的Session，一定要避免冗余的Session产生。
-
-<!-- -->
+3. 如果你自定义自己的 Session，一定要避免冗余的 Session 产生。
 
 记住这3点，你就能规避不少 Spring Data 使用上的问题了。
 

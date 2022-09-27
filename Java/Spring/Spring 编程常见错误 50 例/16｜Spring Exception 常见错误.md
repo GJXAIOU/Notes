@@ -1,24 +1,12 @@
 # 16｜Spring Exception 常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/36/9d/36c198c409246d00b59e7af30870889d.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/56/51/56f3049c03ba11yyyy6540181b709a51.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 今天，我们来学习 Spring 的异常处理机制。Spring 提供了一套健全的异常处理框架，以便我们在开发应用的时候对异常进行处理。但是，我们也会在使用的时候遇到一些麻烦，接下来我将通过两个典型的错误案例，带着你结合源码进行深入了解。
 
 ## 案例 1：小心过滤器异常
 
 为了方便讲解，我们还是沿用之前在事务处理中用到的学生注册的案例，来讨论异常处理的问题：
 
-```
+```java
 @Controller
 @Slf4j
 public class StudentController {
@@ -36,13 +24,13 @@ public class StudentController {
 }
 ```
 
-​为了保证安全，这里需要给请求加一个保护，通过验证 Token 的方式来验证请求的合法性。这个 Token 需要在每次发送请求的时候带在请求的 header 中，header 的 key 是 Token。
+为了保证安全，这里需要给请求加一个保护，通过验证 Token 的方式来验证请求的合法性。这个 Token 需要在每次发送请求的时候带在请求的 header 中，header 的 key 是 Token。
 
 为了校验这个 Token，我们引入了一个 Filter 来处理这个校验工作，这里我使用了一个最简单的 Token：111111。
 
 当 Token 校验失败时，就会抛出一个自定义的 NotAllowException，交由 Spring 处理：
 
-```
+```java
 @WebFilter
 @Component
 public class PermissionFilter implements Filter {
@@ -68,11 +56,12 @@ public class PermissionFilter implements Filter {
     @Override
     public void destroy() {
     }
+}
 ```
 
 NotAllowException 就是一个简单的 RuntimeException 的子类：
 
-```
+```java
 public class NotAllowException extends RuntimeException {
     public NotAllowException() {
         super();
@@ -82,9 +71,7 @@ public class NotAllowException extends RuntimeException {
 
 同时，新增了一个 RestControllerAdvice 来处理这个异常，处理方式也很简单，就是返回一个 403 的 resultCode：
 
-<!-- [[[read_end]]] -->
-
-```
+```java
 @RestControllerAdvice
 public class NotAllowExceptionHandler {
     @ExceptionHandler(NotAllowException.class)
@@ -100,7 +87,7 @@ public class NotAllowExceptionHandler {
 
 然而，在控制台上，我们只看到了下面这样的输出，这其实就说明了 NotAllowExceptionHandler 并没有生效。
 
-```
+```java
 throw NotAllowException
 ```
 
@@ -120,20 +107,20 @@ throw NotAllowException
 
 **首先我们来了解下ControllerAdvice是如何被Spring加载并对外暴露的。**在Spring Web 的核心配置类 WebMvcConfigurationSupport 中，被 @Bean 修饰的 handlerExceptionResolver()，会调用addDefaultHandlerExceptionResolvers() 来添加默认的异常解析器。
 
-```
+```java
 @Bean
 public HandlerExceptionResolver handlerExceptionResolver(
-      @Qualifier("mvcContentNegotiationManager") ContentNegotiationManager contentNegotiationManager) {
-   List<HandlerExceptionResolver> exceptionResolvers = new ArrayList<>();
-   configureHandlerExceptionResolvers(exceptionResolvers);
-   if (exceptionResolvers.isEmpty()) {
-      addDefaultHandlerExceptionResolvers(exceptionResolvers, contentNegotiationManager);
-   }
-   extendHandlerExceptionResolvers(exceptionResolvers);
-   HandlerExceptionResolverComposite composite = new HandlerExceptionResolverComposite();
-   composite.setOrder(0);
-   composite.setExceptionResolvers(exceptionResolvers);
-   return composite;
+    @Qualifier("mvcContentNegotiationManager") ContentNegotiationManager contentNegotiationManager) {
+    List<HandlerExceptionResolver> exceptionResolvers = new ArrayList<>();
+    configureHandlerExceptionResolvers(exceptionResolvers);
+    if (exceptionResolvers.isEmpty()) {
+        addDefaultHandlerExceptionResolvers(exceptionResolvers, contentNegotiationManager);
+    }
+    extendHandlerExceptionResolvers(exceptionResolvers);
+    HandlerExceptionResolverComposite composite = new HandlerExceptionResolverComposite();
+    composite.setOrder(0);
+    composite.setExceptionResolvers(exceptionResolvers);
+    return composite;
 }
 ```
 
@@ -143,10 +130,10 @@ public HandlerExceptionResolver handlerExceptionResolver(
 
 从源码中我们可以看出，ExceptionHandlerExceptionResolver 类实现了InitializingBean接口，并覆写了afterPropertiesSet()。
 
-```
+```java
 public void afterPropertiesSet() {
-   // Do this first, it may add ResponseBodyAdvice beans
-   initExceptionHandlerAdviceCache();
+    // Do this first, it may add ResponseBodyAdvice beans
+    initExceptionHandlerAdviceCache();
     //省略非关键代码
 }
 ```
@@ -155,28 +142,28 @@ public void afterPropertiesSet() {
 
 在我们这个案例里，就是指 NotAllowExceptionHandler 这个异常处理器。
 
-```
+```java
 private void initExceptionHandlerAdviceCache() {
-   //省略非关键代码
-   List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
-   for (ControllerAdviceBean adviceBean : adviceBeans) {
-      Class<?> beanType = adviceBean.getBeanType();
-      if (beanType == null) {
-         throw new IllegalStateException("Unresolvable type for ControllerAdviceBean: " + adviceBean);
-      }
-      ExceptionHandlerMethodResolver resolver = new ExceptionHandlerMethodResolver(beanType);
-      if (resolver.hasExceptionMappings()) {
-         this.exceptionHandlerAdviceCache.put(adviceBean, resolver);
-      }
- //省略非关键代码
-}
+    //省略非关键代码
+    List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
+    for (ControllerAdviceBean adviceBean : adviceBeans) {
+        Class<?> beanType = adviceBean.getBeanType();
+        if (beanType == null) {
+            throw new IllegalStateException("Unresolvable type for ControllerAdviceBean: " + adviceBean);
+        }
+        ExceptionHandlerMethodResolver resolver = new ExceptionHandlerMethodResolver(beanType);
+        if (resolver.hasExceptionMappings()) {
+            this.exceptionHandlerAdviceCache.put(adviceBean, resolver);
+        }
+        //省略非关键代码
+    }
 ```
 
 到这，我们可以总结一下，WebMvcConfigurationSupport 中的handlerExceptionResolver() 实例化并注册了一个ExceptionHandlerExceptionResolver 的实例，而所有被 @ControllerAdvice 注解修饰的异常处理器，都会在 ExceptionHandlerExceptionResolver 实例化的时候自动扫描并装载在其类成员变量 exceptionHandlerAdviceCache 中。
 
 当第一次请求发生时，DispatcherServlet 中的 initHandlerExceptionResolvers() 将获取所有注册到 Spring 的 HandlerExceptionResolver 类型的实例，而ExceptionHandlerExceptionResolver 恰好实现了 HandlerExceptionResolver 接口，这些 HandlerExceptionResolver 类型的实例则会被写入到类成员变量handlerExceptionResolvers中。
 
-```
+```java
 private void initHandlerExceptionResolvers(ApplicationContext context) {
    this.handlerExceptionResolvers = null;
 
@@ -195,7 +182,7 @@ private void initHandlerExceptionResolvers(ApplicationContext context) {
 
 **接着我们再来了解下ControllerAdvice是如何被Spring消费并处理异常的。**下文贴出的是核心类 DispatcherServlet 中的核心方法 doDispatch() 的部分代码：
 
-```
+```java
 protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
    //省略非关键代码
 
@@ -220,7 +207,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 Spring 在执行用户请求时，当在“查找”和“执行”请求对应的 handler 过程中发生异常，就会把异常赋值给 dispatchException，再交给 processDispatchResult() 进行处理。
 
-```
+```java
 private void processDispatchResult(HttpServletRequest request, HttpServletResponse response,
       @Nullable HandlerExecutionChain mappedHandler, @Nullable ModelAndView mv,
       @Nullable Exception exception) throws Exception {
@@ -240,7 +227,7 @@ private void processDispatchResult(HttpServletRequest request, HttpServletRespon
 
 进一步处理后，即当 Exception 不为 null 时，继续交给 processHandlerException处理。
 
-```
+```java
 protected ModelAndView processHandlerException(HttpServletRequest request, HttpServletResponse response,
       @Nullable Object handler, Exception ex) throws Exception {
    //省略非关键代码
@@ -267,7 +254,7 @@ protected ModelAndView processHandlerException(HttpServletRequest request, HttpS
 
 我们可以这样修改 PermissionFilter，注入 HandlerExceptionResolver：
 
-```
+```java
 @Autowired
 @Qualifier("handlerExceptionResolver")
 private HandlerExceptionResolver resolver;
@@ -275,7 +262,7 @@ private HandlerExceptionResolver resolver;
 
 然后，在 doFilter 里捕获异常并交给 HandlerExceptionResolver 处理：
 
-```
+```java
 public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
@@ -291,14 +278,14 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
 
 当我们尝试用错误的 Token 请求，控制台得到了以下信息：
 
-```
+```json
 throw NotAllowException
 403
 ```
 
 返回的 JSON 是：
 
-```
+```json
 {"resultCode": 403}
 ```
 
@@ -310,7 +297,7 @@ throw NotAllowException
 
 一般使用 RESTful 接口时我们会统一返回 JSON 数据，返回值格式如下：
 
-```
+```json
 {"resultCode": 404}
 ```
 
@@ -320,7 +307,7 @@ throw NotAllowException
 
 ExceptionHandler 的作用正是用来捕获指定的异常：
 
-```
+```java
 @RestControllerAdvice
 public class MyExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -335,8 +322,14 @@ public class MyExceptionHandler {
 
 我们尝试发送一个错误的 URL 请求到之前实现过的 /regStudent 接口，并把请求地址换成 /regStudent1，得到了以下结果：
 
-```
-{"timestamp":"2021-05-19T22:24:01.559+0000","status":404,"error":"Not Found","message":"No message available","path":"/regStudent1"}
+```json
+{
+    "timestamp":"2021-05-19T22:24:01.559+0000",
+    "status":404,
+    "error":"Not Found",
+    "message":"No message available",
+    "path":"/regStudent1"
+}
 ```
 
 很显然，这个结果不是我们想要的，看起来应该是 Spring 默认的返回结果。那是什么原因导致 Spring 没有使用我们定义的异常处理器呢？
@@ -345,21 +338,21 @@ public class MyExceptionHandler {
 
 我们可以从异常处理的核心处理代码开始分析，DispatcherServlet 中的 doDispatch() 核心代码如下：
 
-```
+```java
 protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //省略非关键代码
-         mappedHandler = getHandler(processedRequest);
-         if (mappedHandler == null) {
-            noHandlerFound(processedRequest, response);
-            return;
-         }
-         //省略非关键代码
+    //省略非关键代码
+    mappedHandler = getHandler(processedRequest);
+    if (mappedHandler == null) {
+        noHandlerFound(processedRequest, response);
+        return;
+    }
+    //省略非关键代码
 }
 ```
 
 首先调用 getHandler() 获取当前请求的处理器，如果获取不到，则调用noHandlerFound()：
 
-```
+```java
 protected void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
    if (this.throwExceptionIfNoHandlerFound) {
       throw new NoHandlerFoundException(request.getMethod(), getRequestUri(request),
@@ -389,7 +382,7 @@ noHandlerFound() 的逻辑非常简单，如果 throwExceptionIfNoHandlerFound �
 
 同样是在 WebMvcConfigurationSupport 类中，被 @Bean 修饰的 resourceHandlerMapping()，它新建了 ResourceHandlerRegistry 类实例，并通过 addResourceHandlers() 将 ResourceHandler 注册到 ResourceHandlerRegistry 类实例中：
 
-```
+```java
 @Bean
 @Nullable
 public HandlerMapping resourceHandlerMapping(
@@ -420,7 +413,7 @@ public HandlerMapping resourceHandlerMapping(
 
 最终通过 ResourceHandlerRegistry 类实例中的 getHandlerMapping() 返回了 SimpleUrlHandlerMapping 实例，它装载了所有 ResourceHandler 的集合并注册到了 Spring 容器中：
 
-```
+```java
 protected AbstractHandlerMapping getHandlerMapping() {
    //省略非关键代码
    Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
@@ -441,7 +434,7 @@ protected AbstractHandlerMapping getHandlerMapping() {
 
 可以了解到，当前方法中的 addResourceHandlers() 最终执行到了 WebMvcAutoConfiguration 类中的 addResourceHandlers()，通过这个方法，我们可以知道当前有哪些 ResourceHandler 的集合被注册到了Spring容器中：
 
-```
+```java
 public void addResourceHandlers(ResourceHandlerRegistry registry) {
    if (!this.resourceProperties.isAddMappings()) {
       logger.debug("Default resource handling disabled");
@@ -467,32 +460,32 @@ public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
 这里你可以注意一下方法最开始的判断语句，如果 this.resourceProperties.isAddMappings() 为 false，那么会直接返回，后续的两个 ResourceHandler 也不会被添加。
 
-```
+```java
 if (!this.resourceProperties.isAddMappings()) {
-      logger.debug("Default resource handling disabled");
-      return;
-   }
+    logger.debug("Default resource handling disabled");
+    return;
+}
 ```
 
-​至此，有两个 ResourceHandler 被实例化且注册到了 Spirng 容器中，一个处理路径为/webjars/\**\** 的请求，另一个处理路径为 /\*\*的请求 。
+至此，有两个 ResourceHandler 被实例化且注册到了 Spirng 容器中，一个处理路径为/webjars/\**\** 的请求，另一个处理路径为 /\*\*的请求 。
 
 同样，当第一次请求发生时，DispatcherServlet 中的 initHandlerMappings() 将会获取所有注册到 Spring 的 HandlerMapping 类型的实例，而 SimpleUrlHandlerMapping 恰好实现了 HandlerMapping 接口，这些 SimpleUrlHandlerMapping 类型的实例则会被写入到类成员变量 handlerMappings 中。
 
-```
+```java
 private void initHandlerMappings(ApplicationContext context) {
-   this.handlerMappings = null;
-//省略非关键代码
-   if (this.detectAllHandlerMappings) {
-      // Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
-      Map<String, HandlerMapping> matchingBeans =
+    this.handlerMappings = null;
+    //省略非关键代码
+    if (this.detectAllHandlerMappings) {
+        // Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
+        Map<String, HandlerMapping> matchingBeans =
             BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
-      if (!matchingBeans.isEmpty()) {
-         this.handlerMappings = new ArrayList<>(matchingBeans.values());
-         // We keep HandlerMappings in sorted order.
-         AnnotationAwareOrderComparator.sort(this.handlerMappings);
-      }
-   }
-   //省略非关键代码
+        if (!matchingBeans.isEmpty()) {
+            this.handlerMappings = new ArrayList<>(matchingBeans.values());
+            // We keep HandlerMappings in sorted order.
+            AnnotationAwareOrderComparator.sort(this.handlerMappings);
+        }
+    }
+    //省略非关键代码
 }
 ```
 
@@ -500,31 +493,31 @@ private void initHandlerMappings(ApplicationContext context) {
 
 我们来回顾一下 DispatcherServlet 中的 doDispatch() 核心代码：
 
-```
+```java
 protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //省略非关键代码
-         mappedHandler = getHandler(processedRequest);
-         if (mappedHandler == null) {
-            noHandlerFound(processedRequest, response);
-            return;
-         }
-         //省略非关键代码
+    //省略非关键代码
+    mappedHandler = getHandler(processedRequest);
+    if (mappedHandler == null) {
+        noHandlerFound(processedRequest, response);
+        return;
+    }
+    //省略非关键代码
 }
 ```
 
 这里的 getHandler() 将会遍历成员变量 handlerMappings：
 
-```
+```java
 protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-   if (this.handlerMappings != null) {
-      for (HandlerMapping mapping : this.handlerMappings) {
-         HandlerExecutionChain handler = mapping.getHandler(request);
-         if (handler != null) {
-            return handler;
-         }
-      }
-   }
-   return null;
+    if (this.handlerMappings != null) {
+        for (HandlerMapping mapping : this.handlerMappings) {
+            HandlerExecutionChain handler = mapping.getHandler(request);
+            if (handler != null) {
+                return handler;
+            }
+        }
+    }
+    return null;
 }
 ```
 
@@ -538,7 +531,7 @@ protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Ex
 
 那如何解决这个问题呢？还记得 WebMvcAutoConfiguration 类中 addResourceHandlers() 的前两行代码吗？如果 this.resourceProperties.isAddMappings() 为 false，那么此处直接返回，后续的两个 ResourceHandler 也不会被添加。
 
-```
+```java
 public void addResourceHandlers(ResourceHandlerRegistry registry) {
    if (!this.resourceProperties.isAddMappings()) {
       logger.debug("Default resource handling disabled");
@@ -550,7 +543,7 @@ public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
 其调用 ResourceProperties 中的 isAddMappings() 的代码如下：
 
-```
+```java
 public boolean isAddMappings() {
    return this.addMappings;
 }
@@ -558,14 +551,14 @@ public boolean isAddMappings() {
 
 到这，答案也就呼之欲出了，增加两个配置文件如下：
 
-```
+```json
 spring.resources.add-mappings=false
 spring.mvc.throwExceptionIfNoHandlerFound=true
 ```
 
 修改 MyExceptionHandler 的 @ExceptionHandler 为 NoHandlerFoundException 即可：
 
-```
+```java
 @ExceptionHandler(NoHandlerFoundException.class)
 ```
 
@@ -577,8 +570,6 @@ spring.mvc.throwExceptionIfNoHandlerFound=true
 
 - DispatcherServlet 类中的 doDispatch() 是整个 Servlet 处理的核心，它不仅实现了请求的分发，也提供了异常统一处理等等一系列功能；
 - WebMvcConfigurationSupport 是 Spring Web 中非常核心的一个配置类，无论是异常处理器的包装注册（HandlerExceptionResolver），还是资源处理器的包装注册（SimpleUrlHandlerMapping），都是依靠这个类来完成的。
-
-<!-- -->
 
 ## 思考题
 

@@ -1,17 +1,5 @@
 # 21 \| Spring Rest Template 常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/55/f4/55eee58c23d84fbe77f28f6ee263e6f4.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/8a/c9/8a7765089642a3a78c7ab35e4e1884c9.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 前面几节课，我们介绍了一个 Spring 微服务使用数据库过程中可能遇到的常见错误。而实际上，除了直接使用数据库外，使用其他微服务来完成功能也是一个常见的应用场景。
 
 一般而言，微服务之间的通信大多都是使用 HTTP 方式进行的，这自然少不了使用 HttpClient。在不使用 Spring 之前，我们一般都是直接使用 Apache HttpClient 和 Ok HttpClient 等，而一旦你引入 Spring，你就有了一个更好的选择，这就是我们这一讲的主角 RestTemplate。那么在使用它的过程中，会遇到哪些错误呢？接下来我们就来总结下。

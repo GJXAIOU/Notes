@@ -1,17 +1,5 @@
 # 20 \| Spring 事务常见错误（下）
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/bf/yy/bf50352e846a49131858dc0d9e659cyy.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/99/f2/99f86639d1b9f4a664f86fbeb13a54f2.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 通过上一节课的学习，我们了解了 Spring 事务的原理，并解决了几个常见的问题。这节课我们将继续讨论事务中的另外两个问题，一个是关于事务的传播机制，另一个是关于多数据源的切换问题，通过这两个问题，你可以更加深入地了解 Spring 事务的核心机制。
 
 ## 案例 1：嵌套事务回滚错误
@@ -20,9 +8,7 @@
 
 1. 课程表 course，记录课程名称和注册的学生数。
 
-<!-- -->
-
-```
+```mysql
 CREATE TABLE `course` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `course_name` varchar(64) DEFAULT NULL,
@@ -33,9 +19,7 @@ CREATE TABLE `course` (
 
 2. 学生选课表 student\_course，记录学生表 student 和课程表 course 之间的多对多关联。
 
-<!-- -->
-
-```
+```mysql
 CREATE TABLE `student_course` (
   `student_id` int(11) NOT NULL,
   `course_id` int(11) NOT NULL
@@ -48,9 +32,7 @@ CREATE TABLE `student_course` (
 
 1. 新增学生选课记录
 
-<!-- -->
-
-```
+```java
 @Mapper
 public interface StudentCourseMapper {
     @Insert("INSERT INTO `student_course`(`student_id`, `course_id`) VALUES (#{studentId}, #{courseId})")
@@ -60,9 +42,7 @@ public interface StudentCourseMapper {
 
 2. 课程登记学生数 + 1
 
-<!-- -->
-
-```
+```java
 @Mapper
 public interface CourseMapper {
     @Update("update `course` set number = number + 1 where id = #{id}")
@@ -72,9 +52,7 @@ public interface CourseMapper {
 
 我们增加了一个新的业务类 CourseService，用于实现相关业务逻辑。分别调用了上述两个方法来保存学生与课程的关联关系，并给课程注册人数+1。最后，别忘了给这个方法加上事务注解。
 
-<!-- [[[read_end]]] -->
-
-```
+```java
 @Service
 public class CourseService {
     @Autowired
@@ -83,7 +61,7 @@ public class CourseService {
     @Autowired
     private StudentCourseMapper studentCourseMapper;
 
-    //注意这个方法标记了“Transactional”
+    // 注意这个方法标记了“Transactional”
     @Transactional(rollbackFor = Exception.class)
     public void regCourse(int studentId) throws Exception {
         studentCourseMapper.saveStudentCourse(studentId, 1);
@@ -94,28 +72,28 @@ public class CourseService {
 
 我们在之前的 StudentService.saveStudent() 中调用了 regCourse()，实现了完整的业务逻辑。为了避免注册课程的业务异常导致学生信息无法保存，在这里 catch 了注册课程方法中抛出的异常。我们希望的结果是，当注册课程发生错误时，只回滚注册课程部分，保证学生信息依然正常。
 
-```
+```java
 @Service
 public class StudentService {
-  //省略非关键代码
-  @Transactional(rollbackFor = Exception.class)
-  public void saveStudent(String realname) throws Exception {
-      Student student = new Student();
-      student.setRealname(realname);
-      studentService.doSaveStudent(student);
-      try {
-          courseService.regCourse(student.getId());
-      } catch (Exception e) {
-          e.printStackTrace();
-      }
-  }
-  //省略非关键代码
+    // 省略非关键代码
+    @Transactional(rollbackFor = Exception.class)
+    public void saveStudent(String realname) throws Exception {
+        Student student = new Student();
+        student.setRealname(realname);
+        studentService.doSaveStudent(student);
+        try {
+            courseService.regCourse(student.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    // 省略非关键代码
 }
 ```
 
 为了验证异常是否符合预期，我们在 regCourse() 里抛出了一个注册失败的异常：
 
-```
+```java
 @Transactional(rollbackFor = Exception.class)
 public void regCourse(int studentId) throws Exception {
     studentCourseMapper.saveStudentCourse(studentId, 1);
@@ -150,22 +128,22 @@ Exception in thread "main" org.springframework.transaction.UnexpectedRollbackExc
 
 在做进一步的解析之前，我们可以先通过伪代码把整个事务的结构梳理一下：
 
-```
+```java
 // 外层事务
-  @Transactional(rollbackFor = Exception.class)
-  public void saveStudent(String realname) throws Exception {
-      //......省略逻辑代码.....
-      studentService.doSaveStudent(student);
-      try {
+@Transactional(rollbackFor = Exception.class)
+public void saveStudent(String realname) throws Exception {
+    //......省略逻辑代码.....
+    studentService.doSaveStudent(student);
+    try {
         // 嵌套的内层事务
         @Transactional(rollbackFor = Exception.class)
         public void regCourse(int studentId) throws Exception {
-          //......省略逻辑代码.....
+            //......省略逻辑代码.....
         }
-      } catch (Exception e) {
-          e.printStackTrace();
-      }
-  }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 ```
 
 可以看出来，整个业务是包含了 2 层事务，外层的 saveStudent() 的事务和内层的 regCourse() 事务。
@@ -178,7 +156,7 @@ Exception in thread "main" org.springframework.transaction.UnexpectedRollbackExc
 
 我们再来看下 Spring 事务处理的核心，其关键实现参考TransactionAspectSupport.invokeWithinTransaction()：
 
-```
+```java
 protected Object invokeWithinTransaction(Method method, @Nullable Class<?> targetClass,
       final InvocationCallback invocation) throws Throwable {
  
@@ -217,13 +195,11 @@ protected Object invokeWithinTransaction(Method method, @Nullable Class<?> targe
 3. 提交事务；
 4. 处理异常。
 
-<!-- -->
-
 这里要格外注意的是，当前案例是两个事务嵌套的场景，外层事务 doSaveStudent()和内层事务 regCourse()，每个事务都会调用到这个方法。所以，这个方法会被调用两次。下面我们来具体来看下内层事务对异常的处理。
 
 当捕获了异常，会调用TransactionAspectSupport.completeTransactionAfterThrowing() 进行异常处理：
 
-```
+```java
 protected void completeTransactionAfterThrowing(@Nullable TransactionInfo txInfo, Throwable ex) {
    if (txInfo != null && txInfo.getTransactionStatus() != null) {
       if (txInfo.transactionAttribute != null && txInfo.transactionAttribute.rollbackOn(ex)) {
@@ -247,7 +223,7 @@ protected void completeTransactionAfterThrowing(@Nullable TransactionInfo txInfo
 
 在这个方法里，我们对异常类型做了一些检查，当符合声明中的定义后，执行了具体的 rollback 操作，这个操作是通过 TransactionManager.rollback() 完成的：
 
-```
+```java
 public final void rollback(TransactionStatus status) throws TransactionException {
    if (status.isCompleted()) {
       throw new IllegalTransactionStateException(
@@ -261,7 +237,7 @@ public final void rollback(TransactionStatus status) throws TransactionException
 
 而 rollback() 是在 AbstractPlatformTransactionManager 中实现的，继续调用了 processRollback()：
 
-```
+```java
 private void processRollback(DefaultTransactionStatus status, boolean unexpected) {
    try {
       boolean unexpectedRollback = unexpected;
@@ -305,8 +281,6 @@ private void processRollback(DefaultTransactionStatus status, boolean unexpected
 2. 是否为一个新的事务；
 3. 是否处于一个更大的事务中。
 
-<!-- -->
-
 在这里，因为我们用的是默认的传播类型REQUIRED，嵌套的事务并没有开启一个新的事务，所以在这种情况下，当前事务是处于一个更大的事务中，所以会走到情况3分支1的代码块下。
 
 这里有两个判断条件来确定是否设置为仅回滚：<br>
@@ -317,7 +291,7 @@ private void processRollback(DefaultTransactionStatus status, boolean unexpected
 
 显然这里的条件得到了满足，从而执行 doSetRollbackOnly：
 
-```
+```java
 protected void doSetRollbackOnly(DefaultTransactionStatus status) {
    DataSourceTransactionObject txObject = (DataSourceTransactionObject) status.getTransaction();
    txObject.setRollbackOnly();
@@ -326,7 +300,7 @@ protected void doSetRollbackOnly(DefaultTransactionStatus status) {
 
 以及最终调用到的**DataSourceTransactionObject中的setRollbackOnly()：**
 
-```
+```java
 public void setRollbackOnly() {
    getConnectionHolder().setRollbackOnly();
 }
@@ -336,7 +310,7 @@ public void setRollbackOnly() {
 
 接下来，我们来看外层事务。因为在外层事务中，我们自己的代码捕获了内层抛出来的异常，所以这个异常不会继续往上抛，最后的事务会在 TransactionAspectSupport.invokeWithinTransaction() 中的 commitTransactionAfterReturning() 中进行处理：
 
-```
+```java
 protected void commitTransactionAfterReturning(@Nullable TransactionInfo txInfo) {
    if (txInfo != null && txInfo.getTransactionStatus() != null) {     txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());
    }
@@ -345,7 +319,7 @@ protected void commitTransactionAfterReturning(@Nullable TransactionInfo txInfo)
 
 在这个方法里我们执行了 commit 操作，代码如下：
 
-```
+```java
 public final void commit(TransactionStatus status) throws TransactionException {
    //......省略非关键代码.....
    if (!shouldCommitOnGlobalRollbackOnly() && defStatus.isGlobalRollbackOnly()) {
@@ -359,7 +333,7 @@ public final void commit(TransactionStatus status) throws TransactionException {
 
 在 AbstractPlatformTransactionManager.commit()中，当满足了 shouldCommitOnGlobalRollbackOnly() 和 defStatus.isGlobalRollbackOnly()，就会回滚，否则会继续提交事务。其中shouldCommitOnGlobalRollbackOnly()的作用为，如果发现了事务被标记了全局回滚，并且在发生了全局回滚的情况下，判断是否应该提交事务，这个方法的默认实现是返回了 false，这里我们不需要关注它，继续查看isGlobalRollbackOnly()的实现：
 
-```
+```java
 public boolean isGlobalRollbackOnly() {
    return ((this.transaction instanceof SmartTransactionObject) &&
          ((SmartTransactionObject) this.transaction).isRollbackOnly());
@@ -368,7 +342,7 @@ public boolean isGlobalRollbackOnly() {
 
 这个方法最终进入了**DataSourceTransactionObject类中的isRollbackOnly()：**
 
-```
+```java
 public boolean isRollbackOnly() {
    return getConnectionHolder().isRollbackOnly();
 }
@@ -376,7 +350,7 @@ public boolean isRollbackOnly() {
 
 现在让我们再次回顾一下之前的内部事务处理结果，其最终调用到的是**DataSourceTransactionObject中的setRollbackOnly()：**
 
-```
+```java
 public void setRollbackOnly() {
    getConnectionHolder().setRollbackOnly();
 }
@@ -396,7 +370,7 @@ isRollbackOnly()和setRollbackOnly()这两个方法的执行本质都是对Conne
 
 知道了这个结论，修改方法也就很简单了，我们只需要对传播属性进行修改，把类型改成 REQUIRES\_NEW 就可以了。于是这部分代码就修改成这样：
 
-```
+```java
 @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
 public void regCourse(int studentId) throws Exception {
     studentCourseMapper.saveStudentCourse(studentId, 1);
@@ -419,8 +393,6 @@ java.lang.Exception: 注册失败
 - 当子事务声明为 Propagation.REQUIRES\_NEW 时，在 TransactionAspectSupport.invokeWithinTransaction() 中调用 createTransactionIfNecessary() 就会创建一个新的事务，独立于外层事务。
 - 而在 AbstractPlatformTransactionManager.processRollback() 进行 rollback 处理时，因为 status.isNewTransaction() 会因为它处于一个新的事务中而返回 true，所以它走入到了另一个分支，执行了 doRollback() 操作，让这个子事务单独回滚，不会影响到主事务。
 
-<!-- -->
-
 至此，这个问题得到了很好的解决。
 
 ## 案例 2：多数据源间切换之谜
@@ -429,7 +401,7 @@ java.lang.Exception: 注册失败
 
 第三方的 Card 表如下：
 
-```
+```mysql
 CREATE TABLE `card` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_id` int(11) DEFAULT NULL,
@@ -440,7 +412,7 @@ CREATE TABLE `card` (
 
 对应的 Card 对象如下：
 
-```
+```java
 public class Card {
     private Integer id;
     private Integer studentId;
@@ -451,7 +423,7 @@ public class Card {
 
 对应的 Mapper 接口如下，里面包含了一个 saveCard 的 insert 语句，用于创建一条校园卡记录：
 
-```
+```java
 @Mapper
 public interface CardMapper {
     @Insert("INSERT INTO `card`(`student_id`, `balance`) VALUES (#{studentId}, #{balance})")
@@ -462,7 +434,7 @@ public interface CardMapper {
 
 Card 的业务类如下，里面实现了卡与学生 ID 关联，以及充入 50 元的操作：
 
-```
+```java
 @Service
 public class CardService {
     @Autowired
@@ -490,9 +462,7 @@ public class CardService {
 - defaultTargetDataSource 标识默认的连接；
 - resolvedDataSources 存储数据库标识和数据源的映射关系。
 
-<!-- -->
-
-```
+```java
 public abstract class AbstractRoutingDataSource extends AbstractDataSource implements InitializingBean {
 
    @Nullable
@@ -517,7 +487,7 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 
 AbstractRoutingDataSource 实现了 InitializingBean 接口，并覆写了 afterPropertiesSet()。该方法会在初始化 Bean 的时候执行，将多个 DataSource 初始化到 resolvedDataSources。这里的 targetDataSources 属性存储了将要切换的多数据源 Bean 信息。
 
-```
+```java
 @Override
 public void afterPropertiesSet() {
    if (this.targetDataSources == null) {
@@ -537,7 +507,7 @@ public void afterPropertiesSet() {
 
 获取数据库连接的是 getConnection()，它调用了 determineTargetDataSource()来创建连接：
 
-```
+```java
 @Override
 public Connection getConnection() throws SQLException {
    return determineTargetDataSource().getConnection();
@@ -553,7 +523,7 @@ determineTargetDataSource()是整个部分的核心，它的作用就是动态�
 
 targetDataSources 是一个 Map 类型的属性，key 表示每个数据源的名字，value 对应的是每个数据源 DataSource。
 
-```
+```java
 protected DataSource determineTargetDataSource() {
    Assert.notNull(this.resolvedDataSources, "DataSource router not initialized");
    Object lookupKey = determineCurrentLookupKey();
@@ -570,7 +540,7 @@ protected DataSource determineTargetDataSource() {
 
 而选择哪个数据源又是由 determineCurrentLookupKey()来决定的，此方法是抽象方法，需要我们继承 AbstractRoutingDataSource 抽象类来重写此方法。该方法返回一个 key，该 key 是 Bean 中的 beanName，并赋值给 lookupKey，由此 key 可以通过 resolvedDataSources 属性的键来获取对应的 DataSource 值，从而达到数据源切换的效果。
 
-```
+```java
 protected abstract Object determineCurrentLookupKey();
 ```
 
@@ -580,7 +550,7 @@ protected abstract Object determineCurrentLookupKey();
 
 首先，我们创建一个 MyDataSource 类，继承了 AbstractRoutingDataSource，并覆写了 determineCurrentLookupKey()：
 
-```
+```java
 public class MyDataSource extends AbstractRoutingDataSource {
     private static final ThreadLocal<String> key = new ThreadLocal<String>();
 
@@ -605,7 +575,7 @@ public class MyDataSource extends AbstractRoutingDataSource {
 
 其次，我们需要修改 JdbcConfig。这里我新写了一个 dataSource，将原来的 dataSource 改成 dataSourceCore，再将新定义的 dataSourceCore 和 dataSourceCard 放进一个 Map，对应的 key 分别是 core 和 card，并把 Map 赋值给 setTargetDataSources
 
-```
+```java
 public class JdbcConfig {
     //省略非关键代码
     @Value("${card.driver}")
@@ -671,7 +641,7 @@ public class JdbcConfig {
 
 我们定义了一个新的注解 @DataSource，可以直接加在 Service()上，实现数据库切换：
 
-```
+```java
 @Documented
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -686,13 +656,13 @@ public @interface DataSource {
 
 声明方法如下：
 
-```
+```java
 @DataSource(DataSource.card)
 ```
 
 另外，我们还需要写一个 Spring AOP 来对相应的服务方法进行拦截，完成数据源的切换操作。特别要注意的是，这里要加上一个 @Order(1) 标记它的初始化顺序。这个 Order 值一定要比事务的 AOP 切面的值小，这样可以获得更高的优先级，否则自动切换数据源将会失效。
 
-```
+```java
 @Aspect
 @Service
 @Order(1)
@@ -716,7 +686,7 @@ public class DataSourceSwitch {
 
 最后，我们实现了 Card 的发卡逻辑，在方法前声明了切换数据库：
 
-```
+```java
 @Service
 public class CardService {
     @Autowired
@@ -735,7 +705,7 @@ public class CardService {
 
 并在 saveStudent() 里调用了发卡逻辑：
 
-```
+```java
 @Transactional(rollbackFor = Exception.class)
 public void saveStudent(String realname) throws Exception {
     Student student = new Student();
@@ -758,7 +728,7 @@ public void saveStudent(String realname) throws Exception {
 
 在创建了事务以后，会通过 DataSourceTransactionManager.doBegin()获取相应的数据库连接：
 
-```
+```java
 protected void doBegin(Object transaction, TransactionDefinition definition) {
    DataSourceTransactionObject txObject = (DataSourceTransactionObject) transaction;
    Connection con = null;
@@ -776,7 +746,7 @@ txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
 
 这里的 obtainDataSource().getConnection() 调用到了 AbstractRoutingDataSource.getConnection()，这就与我们实现的功能顺利会师了。
 
-```
+```java
 public Connection getConnection() throws SQLException {
    return determineTargetDataSource().getConnection();
 }
@@ -789,8 +759,6 @@ public Connection getConnection() throws SQLException {
 - Spring 在事务处理中有一个很重要的属性 Propagation，主要用来配置当前需要执行的方法如何使用事务，以及与其它事务之间的关系。
 - Spring 默认的传播属性是 REQUIRED，在有事务状态下执行，如果当前没有事务，则创建新的事务；
 - Spring 事务是可以对多个数据源生效，它提供了一个抽象类 AbstractRoutingDataSource，通过实现这个抽象类，我们可以实现自定义的数据库切换。
-
-<!-- -->
 
 ## 思考题
 

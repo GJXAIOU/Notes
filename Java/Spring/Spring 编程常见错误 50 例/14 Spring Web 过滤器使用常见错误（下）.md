@@ -1,26 +1,14 @@
 # 14 \| Spring Web 过滤器使用常见错误（下）
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/b5/13/b5yyfc3a17fc50583bdcd1eb9a74f913.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/66/6f/666f5bfcd124f4c58fa619148679176f.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 通过上节课的两个案例，我们了解了容器运行时过滤器的工作原理，那么这节课我们还是通过两个错误案例，来学习下容器启动时过滤器初始化以及排序注册等相关逻辑。了解了它们，你会对如何使用好过滤器更有信心。下面，我们具体来看一下。
 
-## 案例1：@WebFilter过滤器使用@Order无效
+## 案例1：@WebFilter 过滤器使用 @Order 无效
 
 假设我们还是基于Spring Boot去开发上节课的学籍管理系统，这里我们简单复习下上节课用到的代码。
 
 首先，创建启动程序的代码如下：
 
-```
+```java
 @SpringBootApplication
 @ServletComponentScan
 @Slf4j
@@ -34,7 +22,7 @@ public class Application {
 
 实现的Controller代码如下：
 
-```
+```java
 @Controller
 @Slf4j
 public class StudentController {
@@ -53,7 +41,7 @@ public class StudentController {
 
 AuthFilter：例如，限制特定IP地址段（例如校园网内）的用户方可注册为新用户，当然这里我们仅仅Sleep 1秒来模拟这个过程。
 
-```
+```java
 @WebFilter
 @Slf4j
 @Order(2)
@@ -79,7 +67,7 @@ public class AuthFilter implements Filter {
 
 TimeCostFilter：计算注册学生的执行耗时，需要包括授权过程。
 
-```
+```java
 @WebFilter
 @Slf4j
 @Order(1)
@@ -96,9 +84,7 @@ public class TimeCostFilter implements Filter {
 }
 ```
 
-在上述代码中，我们使用了@Order，期望TimeCostFilter先被执行，因为TimeCostFilter设计的初衷是统计这个接口的性能，所以是需要统计AuthFilter执行的授权过程的。
-
-<!-- [[[read_end]]] -->
+在上述代码中，我们使用了 @Order，期望 TimeCostFilter 先被执行，因为 TimeCostFilter 设计的初衷是统计这个接口的性能，所以是需要统计 AuthFilter 执行的授权过程的。
 
 全部代码实现完毕，执行结果如下：
 
@@ -114,9 +100,9 @@ public class TimeCostFilter implements Filter {
 
 ### 案例解析
 
-通过上节课的学习，我们得知：当一个请求来临时，会执行到 StandardWrapperValve 的 invoke()，这个方法会创建 ApplicationFilterChain，并通过ApplicationFilterChain#doFilter() 触发过滤器执行，并最终执行到内部私有方法internalDoFilter()， 我们可以尝试在internalDoFilter()中寻找一些启示：
+通过上节课的学习，我们得知：当一个请求来临时，会执行到 StandardWrapperValve 的 invoke()，这个方法会创建 ApplicationFilterChain，并通过 ApplicationFilterChain#doFilter() 触发过滤器执行，并最终执行到内部私有方法internalDoFilter()， 我们可以尝试在 internalDoFilter() 中寻找一些启示：
 
-```
+```java
 private void internalDoFilter(ServletRequest request,
                               ServletResponse response)
     throws IOException, ServletException {
@@ -130,7 +116,7 @@ private void internalDoFilter(ServletRequest request,
 
 从上述代码我们得知：过滤器的执行顺序是由类成员变量Filters决定的，而Filters变量则是createFilterChain()在容器启动时顺序遍历StandardContext中的成员变量FilterMaps获得的：
 
-```
+```java
 public static ApplicationFilterChain createFilterChain(ServletRequest request,
         Wrapper wrapper, Servlet servlet) {
 
@@ -161,7 +147,7 @@ public static ApplicationFilterChain createFilterChain(ServletRequest request,
 
 下面继续查找对StandardContext成员变量FilterMaps的写入引用，我们找到了addFilterMapBefore()：
 
-```
+```java
 public void addFilterMapBefore(FilterMap filterMap) {
     validateFilterMap(filterMap);
     // Add this filter mapping to our registered set
@@ -174,7 +160,7 @@ public void addFilterMapBefore(FilterMap filterMap) {
 
 我们继续在addFilterMapBefore()中加入断点，尝试从调用栈中找到一些线索：
 
-```
+```java
 addFilterMapBefore:2992, StandardContext
 addMappingForUrlPatterns:107, ApplicationFilterRegistration
 configure:229, AbstractFilterRegistrationBean
@@ -187,7 +173,7 @@ selfInitialize:228, ServletWebServerApplicationContext
 
 可知，Spring从selfInitialize()一直依次调用到addFilterMapBefore()，稍微分析下selfInitialize()，我们可以了解到，这里是通过调用getServletContextInitializerBeans()，获取所有的ServletContextInitializer类型的Bean，并调用该Bean的onStartup()，从而一步步以调用栈显示的顺序，最终调用到 addFilterMapBefore()。
 
-```
+```java
 private void selfInitialize(ServletContext servletContext) throws ServletException {
    prepareWebApplicationContext(servletContext);
    registerApplicationScope(servletContext);
@@ -206,7 +192,7 @@ private void selfInitialize(ServletContext servletContext) throws ServletExcepti
 
 getServletContextInitializerBeans()的实现非常简单，只是返回了ServletContextInitializerBeans类的一个实例，参考代码如下：
 
-```
+```java
 protected Collection<ServletContextInitializer> getServletContextInitializerBeans() {
    return new ServletContextInitializerBeans(getBeanFactory());
 }
@@ -216,7 +202,7 @@ protected Collection<ServletContextInitializer> getServletContextInitializerBean
 
 既然ServletContextInitializerBeans是集合类，那么我们就可以先查看其iterator()，看看它遍历的是什么。
 
-```
+```java
 @Override
 public Iterator<ServletContextInitializer> iterator() {
    return this.sortedList.iterator();
@@ -229,7 +215,7 @@ public Iterator<ServletContextInitializer> iterator() {
 
 现在我们继续查看ServletContextInitializerBeans的构造方法如下：
 
-```
+```java
 public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
       Class<? extends ServletContextInitializer>... initializerTypes) {
    this.initializers = new LinkedMultiValueMap<>();
@@ -252,15 +238,13 @@ public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
 - 待排序的对象元素自身实现了Order接口，则直接通过getOrder()获取order值；
 - 否则执行OrderUtils.findOrder()获取该对象类@Order的属性。
 
-<!-- -->
-
 这里多解释一句，因为this.initializers的values类型为ServletContextInitializer，其实现了Ordered接口，所以这里的比较器显然是使用了getOrder()获取比较器所需的order值，对应的类成员变量即为order。
 
 继续查看this.initializers中的元素在何处被添加，我们最终得知，addServletContextInitializerBeans()以及addAdaptableBeans()这两个方法均构建了ServletContextInitializer子类的实例，并添加到了this.initializers成员变量中。在这里，我们只研究addServletContextInitializerBeans，毕竟我们使用的添加过滤器方式（使用@WebFilter标记）最终只会通过这个方法生效。
 
 在这个方法中，Spring通过getOrderedBeansOfType()实例化了所有ServletContextInitializer的子类：
 
-```
+```java
 private void addServletContextInitializerBeans(ListableBeanFactory beanFactory) {
    for (Class<? extends ServletContextInitializer> initializerType : this.initializerTypes) {
       for (Entry<String, ? extends ServletContextInitializer> initializerBean : getOrderedBeansOfType(beanFactory,
@@ -275,7 +259,7 @@ private void addServletContextInitializerBeans(ListableBeanFactory beanFactory) 
 
 而这里我们只需要关心对应于Filter的FilterRegistrationBean，显然，FilterRegistrationBean是ServletContextInitializer的子类（实现了Ordered接口），同样由**成员变量order的值决定其执行的优先级。**
 
-```
+```java
 private void addServletContextInitializerBean(String beanName, ServletContextInitializer initializer,
       ListableBeanFactory beanFactory) {
    if (initializer instanceof ServletRegistrationBean) {
@@ -303,7 +287,7 @@ private void addServletContextInitializerBean(String beanName, ServletContextIni
 
 最终添加到this.initializers成员变量中：
 
-```
+```java
 private void addServletContextInitializerBean(Class<?> type, String beanName, ServletContextInitializer initializer,
       ListableBeanFactory beanFactory, Object source) {
    this.initializers.add(type, initializer);
@@ -315,7 +299,7 @@ private void addServletContextInitializerBean(Class<?> type, String beanName, Se
 
 不妨回想下上节课的案例1，它是在WebFilterHandler类的doHandle()动态构建了FilterRegistrationBean的BeanDefinition：
 
-```
+```java
 class WebFilterHandler extends ServletComponentHandler {
 
    WebFilterHandler() {
@@ -365,7 +349,7 @@ class WebFilterHandler extends ServletComponentHandler {
 
 这里我先提供给你一个常见的做法，即实现自己的FilterRegistrationBean来配置添加过滤器，不再使用@WebFilter。具体代码如下：
 
-```
+```java
 @Configuration
 public class FilterConfiguration {
     @Bean
@@ -398,7 +382,7 @@ public class FilterConfiguration {
 
 AuthFilter：
 
-```
+```java
 @WebFilter
 @Slf4j
 @Order(2)
@@ -425,7 +409,7 @@ public class AuthFilter implements Filter {
 
 TimeCostFilter类如下：
 
-```
+```java
 @WebFilter
 @Slf4j
 @Order(1)
@@ -481,7 +465,7 @@ public class TimeCostFilter implements Filter {
 
 我们继续从源码中寻找真相，继续查阅ServletContextInitializerBeans的构造方法如下：
 
-```
+```java
 public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
       Class<? extends ServletContextInitializer>... initializerTypes) {
    this.initializers = new LinkedMultiValueMap<>();
@@ -506,13 +490,11 @@ public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
 - WebFilterHandler相关类通过扫描@WebFilter，动态构建了FilterRegistrationBean类型的BeanDefinition，并注册到Spring；
 - 或者我们自己使用@Bean来显式实例化FilterRegistrationBean并注册到Spring，如案例1中的解决方案。
 
-<!-- -->
-
 但Filter类型的过滤器如何才能被Spring直接实例化呢？相信你已经有答案了：**任何通过@Component修饰的的类，都可以自动注册到Spring，且能被Spring直接实例化。**
 
 现在我们直接查看addAdaptableBeans()，其调用了addAsRegistrationBean()，其beanType为Filter.class：
 
-```
+```java
 protected void addAdaptableBeans(ListableBeanFactory beanFactory) {
    // 省略非关键代码
    addAsRegistrationBean(beanFactory, Filter.class, new FilterRegistrationBeanAdapter());
@@ -522,7 +504,7 @@ protected void addAdaptableBeans(ListableBeanFactory beanFactory) {
 
 继续查看最终调用到的方法addAsRegistrationBean()：
 
-```
+```java
 private <T, B extends T> void addAsRegistrationBean(ListableBeanFactory beanFactory, Class<T> type,
       Class<B> beanType, RegistrationBeanAdapter<T> adapter) {
    List<Map.Entry<String, B>> entries = getOrderedBeansOfType(beanFactory, beanType, this.seen);
@@ -551,20 +533,16 @@ private <T, B extends T> void addAsRegistrationBean(ListableBeanFactory beanFact
 - 获取Filter类实例的Order值，并设置到包装类 RegistrationBean中；
 - 将RegistrationBean添加到this.initializers。
 
-<!-- -->
-
 到这，我们了解到，当过滤器同时被@WebFilter和@Component修饰时，会导致两个FilterRegistrationBean实例的产生。addServletContextInitializerBeans()和addAdaptableBeans()最终都会创建FilterRegistrationBean的实例，但不同的是：
 
 - @WebFilter会让addServletContextInitializerBeans()实例化，并注册所有动态生成的FilterRegistrationBean类型的过滤器；
 - @Component会让addAdaptableBeans()实例化所有实现Filter接口的类，然后再逐一包装为FilterRegistrationBean类型的过滤器。
 
-<!-- -->
-
 ### 问题修正
 
 解决这个问题提及的顺序问题，自然可以继续参考案例1的问题修正部分。另外我们也可以去掉@WebFilter保留@Component的方式进行修改，修改后的Filter示例如下：
 
-```
+```java
 //@WebFilter
 @Slf4j
 @Order(1)
@@ -583,14 +561,10 @@ public class TimeCostFilter implements Filter {
 - 它们最终都被包装并实例化成为了FilterRegistrationBean；
 - 它们最终都是在 ServletContextInitializerBeans的构造器中开始被实例化。
 
-<!-- -->
-
 @WebFilter和@Component的不同点是：
 
 - 被@WebFilter修饰的过滤器会被提前在BeanFactoryPostProcessors扩展点包装成FilterRegistrationBean类型的BeanDefinition，然后在ServletContextInitializerBeans.addServletContextInitializerBeans() 进行实例化；而使用@Component修饰的过滤器类，是在ServletContextInitializerBeans.addAdaptableBeans() 中被实例化成Filter类型后，再包装为RegistrationBean类型。
 - 被@WebFilter修饰的过滤器不会注入Order属性，但被@Component修饰的过滤器会在ServletContextInitializerBeans.addAdaptableBeans() 中注入Order属性。
-
-<!-- -->
 
 ## 思考题
 

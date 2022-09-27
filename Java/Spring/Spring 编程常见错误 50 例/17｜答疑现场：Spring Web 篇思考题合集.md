@@ -1,17 +1,5 @@
 # 17｜答疑现场：Spring Web 篇思考题合集
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/51/1e/51de63234a594ebedf3b25cc2419fb1e.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/1b/30/1b58568b54f0d36d7fb740f21b6f3430.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。
-
 欢迎来到第二次答疑现场，恭喜你，已经完成了三分之二的课程。到今天为止，我们已经解决了 38 个线上问题，不知道你在工作中有所应用了吗？老话说得好，“纸上得来终觉浅，绝知此事要躬行”。希望你能用行动把知识从“我的”变成“你的”。
 
 闲话少叙，接下来我就开始逐一解答第二章的课后思考题了，有任何想法欢迎到留言区补充。
@@ -20,7 +8,7 @@
 
 关于 URL 解析，其实还有许多让我们惊讶的地方，例如案例 2 的部分代码：
 
-```
+```java
 @RequestMapping(path = "/hi2", method = RequestMethod.GET)
 public String hi2(@RequestParam("name") String name){
     return name;
@@ -31,9 +19,9 @@ public String hi2(@RequestParam("name") String name){
 
 针对这个测试，返回的结果其实是"xiaoming,hanmeimei"。这里我们可以追溯到请求参数的解析代码，参考 org.apache.tomcat.util.http.Parameters#addParameter：
 
-```
+```java
 public void addParameter( String key, String value )
-        throws IllegalStateException {
+    throws IllegalStateException {
     //省略其他非关键代码
     ArrayList<String> values = paramHashValues.get(key);
     if (values == null) {
@@ -46,9 +34,7 @@ public void addParameter( String key, String value )
 
 可以看出当使用 [name=xiaoming&name=hanmeimei](<http://localhost:8080/hi2?name=xiaoming&name=hanmeimei>) 这种形式访问时，name 解析出的参数值是一个 ArrayList 集合，它包含了所有的值（此处为xiaoming和hanmeimei）。但是这个数组在最终是需要转化给我们的 String 类型的。转化执行可参考其对应转化器 ArrayToStringConverter 所做的转化，关键代码如下：
 
-<!-- [[[read_end]]] -->
-
-```
+```java
 public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
    return this.helperConverter.convert(Arrays.asList(ObjectUtils.toObjectArray(source)), sourceType, targetType);
 }
@@ -56,13 +42,13 @@ public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDe
 
 其中 helperConverter 为 CollectionToStringConverter，它使用了 "," 作为分隔将集合转化为 String 类型，分隔符定义如下：
 
-```
+```java
 private static final String DELIMITER = ",";
 ```
 
 通过上述分析可知，对于参数解析，解析出的结果其实是一个数组，只是在最终转化时，可能因不同需求转化为不同的类型，从而呈现出不同的值，有时候反倒让我们很惊讶。分析了这么多，我们可以改下代码，测试下刚才的源码解析出的一些结论，代码修改如下：
 
-```
+```java
 @RequestMapping(path = "/hi2", method = RequestMethod.GET)
 public String hi2(@RequestParam("name") String[] name){
     return Arrays.toString(name);
@@ -77,22 +63,23 @@ public String hi2(@RequestParam("name") String[] name){
 
 实际上，答案是否定的。这里我们不妨修改下案例 3 的 pom.xml。修改的目标是让其不要使用默认的内嵌 Tomcat 容器，而是 Jetty 容器。具体修改示例如下：
 
-```
+```xml
 <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                  <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                 </exclusion> 
-            </exclusions>
-        </dependency>
-        <!-- 使用 Jetty -->
-         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jetty</artifactId>
-        </dependency>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion> 
+    </exclusions>
+</dependency>
+
+<!-- 使用 Jetty -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jetty</artifactId>
+</dependency>
 ```
 
 经过上面的修改后，我们再次运行测试程序，我们会发现 Content-Type 确实可以设置成我们想要的样子，具体如下：
@@ -101,48 +88,43 @@ public String hi2(@RequestParam("name") String[] name){
 
 同样是执行 addHeader()，但是因为置换了容器，所以调用的方法实际是 Jetty 的方法，具体参考 org.eclipse.jetty.server.Response#addHeader：
 
-```
-public void addHeader(String name, String value)
-{
-    //省略其他非关键代码
-    if (HttpHeader.CONTENT_TYPE.is(name))
-    {
+```java
+public void addHeader(String name, String value){
+    // 省略其他非关键代码
+    if (HttpHeader.CONTENT_TYPE.is(name)) {
         setContentType(value);
         return;
     }
-    //省略其他非关键代码
+    // 省略其他非关键代码
     _fields.add(name, value);
 }
 ```
 
 在上述代码中，setContentType() 最终是完成了 Header 的添加。这点和 Tomcat 完全不同。具体可参考其实现：
 
-```
-public void setContentType(String contentType)
-{
-        //省略其他非关键代码
-        if (HttpGenerator.__STRICT || _mimeType == null)
-            //添加CONTENT_TYPE
-            _fields.put(HttpHeader.CONTENT_TYPE, _contentType);
-        else
-        {
-            _contentType = _mimeType.asString();
-            _fields.put(_mimeType.getContentTypeField());
-        }
+```java
+public void setContentType(String contentType){
+    // 省略其他非关键代码
+    if (HttpGenerator.__STRICT || _mimeType == null){
+        // 添加CONTENT_TYPE
+        _fields.put(HttpHeader.CONTENT_TYPE, _contentType);
+    }else{
+        _contentType = _mimeType.asString();
+        _fields.put(_mimeType.getContentTypeField());
     }
 }
 ```
 
 再次对照案例 3 给出的部分代码，在这里，直接贴出关键一段（具体参考 AbstractMessageConverterMethodProcessor#writeWithMessageConverters）：
 
-```
+```java
 MediaType selectedMediaType = null;
 MediaType contentType = outputMessage.getHeaders().getContentType();
 boolean isContentTypePreset = contentType != null && contentType.isConcrete();
 if (isContentTypePreset) {    
     selectedMediaType = contentType;
 } else {
-//根据请求 Accept 头和注解指定的返回类型（RequestMapping#produces）协商用何种 MediaType.
+    //根据请求 Accept 头和注解指定的返回类型（RequestMapping#produces）协商用何种 MediaType.
 }
 //省略其他代码：else
 ```
@@ -151,7 +133,7 @@ if (isContentTypePreset) {
 
 追根溯源，主要在于不同的容器对于 addHeader() 的实现不同。这里我们不妨再深入探讨下。首先，回顾我们案例 3 代码中的方法定义：
 
-```
+```java
 import javax.servlet.http.HttpServletResponse;
 public String hi3(HttpServletResponse httpServletResponse)
 ```
@@ -168,7 +150,7 @@ public String hi3(HttpServletResponse httpServletResponse)
 
 实际上，当我们使用 Spring Boot 时，我们都会添加相关依赖项：
 
-```
+```xml
 <dependencies>
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -185,17 +167,13 @@ public String hi3(HttpServletResponse httpServletResponse)
 
 1. 直接使用反射来判断
 
-<!-- -->
-
 例如前文介绍的关键语句：
 
 > ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", null)
 
 2. 使用 @ConditionalOnClass 参考 JacksonHttpMessageConvertersConfiguration 的实现：
 
-<!-- -->
-
-```
+```java
 package org.springframework.boot.autoconfigure.http;
 
 @Configuration(proxyBeanMethods = false)
@@ -208,7 +186,7 @@ class JacksonHttpMessageConvertersConfiguration {
    static class MappingJackson2HttpMessageConverterConfiguration {
       @Bean
       @ConditionalOnMissingBean(value = MappingJackson2HttpMessageConverter.class）
-      //省略部分非关键代码
+      // 省略部分非关键代码
       MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(ObjectMapper objectMapper) {
          return new MappingJackson2HttpMessageConverter(objectMapper);
       }
@@ -221,7 +199,7 @@ class JacksonHttpMessageConvertersConfiguration {
 
 在上面的学籍管理系统中，我们还存在一个接口，负责根据学生的学号删除他的信息，代码如下：
 
-```
+```java
 @RequestMapping(path = "students/{id}", method = RequestMethod.DELETE)
 public void deleteStudent(@PathVariable("id") @Range(min = 1,max = 10000) String id){
     log.info("delete student: {}",id);
@@ -233,7 +211,7 @@ public void deleteStudent(@PathVariable("id") @Range(min = 1,max = 10000) String
 
 按照案例1的案例解析思路，我们可以轻松地找到负责解析ID值的解析器是PathVariableMethodArgumentResolver，它的匹配要求参考如下代码：
 
-```
+```java
 @Override
 public boolean supportsParameter(MethodParameter parameter) {
    if (!parameter.hasParameterAnnotation(PathVariable.class)) {
@@ -243,22 +221,22 @@ public boolean supportsParameter(MethodParameter parameter) {
        PathVariable pathVariable = parameter.getParameterAnnotation(PathVariable.class);
        return (pathVariable != null && StringUtils.hasText(pathVariable.value()));
     }
-   //要返回true，必须标记@PathVariable注解
+   // 要返回true，必须标记@PathVariable注解
    return true;
 }
 ```
 
-查看上述代码，当String类型的方法参数ID标记@PathVariable时，它就能符合上PathVariableMethodArgumentResolver的匹配条件。
+查看上述代码，当 String 类型的方法参数 ID 标记 @PathVariable 时，它就能符合上 PathVariableMethodArgumentResolver 的匹配条件。
 
-翻阅这个解析类的实现，我们很快就可以定位到具体的解析方法，但是当我们顺藤摸瓜去找Validation时，却无蛛丝马迹，这点完全不同于案例1中的解析器RequestResponseBodyMethodProcessor。那么它的校验到底是怎么触发的？你可以把这个问题当做课后作业去思考下，这里仅仅给出一个提示，实际上，对于这种直接标记在方法参数上的校验是通过AOP拦截来做校验的。
+翻阅这个解析类的实现，我们很快就可以定位到具体的解析方法，但是当我们顺藤摸瓜去找 Validation 时，却无蛛丝马迹，这点完全不同于案例 1 中的解析器 RequestResponseBodyMethodProcessor。那么它的校验到底是怎么触发的？你可以把这个问题当做课后作业去思考下，这里仅仅给出一个提示，实际上，对于这种直接标记在方法参数上的校验是通过AOP拦截来做校验的。
 
 ## **[第13课](<https://time.geekbang.org/column/article/376115>)**
 
-在案例2中，我们提到一定要避免在过滤器中调用多次FilterChain#doFilter()。那么假设一个过滤器因为疏忽，在某种情况下，这个方法一次也没有调用，会出现什么情况呢？
+在案例 2 中，我们提到一定要避免在过滤器中调用多次 FilterChain#doFilter()。那么假设一个过滤器因为疏忽，在某种情况下，这个方法一次也没有调用，会出现什么情况呢？
 
-这样的过滤器可参考改造后的DemoFilter：
+这样的过滤器可参考改造后的 DemoFilter：
 
-```
+```java
 @Component
 public class DemoFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -271,23 +249,23 @@ public class DemoFilter implements Filter {
 
 以我们的改造案例为例，我们执行HTTP请求添加用户返回是成功的：
 
-> POST [http://localhost:8080/regStudent/fujian](<http://localhost:8080/regStudent/fujian>)<br>
+> POST http://localhost:8080/regStudent/fujian
 > 
-> <br>
 > 
->  HTTP/1.1 200<br>
 > 
->  Content-Length: 0<br>
+>  HTTP/1.1 200
 > 
->  Date: Tue, 13 Apr 2021 11:37:43 GMT<br>
+>  Content-Length: 0
 > 
->  Keep-Alive: timeout=60<br>
+>  Date: Tue, 13 Apr 2021 11:37:43 GMT
+> 
+>  Keep-Alive: timeout=60
 > 
 >  Connection: keep-alive
 
 但是实际上，我们的Controller层压根没有执行。这里给你解释下原因，还是贴出之前解析过的过滤器执行关键代码（ApplicationFilterChain#internalDoFilter）：
 
-```
+```java
 private void internalDoFilter(ServletRequest request,
                               ServletResponse response){
     if (pos < n) {
@@ -326,7 +304,7 @@ SpringApplication.run(Application.class, args);
 
 会创建一个具体的 ApplicationContext 实现，以ServletWebServerApplicationContext为例，它会调用onRefresh()来与Tomcat或Jetty等容器集成：
 
-```
+```java
 @Override
 protected void onRefresh() {
    super.onRefresh();
@@ -341,7 +319,7 @@ protected void onRefresh() {
 
 查看上述代码中的createWebServer()实现：
 
-```
+```java
 private void createWebServer() {
    WebServer webServer = this.webServer;
    ServletContext servletContext = getServletContext();
@@ -355,7 +333,7 @@ private void createWebServer() {
 
 第6行，执行factory.getWebServer()会启动Tomcat，其中这个方法调用传递了参数getSelfInitializer()，它返回的是一个特殊格式回调方法this::selfInitialize用来添加Filter等，它是当Tomcat启动后才调用的。
 
-```
+```java
 private void selfInitialize(ServletContext servletContext) throws ServletException {
    prepareWebApplicationContext(servletContext);
    registerApplicationScope(servletContext);
@@ -368,19 +346,15 @@ private void selfInitialize(ServletContext servletContext) throws ServletExcepti
 
 那说了这么多，你可能对这个过程还不够清楚，这里我额外贴出了两段调用栈帮助你理解。
 
-1. 启动Spring Boot时，启动Tomcat：
-
-<!-- -->
+1. 启动 Spring Boot 时，启动 Tomcat：
 
 ![](<https://static001.geekbang.org/resource/image/c6/38/c6943e5093cc8c68f88decd2df235938.png?wh=1074*353>)
 
-2. Tomcat启动后回调selfInitialize：
-
-<!-- -->
+2. Tomcat 启动后回调 selfInitialize：
 
 ![](<https://static001.geekbang.org/resource/image/80/50/80975a6eea602239e90e73db4316c550.png?wh=1145*229>)
 
-相信通过上述调用栈，你能更清晰地理解Tomcat启动和Filter添加的时机了。
+相信通过上述调用栈，你能更清晰地理解 Tomcat 启动和 Filter 添加的时机了。
 
 ## **[第15课](<https://time.geekbang.org/column/article/378170>)**
 
@@ -390,12 +364,12 @@ private void selfInitialize(ServletContext servletContext) throws ServletExcepti
 
 实际上，在 Spring Boot 启用 Spring Security 后，匿名访问一个需要授权的 API 接口时，我们会发现这个接口授权会失败，从而进行 302 跳转，跳转的关键代码可参考 ExceptionTranslationFilter 调用的 LoginUrlAuthenticationEntryPoint#commence 方法：
 
-```
+```java
 public void commence(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException authException) throws IOException, ServletException {
-   //省略非关键代码
+   // 省略非关键代码
    redirectUrl = buildRedirectUrlToLoginPage(request, response, authException);
-   //省略非关键代码
+   // 省略非关键代码
    redirectStrategy.sendRedirect(request, response, redirectUrl);
 }
 ```
@@ -406,7 +380,7 @@ public void commence(HttpServletRequest request, HttpServletResponse response,
 
 在跳转后，新的请求最终看到的效果图是由下面的代码生产的 HTML 页面，参考 DefaultLoginPageGeneratingFilter#generateLoginPageHtml：
 
-```
+```java
 private String generateLoginPageHtml(HttpServletRequest request, boolean loginError,
       boolean logoutSuccess) {
    String errorMsg = "Invalid credentials";
@@ -442,28 +416,28 @@ private String generateLoginPageHtml(HttpServletRequest request, boolean loginEr
 
 实现了 FrameworkServlet 的 onRefresh() 接口，这个接口会在WebApplicationContext初始化时被回调：
 
-```
+```java
 public class DispatcherServlet extends FrameworkServlet {
-@Override
-protected void onRefresh(ApplicationContext context) {
-   initStrategies(context);
-}
+    @Override
+    protected void onRefresh(ApplicationContext context) {
+        initStrategies(context);
+    }
 
-/**
+    /**
  * Initialize the strategy objects that this servlet uses.
  * <p>May be overridden in subclasses in order to initialize further strategy objects.
  */
-protected void initStrategies(ApplicationContext context) {
-   initMultipartResolver(context);
-   initLocaleResolver(context);
-   initThemeResolver(context);
-   initHandlerMappings(context);
-   initHandlerAdapters(context);
-   initHandlerExceptionResolvers(context);
-   initRequestToViewNameTranslator(context);
-   initViewResolvers(context);
-   initFlashMapManager(context);
-}
+    protected void initStrategies(ApplicationContext context) {
+        initMultipartResolver(context);
+        initLocaleResolver(context);
+        initThemeResolver(context);
+        initHandlerMappings(context);
+        initHandlerAdapters(context);
+        initHandlerExceptionResolvers(context);
+        initRequestToViewNameTranslator(context);
+        initViewResolvers(context);
+        initFlashMapManager(context);
+    }
 }
 ```
 

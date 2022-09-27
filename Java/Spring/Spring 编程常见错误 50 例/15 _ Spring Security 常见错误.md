@@ -1,16 +1,6 @@
 # 15 \| Spring Security 常见错误
 
-作者: 傅健
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/b6/43/b6df3a29b42eb743c94123bb5ab13843.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/fa/89/fa34ed5fda05ee8b514e130c66babc89.mp3" type="audio/mpeg"></audio>
-
-你好，我是傅健。前面几节课我们学习了 Spring Web 开发中请求的解析以及过滤器的使用。这一节课，我们接着讲 Spring Security 的应用。
+前面几节课我们学习了 Spring Web 开发中请求的解析以及过滤器的使用。这一节课，我们接着讲 Spring Security 的应用。
 
 实际上，在 Spring 中，对于 Security 的处理基本都是借助于过滤器来协助完成的。粗略使用起来不会太难，但是 Security 本身是个非常庞大的话题，所以这里面遇到的错误自然不会少。好在使用 Spring Security 的应用和开发者实在是太多了，以致于时至今日，也没有太多明显的坑了。
 
@@ -20,11 +10,9 @@
 
 当我们第一次尝试使用 Spring Security 时，我们经常会忘记定义一个 PasswordEncoder。因为这在 Spring Security 旧版本中是允许的。而一旦使用了新版本，则必须要提供一个 PasswordEncoder。这里我们可以先写一个反例来感受下：
 
-<!-- [[[read_end]]] -->
-
 首先我们在 Spring Boot 项目中直接开启 Spring Security：
 
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>
@@ -33,7 +21,7 @@
 
 添加完这段依赖后，Spring Security 就已经生效了。然后我们配置下安全策略，如下：
 
-```
+```java
 @Configuration
 public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
 //
@@ -46,7 +34,7 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
 //            }
 //
 //            @Override
-//            public boolean matches(CharSequence charSequence, String //            s) {
+//            public boolean matches(CharSequence charSequence, String s) {
 //                return Objects.equals(charSequence.toString(), s);
 //            }
 //        };
@@ -96,15 +84,15 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 我们再从源码上看下 "no PasswordEncoder" 异常是如何被抛出的？当我们不指定PasswordEncoder去启动我们的案例程序时，我们实际指定了一个默认的PasswordEncoder，这点我们可以从构造器DaoAuthenticationProvider看出来：
 
-```
+```java
 public DaoAuthenticationProvider() {
-setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
+    setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
 }
 ```
 
 我们可以看下PasswordEncoderFactories.createDelegatingPasswordEncoder()的实现：
 
-```
+```java
 public static PasswordEncoder createDelegatingPasswordEncoder() {
    String encodingId = "bcrypt";
    Map<String, PasswordEncoder> encoders = new HashMap<>();
@@ -132,7 +120,7 @@ public static PasswordEncoder createDelegatingPasswordEncoder() {
 
 当我们校验用户时，我们会通过下面的代码来匹配，参考DelegatingPasswordEncoder#matches：
 
-```
+```java
 private PasswordEncoder defaultPasswordEncoderForMatches = new UnmappedIdPasswordEncoder();
 
 @Override
@@ -171,7 +159,7 @@ private String extractId(String prefixEncodedPassword) {
 
 可以看出，假设我们的 prefixEncodedPassword 中含有 id，则根据 id 到 DelegatingPasswordEncoder 的 idToPasswordEncoder 找出合适的 Encoder；假设没有 id，则使用默认的UnmappedIdPasswordEncoder。我们来看下它的实现：
 
-```
+```java
 private class UnmappedIdPasswordEncoder implements PasswordEncoder {
 
    @Override
@@ -190,14 +178,14 @@ private class UnmappedIdPasswordEncoder implements PasswordEncoder {
 
 从上述代码可以看出，no PasswordEncoder for the id "null" 异常就是这样被 UnmappedIdPasswordEncoder 抛出的。那么这个可能含有 id 的 prefixEncodedPassword 是什么？其实它就是存储的密码，在我们的案例中由下面代码行中的 password() 指定：
 
-```
-auth.inMemoryAuthentication()        .withUser("admin").password("pass").roles("ADMIN");
+```java
+auth.inMemoryAuthentication().withUser("admin").password("pass").roles("ADMIN");
 ```
 
 这里我们不妨测试下，修改下上述代码行，给密码指定一个加密方式，看看之前的异常还存在与否：
 
-```
-auth.inMemoryAuthentication()        .withUser("admin").password("{MD5}pass").roles("ADMIN");
+```java
+auth.inMemoryAuthentication().withUser("admin").password("{MD5}pass").roles("ADMIN");
 ```
 
 此时，以调试方式运行程序，你会发现，这个时候已经有了 id，且取出了合适的 PasswordEncoder。
@@ -212,13 +200,13 @@ auth.inMemoryAuthentication()        .withUser("admin").password("{MD5}pass").ro
 
 另外，通过案例解析，相信你也想到了另外一种解决问题的方式，就是在存储的密码上做文章。具体到我们案例，可以采用下面的修正方式：
 
-```
-auth.inMemoryAuthentication()        .withUser("admin").password("{noop}pass").roles("ADMIN");
+```java
+auth.inMemoryAuthentication().withUser("admin").password("{noop}pass").roles("ADMIN");
 ```
 
 然后定位到这个方式，实际上就等于指定 PasswordEncoder 为NoOpPasswordEncoder了，它的实现如下：
 
-```
+```java
 public final class NoOpPasswordEncoder implements PasswordEncoder {
 
    public String encode(CharSequence rawPassword) {
@@ -240,18 +228,18 @@ public final class NoOpPasswordEncoder implements PasswordEncoder {
 
 我们再来看一个 Spring Security 中关于权限角色的案例，ROLE\_ 前缀加还是不加？不过这里我们需要提供稍微复杂一些的功能，即模拟授权时的角色相关控制。所以我们需要完善下案例，这里我先提供一个接口，这个接口需要管理的操作权限：
 
-```
+```java
 @RestController
 public class HelloWorldController {
     @RequestMapping(path = "admin", method = RequestMethod.GET)
     public String admin(){
-         return "admin operation";
+        return "admin operation";
     };
 ```
 
 然后我们使用 Spring Security 默认的内置授权来创建一个授权配置类：
 
-```
+```java
 @Configuration
 public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -300,8 +288,6 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
 2. 用户 admin1：角色为 ADMIN
 3. 用户 admin2：角色为 ADMIN
 
-<!-- -->
-
 然后我们从浏览器访问我们的接口 [http://localhost:8080/admin](<http://localhost:8080/admin>)，使用上述 3 个用户登录，你会发现用户 admin1 可以登录，而 admin2 设置了同样的角色却不可以登陆，并且提示下面的错误：
 
 ![](<https://static001.geekbang.org/resource/image/8e/af/8e5a626c0c5600c1e98d9caf4408aaaf.png?wh=661*246>)
@@ -314,7 +300,7 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 对比 admin1 和 admin2 用户的添加，你会发现，这仅仅是两种添加内置用户的风格而已。但是为什么前者可以正常工作，后者却不可以？本质就在于 Role 的设置风格，可参考下面的这两段关键代码：
 
-```
+```java
 //admin1 的添加
 .withUser("admin").password("pass").roles("ADMIN")
 
@@ -334,7 +320,7 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 查看上面这两种添加方式，你会发现它们真的仅仅是两种风格而已，所以最终构建出用户的代码肯定是相同的。我们先来查看下 admin1 的添加最后对 Role 的处理（参考 User.UserBuilder#roles）：
 
-```
+```java
 public UserBuilder roles(String... roles) {
    List<GrantedAuthority> authorities = new ArrayList<>(
          roles.length);
@@ -355,7 +341,7 @@ public UserBuilder authorities(Collection<? extends GrantedAuthority> authoritie
 
 可以看出，当 admin1 添加 ADMIN 角色时，实际添加进去的是 ROLE\_ADMIN。但是我们再来看下 admin2 的角色设置，最终设置的方法其实就是 User#withUserDetails：
 
-```
+```java
 public static UserBuilder withUserDetails(UserDetails userDetails) {
    return withUsername(userDetails.getUsername())
       //省略非关键代码
@@ -378,7 +364,7 @@ public UserBuilder authorities(Collection<? extends GrantedAuthority> authoritie
 
 对于案例的代码，最终是通过 "UsernamePasswordAuthenticationFilter" 来完成授权的。而且从调用栈信息可以大致看出，授权的关键其实就是查找用户，然后校验权限。查找用户的方法可参考 InMemoryUserDetailsManager#loadUserByUsername，即根据用户名查找已添加的用户：
 
-```
+```java
 public UserDetails loadUserByUsername(String username)
       throws UsernameNotFoundException {
    UserDetails user = users.get(username.toLowerCase());
@@ -399,7 +385,7 @@ public UserDetails loadUserByUsername(String username)
 
 最终在判断角色时，我们会通过 UsernamePasswordAuthenticationToken 的父类方法 AbstractAuthenticationToken#getAuthorities 来取到上述截图中的 ADMIN。而判断是否具备某个角色时，使用的关键方法是 SecurityExpressionRoot#hasAnyAuthorityName：
 
-```
+```java
 private boolean hasAnyAuthorityName(String prefix, String... roles) {
    //通过 AbstractAuthenticationToken#getAuthorities 获取“role”
    Set<String> roleSet = getAuthoritySet();
@@ -432,7 +418,7 @@ private static String getRoleWithDefaultPrefix(String defaultRolePrefix, String 
 
 最终这个结果反映给上层来决定是否通过授权，可参考 WebExpressionVoter#vote：
 
-```
+```java
 public int vote(Authentication authentication, FilterInvocation fi,
       Collection<ConfigAttribute> attributes) {
    //省略非关键代码 
@@ -447,7 +433,7 @@ public int vote(Authentication authentication, FilterInvocation fi,
 
 针对这个案例，有了源码的剖析，可以看出：**ROLE\_ 前缀在 Spring Security 前缀中非常重要。**而要解决这个问题，也非常简单，我们直接在添加 admin2 时，给角色添加上 ROLE\_ 前缀即可：
 
-```
+```java
 //admin2 的添加
 .withUser(new UserDetails() {
     @Override
@@ -472,13 +458,9 @@ public int vote(Authentication authentication, FilterInvocation fi,
 
 1. PasswordEncoder
 
-<!-- -->
-
 在新版本的 Spring Security 中，你一定不要忘记指定一个PasswordEncoder，因为出于安全考虑，我们肯定是要对密码加密的。至于如何指定，其实有多种方式。常见的方式是自定义一个PasswordEncoder类型的Bean。还有一种不常见的方式是通过存储密码时加上加密方法的前缀来指定，例如密码原来是password123，指定前缀后可能是 {MD5}password123。我们可以根据需求来采取不同的解决方案。
 
 2. Role
-
-<!-- -->
 
 在使用角色相关的授权功能时，你一定要注意这个角色是不是加了前缀 ROLE\_。
 
