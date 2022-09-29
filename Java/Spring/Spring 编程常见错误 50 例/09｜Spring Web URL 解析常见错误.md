@@ -2,7 +2,7 @@
 
 上一章节我们讲解了各式各样的错误案例，这些案例都是围绕 Spring 的核心功能展开的，例如依赖注入、AOP 等诸多方面。然而，从现实情况来看，在使用上，我们更多地是使用 Spring 来构建一个 Web 服务，所以从这节课开始，我们会重点解析在 Spring Web 开发中经常遇到的一些错误，帮助你规避这些问题。
 
-不言而喻，这里说的 Web 服务就是指使用 HTTP 协议的服务。而对于 HTTP 请求，首先要处理的就是 URL，所以今天我们就先来介绍下，在 URL 的处理上，Spring 都有哪些经典的案例。闲话少叙，下面我们直接开始演示吧。
+这里说的 Web 服务就是指使用 HTTP 协议的服务。而对于 HTTP 请求，首先要处理的就是 URL，所以今天我们就先来介绍下，在 URL 的处理上，Spring 都有哪些经典的案例。
 
 ## 案例 1：当 @PathVariable 遇到 /
 
@@ -15,20 +15,19 @@ public class HelloWorldController {
     @RequestMapping(path = "/hi1/{name}", method = RequestMethod.GET)
     public String hello1(@PathVariable("name") String name){
         return name;
-
     };  
 }
 ```
 
-当我们使用 [http://localhost:8080/hi1/xiaoming](<http://localhost:8080/hi1/xiaoming>) 访问这个服务时，会返回"xiaoming"，即 Spring 会把 name 设置为 URL 中对应的值。
+当我们使用 http://localhost:8080/hi1/xiaoming 访问这个服务时，会返回"xiaoming"，即 Spring 会把 name 设置为 URL 中对应的值。
 
-看起来顺风顺水，但是假设这个 name 中含有特殊字符/时（例如[http://localhost:8080/hi1/xiao/ming](<http://localhost:8080/hi1/xiaoming>) ），会如何？如果我们不假思索，或许答案是"xiao/ming"？然而稍微敏锐点的程序员都会判定这个访问是会报错的，具体错误参考：
+看起来顺风顺水，但是假设这个 name 中含有特殊字符/时（例如http://localhost:8080/hi1/xiao/ming），会如何？如果我们不假思索，或许答案是"xiao/ming"？然而稍微敏锐点的程序员都会判定这个访问是会报错的，具体错误参考：
 
 ![](<https://static001.geekbang.org/resource/image/92/64/92a3c8894b88eec937139f3c858bf664.png?wh=1578*426>)
 
-如图所示，当 name 中含有/，这个接口不会为 name 获取任何值，而是直接报Not Found错误。当然这里的“找不到”并不是指name找不到，而是指服务于这个特殊请求的接口。
+如图所示，当 name 中含有/，这个接口不会为 name 获取任何值，而是直接报 Not Found 错误。当然这里的“找不到”并不是指 name 找不到，而是指服务于这个特殊请求的接口。
 
-实际上，这里还存在另外一种错误，即当 name 的字符串以/结尾时，/会被自动去掉。例如我们访问 [http://localhost:8080/hi1/xiaoming/](<http://localhost:8080/hi1/xiaoming/>)，Spring 并不会报错，而是返回xiaoming。
+实际上，这里还存在另外一种错误，即当 name 的字符串以/结尾时，/会被自动去掉。例如我们访问 http://localhost:8080/hi1/xiaoming/     Spring 并不会报错，而是返回xiaoming。
 
 针对这两种类型的错误，应该如何理解并修正呢？
 
