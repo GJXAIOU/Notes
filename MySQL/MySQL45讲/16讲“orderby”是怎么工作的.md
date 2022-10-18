@@ -30,7 +30,7 @@ SELECT city,name,age FROM t WHERE city='杭州' ORDER BY name LIMIT 1000  ;
 
 Extra 这个字段中的 `Using filesort` 表示的就是需要排序，**MySQL 会给每个线程分配一块内存用于排序，称为 `sort_buffer`**。
 
-为了说明这个 SQL查询语句的执行过程，我们先来看一下city这个索引的示意图。
+为了说明这个 SQL 查询语句的执行过程，我们先来看一下 city 这个索引的示意图。
 
 ![image-20220108113536443](16讲“orderby”是怎么工作的.resource/image-20220108113536443.png)
 
@@ -38,7 +38,7 @@ Extra 这个字段中的 `Using filesort` 表示的就是需要排序，**MySQL 
 
 通常情况下，这个语句执行流程如下所示 ：
 
-1. 初始化 `sort_buffer`，确定放入`name`、`city`、`age` 这三个字段；
+1. 初始化 `sort_buffer`，确定放入 `name`、`city`、`age` 这三个字段；
 2. 从索引 `city` 找到第一个满足 `city='杭州’` 条件的主键 `id`，也就是图中的 `ID_X`；
 3. 到主键 id 索引取出整行，取 `name`、`city`、`age` 三个字段的值，存入 `sort_buffer` 中；
 4. 从索引 `city` 取下一个记录的主键 id；
@@ -50,9 +50,9 @@ Extra 这个字段中的 `Using filesort` 表示的就是需要排序，**MySQL 
 
 ![img](16讲“orderby”是怎么工作的.resource/6c821828cddf46670f9d56e126e3e772.jpg)
 
-**图中「按name排序」这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数`sort_buffer_size`。**
+**图中「按 name 排序」这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数`sort_buffer_size`。**
 
-`sort_buffer_size`，就是 MySQL 为排序开辟的内存（sort_buffer）的大小。如果要排序的数据量小于 `sort_buffer_size`，排序就在内存中完成。但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。
+`sort_buffer_size` 就是 MySQL 为排序开辟的内存（`sort_buffer`）的大小。如果要排序的数据量小于 `sort_buffer_size`，排序就在内存中完成。但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。
 
 你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件。
 
@@ -108,7 +108,7 @@ SET max_length_for_sort_data = 16;
 
 `max_length_for_sort_data`，是 MySQL 中专门控制用于排序的行数据的长度的一个参数。它的意思是，如果单行的长度超过这个值，MySQL 就认为单行太大，要换一个算法。
 
-`city`、`name`、`age` 这三个字段的定义总长度是 36，我把 `max_length_for_sort_data`设置为 16，我们再来看看计算过程有什么改变。
+`city`、`name`、`age` 这三个字段的定义总长度是 36，我把 `max_length_for_sort_data` 设置为 16，我们再来看看计算过程有什么改变。
 
 新的算法放入 `sort_buffer` 的字段，只有要排序的列（即 name 字段）和主键 id。
 
@@ -116,7 +116,7 @@ SET max_length_for_sort_data = 16;
 
 1. 初始化 `sort_buffer`，确定放入两个字段，即 `name`和 `id`；
 2. 从索引 `city` 找到第一个满足 `city='杭州’` 条件的主键 id，也就是图中的 `ID_X`；
-3. 到主键 id 索引取出整行，取 `name`、`id` 这两个字段，存入 `sort_buffer`中；
+3. 到主键 id 索引取出整行，取 `name`、`id` 这两个字段，存入 `sort_buffer` 中；
 4. 从索引 `city` 取下一个记录的主键 id；
 5. 重复步骤 3、4 直到不满足 `city='杭州’` 条件为止，也就是图中的 `ID_Y`；
 6. 对 `sort_buffer` 中的数据按照字段 `name` 进行排序；

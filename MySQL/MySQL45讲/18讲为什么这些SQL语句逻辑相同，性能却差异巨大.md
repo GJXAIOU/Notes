@@ -40,15 +40,23 @@ mysql> select count(*) from tradelog where month(t_modified)=7;
 
 但是，如果计算 `month()` 函数的话，你会看到传入 7 的时候，在树的第一层就不知道该怎么办了。
 
-也就是说，**对索引字段做函数操作，可能会破坏索引值的有序性，因此优化器就决定放弃走树搜索功能。**
+即**对索引字段做函数操作，可能会破坏索引值的有序性，因此优化器就决定放弃走树搜索功能。**
 
-需要注意的是，优化器并不是要放弃使用这个索引。
+**需要注意的是，优化器并不是要放弃使用这个索引**。
 
 在这个例子里，放弃了树搜索功能，优化器可以选择遍历主键索引，也可以选择遍历索引 `t_modified`，优化器对比索引大小后发现，索引 `t_modified` 更小，遍历这个索引比遍历主键索引来得更快。因此最终还是会选择索引 `t_modified`。
 
 接下来，我们使用 `explain` 命令，查看一下这条 SQL 语句的执行结果。
 
-![img](18讲为什么这些SQL语句逻辑相同，性能却差异巨大.resource/27c2f5ff3549b18ba37a28f4919f3655.png)
+```mysql
+mysql> explain select count(*) from tradelog where month(t_modified)=7;
++----+-------------+----------+------------+-------+---------------+------------+---------+------+------+----------+--------------------------+
+| id | select_type | table    | partitions | type  | possible_keys | key        | key_len | ref  | rows | filtered | Extra                    |
++----+-------------+----------+------------+-------+---------------+------------+---------+------+------+----------+--------------------------+
+|  1 | SIMPLE      | tradelog | NULL       | index | NULL          | t_modified | 6       | NULL |100335|   100.00 | Using where; Using index |
++----+-------------+----------+------------+-------+---------------+------------+---------+------+------+----------+--------------------------+
+1 row in set, 1 warning (0.37 sec)
+```
 
 `key="t_modified"` 表示的是，使用了 `t_modified` 这个索引；我在测试表数据中插入了 10 万行数据，`rows=100335`，说明这条语句扫描了整个索引的所有值；`Extra` 字段的 `Using index`，表示的是使用了覆盖索引。
 
@@ -63,7 +71,7 @@ mysql> select count(*) from tradelog where
 
 当然，如果你的系统上线时间更早，或者后面又插入了之后年份的数据的话，你就需要再把其他年份补齐。
 
-到这里我给你说明了，由于加了 `month()` 函数操作，MySQL 无法再使用索引快速定位功能，而只能使用全索引扫描。
+**由于加了 `month()` 函数操作，MySQL 无法再使用索引快速定位功能，而只能使用全索引扫描**。
 
 不过优化器在个问题上确实有“偷懒”行为，即使是对于不改变有序性的函数，也不会考虑使用索引。比如，对于 `select * from tradelog where id + 1 = 10000` 这个 SQL 语句，这个加 1 操作并不会改变有序性，但是 MySQL 优化器还是不能用 id 索引快速定位到 9999 这一行。所以，需要你在写 SQL 语句的时候，手动改写成 `where id = 10000 -1` 才可以。
 
@@ -87,9 +95,17 @@ mysql> select * from tradelog where tradeid=110717;
 1. 如果规则是「将字符串转成数字」，那么就是做数字比较，结果应该是 1；
 2. 如果规则是「将数字转成字符串」，那么就是做字符串比较，结果应该是 0。
 
-![img](18讲为什么这些SQL语句逻辑相同，性能却差异巨大.resource/2b67fc38f1651e2622fe21d49950b214.png)
+```mysql
+mysql> select '10' > 9;
++----------+
+| '10' > 9 |
++----------+
+|        1 |
++----------+
+1 row in set (0.00 sec)
+```
 
-从图中可知，`select “10” > 9` 返回的是 1，所以你就能确认 MySQL 里的转换规则了：**在 MySQL 中，字符串和数字做比较的话，是将字符串转换成数字。**
+**在 MySQL 中，字符串和数字做比较的话，是将字符串转换成数字。**
 
 这时，你再看这个全表扫描的语句：
 
@@ -103,7 +119,7 @@ mysql> select * from tradelog where tradeid=110717;
 mysql> select * from tradelog where  CAST(tradid AS signed int) = 110717;
 ```
 
-也就是说，这条语句触发了我们上面说到的规则：对索引字段做函数操作，优化器会放弃走树搜索功能。
+这条语句触发了上面规则：对索引字段做函数操作，优化器会放弃走树搜索功能。
 
 现在，我留给你一个小问题，id 的类型是 int，如果执行下面这个语句，是否会导致全表扫描呢？
 
@@ -149,12 +165,21 @@ insert into trade_detail values(11, 'aaaaaaac', 4, 'commit');
 这时候，如果要查询 `id=2` 的交易的所有操作步骤信息，SQL 语句可以这么写：
 
 ```sql
-mysql> select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and l.id=2; /*语句Q1*/
+mysql> select d.* from tradelog l, trade_detail d 
+where d.tradeid=l.tradeid and l.id=2; /*语句Q1*/
 ```
 
-![img](18讲为什么这些SQL语句逻辑相同，性能却差异巨大.resource/adfe464af1d15f3261b710a806c0fa22.png)
-
-图4 语句 Q1 的 explain 结果
+```mysql
+mysql> explain select d.* from tradelog l, trade_detail d
+    -> where d.tradeid=l.tradeid and l.id=2; /*语句Q1*/
++----+-------------+-------+------------+-------+-----------------+---------+---------+-------+------+----------+-------------+
+| id | select_type | table | partitions | type  | possible_keys   | key     | key_len | ref   | rows | filtered | Extra       |
++----+-------------+-------+------------+-------+-----------------+---------+---------+-------+------+----------+-------------+
+|  1 | SIMPLE      | l     | NULL       | const | PRIMARY,tradeid | PRIMARY | 4       | const |    1 |   100.00 | NULL        |
+|  1 | SIMPLE      | d     | NULL       | ALL   | NULL            | NULL    | NULL    | NULL  |   11 |   100.00 | Using where |
++----+-------------+-------+------------+-------+-----------------+---------+---------+-------+------+----------+-------------+
+2 rows in set, 1 warning (0.00 sec)
+```
 
 我们一起来看下这个结果：
 
@@ -175,13 +200,11 @@ mysql> select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and 
 - 第 2 步，是从 L2 中取出 `tradeid` 字段的值；
 - 第 3 步，是根据 `tradeid` 值到 `trade_detail` 表中查找条件匹配的行。explain 的结果里面第二行的 `key=NULL` 表示的就是，这个过程是通过遍历主键索引的方式，一个一个地判断 `tradeid` 的值是否匹配。
 
-进行到这里，你会发现第 3 步不符合我们的预期。因为表 `trade_detail` 里 `tradeid` 字段上是有索引的，我们本来是希望通过使用 `tradeid` 索引能够快速定位到等值的行。但，这里并没有。
+进行到这里，你会发现第 3 步不符合我们的预期。因为表 `trade_detail` 里 `tradeid` 字段上是有索引的，我们本来是希望通过使用 `tradeid` 索引能够快速定位到等值的行。但并没有。
 
 如果你去问 DBA 同学，他们可能会告诉你，因为这两个表的字符集不同，一个是 `utf8`，一个是 `utf8mb4`，所以做表连接查询的时候用不上关联字段的索引。这个回答，也是通常你搜索这个问题时会得到的答案。
 
-但是你应该再追问一下，为什么字符集不同就用不上索引呢？
-
-我们说问题是出在执行步骤的第 3 步，如果单独把这一步改成 SQL 语句的话，那就是：
+为什么字符集不同就用不上索引呢？我们说问题是出在执行步骤的第 3 步，如果单独把这一步改成 SQL 语句的话，那就是：
 
 ```sql
 mysql> select * from trade_detail where tradeid=$L2.tradeid.value; 
@@ -191,7 +214,7 @@ mysql> select * from trade_detail where tradeid=$L2.tradeid.value;
 
 参照前面的两个例子，你肯定就想到了，字符集 `utf8mb4` 是 `utf8` 的超集，所以当这两个类型的字符串在做比较的时候， MySQL 内部的操作是，先把 `utf8` 字符串转成 `utf8mb4` 字符集，再做比较。
 
-> 这个设定很好理解，utf8mb4是utf8的超集。类似地，在程序设计语言里面，做自动类型转换的时候，为了避免数据在转换过程中由于截断导致数据错误，也都是“按数据长度增加的方向”进行转换的。
+> 这个设定很好理解，utf8mb4 是 utf8 的超集。类似地，在程序设计语言里面，做自动类型转换的时候，为了避免数据在转换过程中由于截断导致数据错误，也都是“按数据长度增加的方向”进行转换的。
 
 因此， 在执行上面这个语句的时候，需要将被驱动数据表里的字段一个个地转换成 `utf8mb4`，再跟 L2 做比较。
 
@@ -209,55 +232,72 @@ select * from trade_detail  where CONVERT(traideid USING utf8mb4)=$L2.tradeid.va
 
 作为对比验证，我给你提另外一个需求，“查找trade_detail表里id=4的操作，对应的操作者是谁”，再来看下这个语句和它的执行计划。
 
+```mysql
+mysql>select l.operator from tradelog l , trade_detail d 
+where d.tradeid=l.tradeid and d.id=4;
 ```
-mysql>select l.operator from tradelog l , trade_detail d where d.tradeid=l.tradeid and d.id=4;
+
+```mysql
+mysql> explain select l.operator from tradelog l , trade_detail d
+    -> where d.tradeid=l.tradeid and d.id=4;
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+| id | select_type | table | partitions | type  | possible_keys | key     | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | d     | NULL       | const | PRIMARY       | PRIMARY | 4       | const |    1 |   100.00 | NULL  |
+|  1 | SIMPLE      | l     | NULL       | ref   | tradeid       | tradeid | 131     | const |    1 |   100.00 | NULL  |
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+2 rows in set, 1 warning (0.00 sec)
 ```
 
-![img](18讲为什么这些SQL语句逻辑相同，性能却差异巨大.resource/92cb498ceb3557e41700fae53ce9bd11.png)
+这个语句里 `trade_detail` 表成了驱动表，但是 explain 结果的第二行显示，这次的查询操作用上了被驱动表 tradelog 里的索引(tradeid)，扫描行数是1。
 
-图6 explain 结果
+这也是两个 tradeid 字段的 join 操作，为什么这次能用上被驱动表的 tradeid 索引呢？
 
-这个语句里trade_detail 表成了驱动表，但是explain结果的第二行显示，这次的查询操作用上了被驱动表tradelog里的索引(tradeid)，扫描行数是1。
+假设驱动表 trade_detail 里 id=4 的行记为 R4，那么在连接的时候（图 5 的第 3 步），被驱动表 tradelog 上执行的就是类似这样的 SQL 语句：
 
-这也是两个tradeid字段的join操作，为什么这次能用上被驱动表的tradeid索引呢？我们来分析一下。
-
-假设驱动表trade_detail里id=4的行记为R4，那么在连接的时候（图5的第3步），被驱动表tradelog上执行的就是类似这样的SQL 语句：
-
-```
+```mysql
 select operator from tradelog  where traideid =$R4.tradeid.value; 
 ```
 
-这时候$R4.tradeid.value的字符集是utf8, 按照字符集转换规则，要转成utf8mb4，所以这个过程就被改写成：
+这时候 `$R4.tradeid.value` 的字符集是 utf8, 按照字符集转换规则，要转成 utf8mb4，所以这个过程就被改写成：
 
-```
+```mysql
 select operator from tradelog  where traideid =CONVERT($R4.tradeid.value USING utf8mb4); 
 ```
 
-你看，这里的CONVERT函数是加在输入参数上的，这样就可以用上被驱动表的traideid索引。
+这里的 CONVERT 函数是加在输入参数上的，这样就可以用上被驱动表的 traideid 索引。
 
 理解了原理以后，就可以用来指导操作了。如果要优化语句
 
-```
-select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and l.id=2;
+```mysql
+select d.* from tradelog l, trade_detail d 
+where d.tradeid=l.tradeid and l.id=2;
 ```
 
 的执行过程，有两种做法：
 
-- 比较常见的优化方法是，把trade_detail表上的tradeid字段的字符集也改成utf8mb4，这样就没有字符集转换的问题了。
+- 比较常见的优化方法是，把 trade_detail 表上的 tradeid 字段的字符集也改成 utf8mb4，这样就没有字符集转换的问题了。
 
-```
+```mysql
 alter table trade_detail modify tradeid varchar(32) CHARACTER SET utf8mb4 default null;
 ```
 
-- 如果能够修改字段的字符集的话，是最好不过了。但如果数据量比较大， 或者业务上暂时不能做这个DDL的话，那就只能采用修改SQL语句的方法了。
+- 如果能够修改字段的字符集的话，是最好不过了。但如果数据量比较大， 或者业务上暂时不能做这个 DDL 的话，那就只能采用修改 SQL 语句的方法了。
 
-```
+```mysql
 mysql> select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tradeid USING utf8) and l.id=2; 
 ```
 
-![img](18讲为什么这些SQL语句逻辑相同，性能却差异巨大.resource/aa844a7bf35d330b9ec96fc159331bd6.png)
-
-图7 SQL语句优化后的explain结果
+```mysql
+mysql> explain select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tradeid USING utf8) and l.id=2;
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+| id | select_type | table | partitions | type  | possible_keys | key     | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | l     | NULL       | const | PRIMARY       | PRIMARY | 4       | const |    1 |   100.00 | NULL  |
+|  1 | SIMPLE      | d     | NULL       | ref   | tradeid       | tradeid | 99      | const |    4 |   100.00 | NULL  |
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+2 rows in set, 1 warning (0.00 sec)
+```
 
 这里，我主动把 l.tradeid转成utf8，就避免了被驱动表上的字符编码转换，从explain结果可以看到，这次索引走对了。
 
