@@ -2,101 +2,103 @@
 
 今天这篇文章，我会继续和你介绍在业务高峰期临时提升性能的方法。从文章标题“MySQL是怎么保证数据不丢的？”，你就可以看出来，今天我和你介绍的方法，跟数据的可靠性有关。
 
-在专栏前面文章和答疑篇中，我都着重介绍了WAL机制（你可以再回顾下[第2篇](https://time.geekbang.org/column/article/68633)、[第9篇](https://time.geekbang.org/column/article/70848)、[第12篇](https://time.geekbang.org/column/article/71806)和[第15篇](https://time.geekbang.org/column/article/73161)文章中的相关内容），得到的结论是：只要redo log和binlog保证持久化到磁盘，就能确保MySQL异常重启后，数据可以恢复。
+在专栏前面文章和答疑篇中，着重介绍了 WAL 机制（可以再回顾下[第2篇](https://time.geekbang.org/column/article/68633)、[第9篇](https://time.geekbang.org/column/article/70848)、[第12篇](https://time.geekbang.org/column/article/71806)和[第15篇](https://time.geekbang.org/column/article/73161)文章中的相关内容），得到的结论是：只要 redo log 和 binlog 保证持久化到磁盘，就能确保 MySQL 异常重启后，数据可以恢复。
 
-评论区有同学又继续追问，redo log的写入流程是怎么样的，如何保证redo log真实地写入了磁盘。那么今天，我们就再一起看看MySQL写入binlog和redo log的流程。
+评论区有同学又继续追问，redo log 的写入流程是怎么样的，如何保证 redo log 真实地写入了磁盘。那么今天再一起看看 MySQL 写入 binlog 和 redo log 的流程。
 
-# binlog的写入机制
+## 一、binlog 的写入机制
 
-其实，binlog的写入逻辑比较简单：事务执行过程中，先把日志写到binlog cache，事务提交的时候，再把binlog cache写到binlog文件中。
+**binlog 的写入逻辑比较简单：事务执行过程中，先把日志写到 binlog cache，事务提交的时候，再把 binlog cache 写到 binlog 文件中。**
 
-一个事务的binlog是不能被拆开的，因此不论这个事务多大，也要确保一次性写入。这就涉及到了binlog cache的保存问题。
+一个事务的 binlog 是不能被拆开的，因此不论这个事务多大，也要确保一次性写入。这就涉及到了 binlog cache 的保存问题。
 
-系统给binlog cache分配了一片内存，每个线程一个，参数 binlog_cache_size用于控制单个线程内binlog cache所占内存的大小。如果超过了这个参数规定的大小，就要暂存到磁盘。
+系统给 binlog cache 分配了一片内存，每个线程一个，参数 `binlog_cache_size` 用于控制单个线程内 binlog cache 所占内存的大小。如果超过了这个参数规定的大小，就要暂存到磁盘。
 
-事务提交的时候，执行器把binlog cache里的完整事务写入到binlog中，并清空binlog cache。状态如图1所示。
+事务提交的时候，执行器把 binlog cache 里的完整事务写入到 binlog 中，并清空 binlog cache。状态如图 1 所示。
 
 ![img](23讲MySQL是怎么保证数据不丢的.resource/9ed86644d5f39efb0efec595abb92e3e.png)
 
-图1 binlog写盘状态
+图 1 binlog 写盘状态
 
-可以看到，每个线程有自己binlog cache，但是共用同一份binlog文件。
+可以看到，**每个线程有自己 binlog cache，但是共用同一份 binlog 文件**。
 
-- 图中的write，指的就是指把日志写入到文件系统的page cache，并没有把数据持久化到磁盘，所以速度比较快。
-- 图中的fsync，才是将数据持久化到磁盘的操作。一般情况下，我们认为fsync才占磁盘的IOPS。
+- 图中的 write，指的就是指把日志写入到文件系统的 page cache，并没有把数据持久化到磁盘，所以速度比较快。
+- 图中的 fsync，才是将数据持久化到磁盘的操作。一般情况下，我们认为 fsync 才占磁盘的 IOPS。
 
-write 和fsync的时机，是由参数sync_binlog控制的：
+write 和 fsync 的时机，是由参数 `sync_binlog` 控制的：
 
-1. sync_binlog=0的时候，表示每次提交事务都只write，不fsync；
-2. sync_binlog=1的时候，表示每次提交事务都会执行fsync；
-3. sync_binlog=N(N>1)的时候，表示每次提交事务都write，但累积N个事务后才fsync。
+- `sync_binlog=0` 的时候，表示每次提交事务都只 write，不 fsync；
 
-因此，在出现IO瓶颈的场景里，将sync_binlog设置成一个比较大的值，可以提升性能。在实际的业务场景中，考虑到丢失日志量的可控性，一般不建议将这个参数设成0，比较常见的是将其设置为100~1000中的某个数值。
+- `sync_binlog=1` 的时候，表示每次提交事务都会执行 fsync；
 
-但是，将sync_binlog设置为N，对应的风险是：如果主机发生异常重启，会丢失最近N个事务的binlog日志。
+- `sync_binlog=N(N>1)` 的时候，表示每次提交事务都 write，但累积 N 个事务后才 fsync。
 
-# redo log的写入机制
+因此，在出现 IO 瓶颈的场景里，将 `sync_binlog` 设置成一个比较大的值，可以提升性能。在实际的业务场景中，考虑到丢失日志量的可控性，一般不建议将这个参数设成 0，比较常见的是将其设置为 100~1000 中的某个数值。
 
-接下来，我们再说说redo log的写入机制。
+但是，将 `sync_binlog` 设置为 N，对应的风险是：如果主机发生异常重启，会丢失最近 N 个事务的 binlog 日志。
 
-在专栏的[第15篇答疑文章](https://time.geekbang.org/column/article/73161)中，我给你介绍了redo log buffer。事务在执行过程中，生成的redo log是要先写到redo log buffer的。
+## 二、redo log的写入机制
 
-然后就有同学问了，redo log buffer里面的内容，是不是每次生成后都要直接持久化到磁盘呢？
+在专栏的[第15篇答疑文章](https://time.geekbang.org/column/article/73161)中，介绍了 redo log buffer。**事务在执行过程中，生成的 redo log 是要先写到 redo log buffer 的**。
 
-答案是，不需要。
+但是 redo log buffer 里面的内容，不需要每次生成后都直接持久化到磁盘。
 
-如果事务执行期间MySQL发生异常重启，那这部分日志就丢了。由于事务并没有提交，所以这时日志丢了也不会有损失。
+如果事务执行期间 MySQL 发生异常重启，那这部分日志就丢了。由于事务并没有提交，所以这时日志丢了也不会有损失。
 
-那么，另外一个问题是，事务还没提交的时候，redo log buffer中的部分日志有没有可能被持久化到磁盘呢？
+那么，另外一个问题是，事务还没提交的时候，redo log buffer 中的部分日志有没有可能被持久化到磁盘呢？
 
 答案是，确实会有。
 
-这个问题，要从redo log可能存在的三种状态说起。这三种状态，对应的就是图2 中的三个颜色块。
+这个问题，要从 redo log 可能存在的三种状态说起。这三种状态，对应的就是图2 中的三个颜色块。
 
-![img](23讲MySQL是怎么保证数据不丢的.resource/9d057f61d3962407f413deebc80526d4.png)
+![image-20221109084226207](23%E8%AE%B2MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E4%BF%9D%E8%AF%81%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%A2%E7%9A%84.resource/image-20221109084226207.png)
 
 图2 MySQL redo log存储状态
 
 这三种状态分别是：
 
-1. 存在redo log buffer中，物理上是在MySQL进程内存中，就是图中的红色部分；
-2. 写到磁盘(write)，但是没有持久化（fsync)，物理上是在文件系统的page cache里面，也就是图中的黄色部分；
-3. 持久化到磁盘，对应的是hard disk，也就是图中的绿色部分。
+- 存在 redo log buffer 中，物理上是在MySQL进程内存中，即红色部分；
 
-日志写到redo log buffer是很快的，wirte到page cache也差不多，但是持久化到磁盘的速度就慢多了。
+- 写到磁盘(write)，但是没有持久化（fsync)，物理上是在文件系统的 page cache 里面，即黄色部分；
 
-为了控制redo log的写入策略，InnoDB提供了innodb_flush_log_at_trx_commit参数，它有三种可能取值：
+- 持久化到磁盘，对应的是 hard disk，即绿色部分。
 
-1. 设置为0的时候，表示每次事务提交时都只是把redo log留在redo log buffer中;
-2. 设置为1的时候，表示每次事务提交时都将redo log直接持久化到磁盘；
-3. 设置为2的时候，表示每次事务提交时都只是把redo log写到page cache。
+日志写到 redo log buffer 是很快的，wirte 到 page cache 也差不多，但是持久化到磁盘的速度就慢多了。
 
-InnoDB有一个后台线程，每隔1秒，就会把redo log buffer中的日志，调用write写到文件系统的page cache，然后调用fsync持久化到磁盘。
+为了控制 redo log 的写入策略，InnoDB 提供了 `innodb_flush_log_at_trx_commit` 参数，它有三种可能取值：
 
-注意，事务执行中间过程的redo log也是直接写在redo log buffer中的，这些redo log也会被后台线程一起持久化到磁盘。也就是说，一个没有提交的事务的redo log，也是可能已经持久化到磁盘的。
+- 设置为 0 的时候，表示每次事务提交时都只是把 redo log 留在 redo log buffer 中;
 
-实际上，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的redo log写入到磁盘中。
+- 设置为 1 的时候，表示每次事务提交时都将 redo log 直接持久化到磁盘；
 
-1. **一种是，redo log buffer占用的空间即将达到 innodb_log_buffer_size一半的时候，后台线程会主动写盘。**注意，由于这个事务并没有提交，所以这个写盘动作只是write，而没有调用fsync，也就是只留在了文件系统的page cache。
-2. **另一种是，并行的事务提交的时候，顺带将这个事务的redo log buffer持久化到磁盘。**假设一个事务A执行到一半，已经写了一些redo log到buffer中，这时候有另外一个线程的事务B提交，如果innodb_flush_log_at_trx_commit设置的是1，那么按照这个参数的逻辑，事务B要把redo log buffer里的日志全部持久化到磁盘。这时候，就会带上事务A在redo log buffer里的日志一起持久化到磁盘。
+- 设置为 2 的时候，表示每次事务提交时都只是把 redo log 写到 page cache。
 
-这里需要说明的是，我们介绍两阶段提交的时候说过，时序上redo log先prepare， 再写binlog，最后再把redo log commit。
+InnoDB 有一个后台线程，每隔 1 秒，就会把 redo log buffer 中的日志，调用 write 写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。
 
-如果把innodb_flush_log_at_trx_commit设置成1，那么redo log在prepare阶段就要持久化一次，因为有一个崩溃恢复逻辑是要依赖于prepare 的redo log，再加上binlog来恢复的。（如果你印象有点儿模糊了，可以再回顾下[第15篇文章](https://time.geekbang.org/column/article/73161)中的相关内容）。
+**注意，事务执行中间过程的 redo log 也是直接写在 redo log buffer 中的，这些 redo log 也会被后台线程一起持久化到磁盘。也就是说，一个没有提交的事务的 redo log，也是可能已经持久化到磁盘的。**
 
-每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB就认为redo log在commit的时候就不需要fsync了，只会write到文件系统的page cache中就够了。
+实际上，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的 redo log 写入到磁盘中。
 
-通常我们说MySQL的“双1”配置，指的就是sync_binlog和innodb_flush_log_at_trx_commit都设置成 1。也就是说，一个事务完整提交前，需要等待两次刷盘，一次是redo log（prepare 阶段），一次是binlog。
+1. **一种是，redo log buffer 占用的空间即将达到 `innodb_log_buffer_size` 一半的时候，后台线程会主动写盘。**注意，由于这个事务并没有提交，所以这个写盘动作只是 write，而没有调用 fsync，也就是只留在了文件系统的 page cache。
+2. **另一种是，并行的事务提交的时候，顺带将这个事务的 redo log buffer 持久化到磁盘。**假设一个事务 A 执行到一半，已经写了一些 redo log 到 buffer 中，这时候有另外一个线程的事务 B 提交，如果 `innodb_flush_log_at_trx_commit` 设置的是 1，那么按照这个参数的逻辑，事务 B 要把 redo log buffer 里的日志全部持久化到磁盘。这时候，就会带上事务 A 在 redo log buffer 里的日志一起持久化到磁盘。
 
-这时候，你可能有一个疑问，这意味着我从MySQL看到的TPS是每秒两万的话，每秒就会写四万次磁盘。但是，我用工具测试出来，磁盘能力也就两万左右，怎么能实现两万的TPS？
+这里需要说明的是，我们介绍两阶段提交的时候说过，时序上 redo log 先 prepare，再写 binlog，最后再把 redo log commit。
+
+如果把 `innodb_flush_log_at_trx_commit` 设置成 1，那么 redo log 在 prepare 阶段就要持久化一次，因为有一个崩溃恢复逻辑是要依赖于 prepare 的redo log，再加上 binlog 来恢复的。（如果你印象有点儿模糊了，可以再回顾下[第15篇文章](https://time.geekbang.org/column/article/73161)中的相关内容）。
+
+每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB 就认为 redo log 在 commit 的时候就不需要 fsync 了，只会 write 到文件系统的 page cache 中就够了。
+
+通常我们说 MySQL 的“双1”配置，指的就是 `sync_binlog` 和 `innodb_flush_log_at_trx_commit` 都设置成 1。也就是说，一个事务完整提交前，需要等待两次刷盘，一次是 redo log（prepare 阶段），一次是 binlog。
+
+这时候，你可能有一个疑问，这意味着我从 MySQL 看到的 TPS 是每秒两万的话，每秒就会写四万次磁盘。但是，我用工具测试出来，磁盘能力也就两万左右，怎么能实现两万的 TPS？
 
 解释这个问题，就要用到组提交（group commit）机制了。
 
-这里，我需要先和你介绍日志逻辑序列号（log sequence number，LSN）的概念。LSN是单调递增的，用来对应redo log的一个个写入点。每次写入长度为length的redo log， LSN的值就会加上length。
+这里，我需要先和你介绍日志逻辑序列号（log sequence number，LSN）的概念。LSN 是单调递增的，用来对应 redo log 的一个个写入点。每次写入长度为 length 的 redo log，LSN 的值就会加上 length。
 
-LSN也会写到InnoDB的数据页中，来确保数据页不会被多次执行重复的redo log。关于LSN和redo log、checkpoint的关系，我会在后面的文章中详细展开。
+LSN 也会写到 InnoDB 的数据页中，来确保数据页不会被多次执行重复的 redo log。关于 LSN 和 redo log、checkpoint 的关系，我会在后面的文章中详细展开。
 
-如图3所示，是三个并发事务(trx1, trx2, trx3)在prepare 阶段，都写完redo log buffer，持久化到磁盘的过程，对应的LSN分别是50、120 和160。
+如图3所示，是三个并发事务(trx1, trx2, trx3)在 prepare 阶段，都写完 redo log buffer，持久化到磁盘的过程，对应的 LSN 分别是 50、120 和 160。
 
 ![img](23讲MySQL是怎么保证数据不丢的.resource/933fdc052c6339de2aa3bf3f65b188cc.png)
 
@@ -104,33 +106,33 @@ LSN也会写到InnoDB的数据页中，来确保数据页不会被多次执行�
 
 从图中可以看到，
 
-1. trx1是第一个到达的，会被选为这组的 leader；
-2. 等trx1要开始写盘的时候，这个组里面已经有了三个事务，这时候LSN也变成了160；
-3. trx1去写盘的时候，带的就是LSN=160，因此等trx1返回时，所有LSN小于等于160的redo log，都已经被持久化到磁盘；
-4. 这时候trx2和trx3就可以直接返回了。
+1. trx1 是第一个到达的，会被选为这组的 leader；
+2. 等 trx1 要开始写盘的时候，这个组里面已经有了三个事务，这时候 LSN 也变成了 160；
+3. trx1 去写盘的时候，带的就是 LSN=160，因此等 trx1 返回时，所有 LSN 小于等于 160 的 redo log，都已经被持久化到磁盘；
+4. 这时候 trx2 和 trx3 就可以直接返回了。
 
-所以，一次组提交里面，组员越多，节约磁盘IOPS的效果越好。但如果只有单线程压测，那就只能老老实实地一个事务对应一次持久化操作了。
+所以，一次组提交里面，组员越多，节约磁盘 IOPS 的效果越好。但如果只有单线程压测，那就只能老老实实地一个事务对应一次持久化操作了。
 
-在并发更新场景下，第一个事务写完redo log buffer以后，接下来这个fsync越晚调用，组员可能越多，节约IOPS的效果就越好。
+**在并发更新场景下，第一个事务写完 redo log buffer 以后，接下来这个 fsync 越晚调用，组员可能越多，节约 IOPS 的效果就越好。**
 
 为了让一次fsync带的组员更多，MySQL有一个很有趣的优化：拖时间。在介绍两阶段提交的时候，我曾经给你画了一个图，现在我把它截过来。
 
-![img](23讲MySQL是怎么保证数据不丢的.resource/98b3b4ff7b36d6d72e38029b86870551.png)
+![image-20221109085620468](23%E8%AE%B2MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E4%BF%9D%E8%AF%81%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%A2%E7%9A%84.resource/image-20221109085620468.png)
 
 图4 两阶段提交
 
-图中，我把“写binlog”当成一个动作。但实际上，写binlog是分成两步的：
+图中，我把“写binlog”当成一个动作。但实际上，写 binlog 是分成两步的：
 
-1. 先把binlog从binlog cache中写到磁盘上的binlog文件；
-2. 调用fsync持久化。
+1. 先把 binlog 从 binlog cache 中写到磁盘上的 binlog 文件；
+2. 调用 fsync 持久化。
 
-MySQL为了让组提交的效果更好，把redo log做fsync的时间拖到了步骤1之后。也就是说，上面的图变成了这样：
+MySQL 为了让组提交的效果更好，把 redo log 做 fsync 的时间拖到了步骤 1 之后。也就是说，上面的图变成了这样：
 
-![img](23讲MySQL是怎么保证数据不丢的.resource/5ae7d074c34bc5bd55c82781de670c28.png)
+![image-20221109090227950](23%E8%AE%B2MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E4%BF%9D%E8%AF%81%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%A2%E7%9A%84.resource/image-20221109090227950.png)
 
 图5 两阶段提交细化
 
-这么一来，binlog也可以组提交了。在执行图5中第4步把binlog fsync到磁盘时，如果有多个事务的binlog已经写完了，也是一起持久化的，这样也可以减少IOPS的消耗。
+这么一来，binlog 也可以组提交了。在执行图5中第4步把binlog fsync到磁盘时，如果有多个事务的binlog已经写完了，也是一起持久化的，这样也可以减少IOPS的消耗。
 
 不过通常情况下第3步执行得会很快，所以binlog的write和fsync间的间隔时间短，导致能集合到一起持久化的binlog比较少，因此binlog的组提交的效果通常不如redo log的效果那么好。
 
