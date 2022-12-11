@@ -5,7 +5,10 @@
 建表语句，这个表有一个主键 id 和一个整型字段 c：
 
 ```mysql
-create table T(id int primary key, c int);
+create table T(
+id int primary key, 
+c int
+);
 ```
 
 然后使用更新语句：将 id = 2 这一行的值加 1
@@ -24,9 +27,11 @@ update T set c = c+1 where id=2;
 
 ## 一、重做日志：redo log
 
+redo log 是记录了 InnoDB 存储引擎的事务日志，当数据库实例失败时候 InnoDB 会通过重做日志恢复到掉电前的时刻来保证数据的完整性。
+
 在 MySQL，**如果**每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO 成本、查找成本都很高。为了解决这个问题，**MySQL 使用 WAL（Write-Ahead Logging）技术。关键点就是先写日志，再写磁盘。**
 
-具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log 里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做。
+**具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log 里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做。**
 
 InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，总共就可以记录 4GB 的操作。从头开始写，写到末尾就又回到开头**循环写**，如下面这个图所示。
 
@@ -40,17 +45,17 @@ InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件
 
 ## 二、二进制日志：binlog
 
-MySQL 整体分为两块：一块是  Server 层，它主要做的是 MySQL 功能层面的事情；还有一块是引擎层，负责存储相关的具体事宜。上面放入 **redo log 是 InnoDB 引擎特有的日志，而 Server 层也有自己的日志，称为 binlog（归档日志）。**
+MySQL 整体分为两块：一块是 Server 层，它主要做的是 MySQL 功能层面的事情；还有一块是引擎层，负责存储相关的具体事宜。上面放入 **redo log 是 InnoDB 引擎特有的日志，而 Server 层也有自己的日志，称为 binlog（归档日志）。**
 
 为什么会有两份日志：
 
-因为最开始 MySQL 里并没有 InnoDB 引擎。MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe的能力，binlog 日志只能用于归档。InnoDB 以插件形式引入 MySQL 后，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用另外一套日志系统（redo log）来实现 crash-safe 能力。
+因为最开始 MySQL 里并没有 InnoDB 引擎。MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe 的能力，binlog 日志只能用于归档。InnoDB 以插件形式引入 MySQL 后，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用另外一套日志系统（redo log）来实现 crash-safe 能力。 ==》即 InnoDB 通过 redo log 实现事务。
 
 这两种日志有以下三点不同。
 
 - **redo log 是 InnoDB 引擎特有的；binlog 是 MySQL 的 Server 层实现的，所有引擎都可以使用。**
 
-- redo log 是物理日志，记录的是「在某个数据页上做了什么修改」；binlog 是逻辑日志，记录的是这个语句的原始逻辑，比如「给 id=2 这一行的 c 字段加 1 」。binlog  有两种模式，statement 格式的话是记 SQL 语句， row 格式会记录行的内容，记两条，更新前和更新后都有。
+- redo log 是物理日志，记录的是「在某个数据页上做了什么修改」；binlog 是逻辑日志，记录的是这个语句的原始逻辑，比如「给 id=2 这一行的 c 字段加 1 」。binlog 有两/三种模式，statement 格式的话是记 SQL 语句， row 格式会记录行的内容，记两条，更新前和更新后都有。
 
 - redo log 是循环写的，空间固定会用完；binlog 是可以追加写入的。其中「追加写」是指 binlog 文件写到一定大小后会切换到下一个，并不会覆盖以前的日志。
 
@@ -68,7 +73,21 @@ MySQL 整体分为两块：一块是  Server 层，它主要做的是 MySQL 功�
 
 该这个 update 语句的执行流程图如下：
 
-<img src="02讲日志系统：一条SQL更新语句是如何执行的.resource/2e5bff4910ec189fe1ee6e2ecc7b4bbe.png" alt="img" style="zoom: 50%;" />
+> 红色部分表示在执行器中执行，其他为在 InnoDB 中执行。
+
+```mermaid
+graph LR
+a1[<font color=red>取 id = 2 这一行] --> a2{数据页在内存中}
+a2{数据页在内存中} --否--> b2[磁盘中读入内存]
+a2 --是--> c2[返回行数据]
+b2 --> c2
+c2 --> d2[<font color=red>将这行的 c 值加 1]
+d2 --> e2[<font color=red>写入新行]
+e2 --> f2[新行更新到内存]
+f2 --> g2[写入 redolog 处于 prepare 阶段]
+g2 --> h2[<font color=red>写 binlog]
+h2 --> i2[提交事务 处于 commit 状态]
+```
 
 ### 两阶段提交
 
@@ -91,10 +110,10 @@ MySQL 整体分为两块：一块是  Server 层，它主要做的是 MySQL 功�
 
 由于 redo log 和 binlog 是两个独立的逻辑，如果不用两阶段提交，要么就是先写完 redo log 再写 binlog，或者采用反过来的顺序。我们看看这两种方式会有什么问题。
 
-仍然用前面的 update 语句来做例子。假设当前 id = 2 的行，字段 c 的值是 0，再假设**执行 update 语句过程中在写完第一个日志后，第二个日志还没有写完期间发生了crash**，会出现什么情况呢？
+仍然用前面的 update 语句来做例子。假设当前 id = 2 的行，字段 c 的值是 0，再假设**执行 update 语句过程中在写完第一个日志后，第二个日志还没有写完期间发生了 crash**，会出现什么情况呢？
 
 - **先写 redo log 后写 binlog**。假设在 redo log 写完，binlog 还没有写完的时候，MySQL 进程异常重启。由于我们前面说过的，redo log 写完之后，系统即使崩溃，仍然能够把数据恢复回来，所以恢复后这一行 c 的值是 1。
-    但是由于 binlog 没写完就 crash 了，这时候 binlog 里面就没有记录这个语句。因此，之后备份日志的时候，存起来的 binlog 里面就没有这条语句。如果需要用这个 binlog 来恢复临时库的话，由于这个语句的binlog 丢失，这个临时库就会少了这一次更新，恢复出来的这一行 c 的值就是 0，与原库的值不同。
+    但是由于 binlog 没写完就 crash 了，这时候 binlog 里面就没有记录这个语句。因此，之后备份日志的时候，存起来的 binlog 里面就没有这条语句。如果需要用这个 binlog 来恢复临时库的话，由于这个语句的 binlog 丢失，这个临时库就会少了这一次更新，恢复出来的这一行 c 的值就是 0，与原库的值不同。
 
 - **先写 binlog 后写 redo log**。如果在 binlog 写完之后 crash，由于 redo log 还没写，崩溃恢复以后这个事务无效，所以这一行 c 的值是 0。但是 binlog 里面已经记录了“把 c 从0 改成 1”这个日志。所以，在之后用 binlog 来恢复的时候就多了一个事务出来，恢复出来的这一行 c 的值就是 1，与原库的值不同。
 
@@ -108,8 +127,8 @@ MySQL 整体分为两块：一块是  Server 层，它主要做的是 MySQL 功�
 
 ### 小结
 
-- redo log 用于保证 crash-safe 能力。`innodb_flush_log_at_trx_commit` 这个参数设置成 1 的时候，表示每次事务的 redo log 都直接持久化到磁盘。这个参数我建议你设置成 1，这样可以保证 MySQL异 常重启之后数据不丢失。`sync_binlog` 这个参数设置成 1 的时候，表示每次事务的 binlog 都持久化到磁盘。这个参数我也建议你设置成 1，这样可以保证 MySQL 异常重启之后 binlog 不丢失。【线上两个参数值都是 1】
-- binlog 用于记录了完整的逻辑记录，所有的逻辑记录在 bin log 里都能找到，所以在备份恢复时，是以 bin log 为基础，通过其记录的完整逻辑操作，备份出一个和原库完整的数据。
+- redo log 用于保证 crash-safe 能力。`innodb_flush_log_at_trx_commit` 这个参数设置成 1 的时候，表示每次事务的 redo log 都直接持久化到磁盘。这个参数我建议你设置成 1，这样可以保证 MySQL 异常重启之后数据不丢失。`sync_binlog` 这个参数设置成 1 的时候，表示每次事务的 binlog 都持久化到磁盘。这个参数我也建议你设置成 1，这样可以保证 MySQL 异常重启之后 binlog 不丢失。【线上两个参数值都是 1】
+- binlog 用于记录了完整的逻辑记录，所有的逻辑记录在 binlog 里都能找到，所以在备份恢复时，是以 binlog 为基础，通过其记录的完整逻辑操作，备份出一个和原库完整的数据。
 
 - 定期全量备份的周期“取决于系统重要性，有的是一天一备，有的是一周一备”。那么在什么场景下，一天一备会比一周一备更有优势呢？或者说，它影响了这个数据库系统的哪个指标？
 
