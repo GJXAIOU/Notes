@@ -61,12 +61,6 @@ Java Caching 定义了5个核心接口，分别是 CachingProvider, CacheManager
 | keyGenerator   | 缓存数据时key生成策略          |
 | serialize      | 缓存数据时value序列化策略    |
 
-
-
-
-
-
-
 @Cacheable/@CachePut/@CacheEvict 主要的参数
 
 |参数|含义|示例|
@@ -133,7 +127,7 @@ Java Caching 定义了5个核心接口，分别是 CachingProvider, CacheManager
     ```
 
     |名字|位置|描述|示例|
-| --- | --- | --- | --- |
+    | --- | --- | --- | --- |
     |methodName|root object|当前被调用的方法名；例如设定 key 格式为：`getEmp[值]` 写法为：`@Cacheable(key="#root.methodName+'[' + #id + ']'")`|#root.methodName|
     |method|root object|当前被调用的方法|#root.method.name|
     |target|root object|当前被调用的目标对象|#root.target|
@@ -142,10 +136,10 @@ Java Caching 定义了5个核心接口，分别是 CachingProvider, CacheManager
     |caches|root object|当前方法调用使用的缓存列表（如@Cacheable(value={"cache1", "cache2"})），则有两个cache|#root.caches[0].name|
     |argument name|evaluation context|方法参数的名字. 可以直接#参数名，也可以使用#p0或#a0 的形式，0代表参数的索引；|#iban、#a0 、#p0|
     |result|evaluation context|方法执行后的返回值（仅当方法执行之后的判断有效，如‘unless’，’cache put’的表达式’cache evict’的表达式beforeInvocation=false）|#result|
-    
+
 - keyGenerator：key 的生成器；也可以自己指定 key 的生成器的组件id，自己写一个 KeyGenerator，然后在 `@Cacheable(keyGenerator = "myKeyGenerator")`指定即可。
          注意： key/keyGenerator：二选一使用;
-         
+
      ~~~java
      package com.atguigu.cache.config;
      
@@ -177,26 +171,26 @@ Java Caching 定义了5个核心接口，分别是 CachingProvider, CacheManager
              return (target, method, params) -> method.getName() + "[" + Arrays.asList(params).toString() + "]";
          }
      }
-     ```
-~~~
-     
--  cacheManager：指定对应的缓存管理器；
+     ~~~
+
+- cacheManager：指定对应的缓存管理器；
+
 - cacheResolver：指定获取解析器，和上面  cacheManager 功能一下，两者二选一
 
--  condition：指定符合条件的情况下才缓存；同样支持 SpEL 表达式
+- condition：指定符合条件的情况下才缓存；同样支持 SpEL 表达式
 
-    ```java
-    // 示例如下：
+```java
+  // 示例如下：
     @Cacheable(condition = "#id>0")
     @Cacheable(condition = "#a0>1")：第一个参数的值》1的时候才进行缓存
-    ```
+```
 
--  unless：用于否定缓存；当 unless 指定的条件为 true，方法的返回值就不会被缓存；注意：Unless 可以获取到结果进行判断，同样支持 SpEL 表达式
+- unless：用于否定缓存；当 unless 指定的条件为 true，方法的返回值就不会被缓存；注意：Unless 可以获取到结果进行判断，同样支持 SpEL 表达式
 
-    ```java
-    unless = "#result == null"
-    unless = "#a0==2":如果第一个参数的值是2，结果不缓存；
-    ```
+  ```java
+  unless = "#result == null"
+  unless = "#a0==2":如果第一个参数的值是2，结果不缓存；
+  ```
 
 - sync：是否使用异步模式 ，异步时候不支持 `unless` 属性。异步就是方法返回结果和将结果写入缓存中。
 
@@ -232,7 +226,7 @@ static class CacheConfigurationImportSelector implements ImportSelector {
 }
 ```
 
-  缓存的配置类包括以下这些，在上面的 `return imports`处打断点执行可以获得。
+缓存的配置类包括以下这些，在上面的 `return imports`处打断点执行可以获得。
 
 ```java
 	org.springframework.boot.autoconfigure.cache.GenericCacheConfiguration
@@ -331,15 +325,11 @@ public Cache getCache(String name) {
 - 使用 CacheManager【默认是 ConcurrentMapCacheManager】按照名字得到 Cache【默认是 ConcurrentMapCache】组件
 - key 使用 keyGenerator 生成的，默认是 SimpleKeyGenerator
 
-
-
 `@CachePut(/*value = "emp",*/key = "#result.id")`
 
 既调用方法，又更新缓存数据，适用于修改了数据库某个数据，同时刷新缓存。
 
 运行时机：首先调用目标方法，然后将目标方法的结果缓存起来。【注意 key 要指定一样】
-
-
 
 `@CacheEvict()`：缓存清楚，就是删除数据之后同时将缓存中数据也删除。
 
@@ -348,8 +338,6 @@ public Cache getCache(String name) {
 可以通过指定 `allEntries=true`删除所有缓存。
 
 默认清除缓存是在方法执行之后执行，如果想让清除缓存在方法执行之前执行可以通过 `beforeInvocation=true`来指定（即无论方法执行是否成功缓存都清除）。
-
-
 
 `@Caching()`：包括上面三个注解的所有规则，可以用于指定复杂的操作。
 
@@ -370,13 +358,7 @@ public Employee getEmpByLastName(String lastName){
 }
 ```
 
-
-
 `@CacheConfig()` 配置在类上，可以统一指定该类的所有方法遵循某些缓存规定（抽取缓存公共注解），无需逐个方法指定。
-
-
-
-
 
  默认使用的是 `ConcurrentMapCacheManager==>ConcurrentMapCache`；将数据保存在 `ConcurrentMap<Object, Object>`中
 
@@ -394,7 +376,7 @@ public Employee getEmpByLastName(String lastName){
 
    4、测试缓存
 
-​    原理：CacheManager===Cache 缓存组件来实际给缓存中存取数据
+    原理：CacheManager===Cache 缓存组件来实际给缓存中存取数据
 
   1）、引入redis的starter，容器中保存的是 RedisCacheManager；即导入了 CacheManager，所以其它配置类就不再匹配了。
 
@@ -402,12 +384,13 @@ public Employee getEmpByLastName(String lastName){
 
   3）、默认保存数据 k-v 都是Object；利用序列化保存；如何保存为json
 
-​      1、引入了 redis 的 starter，所以 cacheManager 变为 RedisCacheManager；
-
-​      2、默认创建的 RedisCacheManager 操作 redis 的时候使用的是 `RedisTemplate<Object, Object>`
-
-​      3、RedisTemplate<Object, Object> 是 默认使用 jdk 的序列化机制
+      1、引入了 redis 的 starter，所以 cacheManager 变为 RedisCacheManager；
+    
+      2、默认创建的 RedisCacheManager 操作 redis 的时候使用的是 `RedisTemplate<Object, Object>`
+    
+      3、RedisTemplate<Object, Object> 是 默认使用 jdk 的序列化机制
 
    4）、自定义CacheManager；
 
-​	即使用 RedisCacheManager 但是不再使用默认的 RedisTemplate
+	即使用 RedisCacheManager 但是不再使用默认的 RedisTemplate
+
