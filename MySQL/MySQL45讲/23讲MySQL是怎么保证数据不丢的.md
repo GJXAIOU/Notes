@@ -1,8 +1,8 @@
 # 23讲MySQL是怎么保证数据不丢的
 
-今天这篇文章，我会继续和你介绍在业务高峰期临时提升性能的方法。从文章标题“MySQL是怎么保证数据不丢的？”，你就可以看出来，今天我和你介绍的方法，跟数据的可靠性有关。
+今天这篇文章，我会继续和你介绍在业务高峰期临时提升性能的方法。今天介绍的方法，跟数据的可靠性有关。
 
-在专栏前面文章和答疑篇中，着重介绍了 WAL 机制（可以再回顾下[第2篇](https://time.geekbang.org/column/article/68633)、[第9篇](https://time.geekbang.org/column/article/70848)、[第12篇](https://time.geekbang.org/column/article/71806)和[第15篇](https://time.geekbang.org/column/article/73161)文章中的相关内容），得到的结论是：只要 redo log 和 binlog 保证持久化到磁盘，就能确保 MySQL 异常重启后，数据可以恢复。
+在专栏前面文章和答疑篇中，着重介绍了 WAL 机制（可以再回顾下[第2篇](https://time.geekbang.org/column/article/68633)、[第9篇](https://time.geekbang.org/column/article/70848)、[第12篇](https://time.geekbang.org/column/article/71806)和[第15篇](https://time.geekbang.org/column/article/73161)文章中的相关内容），得到的结论是：**只要 redo log 和 binlog 保证持久化到磁盘，就能确保 MySQL 异常重启后，数据可以恢复。**
 
 评论区有同学又继续追问，redo log 的写入流程是怎么样的，如何保证 redo log 真实地写入了磁盘。那么今天再一起看看 MySQL 写入 binlog 和 redo log 的流程。
 
@@ -37,7 +37,9 @@ write 和 fsync 的时机，是由参数 `sync_binlog` 控制的：
 
 但是，将 `sync_binlog` 设置为 N，对应的风险是：如果主机发生异常重启，会丢失最近 N 个事务的 binlog 日志。
 
-## 二、redo log的写入机制
+> 线上系统配置为 1；
+
+## 二、redo log 的写入机制
 
 在专栏的[第15篇答疑文章](https://time.geekbang.org/column/article/73161)中，介绍了 redo log buffer。**事务在执行过程中，生成的 redo log 是要先写到 redo log buffer 的**。
 
@@ -69,7 +71,7 @@ write 和 fsync 的时机，是由参数 `sync_binlog` 控制的：
 
 - 设置为 0 的时候，表示每次事务提交时都只是把 redo log 留在 redo log buffer 中;
 
-- 设置为 1 的时候，表示每次事务提交时都将 redo log 直接持久化到磁盘；
+- 设置为 1 的时候，表示每次事务提交时都将 redo log 直接持久化到磁盘；  ==》线上配置
 
 - 设置为 2 的时候，表示每次事务提交时都只是把 redo log 写到 page cache。
 
