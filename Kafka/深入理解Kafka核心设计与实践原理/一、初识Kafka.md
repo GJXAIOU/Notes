@@ -6,11 +6,11 @@ Kafka 主要「扮演」的三大角色：
 
 - 消息系统
 
-  具备消息系统的解耦、冗余存储、流量削峰、缓冲、异步通信、扩展性、可恢复性等功能。同时 Kafka 还提供了大多数消息系统难以实现的**消息顺序性保障及回溯消费**的功能。
+  具备消息系统（中间件）的解耦、冗余存储、流量削峰、缓冲、异步通信、扩展性、可恢复性等功能。同时 Kafka 还提供了大多数消息系统难以实现的**消息顺序性保障及回溯消费**的功能。
 
 - 存储系统
 
-  Kafka 把消息持久化到磁盘，相比于其他基于内存存储的系统而言，有效地降低了数据丢失的风险。
+  Kafka 把消息持久化到磁盘，相比于其他基于内存存储的系统而言，有效地降低了数据丢失的风险。也因为 kafka 的消息持久化功能和多副本机制，可以将 kafka 作为长期的数据存储系统系统，只需要将对应的数据保留策略设置为「永久」或者启动主题的日志压缩功能即可。
 
 - 流式处理平台
 
@@ -29,7 +29,7 @@ Kafka 主要「扮演」的三大角色：
 
 ### 1.主题与分区
 
-Kafka 中的消息以主题（Topic）为单位进行归类，生产者负责将消息发送到特定的主题，而消费者负责订阅主题并进行消费。
+Kafka 中的消息以主题（Topic）为单位进行归类，生产者负责将消息发送到特定的主题（每条消息都要指定一个主题），而消费者负责订阅主题并进行消费。
 
 主题是一个逻辑上的概念，它还可以细分为多个分区（Partition），一个分区只属于单个主题。
 
@@ -39,27 +39,33 @@ Kafka 中的消息以主题（Topic）为单位进行归类，生产者负责将
 
 每条消息被发送到 broker 之前，会根据分区规则选择存储到哪个具体的分区。如果分区规则设定得合理，所有的消息都可以均匀地分配到不同的分区中。并且可以通过增加分区来实现水平拓展。
 
+> 因为如果一个主题只对应一个分区（文件），则该文件所有机器的 IO 将会成为该主题的性能瓶颈，分区解决了这个问题；
+
 Kafka 为分区引入了多副本（Replica）机制，通过增加副本数量可以提升容灾能力。同一分区的不同副本中保存的是相同的消息（在同一时刻，副本之间并非完全一样），副本之间是「一主多从」的关系，其中 leader 副本负责处理读写请求，follower 副本只负责与 leader 副本的消息同步。且**副本处于不同 broker 中**，当 leader 副本出现问题，则从 follower 副本中选举新的 leader 提供服务。通过多副本实现故障的自动转移，即当集群中某个 broker 失效但是保证服务可用。
 
 ![image-20220627084240680](%E4%B8%80%E3%80%81%E5%88%9D%E8%AF%86Kafka.resource/image-20220627084240680.png)
 
 Kafka 消费端也具备一定的容灾能力。Consumer 使用拉（Pull）模式从服务端拉取消息，并且保存消费的具体位置，当消费者宕机后恢复上线时可以根据之前保存的消费位置重新拉取需要的消息进行消费，从而不会造成消息丢失。
 
-分区中的所有副本统称为 **AR**（Assigned Replicas）。所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内）组成 ISR（In-SyncReplicas），ISR 集合是 AR 集合中的一个子集。与 leader 副本同步滞后过多的副本（不包括 leader副本）组成 OSR（Out-of-Sync Replicas），由此可见，AR=ISR+OSR。
+分区中的所有副本统称为 **AR**（Assigned Replicas）。所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内）组成 ISR（In-SyncReplicas），ISR 集合是 AR 集合中的一个子集。与 leader 副本同步滞后过多的副本（不包括 leader 副本）组成 OSR（Out-of-Sync Replicas），由此可见，AR = ISR + OSR。
 
 > 正常所有 follower 都应该和 leader 保持一定程度的同步，即 AR = ISR。
 
-leader 副本负责维护和跟踪 ISR 集合中所有 follower 副本的滞后状态，当 follower 副本落后太多或失效时，leader副本会把它从 ISR 集合中剔除。如果 OSR 集合中有 follower 副本“追上”了 leader 副本，那么 leader 副本会把它从 OSR 集合转移至 ISR 集合。默认情况下，当 leader 副本发生故障时，只有在 ISR 集合中的副本才有资格被选举为新的leader，而在 OSR 集合中的副本则没有任何机会。
+leader 副本负责维护和跟踪 ISR 集合中所有 follower 副本的滞后状态，当 follower 副本落后太多或失效时，leader 副本会把它从 ISR 集合中剔除。如果 OSR 集合中有 follower 副本“追上”了 leader 副本，那么 leader 副本会把它从 OSR 集合转移至 ISR 集合。默认情况下，当 leader 副本发生故障时，只有在 ISR 集合中的副本才有资格被选举为新的 leader，而在 OSR 集合中的副本则没有任何机会。
 
 ISR 与 HW 和 LEO 也有紧密的关系。HW（High Watermark，高水位）标识了一个特定的消息偏移量（offset），消费者只能拉取到这个 offset 之前的消息。
 
 ![image-20220524220553984](一、初识Kafka.resource/image-20220524220553984.png)
 
-LEO（Log End Offset）标识当前日志文件中下一条待写入消息的 offset，LEO 等于当前日志分区中最后一条消息的 offset 值加一；
+LEO（Log End Offset）标识当前日志文件中下一条待写入消息的 offset，LEO 等于当前日志分区中最后一条消息的 offset 值加一（图中 LEO 为 9）；
 
 分区 ISR 集合中的每个副本都会维护自身的 LEO，而 **ISR 集合中最小的 LEO 即为分区的 HW**，对消费者而言只能消费 HW 之前的消息。
 
 ![image-20220524223700159](一、初识Kafka.resource/image-20220524223700159.png)
+
+> 因此 kafka 的复制机制既不是完全的同步复制，也不是单纯的异步复制，因为同步复制要求所有能工作的 follower 副本都复制完，该消息才能被确认已成功提交。如果是异步复制，即数据只要写入 leader 副本则认为已成功提交，此时如果 follower 副本都还没复制完而落后 leader 副本，且 leader 副本宕机，则导致数据丢失。
+>
+> ISR 方式有效权衡了数据可靠性和性能之间关系。
 
 ## （二）安装与配置
 
@@ -67,7 +73,7 @@ LEO（Log End Offset）标识当前日志文件中下一条待写入消息的 of
 
 Kafka 通过 ZooKeeper 来实施对元数据信息的管理，包括集群、broker、主题、分区等内容。
 
-ZooKeeper是一个开源的分布式协调服务，是Google Chubby的一个开源实现。分布式应用程序可以基于 ZooKeeper 实现诸如数据发布/订阅、负载均衡、命名服务、分布式协调/通知、集群管理、Master 选举、配置维护等功能。在 ZooKeeper 中共有 3 个角色：leader、follower 和 observer，同一时刻 ZooKeeper 集群中只会有一个 leader，其他的都是follower 和 observer。observer 不参与投票，默认情况下 ZooKeeper 中只有 leader 和 follower 两个角色。
+ZooKeeper 是一个开源的分布式协调服务，是 Google Chubby 的一个开源实现。分布式应用程序可以基于 ZooKeeper 实现诸如数据发布/订阅、负载均衡、命名服务、分布式协调/通知、集群管理、Master 选举、配置维护等功能。在 ZooKeeper 中共有 3 个角色：leader、follower 和 observer，同一时刻 ZooKeeper 集群中只会有一个 leader，其他的都是 follower 和 observer。observer 不参与投票，默认情况下 ZooKeeper 中只有 leader 和 follower 两个角色。
 
 ## （三）生产与消费
 
@@ -75,7 +81,7 @@ ZooKeeper是一个开源的分布式协调服务，是Google Chubby的一个开�
 
 ### 创建 Topic 
 
-生产者将消息发送到 Kafka 的 Topic 中（Topic 的主题）中，消费者也通过 Topic 消费消息；可以直接使用 kafka 安装目录的 bin 目录下脚本工具创建：
+生产者将消息发送到 Kafka 的 Topic 中（Topic 的分区）中，消费者也通过 Topic 消费消息；可以直接使用 kafka 安装目录的 bin 目录下脚本工具创建：
 
 创建格式详解：
 
@@ -104,7 +110,7 @@ bin/kafka-topic.sh --zookeeper localhost:2181 --create --topic topic-demo --repl
 
 ## 1.4 服务端参数配置
 
-Kafka 服务端（broker）还有很多参数配置，涉及使用、调优的各个方面，虽然这些参数在大多数情况下不需要更改，但了解这些参数，以及在特殊应用需求的情况下进行有针对性的调优，可以更好地利用 Kafka为我们工作。以下配置均在 `server.properties` 中
+Kafka 服务端（broker）还有很多参数配置，涉及使用、调优的各个方面，虽然这些参数在大多数情况下不需要更改，但了解这些参数，以及在特殊应用需求的情况下进行有针对性的调优，可以更好地利用 Kafka 为我们工作。以下配置均在 `server.properties` 中：
 
 **1.zookeeper.connect**
 
