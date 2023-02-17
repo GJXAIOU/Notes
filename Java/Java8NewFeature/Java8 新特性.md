@@ -2851,7 +2851,7 @@ public class ConsumerTest {
 
 ## 六、时间与日期 API
 
-### 第三方库：Joda -time
+### （一）第三方库：Joda -time
 
 ```java
 package com.gjxaiou.joda;
@@ -2868,6 +2868,8 @@ public class JodaTest2 {
 
         // 输出：2021-09-02
         System.out.println(today.toString("yyyy-MM-dd"));
+        // 输出：2021-09-02 12:23:23
+        System.out.println(today.toString("yyyy-MM-dd HH:mm:ss"));
         // 输出：2021-09-03
         System.out.println(tomorrow.toString("yyyy-MM-dd"));
 
@@ -2948,9 +2950,9 @@ public class JodaTest3 {
  */
 ```
 
-### Java8 中时间 API
+### （二）Java8 中时间 API
 
-**Joda Time 和 Java 8 中所有的日期和时间的 API 都是不可变对象，每次创建的时候都会返回全新的对象**。所以是线程安全的。
+**Joda Time 和 Java 8 中所有的日期和时间的 API 都是不可变对象，每次创建的时候都会返回全新的对象**，所以是线程安全的。
 
 ```java
 package com.gjxaiou.joda;
@@ -2965,52 +2967,54 @@ public class Java8TimeTest {
     public static void main(String[] args) {
         // LocalDate 是没有时区的时间。
         LocalDate localDate = LocalDate.now();
+        // 输出：2023-02-17
         System.out.println(localDate);
+        // 输出：2023, FEBRUARY: 2, 17
         System.out.println(localDate.getYear() + ", " + localDate.getMonth() + ": " + localDate.getMonthValue() + ", " + localDate.getDayOfMonth());
-        System.out.println("-------");
 
         // 根据年月日构造时间
         LocalDate localDate2 = LocalDate.of(2017, 3, 3);
+        // 输出：2017-03-03
         System.out.println(localDate2);
-        System.out.println("-------");
 
         LocalDate localDate3 = LocalDate.of(2010, 3, 25);
         // MonthDay 是只关注月和日，可以用于一些重复式的。
         MonthDay monthDay = MonthDay.of(localDate3.getMonth(), localDate3.getDayOfMonth());
         MonthDay monthDay2 = MonthDay.from(LocalDate.of(2011, 3, 26));
-
+        // 输出：not equals
         if (monthDay.equals(monthDay2)) {
             System.out.println("equals");
         } else {
             System.out.println("not equals");
         }
-        System.out.println("-------");
 
         LocalTime time = LocalTime.now();
+        // 输出：00:31:24.847
         System.out.println(time);
         LocalTime time2 = time.plusHours(3).plusMinutes(20);
+        // 输出：03:51:24.847
         System.out.println(time2);
-        System.out.println("-------");
 
         // 当前日期的下 2 周
         LocalDate localDate1 = localDate.plus(2, ChronoUnit.WEEKS);
+        // 输出：2023-03-03
         System.out.println(localDate1);
-        System.out.println("-------");
-        // 当前日期的下 2 月
+        
+        // 当前日期的前 2 月
         LocalDate localDate4 = localDate.minus(2, ChronoUnit.MONTHS);
+        // 输出：2022-12-17
         System.out.println(localDate4);
-        System.out.println("-------");
-
 
         // 电脑默认时区
         Clock clock = Clock.systemDefaultZone();
+        // 输出：1676565084847
         System.out.println(clock.millis());
-        System.out.println("-------");
 
         // 判断当前日期和指定日期之间的关系
         LocalDate localDate5 = LocalDate.now();
         LocalDate localDate6 = LocalDate.of(2017, 3, 18);
 
+        // 下面三个输出：true  false  false
         System.out.println(localDate5.isAfter(localDate6));
         System.out.println(localDate5.isBefore(localDate6));
         System.out.println(localDate5.equals(localDate6));
@@ -3023,30 +3027,46 @@ public class Java8TimeTest {
                 addAll(set);
             }
         };
+        
+        /**
+         * 输出所有时区，示例如下：
+         * Africa/Abidjan
+		 * Africa/Accra
+		 * Africa/Addis_Ababa
+		 */
         treeSet.stream().forEach(System.out::println);
         System.out.println("-------");
 
         // 构造时区
         ZoneId zoneId = ZoneId.of("Asia/Shanghai");
         LocalDateTime localDateTime = LocalDateTime.now();
+        // 输出：2023-02-17T00:31:24.862
         System.out.println(localDateTime);
 
         // 构造带有时区的时间
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, zoneId);
+        // 输出：2023-02-17T00:31:24.862+08:00[Asia/Shanghai]
         System.out.println(zonedDateTime);
         System.out.println("-------");
 
         YearMonth yearMonth = YearMonth.now();
+        // 输出：2023-02
         System.out.println(yearMonth);
+        // 输出：28
         System.out.println(yearMonth.lengthOfMonth());
         // 是不是闰年
+        // 输出：false
         System.out.println(yearMonth.isLeapYear());
         System.out.println("-------");
 
         YearMonth yearMonth1 = YearMonth.of(2016, 2);
+        // 输出：2016-02
         System.out.println(yearMonth1);
+        // 输出：29
         System.out.println(yearMonth1.lengthOfMonth());
+        // 输出：366
         System.out.println(yearMonth1.lengthOfYear());
+        // 输出：true
         System.out.println(yearMonth1.isLeapYear());
         System.out.println("-------");
 
@@ -3055,9 +3075,11 @@ public class Java8TimeTest {
         LocalDate localDate8 = LocalDate.of(2021, 3, 16);
 
         Period period = Period.between(localDate7, localDate8);
+        // 输出：间隔 -1 年 -11 月 -1 天
         System.out.println("间隔 " + period.getYears() + " 年 " + period.getMonths() + " 月 " + period.getDays() + " 天 ");
         System.out.println("-------");
 
+        // 输出：2023-02-16T16:31:24.864Z
         System.out.println(Instant.now());
     }
 }
@@ -3219,7 +3241,7 @@ ZonedDateTime 和 LocalDateTime 的一个很大的不同点在于，后者内部
 - public static ZonedDateTime of(LocalDateTime localDateTime, ZoneId zone)
 - public static ZonedDateTime ofInstant(Instant instant, ZoneId zone)：通过时刻和时区构建实例对象
 
-```
+```java
 public static void main(String[] a){
     ZonedDateTime zonedDateTime = ZonedDateTime.now();
     System.out.println(zonedDateTime);
@@ -3259,7 +3281,7 @@ public static void main(String[] a){
 
 Java 8 的新式日期时间 API 中，DateTimeFormatter 作为格式化日期时间的主要类，它与之前的 DateFormat 类最大的不同就在于它是线程安全的，其他的使用上的操作基本类似。我们看看：
 
-```
+```java
 public static void main(String[] a){
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
     LocalDateTime localDateTime = LocalDateTime.now();
@@ -3297,7 +3319,7 @@ DateTimeFormatter 提供将 format 方法将一个日期时间对象转换成格
 
 例如：
 
-```
+```java
 public static void main(String[] args){
     LocalDate date = LocalDate.of(2017,7,22);
     LocalDate date1 = LocalDate.now();
