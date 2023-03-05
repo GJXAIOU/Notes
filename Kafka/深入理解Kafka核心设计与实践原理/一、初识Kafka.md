@@ -25,7 +25,7 @@ Kafka 主要「扮演」的三大角色：
 - Broker 是服务代理节点，Broker 可以简单看做一个独立的 kafka 节点/服务实例，如果 Kafka 服务器上只部署了一个 Kafka 实例，则可以将 Broker 看成一台 Kafka 服务器，一个或多个 Broker 组成了一个 Kafka 集群，其负责将收到的消息存储到磁盘中；
 - Consumer 负责从 Broker 订阅并消费消息。
 
-![在这里插入图片描述](一、初识Kafka.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpZ2h0dXB3b3JsZA==,size_16,color_FFFFFF,t_70-16533119320731.png)
+![在这里插入图片描述](%E4%B8%80%E3%80%81%E5%88%9D%E8%AF%86Kafka.resource/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpZ2h0dXB3b3JsZA==,size_16,color_FFFFFF,t_70-16533119320731-1677774401625-1.png)
 
 ### 1.主题与分区
 
@@ -33,9 +33,11 @@ Kafka 中的消息以主题（Topic）为单位进行归类，生产者负责将
 
 主题是一个逻辑上的概念，它还可以细分为多个分区（Partition），一个分区只属于单个主题。
 
-同一主题下的不同分区包含的消息是不同的，**分区在存储层面可以看作一个可追加的日志（Log）文件**，消息在被追加到分区日志文件的时候都会分配一个特定的偏移量（offset）。**offset 是消息在分区中的唯一标识，Kafka 通过它来保证消息在分区内的顺序性，不过 offset 并不跨越分区，即 Kafka 保证的是分区有序而不是主题有序。**
+**同一主题下的不同分区包含的消息是不同的**，**分区在存储层面可以看作一个可追加的日志（Log）文件**，消息在被追加到分区日志文件的时候都会分配一个特定的偏移量（offset）。**offset 是消息在分区中的唯一标识，Kafka 通过它来保证消息在分区内的顺序性，不过 offset 并不跨越分区，即 Kafka 保证的是分区有序而不是主题有序。**
 
 **Kafka 中的分区可以分布在不同的服务器（broker）上，即一个主题可以横跨多个 broker，以此来提供比单个 broker 更强大的性能**。
+
+> 一个 Partition 只对应一个 broker，但是同一个 broker 上可以有多个 Partition；
 
 每条消息被发送到 broker 之前，会根据分区规则选择存储到哪个具体的分区。如果分区规则设定得合理，所有的消息都可以均匀地分配到不同的分区中。并且可以通过增加分区来实现水平拓展。
 

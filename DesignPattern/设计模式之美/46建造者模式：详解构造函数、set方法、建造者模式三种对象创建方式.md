@@ -1,12 +1,12 @@
 # 46建造者模式：详解构造函数、set方法、建造者模式三种对象创建方式
 
-**Builder 模式/建造者模式/构建者模式/生成器模式** 也是一种创建型设计模式；
+**Builder/建造者/构建者/生成器模式** 是一种创建型设计模式；
 
 建造者模式的原理和代码实现非常简单，难点在于应用场景。比如，你有没有考虑过这样几个问题：直接使用构造函数或者配合 set 方法就能创建对象，为什么还需要建造者模式来创建呢？建造者模式和工厂模式都可以创建对象，那它们两个的区别在哪里呢？
 
 ## 一、为什么需要建造者模式？
 
-创建一个对象最常用的方式是使用 new 关键字调用类的构造函数来完成。那什么情况下这种方式就不适用了，就需要采用建造者模式来创建对象呢？ 下面我通过一个例子来带你看一下。
+创建一个对象最常用的方式是使用 new 关键字调用类的构造函数来完成。那什么情况下这种方式就不适用了，就需要采用建造者模式来创建对象呢？下面我通过一个例子来带你看一下。
 
 假设有这样一道设计面试题：我们需要定义一个资源池配置类 ResourcePoolConfig。这里的资源池，你可以简单理解为线程池、连接池、对象池等。在这个资源池配置类中，有以下几个成员变量，也就是可配置项。现在，请你编写代码实现这个 ResourcePoolConfig 类。
 
@@ -136,10 +136,13 @@ config.setMaxIdle(8);
 
 ```java
 public class ResourcePoolConfig {
+    // 下面的属性本质上可以加上 final 
     private String name;
     private int maxTotal;
     private int maxIdle;
     private int minIdle;
+    
+   // 构造函数必须为私有
     private ResourcePoolConfig(Builder builder) {
         this.name = builder.name;
         this.maxTotal = builder.maxTotal;
@@ -158,6 +161,10 @@ public class ResourcePoolConfig {
         private int maxTotal = DEFAULT_MAX_TOTAL;
         private int maxIdle = DEFAULT_MAX_IDLE;
         private int minIdle = DEFAULT_MIN_IDLE;
+        
+        // 这里缺少一个构造方法
+        // 如果所有都是非必填，则构造方法参数为空，如果有必填的则构造方法中指定必填的字段，剩余的字段通过下面的 setter 方法填充
+        
         public ResourcePoolConfig build() {
             // 校验逻辑放到这里来做，包括必填项校验、依赖关系校验、约束条件校验等
             if (StringUtils.isBlank(name)) {
