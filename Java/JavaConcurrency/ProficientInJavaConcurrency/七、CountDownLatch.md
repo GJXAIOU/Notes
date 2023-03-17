@@ -1,4 +1,4 @@
-### CountDownLatch
+# CountDownLatch
 
 [TOC]
 
@@ -85,8 +85,7 @@ public void await() throws InterruptedException {
 }
 
 // ======= AbstractQueuedSynchronizer.acquireSharedInterruptibly()========
-public final void acquireSharedInterruptibly(int arg)
-        throws InterruptedException {
+public final void acquireSharedInterruptibly(int arg) throws InterruptedException {
     if (Thread.interrupted())
         throw new InterruptedException();
     // 尝试获取锁，如果失败则排队
@@ -95,9 +94,9 @@ public final void acquireSharedInterruptibly(int arg)
 }
 ```
 
-await()方法是等待其它线程完成的方法，它会先尝试获取一下共享锁，如果失败则进入AQS的队列中排队等待被唤醒。
+`await()` 方法是等待其它线程完成的方法，它会先尝试获取一下共享锁，如果失败则进入 AQS 的队列中排队等待被唤醒。
 
-根据上面Sync的源码，我们知道，state不等于0的时候tryAcquireShared()返回的是-1，也就是说count未减到0的时候所有调用await()方法的线程都要排队。
+根据上面 Sync 的源码，我们知道，state 不等于 0 的时候 `tryAcquireShared()` 返回的是 -1，也就是说 count 未减到 0 的时候所有调用 `await()` 方法的线程都要排队。
 
 ## （四）countDown()方法
 
@@ -120,9 +119,9 @@ public final boolean releaseShared(int arg) {
 }
 ```
 
-countDown()方法，会释放一个共享锁，也就是count的次数会减1。
+`countDown()` 方法，会释放一个共享锁，也就是 count 的次数会减 1。
 
-根据上面Sync的源码，我们知道，tryReleaseShared()每次会把count的次数减1，当其减为0的时候返回true，这时候才会唤醒等待的线程。
+根据上面 Sync 的源码，我们知道，`tryReleaseShared()` 每次会把 count 的次数减 1，当其减为 0 的时候返回 true，这时候才会唤醒等待的线程。
 
 ## 使用案例一
 
@@ -187,7 +186,7 @@ hello
 
 这里我们模拟一个使用场景，我们有一个主线程和5个辅助线程，等待主线程准备就绪了，5个辅助线程开始运行，等待5个辅助线程运行完毕了，主线程继续往下运行，大致的流程图如下：
 
-![CountDownLatch](https://gitee.com/alan-tang-tt/yuan/raw/master/死磕%20java同步系列/resource/CountDownLatch1.png)
+![CountDownLatch](%E4%B8%83%E3%80%81CountDownLatch.resource/CountDownLatch1.png)
 
 我们一起来看看这段代码应该怎么写：
 
@@ -226,6 +225,24 @@ public class CountDownLatchTest {
 }
 ```
 
+输出结果：
+
+```java
+Aid thread is waiting for starting.
+Aid thread is waiting for starting.
+Aid thread is waiting for starting.
+Aid thread is waiting for starting.
+Aid thread is waiting for starting.
+Main thread is doing something.
+Main thread is waiting for aid threads finishing.
+Aid thread is doing something.
+Aid thread is doing something.
+Aid thread is doing something.
+Aid thread is doing something.
+Aid thread is doing something.
+Main thread is doing something after all threads have finished.
+```
+
 这段代码分成两段：
 
 第一段，5个辅助线程等待开始的信号，信号由主线程发出，所以5个辅助线程调用startSignal.await()方法等待开始信号，当主线程的事儿干完了，调用startSignal.countDown()通知辅助线程开始干活。
@@ -234,17 +251,17 @@ public class CountDownLatchTest {
 
 ## 注意
 
-- CountDownLatch 的初始次数不可以调整，因为类没有听过修改该参数 count 的方法，除非使用反射。
+- CountDownLatch 的初始次数不可以调整，因为类没有提供修改该参数 count 的方法，除非使用反射。
 
 - CountDownLatch 使用共享锁原因：
 
-    前面我们分析ReentrantReadWriteLock的时候学习过AQS的共享锁模式，比如当前锁是由一个线程获取为互斥锁，那么这时候所有需要获取共享锁的线程都要进入AQS队列中进行排队，当这个互斥锁释放的时候，会一个接着一个地唤醒这些连续的排队的等待获取共享锁的线程，注意，这里的用语是“一个接着一个地唤醒”，也就是说这些等待获取共享锁的线程不是一次性唤醒的。
+    前面我们分析 ReentrantReadWriteLock 的时候学习过 AQS 的共享锁模式，比如当前锁是由一个线程获取为互斥锁，那么这时候所有需要获取共享锁的线程都要进入 AQS 队列中进行排队，当这个互斥锁释放的时候，会一个接着一个地唤醒这些连续的排队的等待获取共享锁的线程，注意，这里的用语是“一个接着一个地唤醒”，也就是说这些等待获取共享锁的线程不是一次性唤醒的。
 
-    因为CountDownLatch的await()多个线程可以调用多次，当调用多次的时候这些线程都要进入AQS队列中排队，当count次数减为0的时候，它们都需要被唤醒，继续执行任务，如果使用互斥锁则不行，互斥锁在多个线程之间是互斥的，一次只能唤醒一个，不能保证当count减为0的时候这些调用了await()方法等待的线程都被唤醒。
+    因为 CountDownLatch 的 await() 多个线程可以调用多次，当调用多次的时候这些线程都要进入 AQS 队列中排队，当 count 次数减为 0 的时候，它们都需要被唤醒，继续执行任务，如果使用互斥锁则不行，互斥锁在多个线程之间是互斥的，一次只能唤醒一个，不能保证当 count 减为 0 的时候这些调用了 await() 方法等待的线程都被唤醒。
 
 - CountDownLatch 与 Thread.join() 区别
 
-    Thread.join() 是在主线程中调用的，它只能等待被调用的线程结束了才会通知主线程，而CountDownLatch 则不同，它的 countDown() 方法可以在线程执行的任意时刻调用，灵活性更大。
+    Thread.join() 是在主线程中调用的，它只能等待被调用的线程结束了才会通知主线程，而 CountDownLatch 则不同，它的 countDown() 方法可以在线程执行的任意时刻调用，灵活性更大。
 
 
 
