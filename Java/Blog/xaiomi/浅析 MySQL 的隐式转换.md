@@ -66,14 +66,13 @@ explain select * from t1 where c1=12345678901234567;
 
 全表扫描
 
-## 什么是隐式类型转换
+## 一、什么是隐式类型转换
 
 MySQL 中对隐式转换的定义：
 
 > When an operator is used with operands of different types, type conversion occurs to make the operands compatible. Some conversions occur implicitly.
-
-翻译下
-当操作符与不同类型的操作数一起使用时，会发生类型转换以使操作数兼容。
+>
+> 翻译：当操作符与不同类型的操作数一起使用时，会发生类型转换以使操作数兼容。
 
 举个例子，当操作数是字符跟数字时， MySQL 会根据使用的操作符，转换字符到数字或转换数字成字符。
 
@@ -84,29 +83,29 @@ mysql> SELECT CONCAT(2,' test');
         -> '2 test'
 ```
 
-### 比较操作时 MySQL 隐式类型转换规则
+### 二、比较操作时 MySQL 隐式类型转换规则
 
 官方文档中有一段对比较操作时， MySQL 的类型转换做了说明：
 
 > If one or both arguments are NULL, the result of the comparison is NULL, except for the NULL-safe <=> equality comparison operator. For NULL <=> NULL, the result is true. No conversion is needed.
-
+>
 > If both arguments in a comparison operation are strings, they are compared as strings.
-
+>
 > If both arguments are integers, they are compared as integers.
-
+>
 > Hexadecimal values are treated as binary strings if not compared to a number.
-
+>
 > If one of the arguments is a TIMESTAMP or DATETIME column and the other argument is a constant, the constant is converted to a timestamp before the comparison is performed. This is done to be more ODBC-friendly. This is not done for the arguments to IN(). To be safe, always use complete datetime, date, or time strings when doing comparisons. For example, to achieve best results when using BETWEEN with date or time values, use CAST() to explicitly convert the values to the desired data type.
-
+>
 > A single-row subquery from a table or tables is not considered a constant. For example, if a subquery returns an integer to be compared to a DATETIME value, the comparison is done as two integers. The integer is not converted to a temporal value. To compare the operands as DATETIME values, use CAST() to explicitly convert the subquery value to DATETIME.
-
+>
 > If one of the arguments is a decimal value, comparison depends on the other argument. The arguments are compared as decimal values if the other argument is a decimal or integer value, or as floating-point values if the other argument is a floating-point value.
-
+>
 > In all other cases, the arguments are compared as floating-point (real) numbers. For example, a comparison of string and numeric operands takes places as a comparison of floating-point numbers.
 
 翻译为中文就是：
 
-- 两个参数至少有一个是 NULL 时，比较的结果也是 NULL，例外是使用 <=> 对两个 NULL 做比较时会返回 1，这两种情况都不需要做类型转换
+- 两个参数至少有一个是 NULL 时，比较的结果也是 NULL，例外是使用 `<=>` 对两个 NULL 做比较时会返回 1，这两种情况都不需要做类型转换
 - 两个参数都是字符串，会按照字符串来比较，不做类型转换
 - 两个参数都是整数，按照整数来比较，不做类型转换
 - 十六进制的值和非数字做比较时，会被当做二进制串
@@ -116,7 +115,7 @@ mysql> SELECT CONCAT(2,' test');
 
 我们用十六进制的来验证看下
 
-### 十六进制
+### （一）十六进制
 
 ```mysql
 CREATE TABLE `t5` (
