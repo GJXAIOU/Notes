@@ -6,7 +6,7 @@
 
 总结时间:
 
-![](<https://static001.geekbang.org/resource/image/bc/19/bc59bcd53d01013fe4eb3e793c5ee119.jpg>)
+
 
 <audio><source src="https://static001.geekbang.org/resource/audio/9a/3b/9a7e6698a3d102e66ac5fd92f3f4b33b.mp3" type="audio/mpeg"></audio>
 
