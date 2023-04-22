@@ -101,9 +101,9 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **26
 
-  有个问题，为什么mapper计算完的结果要放到硬盘呢？那再发送到reducer不是还有个读取再发送的过程吗？这中间不就有一个重复的写和读的过程吗？
+  有个问题，为什么 mapper 计算完的结果要放到硬盘呢？那再发送到 reducer 不是还有个读取再发送的过程吗？这中间不就有一个重复的写和读的过程吗？
 
-  作者回复: 是的，主要为了可靠性，spark就不写硬盘，所以快。
+  作者回复: 是的，主要为了可靠性，spark 就不写硬盘，所以快。
 
 - 
 
@@ -113,7 +113,7 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **22
 
-  老师您好，有个问题，当某个key聚集了大量数据，shuffle到同一个reduce来汇总，考虑数据量很大的情况，这个会不会把reduce所在机器节点撑爆？这样任务是不是就失败了？
+  老师您好，有个问题，当某个 key 聚集了大量数据，shuffle 到同一个 reduce 来汇总，考虑数据量很大的情况，这个会不会把 reduce 所在机器节点撑爆？这样任务是不是就失败了？
 
   展开**
 
@@ -127,11 +127,11 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **19
 
-  MapReduce的思想有点类似分而治之，将一个大任务分割成小任务，分发给服务器去处理，然后汇总结果，这是MapReduce的优势，但是MapReduce也就限制在了只能处理这种可以分割的任务上，比如，统计文本中的不同单词的个数，不知道我这种想法是否正确，还想请老师指教，另外，能否分享一下MapReduce这种技术的局限性呢？
+  MapReduce 的思想有点类似分而治之，将一个大任务分割成小任务，分发给服务器去处理，然后汇总结果，这是 MapReduce 的优势，但是 MapReduce 也就限制在了只能处理这种可以分割的任务上，比如，统计文本中的不同单词的个数，不知道我这种想法是否正确，还想请老师指教，另外，能否分享一下 MapReduce 这种技术的局限性呢？
 
   展开**
 
-  作者回复: 是的，比如MapReduce没法计算斐波那契数列，因为不能分片计算。
+  作者回复: 是的，比如 MapReduce 没法计算斐波那契数列，因为不能分片计算。
   但是大数据场景几乎都是可以分片计算的。
 
 - 
@@ -154,11 +154,11 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **6
 
-  1.数据从PC/Mobile端发动给服务器端
-  2.服务器端收到数据后在分布式集群下会进入到某个Server端，数据经过一系列的业务操作后可能会被记录下来
+  1.数据从 PC/Mobile 端发动给服务器端
+  2.服务器端收到数据后在分布式集群下会进入到某个 Server 端，数据经过一系列的业务操作后可能会被记录下来
   3.这些记录下来的数据会以文件形式存放于某个固定位置
   4.数据推送工具可将这些固定位置的文件推送到大数据平台
-  5.大数据平台的Map Reduce框架会根据程序应用主动读取数据作为Map/Reduce的数据输入
+  5.大数据平台的 Map Reduce 框架会根据程序应用主动读取数据作为 Map/Reduce 的数据输入
   6.大数据平台清晰完数据后以文件形式输出
   7.服务器端去大数据平台存放文件的位置获取文件，并进行解析入库。
   8.最终，数据以图形形式展示在报告上。
@@ -173,7 +173,7 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **4
 
-  请问JobTracker和之前讲到的NameNode是在同一个服务器上的吗？
+  请问 JobTracker 和之前讲到的 NameNode 是在同一个服务器上的吗？
 
   展开**
 
@@ -187,11 +187,11 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **4
 
-  想问下，在Hadoop上跑计算任务，在极端异常的条件下（数据机器down，网络隔离，namenode切换），能保证计算要么返回失败要么给出可信的结果吗？背景是这样的，考量在大数据平台上做资金的清算，非程序的错误，计算结果不能有错有漏，在单机db上这个肯定ok，不考虑事务前提下，Hadoop计算是否也毫无问题？可能考量数据一致性、任务状态一致性等方面，我了解太浅，想请教下老师，这种要求绝对计算准确的场景，hadoop目前胜任吗？
+  想问下，在 Hadoop 上跑计算任务，在极端异常的条件下（数据机器 down，网络隔离，namenode 切换），能保证计算要么返回失败要么给出可信的结果吗？背景是这样的，考量在大数据平台上做资金的清算，非程序的错误，计算结果不能有错有漏，在单机 db 上这个肯定 ok，不考虑事务前提下，Hadoop 计算是否也毫无问题？可能考量数据一致性、任务状态一致性等方面，我了解太浅，想请教下老师，这种要求绝对计算准确的场景，hadoop 目前胜任吗？
 
   展开**
 
-  作者回复: 没有问题，一般宕机也能计算完成，MapReduce有容错能力。计算结果不会有问题。
+  作者回复: 没有问题，一般宕机也能计算完成，MapReduce 有容错能力。计算结果不会有问题。
 
 - 
 
@@ -201,9 +201,9 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **3
 
-  JobTracker创建JobInProcess ，JobinPrcess根据分片数目和设置reduce数目创建TaskInprocess。 那么它是如何决定具体在哪些服务器创建 task tracker呢？我觉得需要了解这个过程，才能明白大数据如何分配和使用资源的。 请老师解答下，谢谢！
+  JobTracker 创建 JobInProcess ，JobinPrcess 根据分片数目和设置 reduce 数目创建 TaskInprocess。 那么它是如何决定具体在哪些服务器创建 task tracker 呢？我觉得需要了解这个过程，才能明白大数据如何分配和使用资源的。 请老师解答下，谢谢！
 
-  作者回复: 所有服务器都启动tasktracker，等待jobtracker分配任务，跟NameNode一样
+  作者回复: 所有服务器都启动 tasktracker，等待 jobtracker 分配任务，跟 NameNode 一样
 
 - 
 
@@ -213,9 +213,9 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **3
 
-  老师，您给出的Partitioner的代码所反映的算法不会影响集群的扩展性吗？为什么不是采用一致性哈希算法呢？
+  老师，您给出的 Partitioner 的代码所反映的算法不会影响集群的扩展性吗？为什么不是采用一致性哈希算法呢？
 
-  作者回复: 不会，调用partitioner是一个job的任务分配，动态的，结束了就完成了，不存在扩展性问题。
+  作者回复: 不会，调用 partitioner 是一个 job 的任务分配，动态的，结束了就完成了，不存在扩展性问题。
 
 - 
 
@@ -225,9 +225,9 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **3
 
-  有一个疑问，之前讲到“移动计算而不是移动数据”，但是在shuffle的过程中，涉及到大量的移动数据，这又是为什么呢？
+  有一个疑问，之前讲到“移动计算而不是移动数据”，但是在 shuffle 的过程中，涉及到大量的移动数据，这又是为什么呢？
 
-  作者回复: 移动计算主要是map阶段，reduce阶段数据还是要移动数据合并关联，不然很多计算无法完成
+  作者回复: 移动计算主要是 map 阶段，reduce 阶段数据还是要移动数据合并关联，不然很多计算无法完成
 
 - 
 
@@ -250,15 +250,15 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **2
 
-  实际操作中是不是通过hive去完成MapReduce 的？
-  如果有一台机子一直卡在那里，整个job就差它一个返回数据，是不是整个job在等待状态？这种怎么处理？
+  实际操作中是不是通过 hive 去完成 MapReduce 的？
+  如果有一台机子一直卡在那里，整个 job 就差它一个返回数据，是不是整个 job 在等待状态？这种怎么处理？
 
   展开**
 
-  作者回复: 如果是SQL操作，就用hive，不用自己编程MapReduce。
+  作者回复: 如果是 SQL 操作，就用 hive，不用自己编程 MapReduce。
 
-  如果机器故障导致某个任务很慢，MapReduce框架会启动多个任务进程在多个服务器同时计算同一个数据块，那个算完输出那个，不会一直等。
-  需要一直等的是数据偏移，某个key聚集了太多数据，大量数据shuffle到一个reduce计算，job一直等这个任务。
+  如果机器故障导致某个任务很慢，MapReduce 框架会启动多个任务进程在多个服务器同时计算同一个数据块，那个算完输出那个，不会一直等。
+  需要一直等的是数据偏移，某个 key 聚集了太多数据，大量数据 shuffle 到一个 reduce 计算，job 一直等这个任务。
 
 - 
 
@@ -268,7 +268,7 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **2
 
-  hadoop可以通过实验去练习吧？一般什么配置？官网的说明文档能当扩展阅读吗？选择那个版本？
+  hadoop 可以通过实验去练习吧？一般什么配置？官网的说明文档能当扩展阅读吗？选择那个版本？
 
   作者回复: 可以，普通笔记本就可以，能，最新版
 
@@ -280,7 +280,7 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **2
 
-  这个思考题感觉问的很开放，我只能按照我的理解回答一下。不管是手机端还是pc端发起的请求都是http或者https的请求，协议下层(tcp/ip)会根据请求地址建立连接把请求的数据（字节流）传输到服务端对应处理方法中。当然服务端需要对请求的地址url和对应的响应方法做映射。响应方法从request中读取对应的请求数据然后处理，最后把结果通过response返回给用户。响应完成后，不会保留之前的状态数据，但连接不一定就会断开，下次请求的时候就不用再重新建立连接了。
+  这个思考题感觉问的很开放，我只能按照我的理解回答一下。不管是手机端还是 pc 端发起的请求都是 http 或者 https 的请求，协议下层(tcp/ip)会根据请求地址建立连接把请求的数据（字节流）传输到服务端对应处理方法中。当然服务端需要对请求的地址 url 和对应的响应方法做映射。响应方法从 request 中读取对应的请求数据然后处理，最后把结果通过 response 返回给用户。响应完成后，不会保留之前的状态数据，但连接不一定就会断开，下次请求的时候就不用再重新建立连接了。
 
   展开**
 
@@ -292,9 +292,9 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **2
 
-  文中第一幅图，map输入 中 0 hello world 12 Byte world ，这里数字代表什么意思了？是map 输入顺序下标吗？
+  文中第一幅图，map 输入 中 0 hello world 12 Byte world ，这里数字代表什么意思了？是 map 输入顺序下标吗？
 
-  作者回复: map输入数据在文件中的偏移量
+  作者回复: map 输入数据在文件中的偏移量
 
 - 
 
@@ -304,27 +304,27 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **1
 
-  java程序用于合并mapper和reducer的代码。
+  java 程序用于合并 mapper 和 reducer 的代码。
   public class WordCountApp {
     public static void main(String[] args) throws Exception {
       //创建配置信息
       Configuration configuration = new Configuration();
 
-  ​    //创建Job
+  ​    //创建 Job
   ​    Job worldCountJob = Job.getInstance(configuration, "WorldCount");
 
-  ​    //设置Job的处理类
+  ​    //设置 Job 的处理类
   ​    worldCountJob.setJarByClass(WordCountApp.class);
 
   ​    //设置作业的输入路径
   ​    FileInputFormat.setInputPaths(worldCountJob, new Path(args[0]));
 
-  ​    //设置map相关参数
+  ​    //设置 map 相关参数
   ​    worldCountJob.setMapperClass(MyMapper.class);
   ​    worldCountJob.setMapOutputKeyClass(Text.class);
   ​    worldCountJob.setMapOutputValueClass(LongWritable.class);
 
-  ​    //设置reduce相关参数
+  ​    //设置 reduce 相关参数
   ​    worldCountJob.setReducerClass(MyReducer.class);
   ​    worldCountJob.setOutputKeyClass(Text.class);
   ​    worldCountJob.setOutputValueClass(LongWritable.class);
@@ -346,24 +346,24 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **1
 
-  shuffle过程中的两次排序。这个很重要吧，需要提一下啊，我就被网易的面试官问过。
+  shuffle 过程中的两次排序。这个很重要吧，需要提一下啊，我就被网易的面试官问过。
 
 - 
 
-  杰之7
+  杰之 7
 
   2019-02-08
 
   **1
 
-  通过这一节的复习，这节内容主要解决MR的启动和运行，数据的合并和连接机制。在这一节中，涉及到了大数据技术的核心技术，调用JAR包，执行机制中会将HDFS中的数据块联系起来，通过HTTP通信发送给相对应的reduce。这些内容设计到了Java编程，网络通信，Linux多服务器的知识，对这些基础知识的掌握是做数据技术的前提。
+  通过这一节的复习，这节内容主要解决 MR 的启动和运行，数据的合并和连接机制。在这一节中，涉及到了大数据技术的核心技术，调用 JAR 包，执行机制中会将 HDFS 中的数据块联系起来，通过 HTTP 通信发送给相对应的 reduce。这些内容设计到了 Java 编程，网络通信，Linux 多服务器的知识，对这些基础知识的掌握是做数据技术的前提。
 
-  在MR的启动和连接步骤中，首先通过应用程序将JAR包存储在HDFS中供将来服务器执行MR计算。
-  应用程序提交Job给JobTrack,JobTrack创建Jobinprocess,Jobinprocess根据数据快和设置reduce数目创建TaskInprocess,这部也就将HDFS和MR关联了起来。TaskTracker与JobTracker通信，分配任务，然后TaskTracker根据任务类型和参数启动相应的Maop或者redece，找到JAR包执行任务。
+  在 MR 的启动和连接步骤中，首先通过应用程序将 JAR 包存储在 HDFS 中供将来服务器执行 MR 计算。
+  应用程序提交 Job 给 JobTrack,JobTrack 创建 Jobinprocess,Jobinprocess 根据数据快和设置 reduce 数目创建 TaskInprocess,这部也就将 HDFS 和 MR 关联了起来。TaskTracker 与 JobTracker 通信，分配任务，然后 TaskTracker 根据任务类型和参数启动相应的 Maop 或者 redece，找到 JAR 包执行任务。
 
-  上述就完成了作业的启动和运行，对于数据的联合和合并，用到的是Shuffle,通过调用partiton接口，对Map产生的<key,value>分区选择，通过HTTP通过发送给对应的reduce执行。
+  上述就完成了作业的启动和运行，对于数据的联合和合并，用到的是 Shuffle,通过调用 partiton 接口，对 Map 产生的<key,value>分区选择，通过 HTTP 通过发送给对应的 reduce 执行。
 
-  通过复习，这一节的内容贯穿了整个大数据技术的核心，涉及到了计算机的JAR，HTTP，Linux， 数据库的joinw，HDFS和MR的主从架构模式，值得我多次重复复习。
+  通过复习，这一节的内容贯穿了整个大数据技术的核心，涉及到了计算机的 JAR，HTTP，Linux， 数据库的 joinw，HDFS 和 MR 的主从架构模式，值得我多次重复复习。
 
   展开**
 
@@ -375,7 +375,7 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **1
 
-  为什么JobTracker分配任务给TaskTracker的时候，TaskTracker和数据块要刚好在一个机器上呢？TaskTracker输入的数据不是应该通过HDSF的API获取的吗？
+  为什么 JobTracker 分配任务给 TaskTracker 的时候，TaskTracker 和数据块要刚好在一个机器上呢？TaskTracker 输入的数据不是应该通过 HDSF 的 API 获取的吗？
 
   展开**
 
@@ -387,11 +387,11 @@ MapReduce 编程相对说来是简单的，但是 MapReduce 框架要将一个�
 
   **1
 
-  GFS把“记录追加的数据大小严格控制在Chunk 最大尺寸的 1/4”，如果文件尾部的Chunk能容纳追加的记录，就把记录追加到这个Chunk。否则，就把这个Chunk做填充，然后新分配一个Chunk来写追加的记录，这就保证了记录存储不会跨块。
-  今天意识到这个设计对MapReduce过程是有用的，如果记录跨块，map实例就无法拿到完整的记录，计算也必然不准确。
+  GFS 把“记录追加的数据大小严格控制在 Chunk 最大尺寸的 1/4”，如果文件尾部的 Chunk 能容纳追加的记录，就把记录追加到这个 Chunk。否则，就把这个 Chunk 做填充，然后新分配一个 Chunk 来写追加的记录，这就保证了记录存储不会跨块。
+  今天意识到这个设计对 MapReduce 过程是有用的，如果记录跨块，map 实例就无法拿到完整的记录，计算也必然不准确。
 
   展开**
 
-  作者回复: MapReduce是可以跨块读记录的～
+  作者回复: MapReduce 是可以跨块读记录的～
 
 收藏

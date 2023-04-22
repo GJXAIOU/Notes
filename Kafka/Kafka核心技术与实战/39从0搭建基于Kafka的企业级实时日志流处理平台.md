@@ -270,9 +270,9 @@ $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic os-che
 
   2019-09-03
 
-  老师，上述Kafka Connect+Kafka Core+Kafka Streams例子中，生产者和消费者分别是什么？
+  老师，上述 Kafka Connect+Kafka Core+Kafka Streams 例子中，生产者和消费者分别是什么？
 
-  作者回复: 此时，生产者和消费者化身成这个大平台的小组件了。Connect中只有producer，将读取的日志行数据写入到Kafka源主题中。Streams中既有producer也有consumer：producer负责将计算结果实时写入到目标Kafka主题；consumer负责从源主题中读取消息供下游实时计算之用。
+  作者回复: 此时，生产者和消费者化身成这个大平台的小组件了。Connect 中只有 producer，将读取的日志行数据写入到 Kafka 源主题中。Streams 中既有 producer 也有 consumer：producer 负责将计算结果实时写入到目标 Kafka 主题；consumer 负责从源主题中读取消息供下游实时计算之用。
 
   **
 
@@ -284,9 +284,9 @@ $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic os-che
 
   2019-09-06
 
-  请教一下，集群版的connector是说每个kafka节点都启动一个吗？还有它读取的nginx日志就在本地？谢谢
+  请教一下，集群版的 connector 是说每个 kafka 节点都启动一个吗？还有它读取的 nginx 日志就在本地？谢谢
 
-  作者回复: 在Nginx日志本地
+  作者回复: 在 Nginx 日志本地
 
   **1
 
@@ -298,7 +298,7 @@ $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic os-che
 
   2019-09-03
 
-  请问胡老师，console-consumer输出的message，为什么结束时间是一个很大的整数？从开始时间看，它应该是millisecond epoch，原本以为结束时间应该也是开始时间+2 second，但是文章中的例子看着不像：
+  请问胡老师，console-consumer 输出的 message，为什么结束时间是一个很大的整数？从开始时间看，它应该是 millisecond epoch，原本以为结束时间应该也是开始时间+2 second，但是文章中的例子看着不像：
 
   bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic os-check --from-beginning --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer --property print.key=true --property key.deserializer=org.apache.kafka.streams.kstream.TimeWindowedDeserializer --property key.deserializer.default.windowed.key.serde.inner=org.apache.kafka.common.serialization.Serdes\$StringSerde
   [android@1565743788000/9223372036854775807] 1522
@@ -312,4 +312,4 @@ $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic os-che
 
   展开**
 
-  作者回复: 这里的结束时间在代码中没有指定，因此默认值是Long.MAX_VALUE
+  作者回复: 这里的结束时间在代码中没有指定，因此默认值是 Long.MAX_VALUE

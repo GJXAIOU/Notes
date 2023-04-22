@@ -52,7 +52,7 @@
 >
 > 8
 
-1.  // 对应实现Controller接口的Controller
+1.  // 对应实现 Controller 接口的 Controller
 
 2.  public class SimpleControllerHandlerAdapter implements HandlerAdapter {
 
@@ -88,7 +88,7 @@
 >
 > 26
 
-1.  // 对应实现Servlet接口的Controller
+1.  // 对应实现 Servlet 接口的 Controller
 
 2.  public class SimpleServletHandlerAdapter implements HandlerAdapter {
 
@@ -126,7 +126,7 @@
 >
 > 45
 
-1.  //AnnotationMethodHandlerAdapter对应通过注解实现的Controller，
+1.  //AnnotationMethodHandlerAdapter 对应通过注解实现的 Controller，
 
 2.  //代码太多了，我就不贴在这里了
 

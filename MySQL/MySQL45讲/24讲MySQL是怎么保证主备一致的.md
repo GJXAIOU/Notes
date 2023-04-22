@@ -1,6 +1,6 @@
 # 24讲MySQL是怎么保证主备一致的
 
-在前面的文章中，我不止一次地和你提到了 binlog，大家知道 **binlog 可以用来归档，也可以用来做主备同步**，但它的内容是什么样的呢？为什么备库执行了binlog 就可以跟主库保持一致了呢？。
+在前面的文章中，我不止一次地和你提到了 binlog，大家知道 **binlog 可以用来归档，也可以用来做主备同步**，但它的内容是什么样的呢？为什么备库执行了 binlog 就可以跟主库保持一致了呢？。
 
 MySQL 能够成为现下最流行的开源数据库，binlog 功不可没。
 
@@ -10,7 +10,7 @@ MySQL 能够成为现下最流行的开源数据库，binlog 功不可没。
 
 ## 一、MySQL 主备的基本原理
 
-如图1所示就是基本的主备切换流程。
+如图 1 所示就是基本的主备切换流程。
 
 ![image-20221109090504149](24%E8%AE%B2MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E4%BF%9D%E8%AF%81%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4%E7%9A%84.resource/image-20221109090504149.png)
 
@@ -36,7 +36,7 @@ MySQL 能够成为现下最流行的开源数据库，binlog 功不可没。
 
 ![image-20221109090941505](24%E8%AE%B2MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E4%BF%9D%E8%AF%81%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4%E7%9A%84.resource/image-20221109090941505.png)
 
-图2 主备流程图
+图 2 主备流程图
 
 图 2 中，包含了我在上一篇文章中讲到的 binlog 和 redo log 的写入机制相关的内容，可以看到：主库接收到客户端的更新请求后，执行内部事务的更新逻辑，同时写 binlog。
 
@@ -85,7 +85,7 @@ insert into t values(5,5,'2018-11-09');
 
 如果要在表中删除一行数据的话，我们来看看这个 delete 语句的 binlog 是怎么记录的。
 
-注意，下面这个语句包含注释，如果你用MySQL客户端来做这个实验的话，要记得加 -c 参数，否则客户端会自动去掉注释。
+注意，下面这个语句包含注释，如果你用 MySQL 客户端来做这个实验的话，要记得加 -c 参数，否则客户端会自动去掉注释。
 
 ```mysql
 mysql> delete from t /*comment*/  where a>=4 and t_modified<='2018-11-10' limit 1;
@@ -101,13 +101,13 @@ mysql> show binlog events in 'master.000001';
 
 ![img](24讲MySQL是怎么保证主备一致的.resource/b9818f73cd7d38a96ddcb75350b52931.png)
 
-图3 statement 格式 binlog 示例
+图 3 statement 格式 binlog 示例
 
-现在，我们来看一下图3的输出结果。
+现在，我们来看一下图 3 的输出结果。
 
 - 第一行 `SET @@SESSION.GTID_NEXT='ANONYMOUS’` 你可以先忽略，后面文章我们会在介绍主备切换的时候再提到；
 - 第二行是一个 BEGIN，跟第四行的 commit 对应，表示中间是一个事务；
-- 第三行就是真实执行的语句了。可以看到，在真实执行的 delete 命令之前，还有一个 `use ‘test’` 命令。这条命令不是我们主动执行的，而是 MySQL 根据当前要操作的表所在的数据库，自行添加的。这样做可以保证日志传到备库去执行的时候，不论当前的工作线程在哪个库里，都能够正确地更新到test库的表t。
+- 第三行就是真实执行的语句了。可以看到，在真实执行的 delete 命令之前，还有一个 `use ‘test’` 命令。这条命令不是我们主动执行的，而是 MySQL 根据当前要操作的表所在的数据库，自行添加的。这样做可以保证日志传到备库去执行的时候，不论当前的工作线程在哪个库里，都能够正确地更新到 test 库的表 t。
     `use 'test’` 命令之后的 delete 语句，就是我们输入的 SQL 原文了。可以看到，**binlog “忠实”地记录了 SQL 命令，甚至连注释也一并记录了**。
 - 最后一行是一个 COMMIT。你可以看到里面写着 xid=61。你还记得这个 XID 是做什么用的吗？如果记忆模糊了，可以再回顾一下[第15篇文章](https://time.geekbang.org/column/article/73161)中的相关内容。
 
@@ -115,22 +115,22 @@ mysql> show binlog events in 'master.000001';
 
 ![img](24讲MySQL是怎么保证主备一致的.resource/96c2be9c0fcbff66883118526b26652b.png)
 
-图4 delete执行warnings
+图 4 delete 执行 warnings
 
 可以看到，运行这条 delete 命令产生了一个 warning，原因是当前 binlog 设置的是 statement 格式，并且语句中有 limit，所以这个命令可能是 unsafe 的。
 
 为什么这么说呢？这是**因为 delete 带 limit，很可能会出现主备数据不一致的情况**。比如上面这个例子：
 
-1. 如果 delete 语句使用的是索引a，那么会根据索引 a 找到第一个满足条件的行，也就是说删除的是 a=4 这一行；
+1. 如果 delete 语句使用的是索引 a，那么会根据索引 a 找到第一个满足条件的行，也就是说删除的是 a=4 这一行；
 2. 但如果使用的是索引 t_modified，那么删除的就是 t_modified='2018-11-09’ 也就是 a=5 这一行。
 
-由于 statement 格式下，记录到 binlog 里的是语句原文，因此可能会出现这样一种情况：在主库执行这条 SQL 语句的时候，用的是索引 a；而在备库执行这条 SQL 语句的时候，却使用了索引t_modified。因此，MySQL 认为这样写是有风险的。
+由于 statement 格式下，记录到 binlog 里的是语句原文，因此可能会出现这样一种情况：在主库执行这条 SQL 语句的时候，用的是索引 a；而在备库执行这条 SQL 语句的时候，却使用了索引 t_modified。因此，MySQL 认为这样写是有风险的。
 
 那么，如果我把 binlog 的格式改为 `binlog_format='row'`， 是不是就没有这个问题了呢？我们先来看看这时候 binlog 中的内容吧。
 
 ![img](24讲MySQL是怎么保证主备一致的.resource/d67a38db154afff610ae3bb64e266826.png)
 
-图5 row 格式 binlog 示例
+图 5 row 格式 binlog 示例
 
 可以看到，与 statement 格式的 binlog 相比，前后的 BEGIN 和 COMMIT 是一样的。但是，**row 格式的 binlog 里没有了 SQL 语句的原文，而是替换成了两个 event：Table_map 和Delete_rows。**
 
@@ -145,14 +145,14 @@ mysqlbinlog  -vv data/master.000001 --start-position=8900;
 
 ![img](24讲MySQL是怎么保证主备一致的.resource/c342cf480d23b05d30a294b114cebfc2.png)
 
-图6 row 格式 binlog 示例的详细信息
+图 6 row 格式 binlog 示例的详细信息
 
 从这个图中，我们可以看到以下几个信息：
 
 - server id 1，表示这个事务是在 server_id=1 的这个库上执行的。
 - 每个 event 都有 CRC32 的值，这是因为我把参数 `binlog_checksum` 设置成了 CRC32。
 - Table_map event 跟在图 5 中看到的相同，显示了接下来要打开的表，map 到数字 226。现在我们这条 SQL 语句只操作了一张表，如果要操作多张表呢？每个表都有一个对应的 Table_map event、都会 map 到一个单独的数字，用于区分对不同表的操作。
-- 我们在 mysqlbinlog 的命令中，使用了 `-vv` 参数是为了把内容都解析出来，所以从结果里面可以看到各个字段的值（比如，@1=4、 @2=4这些值）。
+- 我们在 mysqlbinlog 的命令中，使用了 `-vv` 参数是为了把内容都解析出来，所以从结果里面可以看到各个字段的值（比如，@1=4、 @2=4 这些值）。
 - binlog_row_image 的默认配置是 FULL，因此 Delete_event 里面，包含了删掉的行的所有字段的值。如果把 `binlog_row_image` 设置为 MINIMAL，则只会记录必要的信息，在这个例子里，就是只会记录 id=4 这个信息。
 - 最后的 Xid event，用于表示事务被正确地提交了。
 
@@ -163,7 +163,7 @@ mysqlbinlog  -vv data/master.000001 --start-position=8900;
 基于上面的信息，我们来讨论一个问题：**为什么会有 mixed 这种 binlog 格式的存在场景？**推论过程是这样的：
 
 - 因为有些 statement 格式的 binlog 可能会导致主备不一致，所以要使用 row 格式。
-- 但 **row 格式的缺点是，很占空间**。比如你用一个 delete 语句删掉 10 万行数据，用 statement 的话就是一个 SQL 语句被记录到 binlog 中，占用几十个字节的空间。但如果用row 格式的 binlog，就要把这 10 万条记录都写到 binlog 中。这样做，不仅会占用更大的空间，同时写 binlog 也要耗费 IO 资源，影响执行速度。
+- 但 **row 格式的缺点是，很占空间**。比如你用一个 delete 语句删掉 10 万行数据，用 statement 的话就是一个 SQL 语句被记录到 binlog 中，占用几十个字节的空间。但如果用 row 格式的 binlog，就要把这 10 万条记录都写到 binlog 中。这样做，不仅会占用更大的空间，同时写 binlog 也要耗费 IO 资源，影响执行速度。
 - 所以，MySQL 就取了个折中方案，也就是有了 mixed 格式的 binlog。**mixed 格式的意思是，MySQL 自己会判断这条 SQL 语句是否可能引起主备不一致，如果有可能，就用 row 格式，否则就用 statement 格式**。
 
 也就是说，mixed 格式可以利用 statment 格式的优点，同时又避免了数据不一致的风险。
@@ -196,17 +196,17 @@ mysql> insert into t values(10,10, now());
 
 ![img](24讲MySQL是怎么保证主备一致的.resource/0150301698979255a6f27711c35e9eef.png)
 
-图7 mixed格式和now()
+图 7 mixed 格式和 now()
 
 可以看到，MySQL 用的居然是 statement 格式。你一定会奇怪，如果这个 binlog 过了 1 分钟才传给备库的话，那主备的数据不就不一致了吗？
 
-接下来，我们再用mysqlbinlog工具来看看：
+接下来，我们再用 mysqlbinlog 工具来看看：
 
 ![img](24讲MySQL是怎么保证主备一致的.resource/1ad3a4c4b9a71955edba5195757dd041.png)
 
-图8 TIMESTAMP 命令
+图 8 TIMESTAMP 命令
 
-从图中的结果可以看到，原来 binlog 在记录 event 的时候，多记了一条命令：SET TIMESTAMP=1546103491。它用 SET TIMESTAMP 命令约定了接下来的now()函数的返回时间。
+从图中的结果可以看到，原来 binlog 在记录 event 的时候，多记了一条命令：SET TIMESTAMP=1546103491。它用 SET TIMESTAMP 命令约定了接下来的 now()函数的返回时间。
 
 因此，不论这个 binlog 是 1 分钟之后被备库执行，还是 3 天后用来恢复这个库的备份，这个 insert 语句插入的行，值都是固定的。也就是说，通过这条 SET TIMESTAMP 命令，MySQL 就确保了主备数据的一致性。
 
@@ -226,7 +226,7 @@ mysqlbinlog master.000001  --start-position=2738 --stop-position=2973 | mysql -h
 
 通过上面对 MySQL 中 binlog 基本内容的理解，你现在可以知道，binlog 的特性确保了在备库执行相同的 binlog，可以得到与主库相同的状态。
 
-因此，我们可以认为正常情况下主备的数据是一致的。也就是说，图 1 中 A、B 两个节点的内容是一致的。其实，图1中我画的是 M-S 结构，但实际生产上使用比较多的是双 M 结构，也就是图 9 所示的主备切换流程。
+因此，我们可以认为正常情况下主备的数据是一致的。也就是说，图 1 中 A、B 两个节点的内容是一致的。其实，图 1 中我画的是 M-S 结构，但实际生产上使用比较多的是双 M 结构，也就是图 9 所示的主备切换流程。
 
 ![image-20221114224747862](24%E8%AE%B2MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E4%BF%9D%E8%AF%81%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4%E7%9A%84.resource/image-20221114224747862.png)
 
@@ -254,15 +254,15 @@ mysqlbinlog master.000001  --start-position=2738 --stop-position=2973 | mysql -h
 
 ## 小结
 
-今天这篇文章，我给你介绍了MySQL binlog的格式和一些基本机制，是后面我要介绍的读写分离等系列文章的背景知识，希望你可以认真消化理解。
+今天这篇文章，我给你介绍了 MySQL binlog 的格式和一些基本机制，是后面我要介绍的读写分离等系列文章的背景知识，希望你可以认真消化理解。
 
-binlog在MySQL的各种高可用方案上扮演了重要角色。今天介绍的可以说是所有MySQL高可用方案的基础。在这之上演化出了诸如多节点、半同步、MySQL group replication等相对复杂的方案。
+binlog 在 MySQL 的各种高可用方案上扮演了重要角色。今天介绍的可以说是所有 MySQL 高可用方案的基础。在这之上演化出了诸如多节点、半同步、MySQL group replication 等相对复杂的方案。
 
-我也跟你介绍了MySQL不同格式binlog的优缺点，和设计者的思考。希望你在做系统开发时候，也能借鉴这些设计思想。
+我也跟你介绍了 MySQL 不同格式 binlog 的优缺点，和设计者的思考。希望你在做系统开发时候，也能借鉴这些设计思想。
 
 最后，我给你留下一个思考题吧。
 
-说到循环复制问题的时候，我们说MySQL通过判断server id的方式，断掉死循环。但是，这个机制其实并不完备，在某些场景下，还是有可能出现死循环。
+说到循环复制问题的时候，我们说 MySQL 通过判断 server id 的方式，断掉死循环。但是，这个机制其实并不完备，在某些场景下，还是有可能出现死循环。
 
 你能构造出一个这样的场景吗？又应该怎么解决呢？
 
@@ -270,14 +270,14 @@ binlog在MySQL的各种高可用方案上扮演了重要角色。今天介绍的
 
 ## 上期问题时间
 
-上期我留给你的问题是，你在什么时候会把线上生产库设置成“非双1”。我目前知道的场景，有以下这些：
+上期我留给你的问题是，你在什么时候会把线上生产库设置成“非双 1”。我目前知道的场景，有以下这些：
 
-1. 业务高峰期。一般如果有预知的高峰期，DBA会有预案，把主库设置成“非双1”。
-2. 备库延迟，为了让备库尽快赶上主库。@永恒记忆和@Second Sight提到了这个场景。
-3. 用备份恢复主库的副本，应用binlog的过程，这个跟上一种场景类似。
+1. 业务高峰期。一般如果有预知的高峰期，DBA 会有预案，把主库设置成“非双 1”。
+2. 备库延迟，为了让备库尽快赶上主库。@永恒记忆和@Second Sight 提到了这个场景。
+3. 用备份恢复主库的副本，应用 binlog 的过程，这个跟上一种场景类似。
 4. 批量导入数据的时候。
 
-一般情况下，把生产库改成“非双1”配置，是设置innodb_flush_logs_at_trx_commit=2、sync_binlog=1000。
+一般情况下，把生产库改成“非双 1”配置，是设置 innodb_flush_logs_at_trx_commit=2、sync_binlog=1000。
 
 评论区留言点赞板：
 

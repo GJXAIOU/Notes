@@ -16,7 +16,7 @@
 
 ## 二、Redis 简介
 
-Redis 是以 key-value 存储数据结构服务器。键可以包含：(string)字符串,哈希,（List）链表,（Set）集合，（zset）有序集合。这些数据集合都支持 push/pop、 add/ remove及取交集和并集以及更丰富的操作，redis 支持各种不同的方式排序。
+Redis 是以 key-value 存储数据结构服务器。键可以包含：(string)字符串,哈希,（List）链表,（Set）集合，（zset）有序集合。这些数据集合都支持 push/pop、 add/ remove 及取交集和并集以及更丰富的操作，redis 支持各种不同的方式排序。
 
 - 优点:
     - 对数据高并发读写
@@ -360,10 +360,10 @@ Set 集合是 String 类型的无序集合，set 是通过 hashTable 实现的�
 
 **主从复制过程**
 
-- save与 master建立连接,发送sync同步命令
-- maste会开启一个后台进程,将数据库快照保存到文件中,同时 mastel主进程会开始收集新的写命令并缓存
-- 后台完成保存后,就将文件发送给slave
-- slave将此文件保存到硬盘上
+- save 与 master 建立连接,发送 sync 同步命令
+- maste 会开启一个后台进程,将数据库快照保存到文件中,同时 mastel 主进程会开始收集新的写命令并缓存
+- 后台完成保存后,就将文件发送给 slave
+- slave 将此文件保存到硬盘上
 
 
 **主从复制配置过程**

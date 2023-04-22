@@ -17,7 +17,7 @@ ibd 文件存储的是表中的数据，比如数据行和索引。这个文件�
 
 我们说，MySQL 表里的数据都是存放在磁盘上的。**在磁盘上最小单元是扇区，每个扇区可以存放 512 个字节的数据；操作系统中最小单元是块（block），最小单位是 4kb。**
 
-在Windows系统中，我们可以通过`fsutil fsinfo ntfsinfo c:`来查看。
+在 Windows 系统中，我们可以通过`fsutil fsinfo ntfsinfo c:`来查看。
 
 ```c
 C:\Windows\system32>fsutil fsinfo ntfsinfo c:
@@ -35,7 +35,7 @@ LFS 版本:                  2.0
 每个 FileRecord 段簇数:    0
 ```
 
-在Linux系统上，可以通过以下两个命令查看，这取决于文件系统的格式。
+在 Linux 系统上，可以通过以下两个命令查看，这取决于文件系统的格式。
 
 ```shell
 xfs_growfs /dev/mapper/centos-root | grep bsize
@@ -44,7 +44,7 @@ tune2fs -l /dev/mapper/centos-root | grep Block
 
 MySQL 的 InnoDB 存储引擎它也是有最小存储单位的，叫做页（Page），默认大小是 16kb。
 
-我们新创建一个表 t3，里面任何数据都没有，我们来看它的ibd文件。
+我们新创建一个表 t3，里面任何数据都没有，我们来看它的 ibd 文件。
 
 ```sql
 [root@localhost test]# ll
@@ -97,7 +97,7 @@ MySQL 的 InnoDB 存储引擎它也是有最小存储单位的，叫做页（Pag
 在开始验证之前，我们不仅需要了解页，还需要知道，在 InnoDB 引擎中，页并不是只有一种。常见的页类型有：
 
 - 数据页，B-tree Node；
-- undo页，undo Log Page；
+- undo 页，undo Log Page；
 - 系统页，System Page；
 - 事务数据页，Transaction system Page；
 - 插入缓冲位图页，Insert Buffer Bitmap；
@@ -108,13 +108,13 @@ MySQL 的 InnoDB 存储引擎它也是有最小存储单位的，叫做页（Pag
 
 那么我们就需要大概了解下数据页的结构，数据页由七个部分组成，每个部分都有不同的含义。
 
-- File Header，文件头，固定38字节；
-- Page Header，页头，固定56字节；
-- Infimum + supremum，固定26字节；
+- File Header，文件头，固定 38 字节；
+- Page Header，页头，固定 56 字节；
+- Infimum + supremum，固定 26 字节；
 - User Records，用户记录，即行记录，大小不固定；
 - Free Space，空闲空间，大小不固定；
 - Page Directort，页目录，大小不固定；
-- File Trailer，文件结尾信息，固定8字节。
+- File Trailer，文件结尾信息，固定 8 字节。
 
 其中，File Header 用来记录页的一些头信息，共占用 38 个字节。在这个头信息里，我们可以获取到该页在表空间里的偏移值和这个数据页的类型。
 
@@ -233,7 +233,7 @@ B-tree Node: 933
 
 其次，用户记录也不只放数据行，每个数据行还有一些其他标记，比如是否删除、最小记录、记录数、在堆中的位置信息、记录的类型、下一条记录的相对位置等等；
 
-另外，MySQL 参考手册中也有说到，InnoDB 会保留页的1/16空闲，以便将来插入或者更新索引使用，如果主键 id 不是顺序插入的，那可能还不是1/16，会占用更多的空闲空间。
+另外，MySQL 参考手册中也有说到，InnoDB 会保留页的 1/16 空闲，以便将来插入或者更新索引使用，如果主键 id 不是顺序插入的，那可能还不是 1/16，会占用更多的空闲空间。
 
 总之，我们理解一个页不会全放数据就行了。所以，实测跟理论上不一致也是完全正常的，因为上面的理论没有排除这些项。
 
@@ -246,11 +246,11 @@ Total number of page: 725760
 B-tree Node: 715059
 ```
 
-我们看到，1千万条数据，数据页已经有 71 万个，B+ 树的高度还是3层，这也就是说几万条数据和一千万条数据的查询效率基本上是一样的。 比如我们现在根据主键 ID 查询一条数据，`select * from t5 where id = 6548215;` ，查询时间显示用了 0.010 秒。
+我们看到，1 千万条数据，数据页已经有 71 万个，B+ 树的高度还是 3 层，这也就是说几万条数据和一千万条数据的查询效率基本上是一样的。 比如我们现在根据主键 ID 查询一条数据，`select * from t5 where id = 6548215;` ，查询时间显示用了 0.010 秒。
 
 什么时候会到 4 层呢？大概在 1300 万左右，B+ 树就会增加树高到 4 层。
 
-什么时候会到 5 层呢？笔者没测试出来，因为插入到 5000 万条数据的时候，ibd 数据文件大小已经 55G了，虚拟机已经空间不足了。。
+什么时候会到 5 层呢？笔者没测试出来，因为插入到 5000 万条数据的时候，ibd 数据文件大小已经 55G 了，虚拟机已经空间不足了。。
 
 ```less
 page offset 00000003,page type <B-tree Node>,page level <0003>
@@ -258,11 +258,11 @@ page offset 00000003,page type <B-tree Node>,page level <0003>
 B-tree Node: 3575286
 ```
 
-即便是5000万条数据，我们通过主键ID查询，查询时间也是毫秒级的。
+即便是 5000 万条数据，我们通过主键 ID 查询，查询时间也是毫秒级的。
 
 理论上要达到十亿 - 百亿行数据，树高才能到 5 层。如果有小伙伴用这种方法，测试出来 5 层高的数据，欢迎在评论区留言，让我看看。
 
-另外，朋友们有没有意识到一个问题？其实**影响 B+ 树树高的因素，不仅是数据行，还有主键ID的长度**。我们上面的测试中，ID 的类型是bigint(8)，在其他字段长度均不变的情况下，我们把 ID 的类型改为int(4)，相同的树高就会容纳更多的数据，因为它单个页能承载的指针数变多了。
+另外，朋友们有没有意识到一个问题？其实**影响 B+ 树树高的因素，不仅是数据行，还有主键ID的长度**。我们上面的测试中，ID 的类型是 bigint(8)，在其他字段长度均不变的情况下，我们把 ID 的类型改为 int(4)，相同的树高就会容纳更多的数据，因为它单个页能承载的指针数变多了。
 
 ```sql
 CREATE TABLE `t6` (
@@ -275,7 +275,7 @@ CREATE TABLE `t6` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-针对t6这张表，我们插入16000条数据，然后输出一下页面信息。
+针对 t6 这张表，我们插入 16000 条数据，然后输出一下页面信息。
 
 ```less
 page offset 00000003,page type <B-tree Node>,page level <0001>
@@ -283,30 +283,30 @@ page offset 00000003,page type <B-tree Node>,page level <0001>
 B-tree Node: 1145
 ```
 
-我们来看，如果按照主键ID类型bigint(8)来测试，13000条数据的时候，树高就已经是3了，现在改为int(4)，16000条数据，树高依然还是2层。尽管数据页（B-tree Node）数量还是那么多，变化并不大，但是它不影响树高。
+我们来看，如果按照主键 ID 类型 bigint(8)来测试，13000 条数据的时候，树高就已经是 3 了，现在改为 int(4)，16000 条数据，树高依然还是 2 层。尽管数据页（B-tree Node）数量还是那么多，变化并不大，但是它不影响树高。
 
 ok，看到这里，相信朋友们对开头提出的问题已经有自己的答案了，如果你也跟着试一遍，理解可能会更加深入。
 
-看到这，还有道经典的面试题：为什么MySQL的索引要使用B+树而不是其它树形结构?比如B树？
+看到这，还有道经典的面试题：为什么 MySQL 的索引要使用 B+树而不是其它树形结构?比如 B 树？
 
-简单来说，其中有一个原因就是B+树的高度比较稳定，因为它的非叶子节点不会保存数据，只保存键值和指针的情况下，一个页能承载大量的数据。你想啊，B树它的非叶子节点也会保存数据的，同样的一行数据大小是1kb，那么它一页最多也只能保存16个指针，在大量数据的情况下，树高就会速度膨胀，导致IO次数就会很多，查询就会变得很慢。
+简单来说，其中有一个原因就是 B+树的高度比较稳定，因为它的非叶子节点不会保存数据，只保存键值和指针的情况下，一个页能承载大量的数据。你想啊，B 树它的非叶子节点也会保存数据的，同样的一行数据大小是 1kb，那么它一页最多也只能保存 16 个指针，在大量数据的情况下，树高就会速度膨胀，导致 IO 次数就会很多，查询就会变得很慢。
 
 ## 源码地址
 
-本文的`innodbPageInfo.jar`代码是笔者参考 `MySQL技术内幕（InnoDB存储引擎）`一书中的工具包，书里作者是用Python写的，所以笔者在这里用Java重新实现了一遍。
+本文的`innodbPageInfo.jar`代码是笔者参考 `MySQL技术内幕（InnoDB存储引擎）`一书中的工具包，书里作者是用 Python 写的，所以笔者在这里用 Java 重新实现了一遍。
 
-Java版本的源码我放在GitHub上了：[github.com/taoxun/inno…](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Ftaoxun%2FinnodbPageInfo)
+Java 版本的源码我放在 GitHub 上了：[github.com/taoxun/inno…](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Ftaoxun%2FinnodbPageInfo)
 
-已经打完包的Jar版本，也可以下载：[pan.baidu.com/s/1IZVJRNUk…](https://link.juejin.cn/?target=https%3A%2F%2Fpan.baidu.com%2Fs%2F1IZVJRNUk_bPESp5zoQwOvA) 提取码:5rnz。
+已经打完包的 Jar 版本，也可以下载：[pan.baidu.com/s/1IZVJRNUk…](https://link.juejin.cn/?target=https%3A%2F%2Fpan.baidu.com%2Fs%2F1IZVJRNUk_bPESp5zoQwOvA) 提取码:5rnz。
 
-朋友们可以拿这个工具看一看，自己认为较大的表，它的B+树索引到底有几层？
+朋友们可以拿这个工具看一看，自己认为较大的表，它的 B+树索引到底有几层？
 
 **参考资料：**
 
-姜承尧：《MySQL技术内幕:InnoDB存储引擎》
+姜承尧：《MySQL 技术内幕:InnoDB 存储引擎》
 
 天涯泪小武：[tianyalei.blog.csdn.net/article/det…](https://link.juejin.cn/?target=https%3A%2F%2Ftianyalei.blog.csdn.net%2Farticle%2Fdetails%2F100015840)
 
 飘扬的红领巾：[www.cnblogs.com/leefreeman/…](https://link.juejin.cn/?target=https%3A%2F%2Fwww.cnblogs.com%2Fleefreeman%2Fp%2F8315844.html)
 
-MySQL官方参考手册：[dev.mysql.com/doc/refman/…](https://link.juejin.cn/?target=https%3A%2F%2Fdev.mysql.com%2Fdoc%2Frefman%2F5.7%2Fen%2F)
+MySQL 官方参考手册：[dev.mysql.com/doc/refman/…](https://link.juejin.cn/?target=https%3A%2F%2Fdev.mysql.com%2Fdoc%2Frefman%2F5.7%2Fen%2F)

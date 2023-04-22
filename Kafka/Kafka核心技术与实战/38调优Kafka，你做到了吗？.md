@@ -150,7 +150,7 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-08-29
 
-  请问最后这个例子中的测试 Console Consume是怎样污染缓存页的？是因为它读取了比较老的数据，使得新数据被写入磁盘导致的吗？
+  请问最后这个例子中的测试 Console Consume 是怎样污染缓存页的？是因为它读取了比较老的数据，使得新数据被写入磁盘导致的吗？
 
   展开**
 
@@ -166,11 +166,11 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-08-30
 
-  老师，最近遇到一个问题，在kafka加入SASL ACL中，生产的时候出现需要给事务ID赋权，那有个问题在有多生产者的情况下，同一主题下的事务ID能一样吗？如果ID不能一样，那我在加入kafka的时候每次都需要赋权怎么办
+  老师，最近遇到一个问题，在 kafka 加入 SASL ACL 中，生产的时候出现需要给事务 ID 赋权，那有个问题在有多生产者的情况下，同一主题下的事务 ID 能一样吗？如果 ID 不能一样，那我在加入 kafka 的时候每次都需要赋权怎么办
 
   展开**
 
-  作者回复: 如果你并没有共享KafkaProducer实例，那么每个生产者最好设置成不同的transactional.id。2.0版本开始支持ACL前缀，可以用kafka-acls.sh --resource-pattern-type prefixed 一试
+  作者回复: 如果你并没有共享 KafkaProducer 实例，那么每个生产者最好设置成不同的 transactional.id。2.0 版本开始支持 ACL 前缀，可以用 kafka-acls.sh --resource-pattern-type prefixed 一试
 
   **
 
@@ -182,7 +182,7 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-08-29
 
-  如果将kafka 部署到k8s 中，因为k8s 的节点都是禁用swap 的，所以文中提到的swappiness 设置也就失效了
+  如果将 kafka 部署到 k8s 中，因为 k8s 的节点都是禁用 swap 的，所以文中提到的 swappiness 设置也就失效了
 
   **
 
@@ -194,11 +194,11 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-08-29
 
-  怎么查询linux是否开启了atime
+  怎么查询 linux 是否开启了 atime
 
   展开**
 
-  作者回复: mount -l，默认是开启的，如果发现noatime则是关闭的。Linux 2.6.30引入了relatime。有了relatime，atime的更新时机被缩小了，如果atime=mtime就不会被更新了。
+  作者回复: mount -l，默认是开启的，如果发现 noatime 则是关闭的。Linux 2.6.30 引入了 relatime。有了 relatime，atime 的更新时机被缩小了，如果 atime=mtime 就不会被更新了。
 
   **1
 
@@ -210,9 +210,9 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-09-01
 
-  你好，一个broker建议最多存放多少个topic partition啊？这个个数和broker 的性能有啥关系吗？
+  你好，一个 broker 建议最多存放多少个 topic partition 啊？这个个数和 broker 的性能有啥关系吗？
 
-  作者回复: 没有一定之规。不过据官网文章，单broker最多能承受2000个分区，这个和性能还是有很大关系的。毕竟分区数越多，物理IO性能就可能越差
+  作者回复: 没有一定之规。不过据官网文章，单 broker 最多能承受 2000 个分区，这个和性能还是有很大关系的。毕竟分区数越多，物理 IO 性能就可能越差
 
   **
 
@@ -240,11 +240,11 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-08-29
 
-  关于zero copy那块，是不是仅针对consumer端而言呢？还是说，producer版本与broker不一致时，也会降低性能？
+  关于 zero copy 那块，是不是仅针对 consumer 端而言呢？还是说，producer 版本与 broker 不一致时，也会降低性能？
 
   展开**
 
-  作者回复: "producer版本与broker不一致时，也会降低性能" --- 不会的
+  作者回复: "producer 版本与 broker 不一致时，也会降低性能" --- 不会的
 
   **
 
@@ -256,7 +256,7 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-08-29
 
-  没有调优过Kafka ，但学习了老师今天的优化漏斗，感觉收获挺大，优化漏斗是否可以反过来变成优化金字塔。有些提升吞吐量的参数和降低延迟的参数是冲突的，这就要看业务更注重哪一块的性能了，一般用Kafka都是追求大吞吐量。
+  没有调优过 Kafka ，但学习了老师今天的优化漏斗，感觉收获挺大，优化漏斗是否可以反过来变成优化金字塔。有些提升吞吐量的参数和降低延迟的参数是冲突的，这就要看业务更注重哪一块的性能了，一般用 Kafka 都是追求大吞吐量。
 
   展开**
 
@@ -270,7 +270,7 @@ Broker 端参数 num.replica.fetchers 表示的是 Follower 副本用多少个�
 
   2019-08-29
 
-  老师好，页缓存指的是操作系统的PageCache吗？想请教下为什么给kafka预留的页缓存最好是一个日志段的大小，我的理解是一个日志段对应一个topic的partition，往往kafka都是及时读写的，所以是不是页缓存的大小和吞吐量有关系，也就是每秒的消费数据大小，最好保证消费的时候刚刚发送的数据还在页缓存中。
+  老师好，页缓存指的是操作系统的 PageCache 吗？想请教下为什么给 kafka 预留的页缓存最好是一个日志段的大小，我的理解是一个日志段对应一个 topic 的 partition，往往 kafka 都是及时读写的，所以是不是页缓存的大小和吞吐量有关系，也就是每秒的消费数据大小，最好保证消费的时候刚刚发送的数据还在页缓存中。
 
   展开**
 

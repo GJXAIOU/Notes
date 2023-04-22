@@ -233,7 +233,7 @@ $ bin/kafka-console-producer.sh --broker-list localhost:9092,localhost:9093 --to
 
   2019-08-17
 
-  我跟着试验做了一下，发现一个漏洞，就是原有的writer生产者只要是没有停，即使是删除了writer的配置，原有的writer还是能发消息，而且consumer还能收到
+  我跟着试验做了一下，发现一个漏洞，就是原有的 writer 生产者只要是没有停，即使是删除了 writer 的配置，原有的 writer 还是能发消息，而且 consumer 还能收到
 
   展开**
 
@@ -261,9 +261,9 @@ $ bin/kafka-console-producer.sh --broker-list localhost:9092,localhost:9093 --to
 
   2019-08-17
 
-  老师说的这SCRAM认证用户名和密码直接保存在zookeeper上的，如果zookeeper不做安全控制，岂不是失去意义了？目前我们没有做认证的，研究过一段时间的ssl认证，很麻烦，还影响性能
+  老师说的这 SCRAM 认证用户名和密码直接保存在 zookeeper 上的，如果 zookeeper 不做安全控制，岂不是失去意义了？目前我们没有做认证的，研究过一段时间的 ssl 认证，很麻烦，还影响性能
 
-  作者回复: 不是明文保存的。当然做ZooKeeper的认证也是很有必要的
+  作者回复: 不是明文保存的。当然做 ZooKeeper 的认证也是很有必要的
 
   **
 
@@ -275,18 +275,18 @@ $ bin/kafka-console-producer.sh --broker-list localhost:9092,localhost:9093 --to
 
   2019-08-19
 
-  （1）之前做kafak/ Sasl-Plain认证，几经转折才发现，这个认证用户跟linux用户名没关系，而且不能动态添加减少用户，最重要的是租户可以自己修改acl权限，目前也只是把客户端的kafka-topics.sh给禁用了，一叶障目吧，=。=；
-  （2）还有就是sasl-plain这个acl权限感觉肯定，明明给认证用户a赋予了所有topic的在所有host的读写权限，但重启时发现有部分topic突然无法消费写入了，提示没权限，再重启就好了；
-  （3）接（2）情况，还有就是用kafka-acls.sh去查看topic的所有acl权限时，有的acl完全为空，但是用户a还能写入消费数据，这块完全不懂
-  （4）目前kafa-acls.sh 只是用的基础的 Write和Read权限，像Cluster这个权限不知道干啥用的，其他的了解也不深入
-  （5）最后就是做kafka sasl plain 认证的时候给zk也加了认证，具体如下：
-  zkserver.sh加入这个
+  （1）之前做 kafak/ Sasl-Plain 认证，几经转折才发现，这个认证用户跟 linux 用户名没关系，而且不能动态添加减少用户，最重要的是租户可以自己修改 acl 权限，目前也只是把客户端的 kafka-topics.sh 给禁用了，一叶障目吧，=。=；
+  （2）还有就是 sasl-plain 这个 acl 权限感觉肯定，明明给认证用户 a 赋予了所有 topic 的在所有 host 的读写权限，但重启时发现有部分 topic 突然无法消费写入了，提示没权限，再重启就好了；
+  （3）接（2）情况，还有就是用 kafka-acls.sh 去查看 topic 的所有 acl 权限时，有的 acl 完全为空，但是用户 a 还能写入消费数据，这块完全不懂
+  （4）目前 kafa-acls.sh 只是用的基础的 Write 和 Read 权限，像 Cluster 这个权限不知道干啥用的，其他的了解也不深入
+  （5）最后就是做 kafka sasl plain 认证的时候给 zk 也加了认证，具体如下：
+  zkserver.sh 加入这个
   "-Djava.security.auth.login.config=/opt/beh/core/zookeeper/conf/kafka_zoo_jaas.conf" \
-  zoo.cfg加入这个：
+  zoo.cfg 加入这个：
   authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
   requireClientAuthScheme=sasl
   jaasLoginRenew=3600000
-  但是有点疑惑的就是不知道zk 这个认证是用在那块的？我发现加不加kafka sasl plain都能正常用
+  但是有点疑惑的就是不知道 zk 这个认证是用在那块的？我发现加不加 kafka sasl plain 都能正常用
 
   展开**
 
@@ -300,7 +300,7 @@ $ bin/kafka-console-producer.sh --broker-list localhost:9092,localhost:9093 --to
 
   2019-08-19
 
-  胡老师，kafka平滑升级后面会讲吗？
+  胡老师，kafka 平滑升级后面会讲吗？
 
   展开**
 

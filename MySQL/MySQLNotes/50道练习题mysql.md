@@ -131,7 +131,7 @@ select student.* from student,
 where student.SId=t1.SId;
 ```
 
-4.查询所有同学的学生编号、学生姓名、选课总数、所有课程的总成绩(没成绩的显示为null)  
+4.查询所有同学的学生编号、学生姓名、选课总数、所有课程的总成绩(没成绩的显示为 null)  
 
 ```sql 
 select student.SId,student.Sname,t1.sumscore,t1.coursecount
@@ -184,7 +184,7 @@ and   sc.SId=student.SId
 
 
 7. 查询没有学全所有课程的同学的信息
-- 解法1
+- 解法 1
 ```sql
 select student.*
 from sc ,student
@@ -202,7 +202,7 @@ having count(*) <(select count(*) from course);
 
 但这种解法得出来的结果不包括什么课都没选的同学。**
 
-- 解法2
+- 解法 2
 ```sql
 select DISTINCT student.*
 from 
@@ -387,7 +387,7 @@ GROUP BY sc.CId) as t1 on course.CId=t1.CId
 
 18. 查询各科成绩前三名的记录
 
-思路：前三名转化为若大于此成绩的数量少于3即为前三名。
+思路：前三名转化为若大于此成绩的数量少于 3 即为前三名。
 ```sql
 select *
 from sc  
@@ -662,7 +662,7 @@ and sc.CId=course.CId
 
 30.查询存在不及格的课程
 
-可以用group by 来取唯一，也可以用distinct
+可以用 group by 来取唯一，也可以用 distinct
 
 ```sql
 select DISTINCT sc.CId
@@ -739,7 +739,7 @@ order by score desc
 limit 1;
 ```
 34.成绩有重复的情况下，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩
-为了验证，先修改数据。这样张三老师教的02号课就有两个学生同时获得90的最高分了。
+为了验证，先修改数据。这样张三老师教的 02 号课就有两个学生同时获得 90 的最高分了。
 
 ```sql
 UPDATE sc SET score=90
@@ -847,7 +847,7 @@ select * from student
 where weekofyear(sage)=weekofyear(curdate())+1;
 ```
 
-44.查询本月过生日的学生（目前是8月）
+44.查询本月过生日的学生（目前是 8 月）
 
 ```sql
 select * from student 
@@ -863,7 +863,7 @@ where month(sage)=month(curdate());
 1 row in set (0.00 sec)
 ```
 
-45.查询上个月过生日的学生（目前是8月）
+45.查询上个月过生日的学生（目前是 8 月）
 
 ```sql 
 select * from student 

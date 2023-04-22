@@ -69,7 +69,7 @@ public class RandomIdGenerator implements IdGenerator {
 
 - 对于 `getLastSubstrSplittedByDot(String hostName)` 函数，如果 hostName 为 NULL 或者是空字符串，这个函数应该返回什么？
 
-- 对于 `generateRandomAlphameric(int length)` 函数，如果 length 小于 0 或者等于0，这个函数应该返回什么？
+- 对于 `generateRandomAlphameric(int length)` 函数，如果 length 小于 0 或者等于 0，这个函数应该返回什么？
 
 ## 二、函数出错应该返回啥及其适用场景
 
@@ -344,9 +344,9 @@ C 语言没有异常这样的语法机制，返回错误码便是最常用的出
 
 **精选留言**
 
-- 回答问题 1.抛出异常，因为服务器获取不到host是一种异常情况，并且打印的异常日志不能是war m,而是err，因为该异常不会自动回复。
+- 回答问题 1.抛出异常，因为服务器获取不到 host 是一种异常情况，并且打印的异常日志不能是 war m,而是 err，因为该异常不会自动回复。
 
-    2.往上抛，原封不动。应该在api统一出口处处理异常，这样异常代码会比较聚合（个人…
+    2.往上抛，原封不动。应该在 api 统一出口处处理异常，这样异常代码会比较聚合（个人…
 
 - 1\. 返回”null-1577456311467-3nR3Do45”，不够合理，但勉强能接受；
 
@@ -356,9 +356,9 @@ C 语言没有异常这样的语法机制，返回错误码便是最常用的出
 
     返回空字符串；
 
-- 1、不抛。返回null-123123784378-aldjf780。从功能上讲，函数是生成logtraceid，用于给记录加id，便于查找日志。返回null不影响定位问题，同时程序不会蹦。 
+- 1、不抛。返回 null-123123784378-aldjf780。从功能上讲，函数是生成 logtraceid，用于给记录加 id，便于查找日志。返回 null 不影响定位问题，同时程序不会蹦。 
 
-    2、上抛，到generate中处理。
+    2、上抛，到 generate 中处理。
 
     3、返回空串
 

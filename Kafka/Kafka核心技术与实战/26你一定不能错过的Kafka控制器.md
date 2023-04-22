@@ -120,7 +120,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  类似rocket mq写一个name server的注册模块出来，代替zookeeper ，从而实现 控制器选举 ，元数据共享，还有broker信息注册等功能
+  类似 rocket mq 写一个 name server 的注册模块出来，代替 zookeeper ，从而实现 控制器选举 ，元数据共享，还有 broker 信息注册等功能
 
   展开**
 
@@ -130,11 +130,11 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
 - 
 
-  QQ怪
+  QQ 怪
 
   2019-08-01
 
-  我也想知道rocketmq的name server和用zk的区别和优劣势？
+  我也想知道 rocketmq 的 name server 和用 zk 的区别和优劣势？
 
   **
 
@@ -146,7 +146,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  老师好，想问下rocketmq的name server和用zk的区别和优劣势是什么呢？
+  老师好，想问下 rocketmq 的 name server 和用 zk 的区别和优劣势是什么呢？
 
   **
 
@@ -163,7 +163,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   展开**
 
-  作者回复: 嗯，看到这个KIP了，最近很火，有人还翻译出来了。事实上这个KIP只是在讨论阶段，目前还没有被accept
+  作者回复: 嗯，看到这个 KIP 了，最近很火，有人还翻译出来了。事实上这个 KIP 只是在讨论阶段，目前还没有被 accept
 
   **
 
@@ -177,13 +177,13 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   老师好，关于线程的优化，我能否这样理解:之前是为每一个事件分配一个线程，线程本身的切换以及锁会带来繁重的开销。在后续的版本中，讲请求封装成了一个个的事件，采用异步串行化的方式，放入到队列中，由统一的一个线程来轮询这个队列，从而避免了锁的开销。不知道这样的理解是否准确？
 
-  此外，老师说的多个线程之间共享Broker缓内存区域，可否举个例子，在什么情况下他们需要共享内存区域呢？
+  此外，老师说的多个线程之间共享 Broker 缓内存区域，可否举个例子，在什么情况下他们需要共享内存区域呢？
 
   谢谢老师！
 
   展开**
 
-  作者回复: Controller有个context，里面缓存了很多数据。以前的设计是多个线程会同时访问这些数据，比如topic删除线程、controller线程等。
+  作者回复: Controller 有个 context，里面缓存了很多数据。以前的设计是多个线程会同时访问这些数据，比如 topic 删除线程、controller 线程等。
 
   **
 
@@ -195,7 +195,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  老师 我自己在虚拟机中搭建的kafka集群 为什么zookeeper的/controller是空的？
+  老师 我自己在虚拟机中搭建的 kafka 集群 为什么 zookeeper 的/controller 是空的？
 
   作者回复: 里面没有子节点，但是该节点本身有内容啊。
 
@@ -223,11 +223,11 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  如何区分临时znode和永久znode？
+  如何区分临时 znode 和永久 znode？
 
   展开**
 
-  作者回复: znode的ephemeralOwner不为0的就是临时节点
+  作者回复: znode 的 ephemeralOwner 不为 0 的就是临时节点
 
   **2
 
@@ -239,11 +239,11 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  如何在测试环境模拟一个重分区hang住的现象？
+  如何在测试环境模拟一个重分区 hang 住的现象？
 
   展开**
 
-  作者回复: 可以试试在reassign的过程中删除topic
+  作者回复: 可以试试在 reassign 的过程中删除 topic
 
   **
 
@@ -255,7 +255,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-02
 
-  老师，突然想到一个与本节无关的问题：如果一台机器系统彻底坏了，不能恢复了，这时候副本肯定会丢一个，kafka 会直接把其它机器中的 一个 Follower 副本提升为 Leader 副本，对外提供服务，但是kafka会自动为其创建新的副本吗？
+  老师，突然想到一个与本节无关的问题：如果一台机器系统彻底坏了，不能恢复了，这时候副本肯定会丢一个，kafka 会直接把其它机器中的 一个 Follower 副本提升为 Leader 副本，对外提供服务，但是 kafka 会自动为其创建新的副本吗？
 
   展开**
 
@@ -271,7 +271,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-02
 
-  看到社区在计划移除zookeeper依赖了
+  看到社区在计划移除 zookeeper 依赖了
 
   https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum
 
@@ -287,7 +287,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-02
 
-  请问控制器也会像其他的broker一样提供消息的读写服务吗? 还是只做Broker的控制和协调工作?
+  请问控制器也会像其他的 broker 一样提供消息的读写服务吗? 还是只做 Broker 的控制和协调工作?
 
   作者回复: 也会提供正常的读写服务
 
@@ -301,7 +301,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  老师好，请问Apache Pulsar如何，它貌似解决了kafka目前的一些痛点，未来是否可以代替kafka呢
+  老师好，请问 Apache Pulsar 如何，它貌似解决了 kafka 目前的一些痛点，未来是否可以代替 kafka 呢
 
   **
 
@@ -313,7 +313,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  我怎么感觉zk分布式锁和zk的高可用功能都是通过临时节点来实现的？
+  我怎么感觉 zk 分布式锁和 zk 的高可用功能都是通过临时节点来实现的？
 
   **
 
@@ -325,11 +325,11 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  如果控制器只有1个，那么出现故障后不就没有控制器了。是否是只有1个激活的控制器，再加N个备选的控制器呢？
+  如果控制器只有 1 个，那么出现故障后不就没有控制器了。是否是只有 1 个激活的控制器，再加 N 个备选的控制器呢？
 
   展开**
 
-  作者回复: 目前设计是只有一个active controller，同时配以failover功能。社区的确在考虑引入多个active controller方案
+  作者回复: 目前设计是只有一个 active controller，同时配以 failover 功能。社区的确在考虑引入多个 active controller 方案
 
   **
 
@@ -341,7 +341,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  文章中说的重分区hang住，指的是failed还是一直处于in progress还是两种情况都可以？
+  文章中说的重分区 hang 住，指的是 failed 还是一直处于 in progress 还是两种情况都可以？
 
   作者回复: 都可能
 
@@ -355,10 +355,10 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  怎么zookeeper的那张图里面还有consumer的offset呢？
-  不是consumer的offset都保存在kafka内部位移主题 __consumer_offsets中吗？
+  怎么 zookeeper 的那张图里面还有 consumer 的 offset 呢？
+  不是 consumer 的 offset 都保存在 kafka 内部位移主题 __consumer_offsets 中吗？
 
-  作者回复: 老版本位移的znode，也顺带画出来了。。。。
+  作者回复: 老版本位移的 znode，也顺带画出来了。。。。
 
   **1
 
@@ -370,7 +370,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  epoch这个词我经常看到，查了是纪元的意思，不过用在这里应该怎么理解呢。（在图里）
+  epoch 这个词我经常看到，查了是纪元的意思，不过用在这里应该怎么理解呢。（在图里）
 
   作者回复: 暂时可以理解成版本
 
@@ -384,7 +384,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  手动删除 /controller 节点在找到新的controller节点前，这个时间窗口期kafka集群是不是无法提供服务？比如：删除topic操作、消费消息等，请老师帮忙解惑，谢谢您
+  手动删除 /controller 节点在找到新的 controller 节点前，这个时间窗口期 kafka 集群是不是无法提供服务？比如：删除 topic 操作、消费消息等，请老师帮忙解惑，谢谢您
 
   作者回复: 嗯嗯，会有短暂的不可用
 
@@ -398,10 +398,10 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
   2019-08-01
 
-  为啥需要两个队列，io队列不能省略吗
+  为啥需要两个队列，io 队列不能省略吗
 
   展开**
 
-  作者回复: IO线程池是用于执行请求处理逻辑的
+  作者回复: IO 线程池是用于执行请求处理逻辑的
 
   

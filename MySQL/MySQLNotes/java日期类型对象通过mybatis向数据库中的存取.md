@@ -10,10 +10,10 @@
 
 - datetime 和 Timestamp 保存年月日时分秒
 
-- time只保存时分秒。数据库字段值进行比较时
+- time 只保存时分秒。数据库字段值进行比较时
 
-date只比较年月日，datetime和Timestamp比较年月日时分秒，time只比较 时分秒。
-datetime、Timestamp 在数据库中的存储结构不一样，Timestamp更节省空间，但对于 java 对象的存取都是一样的。
+date 只比较年月日，datetime 和 Timestamp 比较年月日时分秒，time 只比较 时分秒。
+datetime、Timestamp 在数据库中的存储结构不一样，Timestamp 更节省空间，但对于 java 对象的存取都是一样的。
 
 ## 二、java中的四种日期类型：
 
@@ -39,15 +39,15 @@ Java 中的四种日期类型为：`java.util.Date`、`java.sql.Date`、`java.sq
 
 ### java.util.Date 类型的 java 数据保存与读取
 
-- `java.util.Date` 类型的 java 数据（如 `2019-05-08 14:56:23`）向数据库 `Date` 类型字段存值时，会忽略掉 Date java对象中的时分秒 ，只保存年月日(2019-05-08)，当再从数据库中读取 date 类型字段值赋值为 java 的 Date 对象时，Date 对象的值为 `2019-05-08 00:00:00`，时分秒变成 `00：00：00`，保存到数据库之前的原有的时分秒（14:56:23）丢失。
+- `java.util.Date` 类型的 java 数据（如 `2019-05-08 14:56:23`）向数据库 `Date` 类型字段存值时，会忽略掉 Date java 对象中的时分秒 ，只保存年月日(2019-05-08)，当再从数据库中读取 date 类型字段值赋值为 java 的 Date 对象时，Date 对象的值为 `2019-05-08 00:00:00`，时分秒变成 `00：00：00`，保存到数据库之前的原有的时分秒（14:56:23）丢失。
 - `java.util.Date` 类型的 java 数据（如 `2019-05-08 14:56:23`）向数据库 `datetime`、`Timestamp` 类型字段存值时，其年月日时分秒都会保存，再从数据库中取值赋给 Date 对象，还是 `2019-05-08 14:56:23`。
 - `java.util.Date`类型的 java 数据（如 `2019-05-08 14:56:23`）向数据库 `Time` 类型字段存值时，会忽略掉年月日，只保存时分秒 ，当再从数据库中读取 time 类型字段值赋值为 java 的 Date 对象时，Date 对象的值为 `1970-01-01 14:56:23`，保存到数据库之前的原有的年月日 信息（2019-05-08）丢失。 　　
 
 ### java.sql.Date 类型的 java 数据保存
 
 - `java.sql.Date` 类型的 java 数据向数据库 Date 类型字段存值时，因 `java.sql.Date` 只会显示年月日不显示时分秒，因此只保存年月日(如 `2019-05-08`)，当再从数据库中读取 Date 类型字段值赋值为 java 的 Date 对象时，Date 对象的值为 `2019-05-08`。
-- `java.sql.Date` 类型的 java 数据向数据库 Datetime、Timestamp类型字段存值时，因java.sql.Date只会显示年月日不显示时分 秒（即使对象内部保存的是时间戳，有时分秒信息），保存到数据库datetime、Timestamp类型字段的值为2019-05-08 00：00：00，再从数 据库中取值赋给Date（无论是java.util.Date还是java.sql.Date）对象，值为2019-05-08 00：00：00
-- `java.sql.Date` 类型的 java 数据向数据库time类型字段存值时，因java.sql.Date只会显示年月日不显示时分秒（即使对象内部 保存的是时间戳，有时分秒信息），因此会报错，存储失败。
+- `java.sql.Date` 类型的 java 数据向数据库 Datetime、Timestamp 类型字段存值时，因 java.sql.Date 只会显示年月日不显示时分 秒（即使对象内部保存的是时间戳，有时分秒信息），保存到数据库 datetime、Timestamp 类型字段的值为 2019-05-08 00：00：00，再从数 据库中取值赋给 Date（无论是 java.util.Date 还是 java.sql.Date）对象，值为 2019-05-08 00：00：00
+- `java.sql.Date` 类型的 java 数据向数据库 time 类型字段存值时，因 java.sql.Date 只会显示年月日不显示时分秒（即使对象内部 保存的是时间戳，有时分秒信息），因此会报错，存储失败。
 
 ### java.sql.Time 类型的 java 数据保存
 

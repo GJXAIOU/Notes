@@ -6,7 +6,7 @@
 
 ## 前言
 
-经历接近一年的开发、三个候选版本，Redis 7.0 终于正式发布，这是Redis历史上改变最多的一个大版本，它不仅包含了50多个新命令，还有大量核心新特性与改进，这些不仅能够解决用户使用中的诸多问题，还进一步拓展了Redis的使用场景。
+经历接近一年的开发、三个候选版本，Redis 7.0 终于正式发布，这是 Redis 历史上改变最多的一个大版本，它不仅包含了 50 多个新命令，还有大量核心新特性与改进，这些不仅能够解决用户使用中的诸多问题，还进一步拓展了 Redis 的使用场景。
 
 虽然 Redis 7.0 做了许多大胆的尝试，但是稳定性依然是最重要的基石。Redis 官方在 7.0 的 GA 博文中也强调这一点：“While user-facing features are easy to boast of, the real “unsung heroes” in this version are efforts to make Redis more performant, stable, and lean.”（虽然面向用户的功能更容易得到称赞，但这个版本中的无名英雄是我们持续不断的对 Redis 的优化，使其变得更加精简、高效、稳定）。相信从这里可以看出，Redis 发展至今稳定性始终被摆在最重要的位置，因此对于 7.0 的稳定性担忧大可打消。
 
@@ -18,9 +18,9 @@
 
 Function 是 Redis 脚本方案的全新实现，在 Redis 7.0 之前用户只能使用 EVAL 命令族来执行 Lua 脚本，但是 **Redis 对 Lua 脚本的持久化和主从复制一直是 undefined 状态，在各个大版本甚至 release 版本中也都有不同的表现。**因此社区也直接要求用户在使用 Lua 脚本时必须在本地保存一份（这也是最为安全的方式），以防止实例重启、主从切换时可能造成的 Lua 脚本丢失，维护 Redis 中的 Lua 脚本一直是广大用户的痛点。
 
-Function的出现很好的对Lua脚本进行了补充，它允许用户向Redis加载自定义的函数库，一方面相对于EVALSHA的调用方式用户自定义的函数名可以有更为清晰的语义，另一方面Function**加载的函数库明确会进行主从复制和持久化存储，彻底解决了过去Lua脚本在持久化上含糊不清的问题。**
+Function 的出现很好的对 Lua 脚本进行了补充，它允许用户向 Redis 加载自定义的函数库，一方面相对于 EVALSHA 的调用方式用户自定义的函数名可以有更为清晰的语义，另一方面 Function**加载的函数库明确会进行主从复制和持久化存储，彻底解决了过去Lua脚本在持久化上含糊不清的问题。**
 
-那么自7.0开始，Function命令族和EVAL命令族有了各自明确的定义：FUNCTION LOAD会把函数库自动进行主从复制和持久化存储；而SCRIPT LOAD则不会进行持久化和主从复制，脚本仅保存在当前执行节点。并且社区也在计划后续版本中让Function支持更多语言，例如JavaScript、Python等，敬请期待。
+那么自 7.0 开始，Function 命令族和 EVAL 命令族有了各自明确的定义：FUNCTION LOAD 会把函数库自动进行主从复制和持久化存储；而 SCRIPT LOAD 则不会进行持久化和主从复制，脚本仅保存在当前执行节点。并且社区也在计划后续版本中让 Function 支持更多语言，例如 JavaScript、Python 等，敬请期待。
 
 总的来说，**Function在7.0中被设计为数据的一部分，因此能够被保存在RDB、AOF文件中，也能通过主从复制将Function由主库复制到所有从库，可以有效解决之前Lua脚本丢失的问题**，我们也非常建议大家逐步将 Redis 中的 Lua 脚本替换为 Function。
 
@@ -38,7 +38,7 @@ AOF 是 Redis 数据持久化的核心解决方案，其本质是不断追加数
 
 Redis 自 2.0 开始便支持发布订阅机制，使用 pubsub 命令族用户可以很方便地建立消息通知订阅系统，但是**在 cluster 集群模式下 Redis 的 pubsub 存在一些问题，最为显著的就是在大规模集群中带来的广播风暴。**
 
-Redis 的 pubsub 是按 channel 频道进行发布订阅，然而在集群模式下 channel 不被当做数据处理，也即不会参与到hash 值计算无法按 slot 分发，所以在集群模式下 Redis 对用户发布的消息采用的是在集群中广播的方式。
+Redis 的 pubsub 是按 channel 频道进行发布订阅，然而在集群模式下 channel 不被当做数据处理，也即不会参与到 hash 值计算无法按 slot 分发，所以在集群模式下 Redis 对用户发布的消息采用的是在集群中广播的方式。
 
 那么问题显而易见，假如一个集群有 100 个节点，用户在节点 1 对某个 channel 进行 publish 发布消息，该节点就需要把消息广播给集群中其他 99 个节点，如果其他节点中只有少数节点订阅了该频道，那么绝大部分消息都是无效的，这对网络、CPU 等资源造成了极大的浪费。
 
@@ -62,7 +62,7 @@ Redis 发展至今已历经 7 个大版本，而每个大版本都有大量的�
 
 阿里云从 Redis 4.0 开始就深度参与到 Redis 开源社区当中，向社区贡献了大量能力，**目前阿里云在 Redis 社区共有 1名 core team member（核心维护者）和 2 名 contributor（核心贡献者），是原作者和 Redis Labs 以外对 Redis 社区贡献最大的组织。**
 
-我们见证了 Redis 用户在国内的快速增长，阿里云与 Redis 社区的深度合作也逐渐吸引了更多的国内开发者参与到 Redis 建设中去。尤其是在 Redis core team 成立之后，社区 maintainer 也和 Redis 一样变成了多线程（1->5），对于issue 和 PR 的快速处理大幅提升了社区的活跃度。这次 7.0 的 release note 中也可以看到已经有超过 5 名国内开发者贡献了核心 feature，并贡献了近半数 commit。
+我们见证了 Redis 用户在国内的快速增长，阿里云与 Redis 社区的深度合作也逐渐吸引了更多的国内开发者参与到 Redis 建设中去。尤其是在 Redis core team 成立之后，社区 maintainer 也和 Redis 一样变成了多线程（1->5），对于 issue 和 PR 的快速处理大幅提升了社区的活跃度。这次 7.0 的 release note 中也可以看到已经有超过 5 名国内开发者贡献了核心 feature，并贡献了近半数 commit。
 
 这些变化与我们在阿里云上的统计结果也是相符合的：Redis 目前同样也已是国内用户使用规模最大的 NoSQL 数据库之一，并一直处于高速增长中，越来越多的泛互联网甚至传统行业也在逐步接纳 Redis，用于快速高效的构建业务应用服务。
 
@@ -109,19 +109,19 @@ Redis 是一直贴着用户使用发展起来的，它如此受欢迎主要因�
 | 副本一致性（主备）       | 无                | 强一致：半同步  | 强一致：物理复制  | 无                            |
 | 开启副本一致性后写入性能 | -                 | 较低，约70% [2] | 低，约15～25% [4] | -                             |
 
-表1: 社区Redis和其他商业化、开源产品的落盘一致性与副本一致性对比
+表 1: 社区 Redis 和其他商业化、开源产品的落盘一致性与副本一致性对比
 
-注1：与开源Redis社区版比较
+注 1：与开源 Redis 社区版比较
 
-注2：与开源Redis基于内存的使用成本比较
+注 2：与开源 Redis 基于内存的使用成本比较
 
-注3,4：来自AWS官方博客测试数据
+注 3,4：来自 AWS 官方博客测试数据
 
 综合来看，随着用户对 Redis 的应用范围的扩大，与此同时对于容量、成本和数据可靠性的需求也在不断提升，**这些也逐渐成为了衡量 Redis 企业级能力的重要指标。**各大厂商和开源产品也都在构建这些能力上提出了许多解决方案。下面介绍一些典型产品和方案。
 
 ### AWS 的 MemoryDB
 
-AWS MemoryDB 的思路是基于类似 Aurora 的共享存储概念，把日志存放在远端共享存储中，同时内存中仍然保留 Redis 原有的结构。通过这种方式提升数据的持久化一致性，同时也保证了数据读取的延时和吞吐；而缺点则同样因为日志保存在远端，写入性能严重下降（仅有 ElastiCache 也即 Redis 社区版的15%~25%，该数据来自 AWS 官方评测，见本文末尾参考资料）。在主备一致性上，由于直接采取日志的物理复制，所以主备一致性近似接近落盘一致性。
+AWS MemoryDB 的思路是基于类似 Aurora 的共享存储概念，把日志存放在远端共享存储中，同时内存中仍然保留 Redis 原有的结构。通过这种方式提升数据的持久化一致性，同时也保证了数据读取的延时和吞吐；而缺点则同样因为日志保存在远端，写入性能严重下降（仅有 ElastiCache 也即 Redis 社区版的 15%~25%，该数据来自 AWS 官方评测，见本文末尾参考资料）。在主备一致性上，由于直接采取日志的物理复制，所以主备一致性近似接近落盘一致性。
 
 值得一提的是原来 AOF rewrite 这种压缩（compaction）引起的开销也因为在远端做掉而规避掉，因此是一种很彻底的云原生解法。
 
@@ -137,7 +137,7 @@ AWS MemoryDB 的思路是基于类似 Aurora 的共享存储概念，把日志�
 
 **目前这类系统在一致性和容错性上仍有很大的改善空间**，而在用户使用体感上，由于很多用户使用习惯还是把 Redis-like 系统用在业务的同步链路上，对于 LSM KV 引擎的延时上抖动整体吞吐的影响直接映射成了用户体感，因此很难作为一款通用型产品，而这些痛点也同样存在与 Tair 容量存储型中（过去叫混合存储版），这也是一个需要长期在存储和兼容性上优化的方向。
 
-综上所述，容量版本可以很好地解决用户的使用成本问题，但是只有**更好地解决了落盘一致性问题和副本一致性问题，才能够把Redis类系统的使用场景拓展到企业级。**这也是目前看来云厂商一个激烈竞争的企业级产品主流赛道，也有较高的技术门槛。
+综上所述，容量版本可以很好地解决用户的使用成本问题，但是只有**更好地解决了落盘一致性问题和副本一致性问题，才能够把 Redis 类系统的使用场景拓展到企业级。**这也是目前看来云厂商一个激烈竞争的企业级产品主流赛道，也有较高的技术门槛。
 
 ## 写在最后 
 
@@ -149,10 +149,10 @@ Redis8.0 的 feature 计划已经开始，一方面我们也如上文所述，�
 
 参考资料：
 
-[1]Redis 7.0 Multi Part AOF的设计和实现：https://developer.aliyun.com/article/866957
+[1]Redis 7.0 Multi Part AOF 的设计和实现：https://developer.aliyun.com/article/866957
 
-[2]Amazon MemoryDB 与 Amazon ElastiCache比较：https://aws.amazon.com/cn/blogs/china/comparison-of-amazon-memorydb-and-amazon-elasticache/?nc1=b_nrp
+[2]Amazon MemoryDB 与 Amazon ElastiCache 比较：https://aws.amazon.com/cn/blogs/china/comparison-of-amazon-memorydb-and-amazon-elasticache/?nc1=b_nrp
 
-[3]Tair扩展数据结构概览：https://help.aliyun.com/document_detail/146579.html
+[3]Tair 扩展数据结构概览：https://help.aliyun.com/document_detail/146579.html
 
-[4]Tair持久内存型性能白皮书：https://help.aliyun.com/document_detail/185189.html
+[4]Tair 持久内存型性能白皮书：https://help.aliyun.com/document_detail/185189.html

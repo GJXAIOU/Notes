@@ -74,7 +74,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式**的**消息队列**�
 
 - Consumer Group （CG）： 消费者组，由多个 consumer 组成。 **消费者组内每个消费者负责消费不同分区的数据，一个分区只能由一个组内消费者消费；消费者组之间互不影响**。 所有的消费者都属于某个消费者组，即消费者组是逻辑上的一个订阅者。
 
-- Broker：一台 Kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker可以容纳多个 topic。
+- Broker：一台 Kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker 可以容纳多个 topic。
 
 - Topic： 话题，可以理解为一个队列， 生产者和消费者面向的都是一个 topic；
 
@@ -90,7 +90,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式**的**消息队列**�
 
 ## 二、安装&启动&关闭
 
-以下基于 Windows 进行，Linux 版本的差别不大，运行脚本文件后缀从`bat`改为`sh`，配置路径改用Unix风格的；
+以下基于 Windows 进行，Linux 版本的差别不大，运行脚本文件后缀从`bat`改为`sh`，配置路径改用 Unix 风格的；
 
 [官网安装教程](http://kafka.apache.org/0110/documentation/#quickstart)
 
@@ -102,7 +102,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式**的**消息队列**�
 
 - 步骤二：启动 server
 
-    Kafka 用到 ZooKeeper 功能，所以要预先运行ZooKeeper，但是最新版本的 Kafka 已经内置 Zookeeper；这里使用内置的 Zookeeper；
+    Kafka 用到 ZooKeeper 功能，所以要预先运行 ZooKeeper，但是最新版本的 Kafka 已经内置 Zookeeper；这里使用内置的 Zookeeper；
 
     - 修改 `config\zookeeper.properties`，修改增加以下内容：
 
@@ -123,7 +123,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式**的**消息队列**�
         log.dirs=D:\Apache\Kafka\Data
         ```
 
-    - 启动cmd，工作目录切换到`%KAFKA_HOME%`，执行命令行：
+    - 启动 cmd，工作目录切换到`%KAFKA_HOME%`，执行命令行：
 
         ```shell
         ## 先启动 Zookeeper
@@ -137,7 +137,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式**的**消息队列**�
 
 ------
 
-TODO:**一个问题**，通过`kafka-server-stop.bat`或右上角关闭按钮来关闭Kafka服务后，马上下次再启动Kafka，抛出异常，说某文件被占用，需清空`log.dirs`目录下文件，才能重启Kafka。
+TODO:**一个问题**，通过`kafka-server-stop.bat`或右上角关闭按钮来关闭 Kafka 服务后，马上下次再启动 Kafka，抛出异常，说某文件被占用，需清空`log.dirs`目录下文件，才能重启 Kafka。
 
 ```
 [2020-07-21 21:43:26,755] ERROR There was an error in one of the threads during logs loading: java.nio.file.FileSystemException: C:\Kafka\data\kafka-logs-0\my-replicated-topic-0\00000000000000000000.timeindex: 另一个程序正在使用此文件，进程无法访问。
@@ -145,9 +145,9 @@ TODO:**一个问题**，通过`kafka-server-stop.bat`或右上角关闭按钮来
 ...
 ```
 
-参阅网络，这可能是在windows下的一个Bug，没有更好的解决方案，暂时写个py脚本用来对kafka的log文件进行删除。下次启动kafka，先运行这个删除脚本吧。
+参阅网络，这可能是在 windows 下的一个 Bug，没有更好的解决方案，暂时写个 py 脚本用来对 kafka 的 log 文件进行删除。下次启动 kafka，先运行这个删除脚本吧。
 
-**好消息**，当你成功启动 kafka，然后在对应的命令行窗口用`Ctrl + C`结束Kakfa，下次不用清理 kafka日 志，也能正常启动。
+**好消息**，当你成功启动 kafka，然后在对应的命令行窗口用`Ctrl + C`结束 Kakfa，下次不用清理 kafka 日 志，也能正常启动。
 
 如果一直提示找不到 `java.nio.file.FileSystemException` 则删除按照盘符下面的 `temp\kafka-logs` 文件夹；
 
@@ -157,25 +157,25 @@ TODO:**一个问题**，通过`kafka-server-stop.bat`或右上角关闭按钮来
 
 #### Step 3: Create a topic
 
-- 用单一partition和单一replica创建一个名为`test`的topic：
+- 用单一 partition 和单一 replica 创建一个名为`test`的 topic：
 
 ```bat
 bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
 bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
 ```
 
-- 查看已创建的topic，也就刚才创建的名为`test`的topic：
+- 查看已创建的 topic，也就刚才创建的名为`test`的 topic：
 
 ```bat
 bin\windows\kafka-topics.bat --list --zookeeper localhost:2181
 bin\windows\kafka-topics.bat --list --bootstrap-server localhost:9092
 ```
 
-或者，你可配置你的broker去自动创建未曾发布过的topic，代替手动创建topic
+或者，你可配置你的 broker 去自动创建未曾发布过的 topic，代替手动创建 topic
 
 #### Step 4: Send some messages
 
-运行producer，然后输入几行文本，发至服务器：
+运行 producer，然后输入几行文本，发至服务器：
 
 ```bat
 bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
@@ -188,7 +188,7 @@ bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
 
 #### Step 5: Start a consumer
 
-运行consumer，将[Step 4](https://my.oschina.net/jallenkwong/blog/4449224#)中输入的几行句子，标准输出。
+运行 consumer，将[Step 4](https://my.oschina.net/jallenkwong/blog/4449224#)中输入的几行句子，标准输出。
 
 ```bat
 bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
@@ -197,11 +197,11 @@ what a nice day!
 to be or not to be. that' s a question.
 ```
 
-若你另启cmd，执行命令行`bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning`来运行consumer，然后在[Step 4](https://my.oschina.net/jallenkwong/blog/4449224#)中producer窗口输入一行句子，如`I must admit, I can't help but feel a twinge of envy.`，两个consumer也会同时输出`I must admit, I can't help but feel a twinge of envy.`。
+若你另启 cmd，执行命令行`bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning`来运行 consumer，然后在[Step 4](https://my.oschina.net/jallenkwong/blog/4449224#)中 producer 窗口输入一行句子，如`I must admit, I can't help but feel a twinge of envy.`，两个 consumer 也会同时输出`I must admit, I can't help but feel a twinge of envy.`。
 
 #### Step 6: Setting up a multi-broker cluster
 
-目前为止，我们仅作为一个单一broker，这不好玩。让我们弄个有三个节点的集群来玩玩。
+目前为止，我们仅作为一个单一 broker，这不好玩。让我们弄个有三个节点的集群来玩玩。
 
 - 首先，在`%KAFKA%\config\server.properties`的基础上创建两个副本`server-1.properties`和`server-2.properties`。
 
@@ -226,22 +226,22 @@ log.dir=C:\\Kafka\\data\\kafka-logs-2
 
 这个`broker.id`属性是集群中每个节点的唯一永久的名称。
 
-我们必须重写端口和日志目录，只是因为我们在同一台机器上运行它们，并且我们希望阻止brokers试图在同一个端口上注册或覆盖彼此的数据。
+我们必须重写端口和日志目录，只是因为我们在同一台机器上运行它们，并且我们希望阻止 brokers 试图在同一个端口上注册或覆盖彼此的数据。
 
-- 我们已经启动了Zookeeper和我们的单个节点，所以我们只需要启动两个新节点：
+- 我们已经启动了 Zookeeper 和我们的单个节点，所以我们只需要启动两个新节点：
 
 ```bat
 start bin\windows\kafka-server-start.bat config\server-1.properties
 start bin\windows\kafka-server-start.bat config\server-2.properties
 ```
 
-- 创建一个replication-factor为3的topic:
+- 创建一个 replication-factor 为 3 的 topic:
 
 ```bat
 bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
 ```
 
-- OK，现在我们有了一个集群，但是我们怎么知道哪个broker在做什么呢？那就运行`describe topics`命令：
+- OK，现在我们有了一个集群，但是我们怎么知道哪个 broker 在做什么呢？那就运行`describe topics`命令：
 
 ```bat
 bin\windows\kafka-topics.bat --describe --zookeeper localhost:2181 --topic my-replicated-topic
@@ -252,14 +252,14 @@ Configs:
 		Replicas: 0,1,2        Isr: 0,1,2
 ```
 
-- 以下是输出的说明。第一行给出所有Partition的摘要，每一行提供有关一个Partition的信息。因为这个Topic只有一个Partition，所以只有一行。
-    - "leader"是负责给定Partition的所有读写的节点。每个节点都可能成为Partition随机选择的leader。
-    - "replicas"是复制此Partition日志的节点列表，无论它们是leader还是当前处于存活状态。
-    - "isr"是一组 "in-sync" replicas。这是replicas列表的一个子集，它当前处于存活状态，并补充leader。
+- 以下是输出的说明。第一行给出所有 Partition 的摘要，每一行提供有关一个 Partition 的信息。因为这个 Topic 只有一个 Partition，所以只有一行。
+    - "leader"是负责给定 Partition 的所有读写的节点。每个节点都可能成为 Partition 随机选择的 leader。
+    - "replicas"是复制此 Partition 日志的节点列表，无论它们是 leader 还是当前处于存活状态。
+    - "isr"是一组 "in-sync" replicas。这是 replicas 列表的一个子集，它当前处于存活状态，并补充 leader。
 
 注意，**在我的示例中，node 0是Topic唯一Partition的leader**。（下面操作需要用到）
 
-- 让我们为我们的新Topic发布一些信息：
+- 让我们为我们的新 Topic 发布一些信息：
 
 ```bat
 bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic my-replicated-topic
@@ -280,7 +280,7 @@ Love is a big illusion, I should try to forget, but there's something left in my
 ```
 
 - 让我们测试一下容错性，由上文可知，Broker 0 身为 leader，因此，让我们干掉它吧：
-    - 先找出 Broker 0 的进程pid。
+    - 先找出 Broker 0 的进程 pid。
     - 杀掉 Broker 0 的进程。
 
 ```bat
@@ -292,7 +292,7 @@ taskkill /pid 7528 /f
 成功: 已终止 PID 为 7528 的进程。
 ```
 
-- 原leader已被替换成它的flowers中的其中一个，并且 node 0 不在 in-sync replica 集合当中。
+- 原 leader 已被替换成它的 flowers 中的其中一个，并且 node 0 不在 in-sync replica 集合当中。
 
 ```bat
 bin\windows\kafka-topics.bat --describe --zookeeper localhost:2181 --topic my-replicated-topic
@@ -302,7 +302,7 @@ Configs:
 		Topic: my-replicated-topic      Partition: 0    Leader: 1       Replicas: 0,1,2 Isr: 1,2
 ```
 
-- 尽管原leader已逝，当原来消息依然可以接收。（注意，参数`--bootstrap-server localhost:9093`，而不是`--bootstrap-server localhost:9092`）
+- 尽管原 leader 已逝，当原来消息依然可以接收。（注意，参数`--bootstrap-server localhost:9093`，而不是`--bootstrap-server localhost:9092`）
 
 ```bat
 bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9093 --from-beginning --topic my-replicated-topic
@@ -421,7 +421,7 @@ to be or not to be. that' s a question.
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/05.png)
 
-Kafka 中消息是以 topic 进行分类的， producer生产消息，consumer消费消息，都是面向 topic的。(从命令行操作看出)
+Kafka 中消息是以 topic 进行分类的， producer 生产消息，consumer 消费消息，都是面向 topic 的。(从命令行操作看出)
 
 ```bat
 bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
@@ -431,7 +431,7 @@ bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic
 
 topic 是逻辑上的概念，而 partition 是物理上的概念，每个 partition 对应于一个 log 文件，该 log 文件中存储的就是 producer 生产的数据。（topic = N partition，partition = log）
 
-Producer 生产的数据会被不断追加到该log 文件末端，且每条数据都有自己的 offset。 consumer组中的每个consumer， 都会实时记录自己消费到了哪个 offset，以便出错恢复时，从上次的位置继续消费。（producer -> log with offset -> consumer(s)）
+Producer 生产的数据会被不断追加到该 log 文件末端，且每条数据都有自己的 offset。 consumer 组中的每个 consumer， 都会实时记录自己消费到了哪个 offset，以便出错恢复时，从上次的位置继续消费。（producer -> log with offset -> consumer(s)）
 
 ## 12.Kafka高级_文件存储
 
@@ -439,7 +439,7 @@ Producer 生产的数据会被不断追加到该log 文件末端，且每条数�
 
 由于生产者生产的消息会不断追加到 log 文件末尾， 为防止 log 文件过大导致数据定位效率低下， Kafka 采取了**分片**和**索引**机制，将每个 partition 分为多个 segment。
 
-每个 segment对应两个文件——“.index”文件和“.log”文件。 这些文件位于一个文件夹下， 该文件夹的命名规则为： topic 名称+分区序号。例如， first 这个 topic 有三个分区，则其对应的文件夹为 first-0,first-1,first-2。
+每个 segment 对应两个文件——“.index”文件和“.log”文件。 这些文件位于一个文件夹下， 该文件夹的命名规则为： topic 名称+分区序号。例如， first 这个 topic 有三个分区，则其对应的文件夹为 first-0,first-1,first-2。
 
 ```
 00000000000000000000.index
@@ -450,7 +450,7 @@ Producer 生产的数据会被不断追加到该log 文件末端，且每条数�
 00000000000000239430.log
 ```
 
-index 和 log 文件以当前 segment 的第一条消息的 offset 命名。下图为 index 文件和 log文件的结构示意图。
+index 和 log 文件以当前 segment 的第一条消息的 offset 命名。下图为 index 文件和 log 文件的结构示意图。
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/07.png)
 
@@ -463,8 +463,8 @@ index 和 log 文件以当前 segment 的第一条消息的 offset 命名。下�
 
 ### 分区的原因
 
-1. **方便在集群中扩展**，每个 Partition 可以通过调整以适应它所在的机器，而一个 topic又可以有多个 Partition 组成，因此整个集群就可以适应适合的数据了；
-2. **可以提高并发**，因为可以以 Partition 为单位读写了。（联想到ConcurrentHashMap在高并发环境下读写效率比HashTable的高效）
+1. **方便在集群中扩展**，每个 Partition 可以通过调整以适应它所在的机器，而一个 topic 又可以有多个 Partition 组成，因此整个集群就可以适应适合的数据了；
+2. **可以提高并发**，因为可以以 Partition 为单位读写了。（联想到 ConcurrentHashMap 在高并发环境下读写效率比 HashTable 的高效）
 
 ### 分区的原则
 
@@ -474,11 +474,11 @@ index 和 log 文件以当前 segment 的第一条消息的 offset 命名。下�
 
 1. 指明 partition 的情况下，直接将指明的值直接作为 partiton 值；
 2. 没有指明 partition 值但有 key 的情况下，将 key 的 hash 值与 topic 的 partition 数进行取余得到 partition 值；
-3. 既没有 partition 值又没有 key 值的情况下，第一次调用时随机生成一个整数（后面每次调用在这个整数上自增），将这个值与 topic 可用的 partition 总数取余得到 partition值，也就是常说的 round-robin 算法。
+3. 既没有 partition 值又没有 key 值的情况下，第一次调用时随机生成一个整数（后面每次调用在这个整数上自增），将这个值与 topic 可用的 partition 总数取余得到 partition 值，也就是常说的 round-robin 算法。
 
 ## 14.Kafka高级_生产者ISR
 
-为保证 producer 发送的数据，能可靠的发送到指定的 topic， topic 的每个 partition 收到producer 发送的数据后，都需要向 producer 发送 ack（acknowledgement 确认收到），如果producer 收到 ack， 就会进行下一轮的发送，否则重新发送数据。
+为保证 producer 发送的数据，能可靠的发送到指定的 topic， topic 的每个 partition 收到 producer 发送的数据后，都需要向 producer 发送 ack（acknowledgement 确认收到），如果 producer 收到 ack， 就会进行下一轮的发送，否则重新发送数据。
 
 > acknowledgement 英 [əkˈnɒlɪdʒmənt] 美 [əkˈnɑːlɪdʒmənt]
 > n.(对事实、现实、存在的)承认;感谢;谢礼;**收件复函**
@@ -487,14 +487,14 @@ index 和 log 文件以当前 segment 的第一条消息的 offset 命名。下�
 
 **何时发送ack？**
 
-确保有follower与leader同步完成，leader再发送ack，这样才能保证leader挂掉之后，能在follower中选举出新的leader。
+确保有 follower 与 leader 同步完成，leader 再发送 ack，这样才能保证 leader 挂掉之后，能在 follower 中选举出新的 leader。
 
 ------
 
 **多少个follower同步完成之后发送ack？**
 
-1. 半数以上的follower同步完成，即可发送ack继续发送重新发送
-2. 全部的follower同步完成，才可以发送ack
+1. 半数以上的 follower 同步完成，即可发送 ack 继续发送重新发送
+2. 全部的 follower 同步完成，才可以发送 ack
 
 ### 副本数据同步策略
 
@@ -512,7 +512,7 @@ Kafka 选择了第二种方案，原因如下：
 
 采用第二种方案之后，设想以下情景： leader 收到数据，所有 follower 都开始同步数据，但有一个 follower，因为某种故障，迟迟不能与 leader 进行同步，那 leader 就要一直等下去，直到它完成同步，才能发送 ack。这个问题怎么解决呢？
 
-Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader 保持同步的 follower 集合。当 ISR 中的 follower 完成数据的同步之后，就会给 leader 发送 ack。如果 follower长时间未向leader同步数据，则该follower将被踢出ISR，该时间阈值由`replica.lag.time.max.ms`参数设定。 Leader 发生故障之后，就会从 ISR 中选举新的 leader。
+Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader 保持同步的 follower 集合。当 ISR 中的 follower 完成数据的同步之后，就会给 leader 发送 ack。如果 follower 长时间未向 leader 同步数据，则该 follower 将被踢出 ISR，该时间阈值由`replica.lag.time.max.ms`参数设定。 Leader 发生故障之后，就会从 ISR 中选举新的 leader。
 
 > **replica.lag.time.max.ms**
 >
@@ -533,11 +533,11 @@ Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader
 **acks 参数配置**：
 
 - 0： producer 不等待 broker 的 ack，这一操作提供了一个最低的延迟， broker 一接收到还没有写入磁盘就已经返回，当 broker 故障时有可能**丢失数据**；
-- 1： producer 等待 broker 的 ack， partition 的 leader 落盘成功后返回 ack，如果在 follower同步成功之前 leader 故障，那么将会**丢失数据**；
+- 1： producer 等待 broker 的 ack， partition 的 leader 落盘成功后返回 ack，如果在 follower 同步成功之前 leader 故障，那么将会**丢失数据**；
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/10.png)
 
-- -1（all） ： producer 等待 broker 的 ack， partition 的 leader 和 ISR 的follower 全部落盘成功后才返回 ack。但是如果在 follower 同步完成后， broker 发送 ack 之前， leader 发生故障，那么会造成**数据重复**。
+- -1（all） ： producer 等待 broker 的 ack， partition 的 leader 和 ISR 的 follower 全部落盘成功后才返回 ack。但是如果在 follower 同步完成后， broker 发送 ack 之前， leader 发生故障，那么会造成**数据重复**。
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/11.png)
 
@@ -565,13 +565,13 @@ Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/12.png)
 
-- LEO：（Log End Offset）每个副本的最后一个offset
+- LEO：（Log End Offset）每个副本的最后一个 offset
 - HW：（High Watermark）高水位，指的是消费者能见到的最大的 offset， ISR 队列中最小的 LEO
 
 ### follower 故障和 leader 故障
 
 - **follower 故障**：follower 发生故障后会被临时踢出 ISR，待该 follower 恢复后， follower 会读取本地磁盘记录的上次的 HW，并将 log 文件高于 HW 的部分截取掉，从 HW 开始向 leader 进行同步。等该 follower 的 LEO 大于等于该 Partition 的 HW，即 follower 追上 leader 之后，就可以重新加入 ISR 了。
-- **leader 故障**：leader 发生故障之后，会从 ISR 中选出一个新的 leader，之后，为保证多个副本之间的数据一致性， 其余的 follower 会先将各自的 log 文件高于 HW 的部分截掉，然后从新的 leader同步数据。
+- **leader 故障**：leader 发生故障之后，会从 ISR 中选出一个新的 leader，之后，为保证多个副本之间的数据一致性， 其余的 follower 会先将各自的 log 文件高于 HW 的部分截掉，然后从新的 leader 同步数据。
 
 注意： 这只能保证副本之间的数据一致性，并不能保证数据不丢失或者不重复。
 
@@ -581,7 +581,7 @@ Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader
 
 相对的，将服务器 ACK 级别设置为 0，可以保证生产者每条消息只会被发送一次，即 **At Most Once** 语义。
 
-At Least Once 可以保证数据不丢失，但是不能保证数据不重复；相对的， At Most Once可以保证数据不重复，但是不能保证数据不丢失。 但是，对于一些非常重要的信息，比如说**交易数据**，下游数据消费者要求数据既不重复也不丢失，即 **Exactly Once** 语义。
+At Least Once 可以保证数据不丢失，但是不能保证数据不重复；相对的， At Most Once 可以保证数据不重复，但是不能保证数据不丢失。 但是，对于一些非常重要的信息，比如说**交易数据**，下游数据消费者要求数据既不重复也不丢失，即 **Exactly Once** 语义。
 
 > - At least once—Messages are **never lost** but may be redelivered.
 > - At most once—Messages **may be lost** but are never redelivered.
@@ -597,7 +597,7 @@ At Least Once 可以保证数据不丢失，但是不能保证数据不重复；
 At Least Once + 幂等性 = Exactly Once
 ```
 
-要启用幂等性，只需要将 Producer 的参数中 `enable.idempotence` 设置为 true 即可。 Kafka的幂等性实现其实就是将原来下游需要做的去重放在了数据上游。开启幂等性的 Producer 在初始化的时候会被分配一个 PID，发往同一 Partition 的消息会附带 Sequence Number。而Broker 端会对`<PID, Partition, SeqNumber>`做缓存，当具有相同主键的消息提交时， Broker 只会持久化一条。
+要启用幂等性，只需要将 Producer 的参数中 `enable.idempotence` 设置为 true 即可。 Kafka 的幂等性实现其实就是将原来下游需要做的去重放在了数据上游。开启幂等性的 Producer 在初始化的时候会被分配一个 PID，发往同一 Partition 的消息会附带 Sequence Number。而 Broker 端会对`<PID, Partition, SeqNumber>`做缓存，当具有相同主键的消息提交时， Broker 只会持久化一条。
 
 但是 PID 重启就会变化，同时不同的 Partition 也具有不同主键，所以幂等性无法保证跨分区跨会话的 Exactly Once。
 
@@ -633,7 +633,7 @@ At Least Once + 幂等性 = Exactly Once
 
 Kafka 有两种分配策略：
 
-- round-robin循环
+- round-robin 循环
 - range
 
 > **partition.assignment.strategy**
@@ -657,40 +657,40 @@ Kafka 有两种分配策略：
 
 #### Round Robin
 
-关于Roudn Robin重分配策略，其主要采用的是一种轮询的方式分配所有的分区，该策略主要实现的步骤如下。这里我们首先假设有三个topic：t0、t1和t2，这三个topic拥有的分区数分别为1、2和3，那么总共有六个分区，这六个分区分别为：t0-0、t1-0、t1-1、t2-0、t2-1和t2-2。这里假设我们有三个consumer：C0、C1和C2，它们订阅情况为：C0订阅t0，C1订阅t0和t1，C2订阅t0、t1和t2。那么这些分区的分配步骤如下：
+关于 Roudn Robin 重分配策略，其主要采用的是一种轮询的方式分配所有的分区，该策略主要实现的步骤如下。这里我们首先假设有三个 topic：t0、t1 和 t2，这三个 topic 拥有的分区数分别为 1、2 和 3，那么总共有六个分区，这六个分区分别为：t0-0、t1-0、t1-1、t2-0、t2-1 和 t2-2。这里假设我们有三个 consumer：C0、C1 和 C2，它们订阅情况为：C0 订阅 t0，C1 订阅 t0 和 t1，C2 订阅 t0、t1 和 t2。那么这些分区的分配步骤如下：
 
-- 首先将所有的partition和consumer按照字典序进行排序，所谓的字典序，就是按照其名称的字符串顺序，那么上面的六个分区和三个consumer排序之后分别为：
+- 首先将所有的 partition 和 consumer 按照字典序进行排序，所谓的字典序，就是按照其名称的字符串顺序，那么上面的六个分区和三个 consumer 排序之后分别为：
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/16.png)
 
-- 然后依次以按顺序轮询的方式将这六个分区分配给三个consumer，如果当前consumer没有订阅当前分区所在的topic，则轮询的判断下一个consumer：
-- 尝试将t0-0分配给C0，由于C0订阅了t0，因而可以分配成功；
-- 尝试将t1-0分配给C1，由于C1订阅了t1，因而可以分配成功；
-- 尝试将t1-1分配给C2，由于C2订阅了t1，因而可以分配成功；
-- 尝试将t2-0分配给C0，由于C0没有订阅t2，因而会轮询下一个consumer；
-- 尝试将t2-0分配给C1，由于C1没有订阅t2，因而会轮询下一个consumer；
-- 尝试将t2-0分配给C2，由于C2订阅了t2，因而可以分配成功；
-- 同理由于t2-1和t2-2所在的topic都没有被C0和C1所订阅，因而都不会分配成功，最终都会分配给C2。
+- 然后依次以按顺序轮询的方式将这六个分区分配给三个 consumer，如果当前 consumer 没有订阅当前分区所在的 topic，则轮询的判断下一个 consumer：
+- 尝试将 t0-0 分配给 C0，由于 C0 订阅了 t0，因而可以分配成功；
+- 尝试将 t1-0 分配给 C1，由于 C1 订阅了 t1，因而可以分配成功；
+- 尝试将 t1-1 分配给 C2，由于 C2 订阅了 t1，因而可以分配成功；
+- 尝试将 t2-0 分配给 C0，由于 C0 没有订阅 t2，因而会轮询下一个 consumer；
+- 尝试将 t2-0 分配给 C1，由于 C1 没有订阅 t2，因而会轮询下一个 consumer；
+- 尝试将 t2-0 分配给 C2，由于 C2 订阅了 t2，因而可以分配成功；
+- 同理由于 t2-1 和 t2-2 所在的 topic 都没有被 C0 和 C1 所订阅，因而都不会分配成功，最终都会分配给 C2。
 - 按照上述的步骤将所有的分区都分配完毕之后，最终分区的订阅情况如下：
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/17.png)
 
-从上面的步骤分析可以看出，轮询的策略就是简单的将所有的partition和consumer按照字典序进行排序之后，然后依次将partition分配给各个consumer，如果当前的consumer没有订阅当前的partition，那么就会轮询下一个consumer，直至最终将所有的分区都分配完毕。但是从上面的分配结果可以看出，轮询的方式会导致每个consumer所承载的分区数量不一致，从而导致各个consumer压力不均一。
+从上面的步骤分析可以看出，轮询的策略就是简单的将所有的 partition 和 consumer 按照字典序进行排序之后，然后依次将 partition 分配给各个 consumer，如果当前的 consumer 没有订阅当前的 partition，那么就会轮询下一个 consumer，直至最终将所有的分区都分配完毕。但是从上面的分配结果可以看出，轮询的方式会导致每个 consumer 所承载的分区数量不一致，从而导致各个 consumer 压力不均一。
 
 #### Range
 
-所谓的Range重分配策略，就是首先会计算各个consumer将会承载的分区数量，然后将指定数量的分区分配给该consumer。这里我们假设有两个consumer：C0和C1，两个topic：t0和t1，这两个topic分别都有三个分区，那么总共的分区有六个：t0-0、t0-1、t0-2、t1-0、t1-1和t1-2。那么Range分配策略将会按照如下步骤进行分区的分配：
+所谓的 Range 重分配策略，就是首先会计算各个 consumer 将会承载的分区数量，然后将指定数量的分区分配给该 consumer。这里我们假设有两个 consumer：C0 和 C1，两个 topic：t0 和 t1，这两个 topic 分别都有三个分区，那么总共的分区有六个：t0-0、t0-1、t0-2、t1-0、t1-1 和 t1-2。那么 Range 分配策略将会按照如下步骤进行分区的分配：
 
-- 需要注意的是，Range策略是按照topic依次进行分配的，比如我们以t0进行讲解，其首先会获取t0的所有分区：t0-0、t0-1和t0-2，以及所有订阅了该topic的consumer：C0和C1，并且会将这些分区和consumer按照字典序进行排序；
-- 然后按照平均分配的方式计算每个consumer会得到多少个分区，如果没有除尽，则会将多出来的分区依次计算到前面几个consumer。比如这里是三个分区和两个consumer，那么每个consumer至少会得到1个分区，而3除以2后还余1，那么就会将多余的部分依次算到前面几个consumer，也就是这里的1会分配给第一个consumer，总结来说，那么C0将会从第0个分区开始，分配2个分区，而C1将会从第2个分区开始，分配1个分区；
-- 同理，按照上面的步骤依次进行后面的topic的分配。
+- 需要注意的是，Range 策略是按照 topic 依次进行分配的，比如我们以 t0 进行讲解，其首先会获取 t0 的所有分区：t0-0、t0-1 和 t0-2，以及所有订阅了该 topic 的 consumer：C0 和 C1，并且会将这些分区和 consumer 按照字典序进行排序；
+- 然后按照平均分配的方式计算每个 consumer 会得到多少个分区，如果没有除尽，则会将多出来的分区依次计算到前面几个 consumer。比如这里是三个分区和两个 consumer，那么每个 consumer 至少会得到 1 个分区，而 3 除以 2 后还余 1，那么就会将多余的部分依次算到前面几个 consumer，也就是这里的 1 会分配给第一个 consumer，总结来说，那么 C0 将会从第 0 个分区开始，分配 2 个分区，而 C1 将会从第 2 个分区开始，分配 1 个分区；
+- 同理，按照上面的步骤依次进行后面的 topic 的分配。
 - 最终上面六个分区的分配情况如下：
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/18.png)
 
-可以看到，如果按照`Range`分区方式进行分配，其本质上是依次遍历每个topic，然后将这些topic的分区按照其所订阅的consumer数量进行平均的范围分配。这种方式从计算原理上就会导致排序在前面的consumer分配到更多的分区，从而导致各个consumer的压力不均衡。
+可以看到，如果按照`Range`分区方式进行分配，其本质上是依次遍历每个 topic，然后将这些 topic 的分区按照其所订阅的 consumer 数量进行平均的范围分配。这种方式从计算原理上就会导致排序在前面的 consumer 分配到更多的分区，从而导致各个 consumer 的压力不均衡。
 
-TODO:我的问题：topic分多个partition，有些custom根据上述策略，分到topic的部分partition，难道不是要全部partition吗？是不是还要按照相同策略多分配多一次？
+TODO:我的问题：topic 分多个 partition，有些 custom 根据上述策略，分到 topic 的部分 partition，难道不是要全部 partition 吗？是不是还要按照相同策略多分配多一次？
 
 ## 20.Kafka高级_消费者offset的存储
 
@@ -721,13 +721,13 @@ TODO:上机实验
 group.id=shan-kou-zu
 ```
 
-2.打开两个cmd，分别启动两个消费者。（以`%KAFKA_HOME\config\consumer.properties%`作配置参数）
+2.打开两个 cmd，分别启动两个消费者。（以`%KAFKA_HOME\config\consumer.properties%`作配置参数）
 
 ```bat
 bin\windows\kafka-console-consumer.bat --zookeeper 127.0.0.1:2181 --topic test --consumer.config config\consumer.properties
 ```
 
-3.再打开一个cmd，启动一个生产者。
+3.再打开一个 cmd，启动一个生产者。
 
 ```bat
 bin\windows\kafka-console-producer.bat --broker-list 127.0.0.1:9092 --topic test
@@ -767,7 +767,7 @@ Kafka 从 0.11 版本开始引入了事务支持。事务可以保证 Kafka 在 
 
 ### Producer 事务
 
-为了实现跨分区跨会话的事务，需要引入一个全局唯一的 Transaction ID，并将 Producer 获得的PID 和Transaction ID 绑定。这样当Producer 重启后就可以通过正在进行的 TransactionID 获得原来的 PID。
+为了实现跨分区跨会话的事务，需要引入一个全局唯一的 Transaction ID，并将 Producer 获得的 PID 和 Transaction ID 绑定。这样当 Producer 重启后就可以通过正在进行的 TransactionID 获得原来的 PID。
 
 为了管理 Transaction， Kafka 引入了一个新的组件 Transaction Coordinator。 Producer 就是通过和 Transaction Coordinator 交互获得 Transaction ID 对应的任务状态。 Transaction Coordinator 还负责将事务所有写入 Kafka 的一个内部 Topic，这样即使整个服务重启，由于事务状态得到保存，进行中的事务状态可以得到恢复，从而继续进行。
 
@@ -855,7 +855,7 @@ public class CustomProducer {
 
 ## 28.Kafka案例_异步发送API带回调函数的生产者
 
-回调函数会在 producer 收到 ack 时调用，为异步调用， 该方法有两个参数，分别是 RecordMetadata 和 Exception，如果 Exception 为 null，说明消息发送成功，如果Exception 不为 null，说明消息发送失败。
+回调函数会在 producer 收到 ack 时调用，为异步调用， 该方法有两个参数，分别是 RecordMetadata 和 Exception，如果 Exception 为 null，说明消息发送成功，如果 Exception 不为 null，说明消息发送失败。
 
 **注意**：消息发送失败会自动重试，不需要我们在回调函数中手动重试。
 
@@ -910,9 +910,9 @@ public class CallBackProducer {
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/20.png)
 
-ProducerRecord类有许多构造函数，其中一个参数partition可指定分区
+ProducerRecord 类有许多构造函数，其中一个参数 partition 可指定分区
 
-TODO:根据策略阐述，亲自设计分区策略测试，range和round-robin间的区别
+TODO:根据策略阐述，亲自设计分区策略测试，range 和 round-robin 间的区别
 
 ## 30.Kafka案例_API带自定义分区器的生成者
 
@@ -947,7 +947,7 @@ public class MyPartitioner implements Partitioner {
 
 具体内容填写可参考默认分区器`org.apache.kafka.clients.producer.internals.DefaultPartitioner`
 
-然后Producer配置中注册使用
+然后 Producer 配置中注册使用
 
 ```java
 Properties props = new Properties();
@@ -1091,11 +1091,11 @@ props.put("enable.auto.commit", "true");
 >
 > [Source](http://kafka.apache.org/0110/documentation/#newconsumerconfigs)
 
-PS.我将Offset提交类比成数据库事务的提交。
+PS.我将 Offset 提交类比成数据库事务的提交。
 
 ## 35.Kafka案例_API消费者手动提交offset
 
-虽然自动提交 offset 十分便利，但由于其是基于时间提交的， 开发人员难以把握offset 提交的时机。因此 **Kafka 还提供了手动提交 offset 的 API**。
+虽然自动提交 offset 十分便利，但由于其是基于时间提交的， 开发人员难以把握 offset 提交的时机。因此 **Kafka 还提供了手动提交 offset 的 API**。
 
 手动提交 offset 的方法有两种：
 
@@ -1181,7 +1181,7 @@ public class AsyncCommitOffset {
 
 ### 自定义存储 offset
 
-Kafka 0.9 版本之前， offset 存储在 zookeeper， 0.9 版本及之后，默认将 offset 存储在 Kafka的一个内置的 topic 中。除此之外， Kafka 还可以选择自定义存储 offset。
+Kafka 0.9 版本之前， offset 存储在 zookeeper， 0.9 版本及之后，默认将 offset 存储在 Kafka 的一个内置的 topic 中。除此之外， Kafka 还可以选择自定义存储 offset。
 
 offset 的维护是相当繁琐的， 因为需要考虑到消费者的 Rebalace。
 
@@ -1189,7 +1189,7 @@ offset 的维护是相当繁琐的， 因为需要考虑到消费者的 Rebalace
 
 消费者发生 Rebalance 之后，每个消费者消费的分区就会发生变化。**因此消费者要首先获取到自己被重新分配到的分区，并且定位到每个分区最近提交的 offset 位置继续消费**。
 
-要实现自定义存储 offset，需要借助 `ConsumerRebalanceListener`， 以下为示例代码，其中提交和获取 offset 的方法，需要根据所选的 offset 存储系统自行实现。(可将offset存入MySQL数据库)
+要实现自定义存储 offset，需要借助 `ConsumerRebalanceListener`， 以下为示例代码，其中提交和获取 offset 的方法，需要根据所选的 offset 存储系统自行实现。(可将 offset 存入 MySQL 数据库)
 
 [CustomSaveOffset.java](https://gitee.com/jallenkwong/LearnKafka/blob/master/src/main/java/com/lun/kafka/consumer/CustomSaveOffset.java)
 
@@ -1255,11 +1255,11 @@ public class CustomSaveOffset {
 
 Producer 拦截器(interceptor)是在 Kafka 0.10 版本被引入的，主要用于实现 clients 端的定制化控制逻辑。
 
-对于 producer 而言， interceptor 使得用户在消息发送前以及 producer 回调逻辑前有机会对消息做一些定制化需求，比如`修改消息`等。同时， producer 允许用户指定多个 interceptor按序作用于同一条消息从而形成一个拦截链(interceptor chain)。 Intercetpor 的实现接口是`org.apache.kafka.clients.producer.ProducerInterceptor`，其定义的方法包括：
+对于 producer 而言， interceptor 使得用户在消息发送前以及 producer 回调逻辑前有机会对消息做一些定制化需求，比如`修改消息`等。同时， producer 允许用户指定多个 interceptor 按序作用于同一条消息从而形成一个拦截链(interceptor chain)。 Intercetpor 的实现接口是`org.apache.kafka.clients.producer.ProducerInterceptor`，其定义的方法包括：
 
 - `configure(configs)`：获取配置信息和初始化数据时调用。
 - `onSend(ProducerRecord)`：该方法封装进 KafkaProducer.send 方法中，即它运行在用户主线程中。 Producer 确保**在消息被序列化以及计算分区前**调用该方法。 用户可以在该方法中对消息做任何操作，但最好保证不要修改消息所属的 topic 和分区， 否则会影响目标分区的计算。
-- `onAcknowledgement(RecordMetadata, Exception)`：**该方法会在消息从 RecordAccumulator 成功发送到 Kafka Broker 之后，或者在发送过程中失败时调用**。 并且通常都是在 producer 回调逻辑触发之前。 onAcknowledgement 运行在producer 的 IO 线程中，因此不要在该方法中放入很重的逻辑，否则会拖慢 producer 的消息发送效率。
+- `onAcknowledgement(RecordMetadata, Exception)`：**该方法会在消息从 RecordAccumulator 成功发送到 Kafka Broker 之后，或者在发送过程中失败时调用**。 并且通常都是在 producer 回调逻辑触发之前。 onAcknowledgement 运行在 producer 的 IO 线程中，因此不要在该方法中放入很重的逻辑，否则会拖慢 producer 的消息发送效率。
 - `close()`：关闭 interceptor，主要用于执行一些**资源清理**工作
 
 如前所述， interceptor 可能被运行在多个线程中，因此在具体实现时用户需要自行确保线程安全。另外**倘若指定了多个 interceptor，则 producer 将按照指定顺序调用它们**，并仅仅是捕获每个 interceptor 可能抛出的异常记录到错误日志中而非在向上传递。这在使用过程中要特别留意。
@@ -1429,7 +1429,7 @@ public class InterceptorProducer {
 >
 > [Source](https://www.kafka-eagle.org/articles/docs/introduce/what-is-kafka-eagle.html)
 
-一个运行在Tomcat的Web应用。
+一个运行在 Tomcat 的 Web 应用。
 
 ### 安装与运行
 
@@ -1439,11 +1439,11 @@ public class InterceptorProducer {
 
 #### 在Windows上安装与运行
 
-- 安装JDK，设置环境变量时，**路径最好不要带空格**，否则，后序运行ke.bat抛异常。若路径必须带有空格，可以通过小技巧，让ke.bat成功运行。这个技巧是：若你的`JAVA_HOME`的变量值为`C:\Program Files\Java\jdk1.8.0_161`，则将其改成`C:\progra~1\Java\jdk1.8.0_161`。
+- 安装 JDK，设置环境变量时，**路径最好不要带空格**，否则，后序运行 ke.bat 抛异常。若路径必须带有空格，可以通过小技巧，让 ke.bat 成功运行。这个技巧是：若你的`JAVA_HOME`的变量值为`C:\Program Files\Java\jdk1.8.0_161`，则将其改成`C:\progra~1\Java\jdk1.8.0_161`。
 - 到[Kafka Eagle下载页面](http://download.kafka-eagle.org/)下载安装包。也可在网盘下载，链接在[本文首部](https://my.oschina.net/jallenkwong/blog/4449224#)
-- 解压安装包，然后设置环境变量`KE_HOME`，其值如`C:\Kafka\kafka-eagle-web-1.3.7`。若想打开cmd输入命令`ke.bat`运行Kafka Eagle，在`PATH`环境变量的值头添加`%KE_HOME%\bin;`
+- 解压安装包，然后设置环境变量`KE_HOME`，其值如`C:\Kafka\kafka-eagle-web-1.3.7`。若想打开 cmd 输入命令`ke.bat`运行 Kafka Eagle，在`PATH`环境变量的值头添加`%KE_HOME%\bin;`
 - 修改配置文件`%KE_HOME%\conf\system-config.properties`
-- (可选)Kafka Server的JVM调参，用文本编辑器打开`%KAFKA_HOME%\bin\windows\kafka-server-start.bat`，其中的`set KAFKA_HEAP_OPTS=-Xmx1G -Xms1G`改为`set KAFKA_HEAP_OPTS=-server -Xms2G -Xmx2G -XX:PermSize=128m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=8 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70`
+- (可选)Kafka Server 的 JVM 调参，用文本编辑器打开`%KAFKA_HOME%\bin\windows\kafka-server-start.bat`，其中的`set KAFKA_HEAP_OPTS=-Xmx1G -Xms1G`改为`set KAFKA_HEAP_OPTS=-server -Xms2G -Xmx2G -XX:PermSize=128m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=8 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70`
 
 ```properties
 ######################################
@@ -1534,11 +1534,11 @@ kafka.eagle.password=123456
 ```
 
 - 运行
-    - 运行ZooKeeper
-    - 运行Kafka集群，另外运行kafka server前，需设置JMX_PORT，否则Kafka Eagle 后台提示连接失败。执行命令行`set JMX_PORT=9999 & start bin\windows\kafka-server-start.bat config\server.properties`设置JMX_PORT且运行Kafkaserver。在单节点开启Kafka集群，小心端口号冲突。
-    - 点击`%KE_HOME%\bin\ke.bat`，运行Kafka Eagle。
+    - 运行 ZooKeeper
+    - 运行 Kafka 集群，另外运行 kafka server 前，需设置 JMX_PORT，否则 Kafka Eagle 后台提示连接失败。执行命令行`set JMX_PORT=9999 & start bin\windows\kafka-server-start.bat config\server.properties`设置 JMX_PORT 且运行 Kafkaserver。在单节点开启 Kafka 集群，小心端口号冲突。
+    - 点击`%KE_HOME%\bin\ke.bat`，运行 Kafka Eagle。
     - 打开浏览器，在地址栏输入`http://localhost:8048/ke/`，然后在登录页面，输入在配置文件`%KE_HOME%\conf\system-config.properties`设置的账号与密码。
-    - 登录成功，便可进入Kafka Eagle
+    - 登录成功，便可进入 Kafka Eagle
 
 ![img](https://gitee.com/jallenkwong/LearnKafka/raw/master/image/22.png)
 
@@ -1552,11 +1552,11 @@ kafka.eagle.password=123456
 >
 > [Source](https://baike.baidu.com/item/flume/6250098)
 
-TODO:学习Flume时，再补充
+TODO:学习 Flume 时，再补充
 
 ## 42.Kafk之与Flume对接（数据分类）
 
-TODO:学习Flume时，再补充
+TODO:学习 Flume 时，再补充
 
 ## 43.Kafka之Kafka面试题
 

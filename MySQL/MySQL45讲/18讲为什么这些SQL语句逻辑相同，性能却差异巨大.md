@@ -4,7 +4,7 @@
 
 ## 案例一：条件字段函数操作
 
-假设你现在维护了一个交易系统，其中交易记录表 tradelog 包含交易流水号（tradeid）、交易员id（operator）、交易时间（t_modified）等字段。为了便于描述，我们先忽略其他字段。这个表的建表语句如下：
+假设你现在维护了一个交易系统，其中交易记录表 tradelog 包含交易流水号（tradeid）、交易员 id（operator）、交易时间（t_modified）等字段。为了便于描述，我们先忽略其他字段。这个表的建表语句如下：
 
 ```sql
 mysql> CREATE TABLE `tradelog` (
@@ -192,7 +192,7 @@ mysql> explain select d.* from tradelog l, trade_detail d
 
 ![img](18讲为什么这些SQL语句逻辑相同，性能却差异巨大.resource/8289c184c8529acea0269a7460dc62a9.png)
 
-图5 语句 Q1 的执行过程
+图 5 语句 Q1 的执行过程
 
 图中：
 
@@ -230,7 +230,7 @@ select * from trade_detail  where CONVERT(traideid USING utf8mb4)=$L2.tradeid.va
 
 到这里，你终于明确了，字符集不同只是条件之一，**连接过程中要求在被驱动表的索引字段上加函数操作**，是直接导致对被驱动表做全表扫描的原因。
 
-作为对比验证，我给你提另外一个需求，“查找trade_detail表里id=4的操作，对应的操作者是谁”，再来看下这个语句和它的执行计划。
+作为对比验证，我给你提另外一个需求，“查找 trade_detail 表里 id=4 的操作，对应的操作者是谁”，再来看下这个语句和它的执行计划。
 
 ```mysql
 mysql>select l.operator from tradelog l , trade_detail d 
@@ -249,7 +249,7 @@ mysql> explain select l.operator from tradelog l , trade_detail d
 2 rows in set, 1 warning (0.00 sec)
 ```
 
-这个语句里 `trade_detail` 表成了驱动表，但是 explain 结果的第二行显示，这次的查询操作用上了被驱动表 tradelog 里的索引(tradeid)，扫描行数是1。
+这个语句里 `trade_detail` 表成了驱动表，但是 explain 结果的第二行显示，这次的查询操作用上了被驱动表 tradelog 里的索引(tradeid)，扫描行数是 1。
 
 这也是两个 tradeid 字段的 join 操作，为什么这次能用上被驱动表的 tradeid 索引呢？
 
@@ -299,7 +299,7 @@ mysql> explain select d.* from tradelog l , trade_detail d where d.tradeid=CONVE
 2 rows in set, 1 warning (0.00 sec)
 ```
 
-这里，我主动把 l.tradeid转成utf8，就避免了被驱动表上的字符编码转换，从explain结果可以看到，这次索引走对了。
+这里，我主动把 l.tradeid 转成 utf8，就避免了被驱动表上的字符编码转换，从 explain 结果可以看到，这次索引走对了。
 
 ## 小结
 
@@ -315,17 +315,17 @@ mysql> explain select d.* from tradelog l , trade_detail d where d.tradeid=CONVE
 
 ## 上期问题时间
 
-我在上篇文章的最后，留给你的问题是：我们文章中最后的一个方案是，通过三次limit Y,1 来得到需要的数据，你觉得有没有进一步的优化方法。
+我在上篇文章的最后，留给你的问题是：我们文章中最后的一个方案是，通过三次 limit Y,1 来得到需要的数据，你觉得有没有进一步的优化方法。
 
-这里我给出一种方法，取Y1、Y2和Y3里面最大的一个数，记为M，最小的一个数记为N，然后执行下面这条SQL语句：
+这里我给出一种方法，取 Y1、Y2 和 Y3 里面最大的一个数，记为 M，最小的一个数记为 N，然后执行下面这条 SQL 语句：
 
 ```
 mysql> select * from t limit N, M-N+1;
 ```
 
-再加上取整个表总行数的C行，这个方案的扫描行数总共只需要C+M+1行。
+再加上取整个表总行数的 C 行，这个方案的扫描行数总共只需要 C+M+1 行。
 
-当然也可以先取回id值，在应用中确定了三个id值以后，再执行三次where id=X的语句也是可以的。@倪大人 同学在评论区就提到了这个方法。
+当然也可以先取回 id 值，在应用中确定了三个 id 值以后，再执行三次 where id=X 的语句也是可以的。@倪大人 同学在评论区就提到了这个方法。
 
 这次评论区出现了很多很棒的留言：
 

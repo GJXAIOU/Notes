@@ -95,7 +95,7 @@ public class SecurityTransporter extends Transporter {
 }
 ```
 
-在改造之后的代码中，如果传递进 demoFunction() 函数的是父类 Transporter 对象，那 demoFunction() 函数并不会有异常抛出，但如果传递给 demoFunction() 函数的是子类SecurityTransporter 对象，那 demoFunction() 有可能会有异常抛出。尽管代码中抛出的是运行时异常（Runtime Exception），我们可以不在代码中显式地捕获处理，但子类替换父类传递进 demoFunction 函数之后，整个程序的逻辑行为有了改变。
+在改造之后的代码中，如果传递进 demoFunction() 函数的是父类 Transporter 对象，那 demoFunction() 函数并不会有异常抛出，但如果传递给 demoFunction() 函数的是子类 SecurityTransporter 对象，那 demoFunction() 有可能会有异常抛出。尽管代码中抛出的是运行时异常（Runtime Exception），我们可以不在代码中显式地捕获处理，但子类替换父类传递进 demoFunction 函数之后，整个程序的逻辑行为有了改变。
 
 虽然改造之后的代码仍然可以通过 Java 的多态语法，动态地用子类 SecurityTransporter 来替换父类 Transporter，也并不会导致程序编译或者运行报错。但是，从设计思路上来讲，SecurityTransporter 的设计是不符合里式替换原则的。
 
@@ -145,11 +145,11 @@ public class SecurityTransporter extends Transporter {
 
 ### 精选留言
 
-- LSP的意义：
+- LSP 的意义：
 
-  一、改进已有实现。例如程序最开始实现时采用了低效的排序算法，改进时使用LSP实现更高效的排序算法。
+  一、改进已有实现。例如程序最开始实现时采用了低效的排序算法，改进时使用 LSP 实现更高效的排序算法。
 
-  二、指导程序开发。告诉我们如何组织类和子类（subtype），子类的方法（非私有方法）要符合contract。…
+  二、指导程序开发。告诉我们如何组织类和子类（subtype），子类的方法（非私有方法）要符合 contract。…
 
 - 里氏替换最终一句话还是对扩展开放，对修改关闭，不能改变父类的入参，返回，但是子类可以自己扩展方法中的逻辑。父类方法名很明显限定了逻辑内容，比如按金额排序这 种，子类就不要去重写金额排序，改成日期排序之类的，而应该抽出一个排序方法，然后再写一个获取排序的方法，父类获取排序调用金额排序，子类就重写调用排序方法，获取日期排序。…
 
@@ -167,7 +167,7 @@ public class SecurityTransporter extends Transporter {
 
 - 里式替换是细力度的开闭原则。这个准则应用的场景，往往是在方法功能的调整上，要达到的效果是：该方法对已经调用的代码的效果不变，并能支撑新的功能或提供更好的性 能。换句话说，就是在保证兼容的前提条件下做扩展和调整。
 
-  spring对里式替换贯彻得不错，从1.x到4.x能看到大部分代码都坚强的保留着兼容性。…
+  spring 对里式替换贯彻得不错，从 1.x 到 4.x 能看到大部分代码都坚强的保留着兼容性。…
 
 - 个人理解里氏替换就是子类完美继承父类的设计初衷，并做了增强对吗
 

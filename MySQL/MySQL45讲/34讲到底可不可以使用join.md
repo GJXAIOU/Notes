@@ -61,7 +61,7 @@ mysql> explain select * from t1 straight_join t2 on (t1.a=t2.a);
 2 rows in set, 1 warning (0.00 sec)
 ```
 
-图1 使用索引字段 join 的 explain 结果
+图 1 使用索引字段 join 的 explain 结果
 
 可以看到，在这条语句里，被驱动表 t2 的字段 a 上有索引，join 过程用上了这个索引，因此这个语句的执行流程是这样的：
 
@@ -76,7 +76,7 @@ mysql> explain select * from t1 straight_join t2 on (t1.a=t2.a);
 
 ![img](34讲到底可不可以使用join.resource/d83ad1cbd6118603be795b26d38f8df6.jpg)
 
-图2 Index Nested-Loop Join 算法的执行流程
+图 2 Index Nested-Loop Join 算法的执行流程
 
 在这个流程里：
 
@@ -102,7 +102,7 @@ mysql> explain select * from t1 straight_join t2 on (t1.a=t2.a);
 
 在这个 join 语句执行过程中，驱动表是走全表扫描，而被驱动表是走树搜索。
 
-假设被驱动表的行数是 M。每次在被驱动表查一行数据，要先搜索索引 a，再搜索主键索引。每次搜索一棵树近似复杂度是以 2 为底的 M 的对数，记为log2M，所以在被驱动表上查一行的时间复杂度是 $$2*log2^M$$。
+假设被驱动表的行数是 M。每次在被驱动表查一行数据，要先搜索索引 a，再搜索主键索引。每次搜索一棵树近似复杂度是以 2 为底的 M 的对数，记为 log2M，所以在被驱动表上查一行的时间复杂度是 $$2*log2^M$$。
 
 假设驱动表的行数是 N，执行过程就要扫描驱动表 N 行，然后对于每一行，到被驱动表上匹配一次。
 
@@ -150,9 +150,9 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 ![img](34讲到底可不可以使用join.resource/15ae4f17c46bf71e8349a8f2ef70d573.jpg)
 
-图3 Block Nested-Loop Join 算法的执行流程
+图 3 Block Nested-Loop Join 算法的执行流程
 
-对应地，这条SQL语句的explain结果如下所示：
+对应地，这条 SQL 语句的 explain 结果如下所示：
 
 ![img](34讲到底可不可以使用join.resource/676921fa0883e9463dd34fb2bc5e87e1.png)
 
@@ -167,9 +167,9 @@ mysql> explain select * from t1 straight_join t2 on (t1.a=t2.b);
 2 rows in set, 1 warning (0.00 sec)
 ```
 
-图4 不使用索引字段 join 的 explain 结果
+图 4 不使用索引字段 join 的 explain 结果
 
-可以看到，在这个过程中，对表 t1 和 t2 都做了一次全表扫描，因此总的扫描行数是 1100。由于 join_buffer 是以无序数组的方式组织的，因此对表 t2 中的每一行，都要做 100 次判断，总共需要在内存中做的判断次数是：100*1000=10万次。
+可以看到，在这个过程中，对表 t1 和 t2 都做了一次全表扫描，因此总的扫描行数是 1100。由于 join_buffer 是以无序数组的方式组织的，因此对表 t2 中的每一行，都要做 100 次判断，总共需要在内存中做的判断次数是：100*1000=10 万次。
 
 前面我们说过，如果使用 Simple Nested-Loop Join 算法进行查询，扫描行数也是 10 万行。因此，从时间复杂度上来说，这两个算法是一样的。但是，Block Nested-Loop Join 算法的这 10 万次判断是内存操作，速度上会快很多，性能也更好。
 
@@ -192,7 +192,7 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 执行过程就变成了：
 
-1. 扫描表 t1，顺序读取数据行放入 join_buffer 中，放完第 88 行 join_buffer 满了，继续第2步；
+1. 扫描表 t1，顺序读取数据行放入 join_buffer 中，放完第 88 行 join_buffer 满了，继续第 2 步；
 2. 扫描表 t2，把 t2 中的每一行取出来，跟 join_buffer 中的数据做对比，满足 join 条件的，作为结果集的一部分返回；
 3. 清空 join_buffer；
 4. 继续扫描表 t1，顺序读取最后的 12 行数据放入 join_buffer 中，继续执行第 2 步。
@@ -201,11 +201,11 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 ![img](34讲到底可不可以使用join.resource/695adf810fcdb07e393467bcfd2f6ac4.jpg)
 
-图5 Block Nested-Loop Join -- 两段
+图 5 Block Nested-Loop Join -- 两段
 
 图中的步骤 4 和 5，表示清空 join_buffer 再复用。
 
-这个流程才体现出了这个算法名字中“Block”的由来，表示“分块去join”。
+这个流程才体现出了这个算法名字中“Block”的由来，表示“分块去 join”。
 
 可以看到，这时候由于表 t1 被分成了两次放入 `join_buffer` 中，导致表 t2 会被扫描两次。虽然分成两次放入 join_buffer，但是判断等值条件的次数还是不变的，依然是 (88+12)*1000=10 万次。
 
@@ -235,14 +235,14 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 第一个问题：能不能使用 join 语句？
 
 1. 如果可以使用 Index Nested-Loop Join 算法，也就是说可以用上被驱动表上的索引，其实是没问题的；
-2. 如果使用 Block Nested-Loop Join 算法，扫描行数就会过多。尤其是在大表上的 join 操作，这样可能要扫描被驱动表很多次，会占用大量的系统资源。所以这种 joi n尽量不要用。
+2. 如果使用 Block Nested-Loop Join 算法，扫描行数就会过多。尤其是在大表上的 join 操作，这样可能要扫描被驱动表很多次，会占用大量的系统资源。所以这种 joi n 尽量不要用。
 
 所以你在判断要不要使用 join 语句时，就是看 explain 结果里面，Extra 字段里面有没有出现“Block Nested Loop”字样。
 
 第二个问题是：如果要使用 join，应该选择大表做驱动表还是选择小表做驱动表？
 
 1. 如果是 Index Nested-Loop Join 算法，应该选择小表做驱动表；
-2. 如果是Block Nested-Loop Join算法：
+2. 如果是 Block Nested-Loop Join 算法：
     - 在 `join_buffer_size` 足够大的时候，是一样的；
     - 在 `join_buffer_size` 不够大的时候（这种情况更常见），应该选择小表做驱动表。
 
@@ -257,9 +257,9 @@ select * from t1 straight_join t2 on (t1.b=t2.b) where t2.id<=50;
 select * from t2 straight_join t1 on (t1.b=t2.b) where t2.id<=50;
 ```
 
-注意，为了让两条语句的被驱动表都用不上索引，所以 join 字段都使用了没有索引的字段b。
+注意，为了让两条语句的被驱动表都用不上索引，所以 join 字段都使用了没有索引的字段 b。
 
-但如果是用第二个语句的话，join_buffer 只需要放入 t2 的前 50 行，显然是更好的。所以这里，“t2的前50行”是那个相对小的表，也就是“小表”。
+但如果是用第二个语句的话，join_buffer 只需要放入 t2 的前 50 行，显然是更好的。所以这里，“t2 的前 50 行”是那个相对小的表，也就是“小表”。
 
 我们再来看另外一组例子：
 
@@ -273,25 +273,25 @@ select t1.b,t2.* from  t2  straight_join t1 on (t1.b=t2.b) where t2.id<=100;
 - 表 t1 只查字段 b，因此如果把 t1 放到 join_buffer 中，则 join_buffer 中只需要放入 b 的值；
 - 表 t2 需要查所有的字段，因此如果把表 t2 放到 join_buffer 中的话，就需要放入三个字段 id、a 和 b。
 
-这里，我们应该选择表 t1 作为驱动表。也就是说在这个例子里，“只需要一列参与join的表t1”是那个相对小的表。
+这里，我们应该选择表 t1 作为驱动表。也就是说在这个例子里，“只需要一列参与 join 的表 t1”是那个相对小的表。
 
 所以，更准确地说，**在决定哪个表做驱动表的时候，应该是两个表按照各自的条件过滤，过滤完成之后，计算参与 join 的各个字段的总数据量，数据量小的那个表，就是“小表”，应该作为驱动表。**
 
 # 小结
 
-今天，我和你介绍了MySQL执行join语句的两种可能算法，这两种算法是由能否使用被驱动表的索引决定的。而能否用上被驱动表的索引，对join语句的性能影响很大。
+今天，我和你介绍了 MySQL 执行 join 语句的两种可能算法，这两种算法是由能否使用被驱动表的索引决定的。而能否用上被驱动表的索引，对 join 语句的性能影响很大。
 
-通过对Index Nested-Loop Join和Block Nested-Loop Join两个算法执行过程的分析，我们也得到了文章开头两个问题的答案：
+通过对 Index Nested-Loop Join 和 Block Nested-Loop Join 两个算法执行过程的分析，我们也得到了文章开头两个问题的答案：
 
-1. 如果可以使用被驱动表的索引，join语句还是有其优势的；
-2. 不能使用被驱动表的索引，只能使用Block Nested-Loop Join算法，这样的语句就尽量不要使用；
-3. 在使用join的时候，应该让小表做驱动表。
+1. 如果可以使用被驱动表的索引，join 语句还是有其优势的；
+2. 不能使用被驱动表的索引，只能使用 Block Nested-Loop Join 算法，这样的语句就尽量不要使用；
+3. 在使用 join 的时候，应该让小表做驱动表。
 
 最后，又到了今天的问题时间。
 
-我们在上文说到，使用Block Nested-Loop Join算法，可能会因为join_buffer不够大，需要对被驱动表做多次全表扫描。
+我们在上文说到，使用 Block Nested-Loop Join 算法，可能会因为 join_buffer 不够大，需要对被驱动表做多次全表扫描。
 
-我的问题是，如果被驱动表是一个大表，并且是一个冷数据表，除了查询过程中可能会导致IO压力大以外，你觉得对这个MySQL服务还有什么更严重的影响吗？（这个问题需要结合上一篇文章的知识点）
+我的问题是，如果被驱动表是一个大表，并且是一个冷数据表，除了查询过程中可能会导致 IO 压力大以外，你觉得对这个 MySQL 服务还有什么更严重的影响吗？（这个问题需要结合上一篇文章的知识点）
 
 你可以把你的结论和分析写在留言区，我会在下一篇文章的末尾和你讨论这个问题。感谢你的收听，也欢迎你把这篇文章分享给更多的朋友一起阅读。
 
@@ -301,10 +301,10 @@ select t1.b,t2.* from  t2  straight_join t1 on (t1.b=t2.b) where t2.id<=100;
 
 这个问题的核心是，造成了“长事务”。
 
-至于长事务的影响，就要结合我们前面文章中提到的锁、MVCC的知识点了。
+至于长事务的影响，就要结合我们前面文章中提到的锁、MVCC 的知识点了。
 
 - 如果前面的语句有更新，意味着它们在占用着行锁，会导致别的语句更新被锁住；
-- 当然读的事务也有问题，就是会导致undo log不能被回收，导致回滚段空间膨胀。
+- 当然读的事务也有问题，就是会导致 undo log 不能被回收，导致回滚段空间膨胀。
 
 评论区留言点赞板：
 

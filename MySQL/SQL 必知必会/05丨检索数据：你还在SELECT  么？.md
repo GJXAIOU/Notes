@@ -422,7 +422,7 @@ SELECT name,mp_max FROM heros order by hp_max DESC LIMIT 5;
   在 MySQL InnoDB 存储引擎中，`COUNT(*)` 和 `COUNT(1)` 都是对的所有结果进行的 COUNT。如果有 WHERE 子句，则是对所有符合筛选条件的数据行进行统计。如果没有 WHERE 子句，则是对数据表的数据行数进行统计。
   因此 `COUNT(*)` 和 `COUNT(1)` 本质上没有区别，执行的复杂度都是 `O(N)`，也就是采用全表扫描，进行循环+计数的方式进行统计。
 
-  如果是 MySQL MyISAM 存储引擎，统计数据表的行数只需要 `O(1)` 复杂度，这是因为每张 MyISAM 的数据表都有一个meta 信息有存储了 `row_count` 值。而一致性由表级锁来保证。而 InnoDB 支持事务，采用行级锁和 MVCC 机制，所以无法像 MyISAM 一样，只维护一个 `row_count` 变量。因此就需要采用扫描全表，进行循环+计数的方式来完成统计。
+  如果是 MySQL MyISAM 存储引擎，统计数据表的行数只需要 `O(1)` 复杂度，这是因为每张 MyISAM 的数据表都有一个 meta 信息有存储了 `row_count` 值。而一致性由表级锁来保证。而 InnoDB 支持事务，采用行级锁和 MVCC 机制，所以无法像 MyISAM 一样，只维护一个 `row_count` 变量。因此就需要采用扫描全表，进行循环+计数的方式来完成统计。
   需要注意的是，在实际执行中 `COUNT(*)` 和 `COUNT(1)` 执行时间可能略有差别，不过你还是可以把这两个在执行效率上看成是相等的。
 
   **另外在 InnoDB引擎中，如果是采用 `COUNT(*)` 和 `COUNT(1)` 来统计数据行数，要尽量采用二级索引。**

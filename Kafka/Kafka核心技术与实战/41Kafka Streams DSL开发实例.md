@@ -259,7 +259,7 @@ final KTable<Integer, Integer> sumOfEvenNumbers = input
 
   2019-09-09
 
-  单词计数里面的groupBy算子里面的key和value不太明白，不太明确那，为什么最后还要count计数
+  单词计数里面的 groupBy 算子里面的 key 和 value 不太明白，不太明确那，为什么最后还要 count 计数
 
   **
 
@@ -285,7 +285,7 @@ final KTable<Integer, Integer> sumOfEvenNumbers = input
 
   2019-09-07
 
-  count之前加上.windowedBy(TimeWindows.of(Duration.ofMinutes(5)))，应该就可以了吧
+  count 之前加上.windowedBy(TimeWindows.of(Duration.ofMinutes(5)))，应该就可以了吧
 
   作者回复: 是的：）
 

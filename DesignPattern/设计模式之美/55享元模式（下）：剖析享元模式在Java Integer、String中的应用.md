@@ -168,11 +168,11 @@ Integer a = 123;
 Integer a = Integer.valueOf(123);
 ```
 
-第一种创建方式并不会使用到 IntegerCache，而后面两种创建方法可以利用IntegerCache 缓存，返回共享的对象，以达到节省内存的目的。举一个极端一点的例子， 假设程序需要创建 1 万个 -128 到 127 之间的 Integer 对象。使用第一种创建方式，我们需要分配 1 万个 Integer 对象的内存空间；使用后两种创建方式，我们最多只需要分配256 个 Integer 对象的内存空间。
+第一种创建方式并不会使用到 IntegerCache，而后面两种创建方法可以利用 IntegerCache 缓存，返回共享的对象，以达到节省内存的目的。举一个极端一点的例子， 假设程序需要创建 1 万个 -128 到 127 之间的 Integer 对象。使用第一种创建方式，我们需要分配 1 万个 Integer 对象的内存空间；使用后两种创建方式，我们最多只需要分配 256 个 Integer 对象的内存空间。
 
 # 享元模式在 Java String 中的应用
 
-刚刚我们讲了享元模式在 Java Integer 类中的应用，现在，我们再来看下，享元模式在Java String 类中的应用。同样，我们还是先来看一段代码，你觉得这段代码输出的结果是什么呢？
+刚刚我们讲了享元模式在 Java Integer 类中的应用，现在，我们再来看下，享元模式在 Java String 类中的应用。同样，我们还是先来看一段代码，你觉得这段代码输出的结果是什么呢？
 
 ```java
 String s1 = "小争哥";
@@ -192,7 +192,7 @@ System.out.println(s1 == s3);
 
 好了，今天的内容到此就讲完了。我们一块来总结回顾一下，你需要重点掌握的内容。
 
-在 Java Integer 的实现中，-128 到 127 之间的整型对象会被事先创建好，缓存在IntegerCache 类中。当我们使用自动装箱或者 valueOf() 来创建这个数值区间的整型对象时，会复用 IntegerCache 类事先创建好的对象。这里的 IntegerCache 类就是享元工厂类，事先创建好的整型对象就是享元对象。
+在 Java Integer 的实现中，-128 到 127 之间的整型对象会被事先创建好，缓存在 IntegerCache 类中。当我们使用自动装箱或者 valueOf() 来创建这个数值区间的整型对象时，会复用 IntegerCache 类事先创建好的对象。这里的 IntegerCache 类就是享元工厂类，事先创建好的整型对象就是享元对象。
 
 在 Java String 类的实现中，JVM 开辟一块存储区专门存储字符串常量，这块存储区叫作字符串常量池，类似于 Integer 中的 IntegerCache。不过，跟 IntegerCache 不同的是，
 

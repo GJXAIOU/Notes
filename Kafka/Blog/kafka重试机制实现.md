@@ -146,7 +146,7 @@ public class KafkaConfiguration {
 Spring-Kafka 通过实现自定义的 SeekToCurrentErrorHandler ，当 Consumer 消费消息异常的时候，进行拦截处理：
 
 - 重试小于最大次数时，重新投递该消息给 Consumer
-- 重试到达最大次数时，如果Consumer 还是消费失败时，该消息就会发送到死信队列。 死信队列的 命名规则为： 原有 Topic + .DLT 后缀 = 其死信队列的 Topic
+- 重试到达最大次数时，如果 Consumer 还是消费失败时，该消息就会发送到死信队列。 死信队列的 命名规则为： 原有 Topic + .DLT 后缀 = 其死信队列的 Topic
 
 ```javascript
  ConsumerRecordRecoverer recoverer = new DeadLetterPublishingRecoverer(template);
@@ -433,9 +433,9 @@ public class ProduceMockTest {
 
 复制
 
-10秒 重试3次
+10 秒 重试 3 次
 
-3次处理后依然失败，转入死信队列
+3 次处理后依然失败，转入死信队列
 
 看看数据
 

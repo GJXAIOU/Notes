@@ -148,11 +148,11 @@ public class Demo {
 
 在 Java 语言中，Object 类的 clone() 方法执行的就是我们刚刚说的浅拷贝。它只会拷贝对象中的基本数据类型的数据（比如，int、long），以及引用对象（SearchWord）的内存 地址，不会递归地拷贝引用对象本身。
 
-在上面的代码中，我们通过调用 HashMap 上的 clone() 浅拷贝方法来实现原型模式。当我们通过 newKeywords 更新 SearchWord 对象的时候（比如，更新“设计模式”这个搜索关键词的访问次数），newKeywords 和 currentKeywords 因为指向相同的一组SearchWord 对象，就会导致 currentKeywords 中指向的 SearchWord，有的是老版本的，有的是新版本的，就没法满足我们之前的需求：currentKeywords 中的数据在任何时刻都是同一个版本的，不存在介于老版本与新版本之间的中间状态。
+在上面的代码中，我们通过调用 HashMap 上的 clone() 浅拷贝方法来实现原型模式。当我们通过 newKeywords 更新 SearchWord 对象的时候（比如，更新“设计模式”这个搜索关键词的访问次数），newKeywords 和 currentKeywords 因为指向相同的一组 SearchWord 对象，就会导致 currentKeywords 中指向的 SearchWord，有的是老版本的，有的是新版本的，就没法满足我们之前的需求：currentKeywords 中的数据在任何时刻都是同一个版本的，不存在介于老版本与新版本之间的中间状态。
 
 现在，我们又该如何来解决这个问题呢？
 
-我们可以将浅拷贝替换为深拷贝。newKeywords 不仅仅复制 currentKeywords 的索引， 还把 SearchWord 对象也复制一份出来，这样 newKeywords 和 currentKeywords 就指向不同的 SearchWord 对象，也就不存在更新 newKeywords 的数据会导致currentKeywords 的数据也被更新的问题了。
+我们可以将浅拷贝替换为深拷贝。newKeywords 不仅仅复制 currentKeywords 的索引， 还把 SearchWord 对象也复制一份出来，这样 newKeywords 和 currentKeywords 就指向不同的 SearchWord 对象，也就不存在更新 newKeywords 的数据会导致 currentKeywords 的数据也被更新的问题了。
 
 那如何实现深拷贝呢？总结一下的话，有下面两种方法。
 
@@ -211,7 +211,7 @@ public Object deepCopy(Object object) {
 
 刚刚的两种实现方法，不管采用哪种，深拷贝都要比浅拷贝耗时、耗内存空间。针对我们这个应用场景，有没有更快、更省内存的实现方式呢？
 
-我们可以先采用浅拷贝的方式创建 newKeywords。对于需要更新的 SearchWord 对象， 我们再使用深度拷贝的方式创建一份新的对象，替换 newKeywords 中的老对象。毕竟需要更新的数据是很少的。这种方式即利用了浅拷贝节省时间、空间的优点，又能保证currentKeywords 中的中数据都是老版本的数据。具体的代码实现如下所示。这也是标题中讲到的，在我们这个应用场景下，最快速 clone 散列表的方式。
+我们可以先采用浅拷贝的方式创建 newKeywords。对于需要更新的 SearchWord 对象， 我们再使用深度拷贝的方式创建一份新的对象，替换 newKeywords 中的老对象。毕竟需要更新的数据是很少的。这种方式即利用了浅拷贝节省时间、空间的优点，又能保证 currentKeywords 中的中数据都是老版本的数据。具体的代码实现如下所示。这也是标题中讲到的，在我们这个应用场景下，最快速 clone 散列表的方式。
 
 ```java
 public class Demo {
@@ -257,7 +257,7 @@ public class Demo {
 ## 四、课堂讨论
 
 1.  在今天的应用场景中，如果不仅往数据库中添加和更新关键词，还删除关键词，这种情况下，又该如何实现呢？
-2.  在 第 7 讲中，为了让 ShoppingCart 的 getItems() 方法返回不可变对象，我们如下来实现代码。当时，我们指出这样的实现思路还是有点问题。因为当调用者通过ShoppingCart 的 getItems() 获取到 items 之后，我们还是可以修改容器中每个对象（ShoppingCartItem）的数据。学完本节课之后，现在你有没有解决方法了呢？
+2.  在 第 7 讲中，为了让 ShoppingCart 的 getItems() 方法返回不可变对象，我们如下来实现代码。当时，我们指出这样的实现思路还是有点问题。因为当调用者通过 ShoppingCart 的 getItems() 获取到 items 之后，我们还是可以修改容器中每个对象（ShoppingCartItem）的数据。学完本节课之后，现在你有没有解决方法了呢？
 
 ```java
 public class ShoppingCart {
@@ -333,7 +333,7 @@ item.setPrice(19.0); // 这里修改了item的价格属性
 >
 > 2020-02-19
 
-1.  两个Map比较下key找到差集
+1.  两个 Map 比较下 key 找到差集
 
 2.  可以返回深复制的购物车结构，或者干脆分成两个方法，一个返回深复制的结构，一个返回当前结构，区分使用场景。
 
@@ -455,7 +455,7 @@ item.setPrice(19.0); // 这里修改了item的价格属性
 >
 > 问题1: 1.设置标记位,"使用中","弃用","已删除"等,检查到标记为"弃用"的数据时,删除map里的数据同时修改标记位为"已删除",扫描数据库里更新的数据时增加检索条件"使用中" 2.每次数据库都全量扫描,拿到标记位为"使用中"的数据,直接替换map
 
-1.  删除数据时同时删除数据库和map里的数据…
+1.  删除数据时同时删除数据库和 map 里的数据…
 
 > 展开
 

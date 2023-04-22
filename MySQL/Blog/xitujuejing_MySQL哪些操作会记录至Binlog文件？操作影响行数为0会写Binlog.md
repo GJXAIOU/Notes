@@ -17,28 +17,28 @@
 
 ### （一）主要用途
 
-- 主从复制，MySQL使用主从架构后，从库和主库建立连接后，主库会将Binlog发送至从库，而从库通过解析回放执行Binglog文件的内容，达到主从一致的效果。所有的数据订阅、同步和迁移的工具也是基于这一原理来实现的。
-- 数据恢复，Binlog详细记录了数据库的所有变化，例如当某一时刻某些数据因为一些错误的操作而导致数据错误覆盖，可以使用Mysqlbinlog工具将数据恢复至操作之前的某一时刻。
+- 主从复制，MySQL 使用主从架构后，从库和主库建立连接后，主库会将 Binlog 发送至从库，而从库通过解析回放执行 Binglog 文件的内容，达到主从一致的效果。所有的数据订阅、同步和迁移的工具也是基于这一原理来实现的。
+- 数据恢复，Binlog 详细记录了数据库的所有变化，例如当某一时刻某些数据因为一些错误的操作而导致数据错误覆盖，可以使用 Mysqlbinlog 工具将数据恢复至操作之前的某一时刻。
 
 ### （二）记录的模式(基于MySQL8.0)
 
-- Statement，Binlog存储的是原始SQL语句。
-    - 优点：不需要记录每一行的变化，和`Row`相比减少了Binlog日志量，节约了IO，提高了性能。
-    - 缺点：由于记录的只是执行语句，某些情况下在从库上回放会导致主从不一致，例如SQL中包含`UUID(),USER()`等函数。
-- Row，Binlog存储的是每一行所有字段变化前后的值。
+- Statement，Binlog 存储的是原始 SQL 语句。
+    - 优点：不需要记录每一行的变化，和`Row`相比减少了 Binlog 日志量，节约了 IO，提高了性能。
+    - 缺点：由于记录的只是执行语句，某些情况下在从库上回放会导致主从不一致，例如 SQL 中包含`UUID(),USER()`等函数。
+- Row，Binlog 存储的是每一行所有字段变化前后的值。
     - 优点：由于记录了每行每个字段变更前后的值，不会出现`Statement`模式带来的问题。
-    - 缺点：一条SQL可能导致100行产生变化，那么Binlog就会详细记录这100行每个字段变化前后的值，`Statement`模式只需要记录这一条SQL，所以和`Statement`模式相比**可能会产生大量的日志内容**。
-- `Mixed`，混合模式，会对于每一条SQL进行分析，当使用`Statement`模式记录会导致问题时使用`Row`模式记录，例如SQL中包含`UUID(),USER()`等函数会使用`Row`模式。
+    - 缺点：一条 SQL 可能导致 100 行产生变化，那么 Binlog 就会详细记录这 100 行每个字段变化前后的值，`Statement`模式只需要记录这一条 SQL，所以和`Statement`模式相比**可能会产生大量的日志内容**。
+- `Mixed`，混合模式，会对于每一条 SQL 进行分析，当使用`Statement`模式记录会导致问题时使用`Row`模式记录，例如 SQL 中包含`UUID(),USER()`等函数会使用`Row`模式。
 
 ## 三、哪些情况会写Binlog文件？操作没产生表数据变化会写Binlog吗？
 
 ### （一）结论(基于MySQL8.0)
 
-- `Statement`模式下，会记录所有执行成功DDL和DML操作，包括`UPDATE 和 DELETE`操作影响行数为0的情况。
-- `Row`模式下，会记录所有执行成功且返回的影响行数大于0的DDL和DML操作，当`UPDATE 和 DELETE`操作的影响行数为0时不会记录操作至Binlog。
-- Mixed 模式下，当一条SQL分析到应该使用 Statement 模式写Binlog时，按照 Statement 规则，当一条SQL分析到应该使用 Row 模式写Binlog时，按照 Row 规则。
-    - 一条UPDATE中含有USER()函数，且执行成功但操作返回的影响行数为0，由于SQL中含有USER()函数，会按照`Row`规则，故这不会记录至Binlog。
-    - 一条SQL`UPDATE SET NAME = 'kd' WHERE ID = 1`，且ID为1的数据不存在，尽管执行成功且返回的影响行数为0，但这一条SQL会使用`Statement`规则，所以这个操作依然会记录至Binlog。
+- `Statement`模式下，会记录所有执行成功 DDL 和 DML 操作，包括`UPDATE 和 DELETE`操作影响行数为 0 的情况。
+- `Row`模式下，会记录所有执行成功且返回的影响行数大于 0 的 DDL 和 DML 操作，当`UPDATE 和 DELETE`操作的影响行数为 0 时不会记录操作至 Binlog。
+- Mixed 模式下，当一条 SQL 分析到应该使用 Statement 模式写 Binlog 时，按照 Statement 规则，当一条 SQL 分析到应该使用 Row 模式写 Binlog 时，按照 Row 规则。
+    - 一条 UPDATE 中含有 USER()函数，且执行成功但操作返回的影响行数为 0，由于 SQL 中含有 USER()函数，会按照`Row`规则，故这不会记录至 Binlog。
+    - 一条 SQL`UPDATE SET NAME = 'kd' WHERE ID = 1`，且 ID 为 1 的数据不存在，尽管执行成功且返回的影响行数为 0，但这一条 SQL 会使用`Statement`规则，所以这个操作依然会记录至 Binlog。
 
 ### （二）准备环境
 
@@ -90,9 +90,9 @@ Variable_name: binlog_format
 
 **操作步骤**
 
-- 插入：`INSERT INTO TEST VALUES(1,'1');`【记录至Binlog】
-- 修改：`UPDATE TEST SET NAME ='kd' WHERE ID=1;`【记录至Binlog】
-- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【记录至Binlog】
+- 插入：`INSERT INTO TEST VALUES(1,'1');`【记录至 Binlog】
+- 修改：`UPDATE TEST SET NAME ='kd' WHERE ID=1;`【记录至 Binlog】
+- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【记录至 Binlog】
 
 ```sql
 mysql> INSERT INTO `TEST` VALUES(1,'1');
@@ -130,9 +130,9 @@ Variable_name: binlog_format
 
 **操作步骤**
 
-- 插入：`INSERT INTO  TEST  VALUES(3,'3');`【记录至Binlog】
-- 修改：`UPDATE TEST SET NAME ='kd' WHERE ID=3;`【记录至Binlog】
-- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【没有记录至Binlog】
+- 插入：`INSERT INTO  TEST  VALUES(3,'3');`【记录至 Binlog】
+- 修改：`UPDATE TEST SET NAME ='kd' WHERE ID=3;`【记录至 Binlog】
+- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【没有记录至 Binlog】
 
 ```sql
 mysql> INSERT INTO `TEST` VALUES(3,'3');
@@ -149,10 +149,10 @@ Rows matched: 1  Changed: 0  Warnings: 0
 SHOW BINLOG EVENTS IN 'binlog.000003';
 ```
 
-- 对于`Row`模式来说执行成功且返回的影响行数大于0才会记录Binlog，故第三条SQL没有记录Binlog。
-- `Row`模式下需使用Mysqlbinlog工具解析Binlog才能看到详细每行的变化。![image.png](xitujuejing_MySQL%E5%93%AA%E4%BA%9B%E6%93%8D%E4%BD%9C%E4%BC%9A%E8%AE%B0%E5%BD%95%E8%87%B3Binlog%E6%96%87%E4%BB%B6%EF%BC%9F%E6%93%8D%E4%BD%9C%E5%BD%B1%E5%93%8D%E8%A1%8C%E6%95%B0%E4%B8%BA0%E4%BC%9A%E5%86%99Binlog.resource/0dbf487b9c834d6fb9b136c0b6ce9d33~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+- 对于`Row`模式来说执行成功且返回的影响行数大于 0 才会记录 Binlog，故第三条 SQL 没有记录 Binlog。
+- `Row`模式下需使用 Mysqlbinlog 工具解析 Binlog 才能看到详细每行的变化。![image.png](xitujuejing_MySQL%E5%93%AA%E4%BA%9B%E6%93%8D%E4%BD%9C%E4%BC%9A%E8%AE%B0%E5%BD%95%E8%87%B3Binlog%E6%96%87%E4%BB%B6%EF%BC%9F%E6%93%8D%E4%BD%9C%E5%BD%B1%E5%93%8D%E8%A1%8C%E6%95%B0%E4%B8%BA0%E4%BC%9A%E5%86%99Binlog.resource/0dbf487b9c834d6fb9b136c0b6ce9d33~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
 
-`Row`模式下Binlog详情
+`Row`模式下 Binlog 详情
 
 ```shell
 // 通过mysqlbinlog工具解析Binlog文件，因为Binlog是二进制文件直接打开会收获乱码
@@ -225,11 +225,11 @@ Variable_name: binlog_format
 
 **操作步骤**
 
-- 插入：`INSERT INTO `TEST` VALUES(4,'4');`【使用的是`Statement`模式，记录至Binlog】
-- 修改：`UPDATE `TEST`SET`NAME`='kd' WHERE `ID`=4;`【使用的是`Statement`模式，记录至Binlog】
-- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【使用的是`Statement`模式，记录至Binlog】
-- 修改：`UPDATE `TEST`SET`NAME`=USER() WHERE `ID`=4;`【使用的是`Row`模式，记录至Binlog】
-- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【使用的是`Row`模式，没有记录至Binlog】
+- 插入：`INSERT INTO `TEST` VALUES(4,'4');`【使用的是`Statement`模式，记录至 Binlog】
+- 修改：`UPDATE `TEST`SET`NAME`='kd' WHERE `ID`=4;`【使用的是`Statement`模式，记录至 Binlog】
+- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【使用的是`Statement`模式，记录至 Binlog】
+- 修改：`UPDATE `TEST`SET`NAME`=USER() WHERE `ID`=4;`【使用的是`Row`模式，记录至 Binlog】
+- 修改：`再次执行上一步的SQL -〉执行成功但操作的影响行数为0`【使用的是`Row`模式，没有记录至 Binlog】
 
 ```sql
 mysql> INSERT INTO `TEST` VALUES(4,'4');
@@ -255,9 +255,9 @@ SHOW BINLOG EVENTS IN 'binlog.000003';
 复制代码
 ```
 
-- `Mixed`模式下，当一条SQL分析到应该使用`Statement`模式写Binlog时，按照`Statement`规则，当一条SQL分析到应该使用`Row`模式写Binlog时，按照`Row`规则。
-- 一二三条使用SQL使用的是`Statement`，四五条SQL使用的是`Row`。
-- 由于第五条SQL使用的是`Row`，且执行成功但操作的影响行数为0，故不记录Binlog。![image.png](xitujuejing_MySQL%E5%93%AA%E4%BA%9B%E6%93%8D%E4%BD%9C%E4%BC%9A%E8%AE%B0%E5%BD%95%E8%87%B3Binlog%E6%96%87%E4%BB%B6%EF%BC%9F%E6%93%8D%E4%BD%9C%E5%BD%B1%E5%93%8D%E8%A1%8C%E6%95%B0%E4%B8%BA0%E4%BC%9A%E5%86%99Binlog.resource/c58fab439f814a81bb4adb79ef94cd7b~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+- `Mixed`模式下，当一条 SQL 分析到应该使用`Statement`模式写 Binlog 时，按照`Statement`规则，当一条 SQL 分析到应该使用`Row`模式写 Binlog 时，按照`Row`规则。
+- 一二三条使用 SQL 使用的是`Statement`，四五条 SQL 使用的是`Row`。
+- 由于第五条 SQL 使用的是`Row`，且执行成功但操作的影响行数为 0，故不记录 Binlog。![image.png](xitujuejing_MySQL%E5%93%AA%E4%BA%9B%E6%93%8D%E4%BD%9C%E4%BC%9A%E8%AE%B0%E5%BD%95%E8%87%B3Binlog%E6%96%87%E4%BB%B6%EF%BC%9F%E6%93%8D%E4%BD%9C%E5%BD%B1%E5%93%8D%E8%A1%8C%E6%95%B0%E4%B8%BA0%E4%BC%9A%E5%86%99Binlog.resource/c58fab439f814a81bb4adb79ef94cd7b~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
 
 **第四条UPDATE `TEST` SET `NAME`=USER() WHERE `ID`=4;的Binlog详情**
 
@@ -289,9 +289,9 @@ COMMIT/*!*/;
 
 ### 总结
 
-- 由于篇幅有限，没有把DELETE的测试放在文章里面，但DELETE和UPDATE是一致的。
-- `Statement`模式下，会记录所有执行成功DDL和DML操作，包括`UPDATE和DELETE`操作的影响行数为0的情况。
-- `Row`模式下，会记录所有执行成功且返回的影响行数大于0的DDL和DML操作，当`UPDATE和DELETE`操作的影响行数为0时不会记录操作至Binlog。
-- Mixed 模式下，当一条SQL应该使用 Statement 模式写Binlog时，按照 Statement 规则，当一条SQL应该使用 Row 模式写Binlog时，按照Row 规则。
-    - 一条UPDATE中含有USER()函数，且执行成功但操作返回的影响行数为0，由于SQL中含有USER()函数，会按照`Row`规则，故这不会记录至Binlog。
-    - 一条SQL`UPDATE SET NAME = 'kd' WHERE ID = 1`，且ID为1的数据不存在，尽管执行成功且返回的影响行数为0，但这一条SQL会使用`Statement`规则，所以这个操作依然会记录至Binlog。
+- 由于篇幅有限，没有把 DELETE 的测试放在文章里面，但 DELETE 和 UPDATE 是一致的。
+- `Statement`模式下，会记录所有执行成功 DDL 和 DML 操作，包括`UPDATE和DELETE`操作的影响行数为 0 的情况。
+- `Row`模式下，会记录所有执行成功且返回的影响行数大于 0 的 DDL 和 DML 操作，当`UPDATE和DELETE`操作的影响行数为 0 时不会记录操作至 Binlog。
+- Mixed 模式下，当一条 SQL 应该使用 Statement 模式写 Binlog 时，按照 Statement 规则，当一条 SQL 应该使用 Row 模式写 Binlog 时，按照 Row 规则。
+    - 一条 UPDATE 中含有 USER()函数，且执行成功但操作返回的影响行数为 0，由于 SQL 中含有 USER()函数，会按照`Row`规则，故这不会记录至 Binlog。
+    - 一条 SQL`UPDATE SET NAME = 'kd' WHERE ID = 1`，且 ID 为 1 的数据不存在，尽管执行成功且返回的影响行数为 0，但这一条 SQL 会使用`Statement`规则，所以这个操作依然会记录至 Binlog。

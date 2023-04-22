@@ -40,11 +40,11 @@ SELECT city ,COUNT(*) AS num FROM staff GROUP BY city;
 - Extra 这个字段的`Using temporary`表示在执行分组的时候使用了**临时表**
 - Extra 这个字段的`Using filesort`表示使用了**排序**
 
-`group by` 怎么就使用到`临时表和排序`了呢？我们来看下这个SQL的执行流程
+`group by` 怎么就使用到`临时表和排序`了呢？我们来看下这个 SQL 的执行流程
 
 ### （二）group by 的简单执行流程
 
-该 SQL的执行流程大致如下：
+该 SQL 的执行流程大致如下：
 
 - 创建内存临时表，表里有两个字段 `city` 和 `num`；
 
@@ -65,13 +65,13 @@ SELECT city ,COUNT(*) AS num FROM staff GROUP BY city;
 - 如果是`全字段排序`，需要查询返回的字段，都放入`sort buffer`，根据**排序字段**排完，直接返回
 - 如果是`rowid排序`，只是需要排序的字段放入`sort buffer`，然后多一次**回表**操作，再返回。
 
-怎么确定走的是全字段排序还是rowid 排序排序呢？由一个[数据库](https://cloud.tencent.com/solution/database?from=10680)参数控制的，`max_length_for_sort_data`，详见 [**看一遍就理解：order by详解**](https://mp.weixin.qq.com/s?__biz=Mzg3NzU5NTIwNg==&mid=2247490571&idx=1&sn=e8638573ec8d720fd25da5b2b0d90ed2&chksm=cf21c322f8564a34461acd9811730d14d12075cf5c7438a3a11433725b9ce463fcb78e7916a1&token=574771970&lang=zh_CN&scene=21#wechat_redirect)
+怎么确定走的是全字段排序还是 rowid 排序排序呢？由一个[数据库](https://cloud.tencent.com/solution/database?from=10680)参数控制的，`max_length_for_sort_data`，详见 [**看一遍就理解：order by详解**](https://mp.weixin.qq.com/s?__biz=Mzg3NzU5NTIwNg==&mid=2247490571&idx=1&sn=e8638573ec8d720fd25da5b2b0d90ed2&chksm=cf21c322f8564a34461acd9811730d14d12075cf5c7438a3a11433725b9ce463fcb78e7916a1&token=574771970&lang=zh_CN&scene=21#wechat_redirect)
 
 ## 三、where 和 having 的区别
 
 - group by + where 的执行流程
 - group by + having 的执行流程
-- 同时有where、group by 、having的执行顺序
+- 同时有 where、group by 、having 的执行顺序
 
 ### （一）group by + where 的执行流程
 
@@ -102,7 +102,7 @@ explain select city ,count(*) as num from staff where age> 30 group by city;
 
 - 扫描索引树 `idx_age`，找到大于年龄大于 30 的主键 ID
 
-- 通过主键ID，回表找到 `city = 'X'`
+- 通过主键 ID，回表找到 `city = 'X'`
 
     - 判断**临时表**中是否有为 `city='X'` 的行，没有就插入一个记录 (X,1);
 
@@ -140,22 +140,22 @@ select city ,count(*) as num from staff  where age> 19 group by city having num 
 
 - 对 `group by` 子句形成的城市组，运行聚集函数计算每一组的员工数量值；
 
-- 最后用 `having` 子句选出员工数量大于等于3的城市组。
+- 最后用 `having` 子句选出员工数量大于等于 3 的城市组。
 
 ### （四）where + having 区别总结
 
 - `having`子句用于**分组后筛选**，where 子句用于**行**条件筛选
 - `having`一般都是配合`group by` 和聚合函数一起出现如(`count()`,`sum()`,`avg()`,`max()`,`min()`)
 - `where` 条件子句中不能使用聚集函数，而 `having` 子句就可以。
-- `having`只能用在 group by 之后，where 执行在 group by之 前
+- `having`只能用在 group by 之后，where 执行在 group by 之 前
 
 ## 四、使用 group by 注意的问题
 
 使用 group by 主要有这几点需要注意：
 
 - `group by`一定要配合聚合函数一起使用嘛？
-- `group by`的字段一定要出现在select中嘛
-- `group by`导致的慢SQL问题
+- `group by`的字段一定要出现在 select 中嘛
+- `group by`导致的慢 SQL 问题
 
 ###  （一）group by 一定要配合聚合函数使用嘛？
 
@@ -177,7 +177,7 @@ select city,id_card,age from staff group by  city;
 
 ### （二）group by 后面跟的字段是否一定要出现在 select 中。
 
-不一定，比如以下SQL：
+不一定，比如以下 SQL：
 
 ```mysql
 select max(age)  from staff group by city;
@@ -191,15 +191,15 @@ select max(age)  from staff group by city;
 
 ## （三）group by 导致的慢 SQL 问题
 
-group by 使用不当，很容易就会产生慢SQL 问题。因为它既用到**临时表**，又默认用到**排序**。有时候还可能用到**磁盘临时表**。
+group by 使用不当，很容易就会产生慢 SQL 问题。因为它既用到**临时表**，又默认用到**排序**。有时候还可能用到**磁盘临时表**。
 
 - 如果执行过程中，会发现内存临时表大小到达了**上限**（控制这个上限的参数就是 `tmp_table_size`），会把**内存临时表转成磁盘临时表**。
 - 如果数据量很大，很可能这个查询需要的磁盘临时表，就会占用大量的磁盘空间。
 
 ## 五、group by 的一些优化方案
 
-- 优化方向1：既然默认会排序，不给它排是不是就行。
-- 优化方向2：既然临时表是影响 group by 性能的因素，是不是可以不用临时表
+- 优化方向 1：既然默认会排序，不给它排是不是就行。
+- 优化方向 2：既然临时表是影响 group by 性能的因素，是不是可以不用临时表
 
 执行 `group by` 语句为什么需要临时表呢？`group by` 的语义逻辑，就是统计不同的值出现的个数。如果这个**这些值一开始就是有序的**，我们是不是直接往下扫描统计就好了，就不用**临时表来记录并统计结果**啦?
 
@@ -212,7 +212,7 @@ group by 使用不当，很容易就会产生慢SQL 问题。因为它既用到*
 
 如何保证`group by`后面的字段数值一开始就是有序的呢？当然就是**加索引**啦。
 
-我们回到一下这个SQL
+我们回到一下这个 SQL
 
 ```mysql
 select city ,count(*) as num from staff where age= 19 group by city;
@@ -256,9 +256,9 @@ select city ,count(*) as num from staff group by city order by null
 
 如果数据量实在太大怎么办呢？总不能无限调大`tmp_table_size`吧？但也不能眼睁睁看着数据先放到内存临时表，**随着数据插入**发现到达上限，再转成磁盘临时表吧？这样就有点不智能啦。
 
-因此，如果预估数据量比较大，我们使用`SQL_BIG_RESULT` 这个提示直接用磁盘临时表。MySQl优化器发现，磁盘临时表是B+树存储，存储效率不如数组来得高。因此会直接用数组来存
+因此，如果预估数据量比较大，我们使用`SQL_BIG_RESULT` 这个提示直接用磁盘临时表。MySQl 优化器发现，磁盘临时表是 B+树存储，存储效率不如数组来得高。因此会直接用数组来存
 
-示例SQl如下：
+示例 SQl 如下：
 
 ```javascript
 select SQL_BIG_RESULT city ,count(*) as num from staff group by city;
@@ -270,15 +270,15 @@ select SQL_BIG_RESULT city ,count(*) as num from staff group by city;
 
 执行流程如下：
 
-1. 初始化 sort_buffer，放入city字段；
-2. 扫描表staff，依次取出city的值,存入 sort_buffer 中；
-3. 扫描完成后，对 sort_buffer的city字段做排序
+1. 初始化 sort_buffer，放入 city 字段；
+2. 扫描表 staff，依次取出 city 的值,存入 sort_buffer 中；
+3. 扫描完成后，对 sort_buffer 的 city 字段做排序
 4. 排序完成后，就得到了一个有序数组。
 5. 根据有序数组，统计每个值出现的次数。
 
 ## **6. 一个生产慢SQL如何优化** 
 
-最近遇到个生产慢SQL，跟group by相关的，给大家看下怎么优化哈。
+最近遇到个生产慢 SQL，跟 group by 相关的，给大家看下怎么优化哈。
 
 表结构如下：
 
@@ -296,11 +296,11 @@ CREATE TABLE `staff` (
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT='员工表';
 ```
 
-查询的SQL是这样的：
+查询的 SQL 是这样的：
 
 ```javascript
 select * from t1 where status = #{status} group by #{legal_cert_no}
 ```
 
-我们先不去探讨这个SQL的=是否合理。如果就是这么个SQL，你会怎么优化呢？有想法的小伙伴可以留言讨论哈，也可以加我微信加群探讨。如果你觉得文章那里写得不对，也可以提出来哈，一起进步，加油呀
+我们先不去探讨这个 SQL 的=是否合理。如果就是这么个 SQL，你会怎么优化呢？有想法的小伙伴可以留言讨论哈，也可以加我微信加群探讨。如果你觉得文章那里写得不对，也可以提出来哈，一起进步，加油呀
 

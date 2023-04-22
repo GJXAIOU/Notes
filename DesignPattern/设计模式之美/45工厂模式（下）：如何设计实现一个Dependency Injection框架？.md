@@ -47,7 +47,7 @@ public class RedisCounter {
 }
 ```
 
-配置文件beans.xml：
+配置文件 beans.xml：
 
 ```xml
 <beans>
@@ -83,7 +83,7 @@ public class RedisCounter {
 
 因为我们主要是讲解设计模式，所以，在今天的讲解中，我们只实现一个 DI 容器的最小原型。像 Spring 框架这样的 DI 容器，它支持的配置格式非常灵活和复杂。为了简化代码实现，重点讲解原理，在最小原型中，我们只支持下面配置文件中涉及的配置语法。
 
-配置文件beans.xml  
+配置文件 beans.xml  
 
 ```xml
 <beans>
@@ -158,7 +158,7 @@ public class ClassPathXmlApplicationContext implements ApplicationContext {
 }
 ```
 
-从上面的代码中，我们可以看出，ClassPathXmlApplicationContext 负责组装BeansFactory 和 BeanConfigParser 两个类，串联执行流程：从 classpath 中加载 XML 格式的配置文件，通过 BeanConfigParser 解析为统一的 BeanDefinition 格式，然后， BeansFactory 根据 BeanDefinition 来创建对象。
+从上面的代码中，我们可以看出，ClassPathXmlApplicationContext 负责组装 BeansFactory 和 BeanConfigParser 两个类，串联执行流程：从 classpath 中加载 XML 格式的配置文件，通过 BeanConfigParser 解析为统一的 BeanDefinition 格式，然后， BeansFactory 根据 BeanDefinition 来创建对象。
 
 ## 配置文件解析
 
@@ -395,7 +395,7 @@ BeansFactory 类中的 createBean() 函数是一个递归函数。当构造函�
 >
 > 2020-02-24
 
-1.  我理解spring 解决A和B对象的循环引用是这样的流程是这样的，假设先加载A，丢一个A的引用到一个引用map&lt;id, ref&gt;，发现A有一个filed 引用B，就初始化B，丢一个B的引用到Map，初始化发现需要一个A，就从map里面找，找到了一个A，就把A的引用丢给B 的属性，然后B加载结束了，A继续加载，拿到map里面的B，加载完成。
+1.  我理解 spring 解决 A 和 B 对象的循环引用是这样的流程是这样的，假设先加载 A，丢一个 A 的引用到一个引用 map&lt;id, ref&gt;，发现 A 有一个 filed 引用 B，就初始化 B，丢一个 B 的引用到 Map，初始化发现需要一个 A，就从 map 里面找，找到了一个 A，就把 A 的引用丢给 B 的属性，然后 B 加载结束了，A 继续加载，拿到 map 里面的 B，加载完成。
 
 > 展开
 
@@ -433,7 +433,7 @@ BeansFactory 类中的 createBean() 函数是一个递归函数。当构造函�
 
 1.  会导致堆栈溢出
 
-2.  想到的办法是检测有向无环图，但真实的项目中一定会有循环依赖，如何解决这个问题，看了一下\*Spring\*中是通过\*setter\*依赖的方法来解决的，使用了3级缓存。…
+2.  想到的办法是检测有向无环图，但真实的项目中一定会有循环依赖，如何解决这个问题，看了一下\*Spring\*中是通过\*setter\*依赖的方法来解决的，使用了 3 级缓存。…
 
 > 展开
 
@@ -457,7 +457,7 @@ BeansFactory 类中的 createBean() 函数是一个递归函数。当构造函�
 >
 > 20200218再次复习：
 
-1.  研究了Spring容器中处理循环依赖的知识点：（1）只能处理单例的、setter注入的循环依赖，其他的注入模式无法处理；（2）依赖缓存处理循环依赖，关键思想是，将正在创建中的对象提前暴露一个单例工厂，让其他实例可以引用到
+1.  研究了 Spring 容器中处理循环依赖的知识点：（1）只能处理单例的、setter 注入的循环依赖，其他的注入模式无法处理；（2）依赖缓存处理循环依赖，关键思想是，将正在创建中的对象提前暴露一个单例工厂，让其他实例可以引用到
 
 2.  网上一篇比较好的文章：https://juejin.im/post/5d0d8f64f265da1b7b3193ac
 
@@ -525,7 +525,7 @@ BeansFactory 类中的 createBean() 函数是一个递归函数。当构造函�
 >
 > 感谢分享，尝试回答下课堂讨论
 
-1.  scope = singleton 情况下是不会的，递归方法里如果存在了bean 则会直接返回。 如果是prototype 则需要每次调用都new出一个对象来，可能存在风险，spring 是怎么规避这个问题的，需要研究下代码。
+1.  scope = singleton 情况下是不会的，递归方法里如果存在了 bean 则会直接返回。 如果是 prototype 则需要每次调用都 new 出一个对象来，可能存在风险，spring 是怎么规避这个问题的，需要研究下代码。
 
 2.  ref 文中的实现目测没有检查 ref 的类型是否和对象的属性类型是否一致。
 

@@ -6,7 +6,7 @@
 
 其实 MapReduce 编程模型并不是 Hadoop 原创，甚至也不是 Google 原创，但是 Google 和 Hadoop 创造性地将 MapReduce 编程模型用到大数据计算上，立刻产生了神奇的效果，看似复杂的各种各样的机器学习、数据挖掘、SQL 处理等大数据计算变得简单清晰起来。
 
-今天我们就来聊聊Hadoop 解决大规模数据分布式计算的方案——MapReduce。
+今天我们就来聊聊 Hadoop 解决大规模数据分布式计算的方案——MapReduce。
 
 在我看来，**MapReduce 既是一个编程模型，又是一个计算框架**。也就是说，开发人员必须基于 MapReduce 编程模型进行编程开发，然后将程序通过 MapReduce 计算框架分发到 Hadoop 集群中运行。我们先看一下作为编程模型的 MapReduce。
 
@@ -181,7 +181,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **16
 
-  把pageID和age当做key计算出现的次数并做汇总，然后对key排序，输出排序后的key和其对应的总次数
+  把 pageID 和 age 当做 key 计算出现的次数并做汇总，然后对 key 排序，输出排序后的 key 和其对应的总次数
 
 - 
 
@@ -207,7 +207,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
     val lines = sc.textFile("file:///e:/pv_users.txt")
     //拼接成（1_25,1）的形式
     val newKeyValue = lines.map(_.split(",")).map(pvdata => ((pvdata(0)+ "_" + pvdata(1)),1))
-    //对上述KV进行统计
+    //对上述 KV 进行统计
     val pvcount = newKeyValue.reduceByKey(_ + _)
     //将拼接符号去掉，组合成形如(1,25,1)的形式
     val pvid_age_count = pvcount.map(newkv => (newkv._1.split("_")(0),newkv._1.split("_")(1),newkv._2))
@@ -232,9 +232,9 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **9
 
-  单机安装伪hadoop集群
+  单机安装伪 hadoop 集群
   见：https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html
-  注：在Mac中安装遇到了一些问题 但是google一下就能解决 恕不一一道来
+  注：在 Mac 中安装遇到了一些问题 但是 google 一下就能解决 恕不一一道来
 
   思考题解答步骤
   cat pv_users
@@ -243,11 +243,11 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
   1,32
   2,25
 
-  \# 导入该文件到dfs中
+  \# 导入该文件到 dfs 中
   bin/hdfs dfs -put pv_users pv_users
 
-  \# 因为每一行只有pageid, age并且中间没有空格 可以直接利用hadoop自带的wordcount程序
-  \# 读取dfs中的pv_user文件 进行统计 然后将结果输出到pv_users_count中
+  \# 因为每一行只有 pageid, age 并且中间没有空格 可以直接利用 hadoop 自带的 wordcount 程序
+  \# 读取 dfs 中的 pv_user 文件 进行统计 然后将结果输出到 pv_users_count 中
   bin/yarn jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.9.1.jar wordcount pv_users pv_users_count
   \# 读取统计结果
   bin/hdfs dfs -cat pv_users_count/part-r-00000
@@ -267,7 +267,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **7
 
-  将pageid和 age拼接成字符串当做一个key，然后通过Map和Reduce计算即可得出对应的count
+  将 pageid 和 age 拼接成字符串当做一个 key，然后通过 Map 和 Reduce 计算即可得出对应的 count
 
 - 
 
@@ -339,7 +339,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
   hadoop jar page-1.0-SNAPSHOT.jar PageMain /input/page /output5
   ps：第一次运行报错了~~（不练不知道）
   错误：Initialization of all the collectors failed. Error in last collector was :interface javax.xml.soap.
-  原因：编写Main的时候，Text的引用import错了，习惯了弹出提示直接确定~应该导入`import org.apache.hadoop.io.Text;`
+  原因：编写 Main 的时候，Text 的引用 import 错了，习惯了弹出提示直接确定~应该导入`import org.apache.hadoop.io.Text;`
 
   展开**
 
@@ -353,9 +353,9 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **5
 
-  我想问一下那个计算过程的示意图里map输入部分，上面的是0，12，下面是0，13，是啥意思？
+  我想问一下那个计算过程的示意图里 map 输入部分，上面的是 0，12，下面是 0，13，是啥意思？
 
-  作者回复: map函数输入的key，表示这行数据在文件中的偏移量，通常忽略掉
+  作者回复: map 函数输入的 key，表示这行数据在文件中的偏移量，通常忽略掉
 
 - 
 
@@ -403,7 +403,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **2
 
-  老师，我是大数据初学者，除了编程语言本身的，可以推荐一些书籍或者资料辅助这个专栏的学习吗，像hadoop相关类的，这期的代码看不懂了。
+  老师，我是大数据初学者，除了编程语言本身的，可以推荐一些书籍或者资料辅助这个专栏的学习吗，像 hadoop 相关类的，这期的代码看不懂了。
 
 - 
 
@@ -413,7 +413,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **2
 
-  这个如果在复杂或者高级一点，就需要用mapreduce的序列化对象作为key的功能去实现了，最近也在学习大数据，学的时候感觉找到了sql的本质，记得公司前年的项目就是手写了一堆js函数，实现了mongodb的类似sql的分组聚合操作。
+  这个如果在复杂或者高级一点，就需要用 mapreduce 的序列化对象作为 key 的功能去实现了，最近也在学习大数据，学的时候感觉找到了 sql 的本质，记得公司前年的项目就是手写了一堆 js 函数，实现了 mongodb 的类似 sql 的分组聚合操作。
   后续可以开设视频的专栏就更好了
 
   展开**
@@ -426,7 +426,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **2
 
-  mapreduce核心思想就跟传统的SQL中的group by一样
+  mapreduce 核心思想就跟传统的 SQL 中的 group by 一样
 
   展开**
 
@@ -438,7 +438,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **2
 
-  我的思路和前面几个同学的类似，就是把文本直接当做key，value使用数字统计，最后就是通过reduce统计出现次数了
+  我的思路和前面几个同学的类似，就是把文本直接当做 key，value 使用数字统计，最后就是通过 reduce 统计出现次数了
 
   作者回复: 是的
 
@@ -450,9 +450,9 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **2
 
-  对于大数据来说是盲区，如果应用直接往hbase中写可以吗？2.5万的并发。hbase可以满足我们的查询需求吗？还有日志分析
+  对于大数据来说是盲区，如果应用直接往 hbase 中写可以吗？2.5 万的并发。hbase 可以满足我们的查询需求吗？还有日志分析
 
-  作者回复: 你可能需要一个完整的技术架构方案，而不只是HBASE能不能搞定的问题，建议你看下我写另一本书《大型网站技术架构：核心原理与案例分析》，专栏后面也会对大数据架构有各个角度的探讨，欢迎持续关注
+  作者回复: 你可能需要一个完整的技术架构方案，而不只是 HBASE 能不能搞定的问题，建议你看下我写另一本书《大型网站技术架构：核心原理与案例分析》，专栏后面也会对大数据架构有各个角度的探讨，欢迎持续关注
 
 - 
 
@@ -462,7 +462,7 @@ TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨
 
   **2
 
-  老师关于抽象是洞察事物本质的总结很精辟。关于思考题，我的思路是把pageid+age作为map函数计算key值，value分别是1。然后reduce再根据key对value的集合进行sum。就可以得出sql的结果。
+  老师关于抽象是洞察事物本质的总结很精辟。关于思考题，我的思路是把 pageid+age 作为 map 函数计算 key 值，value 分别是 1。然后 reduce 再根据 key 对 value 的集合进行 sum。就可以得出 sql 的结果。
 
   展开**
 

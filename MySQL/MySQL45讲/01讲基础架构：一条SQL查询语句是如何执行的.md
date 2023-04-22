@@ -76,7 +76,7 @@ mysql> select SQL_CACHE * from T where ID=10；
 
 - 识别完成之后，就要做「**语法分析**」。根据词法分析的结果，语法分析器会根据语法规则，**判断你输入的这个 SQL 语句是否满足 MySQL 语法。**
 
-    如果你的语句不对，就会收到「You have an error in your SQL syntax（语法/语句）」的错误提醒，比如下面这个语句select 少打了开头的字母“s”。
+    如果你的语句不对，就会收到「You have an error in your SQL syntax（语法/语句）」的错误提醒，比如下面这个语句 select 少打了开头的字母“s”。
 
     ```mysql
     mysql> elect * from t where ID=1;
@@ -88,9 +88,9 @@ mysql> select SQL_CACHE * from T where ID=10；
 
 ### （四）优化器
 
-经过了分析器，MySQL就知道你要做什么了。在开始执行之前，还要先经过优化器的处理。
+经过了分析器，MySQL 就知道你要做什么了。在开始执行之前，还要先经过优化器的处理。
 
-**优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接顺序。**比如你执行下面这样的语句，这个语句是执行两个表的join：
+**优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接顺序。**比如你执行下面这样的语句，这个语句是执行两个表的 join：
 
 ```mysql
 mysql> select * from t1 join t2 using(ID)  where t1.c=10 and t2.d=20;
@@ -139,7 +139,7 @@ ERROR 1142 (42000): SELECT command denied to user 'b'@'localhost' for table 'T'
 
 ### （六）问题
 
-如果表T中没有字段k，而你执行了这个语句 select * from T where k=1, 那肯定是会报「不存在这个列」的错误： “Unknown column ‘k’ in ‘where clause’”。你觉得这个错误是在我们上面提到的哪个阶段报出来的呢？
+如果表 T 中没有字段 k，而你执行了这个语句 select * from T where k=1, 那肯定是会报「不存在这个列」的错误： “Unknown column ‘k’ in ‘where clause’”。你觉得这个错误是在我们上面提到的哪个阶段报出来的呢？
 
 **分析器**：在分析阶段判断语句是否正确，表是否存在，列是否存在等
 

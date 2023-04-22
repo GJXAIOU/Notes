@@ -115,7 +115,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **22
 
-  jupyter notebook应该算是一个。
+  jupyter notebook 应该算是一个。
 
   展开**
 
@@ -151,7 +151,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **9
 
-  技术嫁接，我还真搞过2个，1个是selenium + 网上找的代码改本机host 实现 自动测试线上的每台机器的功能，另外1个是 java agent + jd-core （一个反编译软件的底层库）实现profile 监控同时能显示线上跑的真实的代码内容
+  技术嫁接，我还真搞过 2 个，1 个是 selenium + 网上找的代码改本机 host 实现 自动测试线上的每台机器的功能，另外 1 个是 java agent + jd-core （一个反编译软件的底层库）实现 profile 监控同时能显示线上跑的真实的代码内容
 
   展开**
 
@@ -165,7 +165,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **7
 
-  Jekins之类的持续集成工具，集成了非常多的工具及模块，比如sonar,git,mail等
+  Jekins 之类的持续集成工具，集成了非常多的工具及模块，比如 sonar,git,mail 等
 
 - 
 
@@ -181,7 +181,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
   import org.apache.spark.{SparkConf, SparkContext}
 
   /**
-   \* 使用Spark Core的算子实现简单的join操作
+   \* 使用 Spark Core 的算子实现简单的 join 操作
    */
   object JoinBySpark {
    def main(args: Array[String]): Unit = {
@@ -228,7 +228,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **5
 
-  老师，您好！hive on spark跟spark sql on hive性能上会一样吗，这两种方案怎么选型
+  老师，您好！hive on spark 跟 spark sql on hive 性能上会一样吗，这两种方案怎么选型
 
 - 
 
@@ -241,7 +241,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
   李老师 在跟着学的过程中 基本上都是现学的 比如 hive
   https://cwiki.apache.org/confluence/display/Hive/GettingStarted
 
-  在学习课程的过程中 是不是先不用对涉及到的这些大数据技术 如hdfs yarn hive等去做深入了解 只需跑一下GettingStared即可 即有个概念
+  在学习课程的过程中 是不是先不用对涉及到的这些大数据技术 如 hdfs yarn hive 等去做深入了解 只需跑一下 GettingStared 即可 即有个概念
 
   展开**
 
@@ -255,7 +255,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **2
 
-  多种技术组合而成的软件产品太多了，比如:语音识别技术与搜索引擎技术组合成语音识别技术，比如iphone上的siri 。还有人脸识别技术与监控技术结合及公安系统组合，就可以马路闯红灯，直接暴露闯红灯的身份。
+  多种技术组合而成的软件产品太多了，比如:语音识别技术与搜索引擎技术组合成语音识别技术，比如 iphone 上的 siri 。还有人脸识别技术与监控技术结合及公安系统组合，就可以马路闯红灯，直接暴露闯红灯的身份。
 
   展开**
 
@@ -267,10 +267,10 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **1
 
-  大数据框架可以执行sql,能执行sql的框架有hadoop的hive spark的sparkSQL,sparkSQL的执行速度要快于hive,
-  由于大数据框架能执行sql那么是不是可以把这个框架当做数据库来看待?java就能调用大数据服务操作数据了?
+  大数据框架可以执行 sql,能执行 sql 的框架有 hadoop 的 hive spark 的 sparkSQL,sparkSQL 的执行速度要快于 hive,
+  由于大数据框架能执行 sql 那么是不是可以把这个框架当做数据库来看待?java 就能调用大数据服务操作数据了?
 
-  作者回复: 可以呀，hive就有jdbc供java调用
+  作者回复: 可以呀，hive 就有 jdbc 供 java 调用
 
 - 
 
@@ -280,7 +280,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **1
 
-  当初接触到ajax时就觉得很神奇，了解其实现原理后发现就是已有的两个技术（Javascript+xml）相结合后产生的技术魅力，这就是1+1>2的效果
+  当初接触到 ajax 时就觉得很神奇，了解其实现原理后发现就是已有的两个技术（Javascript+xml）相结合后产生的技术魅力，这就是 1+1>2 的效果
 
 - 
 
@@ -290,7 +290,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **1
 
-  openstack把各个功粘合在一起，话说openstack我们要学吗？怎么判断一个工具需要不需要学习？还有一个特迷茫的事，30多岁学编程，大数据，没经验，能找到工作吗？😂😂
+  openstack 把各个功粘合在一起，话说 openstack 我们要学吗？怎么判断一个工具需要不需要学习？还有一个特迷茫的事，30 多岁学编程，大数据，没经验，能找到工作吗？😂😂
 
   展开**
 
@@ -302,7 +302,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **1
 
-  springboot 内置了tomcat 我们无需再为应用配置一个tomcat ，把tomcat嫁接到springboot上。 我看最新的http3.0就是用基于UDP协议的…… 这也算是一种嫁接吧
+  springboot 内置了 tomcat 我们无需再为应用配置一个 tomcat ，把 tomcat 嫁接到 springboot 上。 我看最新的 http3.0 就是用基于 UDP 协议的…… 这也算是一种嫁接吧
 
   展开**
 
@@ -328,7 +328,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **1
 
-  Spring Cloud将各种微服务的基础设施集成在一起，Spring Boot简化应用配置和管理依赖，这两者结合在一起，使得微服务应用能够快速开发和构建
+  Spring Cloud 将各种微服务的基础设施集成在一起，Spring Boot 简化应用配置和管理依赖，这两者结合在一起，使得微服务应用能够快速开发和构建
 
 - 
 
@@ -380,7 +380,7 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **
 
-  “在我们工作中也可以借鉴一下这种将两种技术嫁接到一起产生极大应用创新性的手段，说不定下一个做出类似Hive这种具有巨大应用价值的产品的人就是你！”老师的这句话好振奋人心啊！
+  “在我们工作中也可以借鉴一下这种将两种技术嫁接到一起产生极大应用创新性的手段，说不定下一个做出类似 Hive 这种具有巨大应用价值的产品的人就是你！”老师的这句话好振奋人心啊！
 
   展开**
 
@@ -394,6 +394,6 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   **
 
-  postgresql 数据库支持json数据类型，将结构化数据和非结构化数据整合在一起。
+  postgresql 数据库支持 json 数据类型，将结构化数据和非结构化数据整合在一起。
 
 收藏

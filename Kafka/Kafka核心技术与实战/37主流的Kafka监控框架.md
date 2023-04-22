@@ -167,7 +167,7 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-28
 
-  请求积压，监控两个idle就好吧？但是具体哪些请求积压和哪些ip的请求，这块还不清楚，求指教。
+  请求积压，监控两个 idle 就好吧？但是具体哪些请求积压和哪些 ip 的请求，这块还不清楚，求指教。
 
   作者回复: 目前只能监控是否存在请求积压，无法确认到底是那些请求积压的
 
@@ -181,9 +181,9 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-28
 
-  你好，我们生产request handle idle过低的原因找到了，是由于磁盘坏道导致的？能否加些关于kafkaApi的监控？看下请求的分布情况及哪些请求占用requesthandler过多吗？
+  你好，我们生产 request handle idle 过低的原因找到了，是由于磁盘坏道导致的？能否加些关于 kafkaApi 的监控？看下请求的分布情况及哪些请求占用 requesthandler 过多吗？
 
-  作者回复: 好问题！hmm.... 目前暂时做不到或者非常不方便。你可以启动KafkaApis的TRACE日志，然后汇总统计哪类请求占用了过多的线层
+  作者回复: 好问题！hmm.... 目前暂时做不到或者非常不方便。你可以启动 KafkaApis 的 TRACE 日志，然后汇总统计哪类请求占用了过多的线层
 
   **1
 
@@ -195,7 +195,7 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-27
 
-  前公司携程grafana用的就很好
+  前公司携程 grafana 用的就很好
 
   展开**
 
@@ -209,7 +209,7 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-27
 
-  监控records-lag-max 和 records-lead-min，它们分别表示此消费者在测试窗口时间内曾经达到的最大的 Lag 值和最小的 Lead 值。
+  监控 records-lag-max 和 records-lead-min，它们分别表示此消费者在测试窗口时间内曾经达到的最大的 Lag 值和最小的 Lead 值。
 
   展开**
 
@@ -223,7 +223,7 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-27
 
-  感觉Grafana+InfluxDB这一套，可以用于任何语言，还可以自定义接口出来加入监控。
+  感觉 Grafana+InfluxDB 这一套，可以用于任何语言，还可以自定义接口出来加入监控。
 
   **
 
@@ -235,7 +235,7 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-27
 
-  Kafka Eagle会导致zookeeper连接占满不释放
+  Kafka Eagle 会导致 zookeeper 连接占满不释放
 
   展开**
 
@@ -249,11 +249,11 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-27
 
-  老师 生产环境建议用confluent免费版本的kafka么 比如5.3版本基于apache kafka 2.3的？我们想自己搭kafka 在confluent和apache里面选一个，都是免费的
+  老师 生产环境建议用 confluent 免费版本的 kafka 么 比如 5.3 版本基于 apache kafka 2.3 的？我们想自己搭 kafka 在 confluent 和 apache 里面选一个，都是免费的
 
   展开**
 
-  作者回复: confluent免费版不错的，可以用：）
+  作者回复: confluent 免费版不错的，可以用：）
 
   **
 
@@ -265,7 +265,7 @@ $GOPATH/bin/Burrow --config-dir /path/containing/config
 
   2019-08-27
 
-  老师，Kafka Manager貌似不支持Kafka 2.x版本吧
+  老师，Kafka Manager 貌似不支持 Kafka 2.x 版本吧
 
   展开**
 

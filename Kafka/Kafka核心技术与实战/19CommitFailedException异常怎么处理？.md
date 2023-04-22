@@ -92,11 +92,11 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  老师，1、请问Standalone Consumer 的独立消费者一般什么情况会用到
+  老师，1、请问 Standalone Consumer 的独立消费者一般什么情况会用到
   2、Standalone Consumer 的独立消费者 使用跟普通消费者组有什么区别的。
 
-  作者回复: 1. 很多流处理框架的Kafka connector都没有使用consumer group，而是直接使用standalone consumer，因为group机制不好把控
-  \2. standalone consumer没有rebalance，也没有group提供的负载均衡，你需要自己实现。其他方面（比如位移提交）和group没有太大的不同
+  作者回复: 1. 很多流处理框架的 Kafka connector 都没有使用 consumer group，而是直接使用 standalone consumer，因为 group 机制不好把控
+  \2. standalone consumer 没有 rebalance，也没有 group 提供的负载均衡，你需要自己实现。其他方面（比如位移提交）和 group 没有太大的不同
 
   **
 
@@ -108,7 +108,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-17
 
-  max.poll.interval.ms是指两次poll()的最大间隔时间，kafka消费者以轮询的方式来拉取消息，并且一次拉取批量的消息（默认500条），而批量的大小是通过max.poll.records来控制的。两次poll()的实际时间取决于 单条消息的处理时间*一次拉取的消息量（500），当超过max.poll.interval.ms配置的时间Kafka server认为kafka consumer掉线了，于是就执行分区再均衡将这个consumer踢出消费者组。但是consumer又不知道服务端把自己给踢出了，下次在执行poll()拉取消息的时候（在poll()拉取消息之前有个自动提交offset的操作），就会触发该问题。 可见第2,3种方案是通过调整Kafka consumer的配置参数来缩短业务总的处理时间或者增加服务端判断时长，比较容易实现；第1种就跟业务有关了，比较难搞，有些业务可能就是要这么长的时间，很难再缩短；第4种方案就更复杂了，要把同步消息转换成异步，交给其它线程来处理，这时需要把auto.commit.enable=false，手动提交offset，并且consumer是线程不安全的，异步线程何时处理完，何时该提交，在哪提交，也是应用需要考虑的问题！希望胡老师针对第4种方案重点探讨一下！
+  max.poll.interval.ms 是指两次 poll()的最大间隔时间，kafka 消费者以轮询的方式来拉取消息，并且一次拉取批量的消息（默认 500 条），而批量的大小是通过 max.poll.records 来控制的。两次 poll()的实际时间取决于 单条消息的处理时间*一次拉取的消息量（500），当超过 max.poll.interval.ms 配置的时间 Kafka server 认为 kafka consumer 掉线了，于是就执行分区再均衡将这个 consumer 踢出消费者组。但是 consumer 又不知道服务端把自己给踢出了，下次在执行 poll()拉取消息的时候（在 poll()拉取消息之前有个自动提交 offset 的操作），就会触发该问题。 可见第 2,3 种方案是通过调整 Kafka consumer 的配置参数来缩短业务总的处理时间或者增加服务端判断时长，比较容易实现；第 1 种就跟业务有关了，比较难搞，有些业务可能就是要这么长的时间，很难再缩短；第 4 种方案就更复杂了，要把同步消息转换成异步，交给其它线程来处理，这时需要把 auto.commit.enable=false，手动提交 offset，并且 consumer 是线程不安全的，异步线程何时处理完，何时该提交，在哪提交，也是应用需要考虑的问题！希望胡老师针对第 4 种方案重点探讨一下！
 
   展开**
 
@@ -122,12 +122,12 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  老师，我想问下max.poll.interval.ms两者session.timeout.ms有什么联系，可以说0.10.1.0 之前的客户端 API，相当于session.timeout.ms代替了max.poll.interval.ms吗？
-  比如说session.timeout.ms是5秒，如果消息处理超过5秒，也算是超时吗？
+  老师，我想问下 max.poll.interval.ms 两者 session.timeout.ms 有什么联系，可以说 0.10.1.0 之前的客户端 API，相当于 session.timeout.ms 代替了 max.poll.interval.ms 吗？
+  比如说 session.timeout.ms 是 5 秒，如果消息处理超过 5 秒，也算是超时吗？
 
   展开**
 
-  作者回复: 嗯，我更愿意说是max.poll.interval.ms承担了session.timeout.ms的部分功能。在没有max.poll.interval.ms和单独的心跳线程之前，如果session.timeout.ms = 5s，消息处理超过了5s，那么consumer就算是超时
+  作者回复: 嗯，我更愿意说是 max.poll.interval.ms 承担了 session.timeout.ms 的部分功能。在没有 max.poll.interval.ms 和单独的心跳线程之前，如果 session.timeout.ms = 5s，消息处理超过了 5s，那么 consumer 就算是超时
 
   **1
 
@@ -139,13 +139,13 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-19
 
-  老师，请教2个问题，谢谢!
-  我想问下0.10.1.0之后的session.timeout.ms还有什么作用呢？
-  standalone consumer和group consumer在配置上如何区分?
+  老师，请教 2 个问题，谢谢!
+  我想问下 0.10.1.0 之后的 session.timeout.ms 还有什么作用呢？
+  standalone consumer 和 group consumer 在配置上如何区分?
 
   展开**
 
-  作者回复: 用于侦测会话超时。standalone consumer和group的区分体现在API上
+  作者回复: 用于侦测会话超时。standalone consumer 和 group 的区分体现在 API 上
 
   **
 
@@ -159,7 +159,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   [2019-07-17 18:53:36,230] ERROR [ReplicaManager broker=2] Error processing append operation on partition __consumer_offsets-49 (kafka.server.ReplicaManager)
   org.apache.kafka.common.errors.NotEnoughReplicasException: The size of the current ISR Set(2) is insufficient to satisfy the min.isr requirement of 2 for partition __consumer_offsets-49
-  把min.insync.replicas = 2改成1，消费者就可以运行了，这种flower失效的情况怎么处理呢？
+  把 min.insync.replicas = 2 改成 1，消费者就可以运行了，这种 flower 失效的情况怎么处理呢？
 
   展开**
 
@@ -173,7 +173,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-17
 
-  老师，kafka报错，哪个论坛比较火？
+  老师，kafka 报错，哪个论坛比较火？
 
   展开**
 
@@ -187,9 +187,9 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-17
 
-  请问如何计算单条消息处理的时间， 比如收到一条消息之后要调用A,B,C,D,E 五个方法处理，其中处理完B,E之后将结果发给别的kafka，处理时间是处理完A,B时间还是处理完A,B,C,D,E 的总时间？
+  请问如何计算单条消息处理的时间， 比如收到一条消息之后要调用 A,B,C,D,E 五个方法处理，其中处理完 B,E 之后将结果发给别的 kafka，处理时间是处理完 A,B 时间还是处理完 A,B,C,D,E 的总时间？
 
-  作者回复: 这取决于你对如何才算处理完一条消息的定义。另外从Kafka中拿到消息后剩下的事情就完全由你负责了，因此如何计算处理时间应该是你说了算的：）
+  作者回复: 这取决于你对如何才算处理完一条消息的定义。另外从 Kafka 中拿到消息后剩下的事情就完全由你负责了，因此如何计算处理时间应该是你说了算的：）
 
   **
 
@@ -201,7 +201,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  我在线上也遇到这个问题，想问一下老师：在新的consumer加入，发生repartition的时候，是否也会抱这个错，谢谢了！
+  我在线上也遇到这个问题，想问一下老师：在新的 consumer 加入，发生 repartition 的时候，是否也会抱这个错，谢谢了！
 
   展开**
 
@@ -215,7 +215,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  老师我这边遇到了一个奇怪的情况，kafka生成者发送消息能创建topic,但是消息怎么都发不上去broker。并且在kafka-logs底下有一个和刚刚那条消息key值一样的文件夹,
+  老师我这边遇到了一个奇怪的情况，kafka 生成者发送消息能创建 topic,但是消息怎么都发不上去 broker。并且在 kafka-logs 底下有一个和刚刚那条消息 key 值一样的文件夹,
 
   并且打印出如下的日志：
   [2019-07-16 22:34:16,380] INFO [Log partition=23bb7ffd-4aa5-42e2-9d84-c90f4566c15b-2, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.Log)
@@ -224,7 +224,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   展开**
 
-  作者回复: 这都是info级别的log，没有看出有什么问题。最好确认去leader副本所在的broker去看日志
+  作者回复: 这都是 info 级别的 log，没有看出有什么问题。最好确认去 leader 副本所在的 broker 去看日志
 
   **
 
@@ -236,7 +236,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  老师好，我上一个问题的具体描述是这样的，今天讲CommitFailedException的例子是调用consumer.commitSync();手动提交offset，确实当消息处理的总时间超过预设的max.poll.interval.ms时会报这个异常，但是如果是自动提交offset的情况下，也就是把enable.auto.commit=true，然后删除consumer.commitSync();代码，其它代码不变，也是max.poll.interval.ms=5s，然后循环中sleep(6s)，发现不会报异常并且会一直重复消费，想问下这是什么原因呢？
+  老师好，我上一个问题的具体描述是这样的，今天讲 CommitFailedException 的例子是调用 consumer.commitSync();手动提交 offset，确实当消息处理的总时间超过预设的 max.poll.interval.ms 时会报这个异常，但是如果是自动提交 offset 的情况下，也就是把 enable.auto.commit=true，然后删除 consumer.commitSync();代码，其它代码不变，也是 max.poll.interval.ms=5s，然后循环中 sleep(6s)，发现不会报异常并且会一直重复消费，想问下这是什么原因呢？
 
   展开**
 
@@ -252,11 +252,11 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  假如broker集群整个挂掉了，过段时间集群恢复后，consumer group会自动恢复消费吗？还是需要手动重启consumer机器？
+  假如 broker 集群整个挂掉了，过段时间集群恢复后，consumer group 会自动恢复消费吗？还是需要手动重启 consumer 机器？
 
   展开**
 
-  作者回复: consumer有重连机制
+  作者回复: consumer 有重连机制
 
   **
 
@@ -268,11 +268,11 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  老师好，今天讲CommitFailedException的例子是调用consumer.commitSync();手动提交offset，确实当消息处理的总时间超过预设的max.poll.interval.ms时会报这个异常，但是如果是自动提交offset的情况下，不会报异常并且会一直重复消费，想问下这是什么原因呢？
+  老师好，今天讲 CommitFailedException 的例子是调用 consumer.commitSync();手动提交 offset，确实当消息处理的总时间超过预设的 max.poll.interval.ms 时会报这个异常，但是如果是自动提交 offset 的情况下，不会报异常并且会一直重复消费，想问下这是什么原因呢？
 
   展开**
 
-  作者回复: 不知道你的代码是怎么写的。你是说循环调用poll然后返回相同的方法，是吗
+  作者回复: 不知道你的代码是怎么写的。你是说循环调用 poll 然后返回相同的方法，是吗
 
   **1
 
@@ -284,9 +284,9 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  想进一步了解学习standalone consumer有什么资料推荐吗？
+  想进一步了解学习 standalone consumer 有什么资料推荐吗？
 
-  作者回复: 没有。你可以自己试试。其实用法与consumer group差不多
+  作者回复: 没有。你可以自己试试。其实用法与 consumer group 差不多
 
   **
 
@@ -302,7 +302,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   展开**
 
-  作者回复: 之前版本中session.timeout.ms有多重含义，session过期时间、消息处理逻辑最大时间等
+  作者回复: 之前版本中 session.timeout.ms 有多重含义，session 过期时间、消息处理逻辑最大时间等
 
   **
 
@@ -314,7 +314,7 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  老师好，看你解释注释那段的时候提到消费者组已经开启了Rebalance过程，但是看后面的介绍，出现异常好像并不一定有Rebalance，是这样吗？
+  老师好，看你解释注释那段的时候提到消费者组已经开启了 Rebalance 过程，但是看后面的介绍，出现异常好像并不一定有 Rebalance，是这样吗？
 
   展开**
 
@@ -330,11 +330,11 @@ Okay，现在我们已经说完了关于 CommitFailedException 异常的经典�
 
   2019-07-16
 
-  希望老师可以更加具体的说说，rebalance的细节，比如某个consumer发生full gc的场景，它的partition是怎么被分配走的，重连之后提交会发生什么
+  希望老师可以更加具体的说说，rebalance 的细节，比如某个 consumer 发生 full gc 的场景，它的 partition 是怎么被分配走的，重连之后提交会发生什么
 
   展开**
 
-  作者回复: 假设full gc导致所有线程STW，从而心跳中断，导致被踢出group，Coordinator向其他存活consumer发送心跳response，通知它们开启新一轮rebalance。
+  作者回复: 假设 full gc 导致所有线程 STW，从而心跳中断，导致被踢出 group，Coordinator 向其他存活 consumer 发送心跳 response，通知它们开启新一轮 rebalance。
 
   **
 

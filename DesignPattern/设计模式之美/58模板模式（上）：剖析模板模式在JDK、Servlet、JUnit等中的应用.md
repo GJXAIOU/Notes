@@ -6,7 +6,7 @@
 
 ## 一、模板模式的原理与实现
 
-模板模式，全称是模板方法设计模式（Template Method Design Pattern）。在GoF 的《设计模式》一书中，它是这么定义的：
+模板模式，全称是模板方法设计模式（Template Method Design Pattern）。在 GoF 的《设计模式》一书中，它是这么定义的：
 
 > Define the skeleton of an algorithm in an operation, deferring some steps to subclasses. Template Method lets subclasses redefine certain steps of an algorithm without changing the algorithm’s structure.
 
@@ -322,7 +322,7 @@ public abstract class AbstractClass {
 
     写个适配器，把所有抽象方法默认实现一下，子类继承这个 adapter 就行了。
 
-- 可以借鉴AbstractList的addall实现。提供默认的方法method1...method4方法，每个方法直接抛出异常，使用模板方法的时候强制重写用到的method方法，用不到的method不用重写。
+- 可以借鉴 AbstractList 的 addall 实现。提供默认的方法 method1...method4 方法，每个方法直接抛出异常，使用模板方法的时候强制重写用到的 method 方法，用不到的 method 不用重写。
 
 - 使用外观模式，用一个新类再次包装，只暴露需要的接口。
 
@@ -334,19 +334,19 @@ public abstract class AbstractClass {
 
     二. 如果可以修改框架代码的情况下：…
 
-- Es框架里，abstractrunable是属于包装者还是模板。感觉更像包装者。不管啥了，总之觉得这样挺好用的。父类public就好了，就能解决没必要强制重写了。
+- Es 框架里，abstractrunable 是属于包装者还是模板。感觉更像包装者。不管啥了，总之觉得这样挺好用的。父类 public 就好了，就能解决没必要强制重写了。
 
 - 如果其他的类不考虑复用的话，可以将这些抽取成一个基类，就是两个抽象类。分别给不需要的方法定义空实现。
 
-- 课后作业的思考：对于必须要子类实现的方法定义为抽象方法或throw Exception，对于变动比较少但是同时也不想失去扩展性的方法添加默认实现，调用时优先获取用户自定义方法，获取不到的情况下使用默认方法
+- 课后作业的思考：对于必须要子类实现的方法定义为抽象方法或 throw Exception，对于变动比较少但是同时也不想失去扩展性的方法添加默认实现，调用时优先获取用户自定义方法，获取不到的情况下使用默认方法
 
 - 如果项目中多次用到这个类的话, 可以单独实现一个基类来继承这个模版类, 将不需要的扩展方法进行默认实现.
 
     项目开发中直接使用基类方法就好.
 
-- 参考装饰器模式那一课中JAVA IO类库中的做法，引入一个中间父类，实现所有的抽象方法，然后再让业务类去继承这个中间的父类。
+- 参考装饰器模式那一课中 JAVA IO 类库中的做法，引入一个中间父类，实现所有的抽象方法，然后再让业务类去继承这个中间的父类。
 
-- 课堂讨论题：我的理解是，这个第三方框架我们是无法修改其源码的。如果以此为前提， 我也没想到好办法，1）再写一个基类继承框架的AbstractClass，对无需实现的方法直接给空实现或throw exception；2）新写的基类仍然是Abstract修饰，只对需要实现的方法处理
+- 课堂讨论题：我的理解是，这个第三方框架我们是无法修改其源码的。如果以此为前提， 我也没想到好办法，1）再写一个基类继承框架的 AbstractClass，对无需实现的方法直接给空实现或 throw exception；2）新写的基类仍然是 Abstract 修饰，只对需要实现的方法处理
 
 - 课堂讨论：
 

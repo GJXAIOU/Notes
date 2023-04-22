@@ -167,7 +167,7 @@ Uber 公司之前也是使用 MirrorMaker 的，但是在使用过程中，他�
 
   2019-08-22
 
-  您好，我们最近也在调研brooklin和uReplicator，能否比较下二者的优缺点啊？
+  您好，我们最近也在调研 brooklin 和 uReplicator，能否比较下二者的优缺点啊？
 
   **
 
@@ -179,7 +179,7 @@ Uber 公司之前也是使用 MirrorMaker 的，但是在使用过程中，他�
 
   2019-08-22
 
-  是不是通过MirrorMaker拷贝，只要是目标集群的主题分区数量和源主题分区数量一致，拷贝的主题分区数据就是一一对应的？
+  是不是通过 MirrorMaker 拷贝，只要是目标集群的主题分区数量和源主题分区数量一致，拷贝的主题分区数据就是一一对应的？
 
   展开**
 
@@ -193,8 +193,8 @@ Uber 公司之前也是使用 MirrorMaker 的，但是在使用过程中，他�
 
   2019-08-22
 
-  老师，你好，你提的这几款工具，MirrorMaker是免费的，其它的也是免费可以用的么
+  老师，你好，你提的这几款工具，MirrorMaker 是免费的，其它的也是免费可以用的么
 
-  作者回复: LinkedIn的Brooklin MM好像没有开源，Confluent的Replicator要收费，Uber的uReplicator应该开源了
+  作者回复: LinkedIn 的 Brooklin MM 好像没有开源，Confluent 的 Replicator 要收费，Uber 的 uReplicator 应该开源了
 
   

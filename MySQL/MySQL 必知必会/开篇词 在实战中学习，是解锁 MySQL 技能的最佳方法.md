@@ -88,11 +88,11 @@
 
 - 在工作中，最重要的绝对不是你的知识储备量，而是你解决实际问题的能力。
 
-  作者回复: 说的好，MySQL的知识和技能，只有在实际工作中解决了问题，才能体现价值，否则是没有意义的
+  作者回复: 说的好，MySQL 的知识和技能，只有在实际工作中解决了问题，才能体现价值，否则是没有意义的
 
-- 老师你好，请教一个问题，MySQL官方一直没有出集群的解决方案，是否有被淘汰的一天，比如现在TiDB，虽然TiDB用户群体是数据量大的。
+- 老师你好，请教一个问题，MySQL 官方一直没有出集群的解决方案，是否有被淘汰的一天，比如现在 TiDB，虽然 TiDB 用户群体是数据量大的。
 
-  作者回复: MySQL官方有NDB cluster的解决方案(https://dev.mysql.com/doc/refman/8.0/en/faqs-mysql-cluster.html)，可以看一下。MySQL有自己的特点，用户群体也大，Oracle应该会继续进行维护。个人觉得，MySQL的生命周期还长。
+  作者回复: MySQL 官方有 NDB cluster 的解决方案(https://dev.mysql.com/doc/refman/8.0/en/faqs-mysql-cluster.html)，可以看一下。MySQL有自己的特点，用户群体也大，Oracle应该会继续进行维护。个人觉得，MySQL的生命周期还长。
 
 - 光说不练假把式，光练不说傻把式，又说又练真把式。
 

@@ -175,13 +175,13 @@ try (AdminClient client = AdminClient.create(props)) {
 
 - 
 
-  QQ怪
+  QQ 怪
 
   2019-08-15
 
-  想问下老师，在kafka某个topic下不小心创建了多个不用的消费组，怎么删除掉不用的消费组呢？
+  想问下老师，在 kafka 某个 topic 下不小心创建了多个不用的消费组，怎么删除掉不用的消费组呢？
 
-  作者回复: 弃之不用，Kafka会自动删除它们的
+  作者回复: 弃之不用，Kafka 会自动删除它们的
 
   **
 
@@ -193,7 +193,7 @@ try (AdminClient client = AdminClient.create(props)) {
 
   2019-08-15
 
-  老师，你好，这个只是提供了API是吧，那要是想可视化工具，还得基于它写代码是么
+  老师，你好，这个只是提供了 API 是吧，那要是想可视化工具，还得基于它写代码是么
 
   作者回复: 嗯嗯，是的
 
@@ -207,10 +207,10 @@ try (AdminClient client = AdminClient.create(props)) {
 
   2019-08-19
 
-  打卡，此节介绍了kafka的运维利器——AdminClient
+  打卡，此节介绍了 kafka 的运维利器——AdminClient
   1：AdminClient 的工作原理？
   从设计上来看，AdminClient 是一个双线程的设计：前端主线程和后端 I/O 线程。前端线程负责将用户要执行的操作转换成对应的请求，然后再将请求发送到后端 I/O 线程的队列中；而后端 I/O 线程从队列中读取相应的请求，然后发送到对应的 Broker 节点上，之后把执行结果保存起来，以便等待前端线程的获取。
-  2：AdminClient的特点？
+  2：AdminClient 的特点？
   社区于 0.11 版本正式推出了 Java 客户端版的 AdminClient 工具，该工具提供了几十种运维操作，而且它还在不断地演进着——功能强悍，不断完善中。
 
   展开**
@@ -225,7 +225,7 @@ try (AdminClient client = AdminClient.create(props)) {
 
   2019-08-17
 
-  可视化kafka管理工具，老师能推荐下吗？能支持2.0+版本 感谢！
+  可视化 kafka 管理工具，老师能推荐下吗？能支持 2.0+版本 感谢！
 
   作者回复: kafka manager
 
@@ -239,9 +239,9 @@ try (AdminClient client = AdminClient.create(props)) {
 
   2019-08-15
 
-  老师，有个问题，如果broker的端口号改变了，消费之前的 topic需要改动哪些参数
+  老师，有个问题，如果 broker 的端口号改变了，消费之前的 topic 需要改动哪些参数
 
-  作者回复: 要修改consume端的连接配置即可
+  作者回复: 要修改 consume 端的连接配置即可
 
   **
 
@@ -253,11 +253,11 @@ try (AdminClient client = AdminClient.create(props)) {
 
   2019-08-15
 
-  老师可以简单对比一下pulsar 与kafka吗？感觉pulsar 的好多设计都是借鉴kafka的，最大的一个区别是将broker 与数据存储分离，使得broker 可以更加容易扩展。另外，consumer 数量的扩展也不受partition 数量的限制。pulsar 大有取代kafka之势，老师怎么看？
+  老师可以简单对比一下 pulsar 与 kafka 吗？感觉 pulsar 的好多设计都是借鉴 kafka 的，最大的一个区别是将 broker 与数据存储分离，使得 broker 可以更加容易扩展。另外，consumer 数量的扩展也不受 partition 数量的限制。pulsar 大有取代 kafka 之势，老师怎么看？
 
   展开**
 
-  作者回复: 哈哈，和Pulsar的郭总和翟总相识，不敢妄言。
+  作者回复: 哈哈，和 Pulsar 的郭总和翟总相识，不敢妄言。
 
   **1
 
@@ -269,4 +269,4 @@ try (AdminClient client = AdminClient.create(props)) {
 
   2019-08-15
 
-  添加JMX指标以获取 Broker 磁盘占用这块感觉可以提个KIP
+  添加 JMX 指标以获取 Broker 磁盘占用这块感觉可以提个 KIP

@@ -259,7 +259,7 @@ r.setHeight(3); // r is valid
 
 ## 四、课堂讨论
 
-在下面的 ConstructorArg 类中，当 isRef 为 true 的时候，arg 表示 String 类型的refBeanId，type 不需要设置；当 isRef 为 false 的时候，arg、type 都需要设置。请根据这个需求，完善 ConstructorArg 类。
+在下面的 ConstructorArg 类中，当 isRef 为 true 的时候，arg 表示 String 类型的 refBeanId，type 不需要设置；当 isRef 为 false 的时候，arg、type 都需要设置。请根据这个需求，完善 ConstructorArg 类。
 
 ```java
 public class ConstructorArg {
@@ -272,8 +272,8 @@ public class ConstructorArg {
 
 ## 五、精选留言
 
-- 当在开发中需要创建一个具体的对象，如果必填属性很多，属性存在复杂的校验和属性之间存在依赖关系，可以使用建造者模式来避免类的构造函数参数列表过长，导致可读性差，不易使用的问题。建造者模式可以将类的构造方法私有，不提供类的setter方法，因此可以创建一个不变的对象。同时在某些场景下将属性构造好可以解决类的无效状态。
+- 当在开发中需要创建一个具体的对象，如果必填属性很多，属性存在复杂的校验和属性之间存在依赖关系，可以使用建造者模式来避免类的构造函数参数列表过长，导致可读性差，不易使用的问题。建造者模式可以将类的构造方法私有，不提供类的 setter 方法，因此可以创建一个不变的对象。同时在某些场景下将属性构造好可以解决类的无效状态。
 
   使用思路：把校验逻辑放置到 Builder 类中，先创建建造者，并且通过 set() 方法设置建…
 
-- 感觉课后思考题的arguments逻辑判断相对复杂，再加上想尝试一下建造者模式，所以抛砖引玉，给一个Python的尝试，有一个困惑是对于Python这种语言，如何避免对用户暴露在调用builder之前build方法之前初始化的ConstructorArg对象？
+- 感觉课后思考题的 arguments 逻辑判断相对复杂，再加上想尝试一下建造者模式，所以抛砖引玉，给一个 Python 的尝试，有一个困惑是对于 Python 这种语言，如何避免对用户暴露在调用 builder 之前 build 方法之前初始化的 ConstructorArg 对象？

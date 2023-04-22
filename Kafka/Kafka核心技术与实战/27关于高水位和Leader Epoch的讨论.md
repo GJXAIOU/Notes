@@ -187,7 +187,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
 - 
 
-  QQ怪
+  QQ 怪
 
   2019-08-03
 
@@ -211,9 +211,9 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
   另一篇文章https://www.cnblogs.com/huxi2b/p/7453543.html
   有这样一句话：
   \--------------------------
-  尝试更新分区HW——此时leader LEO = 1，remote LEO = 0，故分区HW值= min(leader LEO, follower remote LEO) = 0
+  尝试更新分区 HW——此时 leader LEO = 1，remote LEO = 0，故分区 HW 值= min(leader LEO, follower remote LEO) = 0
   \-----------------------------------------
-  说的是高水位的值是leo相比较得出的最小值，跟当前的hw没关系
+  说的是高水位的值是 leo 相比较得出的最小值，跟当前的 hw 没关系
 
   
 
@@ -229,7 +229,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-04
 
-  关于epoch机制，也是就是文章的最后一个图，有副本B重启完需要向副本A发送一个特殊获取leader的leo值的步骤，如果副本B重启完向副本A发送特殊请求之前副本A就挂了，会是什么情况？
+  关于 epoch 机制，也是就是文章的最后一个图，有副本 B 重启完需要向副本 A 发送一个特殊获取 leader 的 leo 值的步骤，如果副本 B 重启完向副本 A 发送特殊请求之前副本 A 就挂了，会是什么情况？
 
   作者回复: 那要看分区还有其他副本吗，如果有，继续走后面的流程。如果没有，分区不可用了
 
@@ -243,9 +243,9 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-04
 
-  请问老师：副本B重启的时候，为什么副本A的图片里有个红色的叉？
+  请问老师：副本 B 重启的时候，为什么副本 A 的图片里有个红色的叉？
 
-  作者回复: 表示A又挂了。。。。
+  作者回复: 表示 A 又挂了。。。。
 
   **
 
@@ -257,16 +257,16 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-04
 
-  原文中“如果 Kafka 只判断第 1 个条件的话”--这里应该是：第2个条件？评论区其他人也有提到
+  原文中“如果 Kafka 只判断第 1 个条件的话”--这里应该是：第 2 个条件？评论区其他人也有提到
   对这块的个人理解：
   两个条件之间的关系是与不是或
-  这里想表达的应该是--这个即将进入isr的副本的LEO值比分区高水位小，但满足条件2；
-  文中对条件2的描述好像有点歧义，以下是网上找的一段：
-  假设replica.lag.max.messages设置为4，表明只要follower落后leader不超过3，就不会从同步副本列表中移除。replica.lag.time.max设置为500 ms，表明只要follower向leader发送请求时间间隔不超过500 ms，就不会被标记为死亡,也不会从同步副本列中移除。
+  这里想表达的应该是--这个即将进入 isr 的副本的 LEO 值比分区高水位小，但满足条件 2；
+  文中对条件 2 的描述好像有点歧义，以下是网上找的一段：
+  假设 replica.lag.max.messages 设置为 4，表明只要 follower 落后 leader 不超过 3，就不会从同步副本列表中移除。replica.lag.time.max 设置为 500 ms，表明只要 follower 向 leader 发送请求时间间隔不超过 500 ms，就不会被标记为死亡,也不会从同步副本列中移除。
 
   展开**
 
-  作者回复: replica.lag.max.messages已经被移除了，不要看这篇了。你可以看看我之前写的这篇：Kafka副本管理—— 为何去掉replica.lag.max.messages参数（https://www.cnblogs.com/huxi2b/p/5903354.html）
+  作者回复: replica.lag.max.messages 已经被移除了，不要看这篇了。你可以看看我之前写的这篇：Kafka 副本管理—— 为何去掉 replica.lag.max.messages 参数（https://www.cnblogs.com/huxi2b/p/5903354.html）
 
   **
 
@@ -278,12 +278,12 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  老师好，想问下hw到底是怎么判断的，假如分区有1个leader和3个follower，那这3个follower拉取leader数据的节奏是怎么样的，是每次都同时一起拉还是各拉各的频率，假如当前leader副本的hw是3，LEO是10，会不会出现第一个follower LEO是7的过来拉数据，然后根据min(10,7)把hw设置成7，但是下一个follower可能LEO是5过来拉数据，这样min(10,5) hw又变成了5，我觉得应该不是这样的，但在多个follower交替拉取leader数据的时候，HW的值究竟该怎么判断呢？？
+  老师好，想问下 hw 到底是怎么判断的，假如分区有 1 个 leader 和 3 个 follower，那这 3 个 follower 拉取 leader 数据的节奏是怎么样的，是每次都同时一起拉还是各拉各的频率，假如当前 leader 副本的 hw 是 3，LEO 是 10，会不会出现第一个 follower LEO 是 7 的过来拉数据，然后根据 min(10,7)把 hw 设置成 7，但是下一个 follower 可能 LEO 是 5 过来拉数据，这样 min(10,5) hw 又变成了 5，我觉得应该不是这样的，但在多个 follower 交替拉取 leader 数据的时候，HW 的值究竟该怎么判断呢？？
 
   展开**
 
   作者回复: 各自有各自的拉取时点，没有规律。
-  HW的更新取的是所有副本LEO的最小值
+  HW 的更新取的是所有副本 LEO 的最小值
 
   **
 
@@ -295,7 +295,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  老师好，想问下hw到底是怎么判断的，假如分区有1个leader外加3个follower，那这些flower
+  老师好，想问下 hw 到底是怎么判断的，假如分区有 1 个 leader 外加 3 个 follower，那这些 flower
 
   **
 
@@ -307,7 +307,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  发现老师以前一篇关于leo、epoch的文章，可以帮忙大家对比理解。
+  发现老师以前一篇关于 leo、epoch 的文章，可以帮忙大家对比理解。
   https://www.cnblogs.com/huxi2b/p/7453543.html
 
   展开**
@@ -322,14 +322,14 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  “当获知到 Leader LEO=2 后，B 发现该 LEO值不比它自己的 LEO 值小，而且缓存中也没有保存任何起始位移值 > 2 的 Epoch 条目”是什么意思？
+  “当获知到 Leader LEO=2 后，B 发现该 LEO 值不比它自己的 LEO 值小，而且缓存中也没有保存任何起始位移值 > 2 的 Epoch 条目”是什么意思？
 
-  老师，leo值不比自己leo知道说明意思，但是后面epoch这句话不理解，如果起始值大于2意味着什么呢？
-  如果大于2，不是应该说follower当前的日志更老吗，更不应该截断日志。麻烦解答下，谢谢，很疑惑
+  老师，leo 值不比自己 leo 知道说明意思，但是后面 epoch 这句话不理解，如果起始值大于 2 意味着什么呢？
+  如果大于 2，不是应该说 follower 当前的日志更老吗，更不应该截断日志。麻烦解答下，谢谢，很疑惑
 
   展开**
 
-  作者回复: 获取到的leader LEO值不小于自己的LEO。2仅仅是图中举的例子的位移。
+  作者回复: 获取到的 leader LEO 值不小于自己的 LEO。2 仅仅是图中举的例子的位移。
 
   **
 
@@ -341,7 +341,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  老师，follwer同步leader的时候，是只同步已提交的消息，还是未提交和提交都同步
+  老师，follwer 同步 leader 的时候，是只同步已提交的消息，还是未提交和提交都同步
 
   **
 
@@ -382,7 +382,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
   iii. 更新 currentHW = min(currentHW, LEO-1，LEO-2，……，LEO-n)。
 
   
-  老师这里的第二点，怎么跟上面图片的概念不一样，上面图片是说获取leader的leo与所有远程副本的leo比较，取最小的。这里却说以hw与所有远程副本的leo取最小
+  老师这里的第二点，怎么跟上面图片的概念不一样，上面图片是说获取 leader 的 leo 与所有远程副本的 leo 比较，取最小的。这里却说以 hw 与所有远程副本的 leo 取最小
 
   展开**
 
@@ -398,7 +398,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  胡老师，更新完远副本LEO中的最小值，才更新leader副本hw值，这个是否是所有远副本都有值才做更新呢？
+  胡老师，更新完远副本 LEO 中的最小值，才更新 leader 副本 hw 值，这个是否是所有远副本都有值才做更新呢？
 
   作者回复: 是的
 
@@ -412,11 +412,11 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  Leader Epoch是怎么产生和传播到其他follower上的？传播的时机是怎样的？还有这个LeaderEpoch的offset表示的是HW还是LEO？
+  Leader Epoch 是怎么产生和传播到其他 follower 上的？传播的时机是怎样的？还有这个 LeaderEpoch 的 offset 表示的是 HW 还是 LEO？
 
   展开**
 
-  作者回复: follower去发送特定请求获取的。时机就是重启回来时，因为只是做截断用的。另外offset表示该副本在leader时写入的第一个消息的offset，不是HW也不是LEO
+  作者回复: follower 去发送特定请求获取的。时机就是重启回来时，因为只是做截断用的。另外 offset 表示该副本在 leader 时写入的第一个消息的 offset，不是 HW 也不是 LEO
 
   **3
 
@@ -428,7 +428,7 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  副本同步机制解析那有个问题，Follow分区在拉取offset为1的消息后，leader分区会更新远程副本的LEO为1并要更新高水位，按老师说的Leader 副本更新高水位的逻辑，是 currentHW = min(currentHW, LEO-1，LEO-2，……，LEO-n)，此时leader副本的currentHW为0，也即 currentHW = min(0,1)=0，高水位还是0呀，也不会变成1，我理解应该改成写 currentHW=min(currentLEO, LEO-1，LEO-2，……，LEO-n),currentLEO为leader分区当的LEO值
+  副本同步机制解析那有个问题，Follow 分区在拉取 offset 为 1 的消息后，leader 分区会更新远程副本的 LEO 为 1 并要更新高水位，按老师说的 Leader 副本更新高水位的逻辑，是 currentHW = min(currentHW, LEO-1，LEO-2，……，LEO-n)，此时 leader 副本的 currentHW 为 0，也即 currentHW = min(0,1)=0，高水位还是 0 呀，也不会变成 1，我理解应该改成写 currentHW=min(currentLEO, LEO-1，LEO-2，……，LEO-n),currentLEO 为 leader 分区当的 LEO 值
 
   展开**
 
@@ -456,11 +456,11 @@ Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同�
 
   2019-08-03
 
-  “当获知到 Leader LEO=2 后，B 发现该 LEO值不比它自己的 LEO 值小，而且缓存中也没有保存任何起始位移值 > 2 的 Epoch 条目”是什么意思？
-  如果follower B重启回来之后去取Leader A的LEO，但是此时Leader A已经挂了，这套机制不就玩不转了吗？
+  “当获知到 Leader LEO=2 后，B 发现该 LEO 值不比它自己的 LEO 值小，而且缓存中也没有保存任何起始位移值 > 2 的 Epoch 条目”是什么意思？
+  如果 follower B 重启回来之后去取 Leader A 的 LEO，但是此时 Leader A 已经挂了，这套机制不就玩不转了吗？
 
   展开**
 
-  作者回复: 这套机制防止的是根据HW做日志截断出现数据不一致，不能防止任何情况下副本都正常工作
+  作者回复: 这套机制防止的是根据 HW 做日志截断出现数据不一致，不能防止任何情况下副本都正常工作
 
   

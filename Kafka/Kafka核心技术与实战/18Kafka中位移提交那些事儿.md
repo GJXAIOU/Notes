@@ -160,7 +160,7 @@ while (true) {
 
   2019-07-13
 
-  老师手动提交的设计很优美，先用异步提交不影响程序的性能，再用consumer关闭时同步提交来确保位移一定提交成功。这里我有个疑问，比如我程序运行期间有多次异步提交没有成功，比如101的offset和201的offset没有提交成功，程序关闭的时候501的offset提交成功了，是不是就代表前面500条我还是消费成功了，只要最新的位移提交成功，就代表之前的消息都提交成功了？第二点 就是批量提交哪里，如果一个消费者晓得多个分区的消息，封装在一个Map对象里面消费者也能正确的对多个分区的位移都保证正确的提交吗？
+  老师手动提交的设计很优美，先用异步提交不影响程序的性能，再用 consumer 关闭时同步提交来确保位移一定提交成功。这里我有个疑问，比如我程序运行期间有多次异步提交没有成功，比如 101 的 offset 和 201 的 offset 没有提交成功，程序关闭的时候 501 的 offset 提交成功了，是不是就代表前面 500 条我还是消费成功了，只要最新的位移提交成功，就代表之前的消息都提交成功了？第二点 就是批量提交哪里，如果一个消费者晓得多个分区的消息，封装在一个 Map 对象里面消费者也能正确的对多个分区的位移都保证正确的提交吗？
 
   展开**
 
@@ -175,8 +175,8 @@ while (true) {
   2019-07-13
 
   老师，您好～ 看了今天的教程我有两个问题想请教下，希望老师能赐教。
-  \1. 从文中的代码看上去，使用commitAsync提供offset，不需要等待异步执行结果再次poll就能拿到下一批消息，是那么这个offset的最新值是不是理解为其实是在consumer client的内存中管理的（因为实际commitAsync如果失败的话，offset不会写入broker中）？如果是这样的话，如果在执行到commitSync之前，consumer client进程重启了，就有可能会消费到因commitAsync失败产生的重复消息。
-  \2. 教程中手动提交100条消息的代码是一个同步处理的代码，我在实际工程中遇到的问题是，为了提高消息处理效率，coumser poll到一批消息后会提交到一个thread pool中处理，这种情况下，请教下怎样做到控制offset分批提交？
+  \1. 从文中的代码看上去，使用 commitAsync 提供 offset，不需要等待异步执行结果再次 poll 就能拿到下一批消息，是那么这个 offset 的最新值是不是理解为其实是在 consumer client 的内存中管理的（因为实际 commitAsync 如果失败的话，offset 不会写入 broker 中）？如果是这样的话，如果在执行到 commitSync 之前，consumer client 进程重启了，就有可能会消费到因 commitAsync 失败产生的重复消息。
+  \2. 教程中手动提交 100 条消息的代码是一个同步处理的代码，我在实际工程中遇到的问题是，为了提高消息处理效率，coumser poll 到一批消息后会提交到一个 thread pool 中处理，这种情况下，请教下怎样做到控制 offset 分批提交？
   谢谢
 
   展开**
@@ -193,7 +193,7 @@ while (true) {
 
   先说一下，课后思考，解决的办法应该就是，将消息处理和位移提交放在一个事务里面，要么都成功，要么都失败。
 
-  老师文章里面的举的一个例子没有很明白，能不能再解释一下。就是那个位移提交后Rebalance的例子。
+  老师文章里面的举的一个例子没有很明白，能不能再解释一下。就是那个位移提交后 Rebalance 的例子。
 
   展开**
 
@@ -207,9 +207,9 @@ while (true) {
 
   2019-07-13
 
-  对于手动同步和异步提交结合的场景，如果poll出来的消息是500条，而业务处理200条的时候，业务抛异常了，后续消息根本就没有被遍历过，finally里手动同步提交的是201还是000，还是501？
+  对于手动同步和异步提交结合的场景，如果 poll 出来的消息是 500 条，而业务处理 200 条的时候，业务抛异常了，后续消息根本就没有被遍历过，finally 里手动同步提交的是 201 还是 000，还是 501？
 
-  作者回复: 如果调用没有参数的commit，那么提交的是500
+  作者回复: 如果调用没有参数的 commit，那么提交的是 500
 
   **1
 
@@ -221,7 +221,7 @@ while (true) {
 
   2019-07-15
 
-  不过老师有一个问题，poll下来的数据是有序的吗？同一个partition中各个消息的相对顺序，当然不同partition应该是不一定的
+  不过老师有一个问题，poll 下来的数据是有序的吗？同一个 partition 中各个消息的相对顺序，当然不同 partition 应该是不一定的
 
   展开**
 
@@ -237,7 +237,7 @@ while (true) {
 
   2019-07-15
 
-  我们目前的做法是kafka消费前都有一个消息接口表，可以使用Redis或者MySQL(Redis只存最近100个消息)，然后会设置consumer拉取消息的大小极限，保证消息数量不超过100(这个阈值可以自行调整)，其中我们会保证kafka消息的key是全局唯一的，比如使用雪花算法，在进行消费的时候可以通过前置表进行幂等性去重
+  我们目前的做法是 kafka 消费前都有一个消息接口表，可以使用 Redis 或者 MySQL(Redis 只存最近 100 个消息)，然后会设置 consumer 拉取消息的大小极限，保证消息数量不超过 100(这个阈值可以自行调整)，其中我们会保证 kafka 消息的 key 是全局唯一的，比如使用雪花算法，在进行消费的时候可以通过前置表进行幂等性去重
 
   展开**
 
@@ -251,10 +251,10 @@ while (true) {
 
   2019-07-15
 
-  所以自动提交有2个时机吗？
+  所以自动提交有 2 个时机吗？
 
-  1 固定频率提及，例如5s提及一次
-  2 poll新数据之前提交前面消费的数据
+  1 固定频率提及，例如 5s 提及一次
+  2 poll 新数据之前提交前面消费的数据
 
   作者回复: 它们实际上是一个时机
 
@@ -268,7 +268,7 @@ while (true) {
 
   2019-07-15
 
-  老师 consumer offset在spark程序中如何控制手动提交的 有没有sample code可以参考的 thks
+  老师 consumer offset 在 spark 程序中如何控制手动提交的 有没有 sample code 可以参考的 thks
 
   **
 
@@ -281,8 +281,8 @@ while (true) {
   2019-07-15
 
   避免重复消费：
-  \1. （不考虑rebalance）producer在生成消息体是，里面加上唯一标识符比如：唯一Id，即保证消息的幂等性，consumer在处理消息的过程中，将消费后的消息Id存储到数据库中或者redis，等消息处理完毕后在手动提交offset
-  \2. （考虑rebalance）监听consumer的rebalance，rebalance发生前将topic-partion-offset存入数据库，rebalance后根据获取到的分区信息到数据库中查找上次消费到的位置seek到上次消费位置，在处理消息中，利用数据库事务管理处理消息
+  \1. （不考虑 rebalance）producer 在生成消息体是，里面加上唯一标识符比如：唯一 Id，即保证消息的幂等性，consumer 在处理消息的过程中，将消费后的消息 Id 存储到数据库中或者 redis，等消息处理完毕后在手动提交 offset
+  \2. （考虑 rebalance）监听 consumer 的 rebalance，rebalance 发生前将 topic-partion-offset 存入数据库，rebalance 后根据获取到的分区信息到数据库中查找上次消费到的位置 seek 到上次消费位置，在处理消息中，利用数据库事务管理处理消息
   2.
 
   展开**
@@ -297,7 +297,7 @@ while (true) {
 
   2019-07-14
 
-  消费者端实现消费幂等。具体做法：创建本地消息表，以messageId作为主键。消费消息的同时也插入消息表，把消费逻辑的sql语句和消息表的insert语句放在同一个数据库事务中。
+  消费者端实现消费幂等。具体做法：创建本地消息表，以 messageId 作为主键。消费消息的同时也插入消息表，把消费逻辑的 sql 语句和消息表的 insert 语句放在同一个数据库事务中。
 
   **
 
@@ -313,7 +313,7 @@ while (true) {
 
   我不用 java，看的是 librdkafka 的文档。enable.auto.commit 的文档说明是：Automatically and periodically commit offsets in the background. 也就是说他会定期提交 offset，但是这里没有明说提交的 offset 是什么时候记录的，我的理解是记录是由 enable.auto.offset.store 决定的。
 
-  enable.auto.offset.store 文档说明是：Automatically store offset of last message provided to application. The offset store is an in-memory store of the next offset to (auto-)commit for each partition. 也就是说如果设置成 true（默认值），他会自动把上个提交给应用程序的offset 记录到内存中。
+  enable.auto.offset.store 文档说明是：Automatically store offset of last message provided to application. The offset store is an in-memory store of the next offset to (auto-)commit for each partition. 也就是说如果设置成 true（默认值），他会自动把上个提交给应用程序的 offset 记录到内存中。
 
   也就是说，如果应用拿到一个 offset 了，librdkafka 就会把这个 offset 记录到内存中，然后默认情况下至多 5s 之后，就会提交给 broker。这时候如果应用还没有完成这个 offset 的处理时，发生了崩溃，这个 offset 就丢掉了，所以是一个至多一次的语义。
 
@@ -331,12 +331,12 @@ while (true) {
 
   2019-07-14
 
-  我现在有点糊涂了，kafka的offset是以broker发消息给consumer时，broker的offset为准；还是以consumer 的commit offset为准？比如，一个partition现在的offset是99，执行poll(10)方法时，broker给consumer发送了10条记录，在broker中offset变为109；假如 enable.auto.commit 为false，为手动提交consumer offset,但是cosumer在执行consumer.commitSync()或consumer.commitAsync()时进程失败，整个consumer进程都崩溃了；于是一个新的consumer接替原consumer继续消费，那么他是从99开始消费，还是从109开始消费？
+  我现在有点糊涂了，kafka 的 offset 是以 broker 发消息给 consumer 时，broker 的 offset 为准；还是以 consumer 的 commit offset 为准？比如，一个 partition 现在的 offset 是 99，执行 poll(10)方法时，broker 给 consumer 发送了 10 条记录，在 broker 中 offset 变为 109；假如 enable.auto.commit 为 false，为手动提交 consumer offset,但是 cosumer 在执行 consumer.commitSync()或 consumer.commitAsync()时进程失败，整个 consumer 进程都崩溃了；于是一个新的 consumer 接替原 consumer 继续消费，那么他是从 99 开始消费，还是从 109 开始消费？
 
   展开**
 
-  作者回复: 首先，poll(10)不是获取10条消息的意思。
-  其次，consumer获取的位移是它之前最新一次提交的位移，因此是99
+  作者回复: 首先，poll(10)不是获取 10 条消息的意思。
+  其次，consumer 获取的位移是它之前最新一次提交的位移，因此是 99
 
   **
 
@@ -348,11 +348,11 @@ while (true) {
 
   2019-07-14
 
-  老师好，consumer的api在读取的时候能指定从某个partition的某个offset开始读取吗？看参数只能用latest,oldest进行指定，然后用kafka记录的offset进行读取，我们能自己控制起始的offset吗，这样可以做更精准的exact once的语义
+  老师好，consumer 的 api 在读取的时候能指定从某个 partition 的某个 offset 开始读取吗？看参数只能用 latest,oldest 进行指定，然后用 kafka 记录的 offset 进行读取，我们能自己控制起始的 offset 吗，这样可以做更精准的 exact once 的语义
 
   展开**
 
-  作者回复: 可以控制，使用KafkaConsumer.seek可以精确控制你要开始消费的位移
+  作者回复: 可以控制，使用 KafkaConsumer.seek 可以精确控制你要开始消费的位移
 
   **1
 
@@ -364,11 +364,11 @@ while (true) {
 
   2019-07-13
 
-  老师，有个疑问。commitSync 和 commitAsync 组合这个代码，捕获异常在while循环外面，如果发生异常不就不走了吗，程序也就停止。是不是放在while循环比较好，既可以处理异常，还能提交偏移量，还能继续消费处理消息？
+  老师，有个疑问。commitSync 和 commitAsync 组合这个代码，捕获异常在 while 循环外面，如果发生异常不就不走了吗，程序也就停止。是不是放在 while 循环比较好，既可以处理异常，还能提交偏移量，还能继续消费处理消息？
 
   展开**
 
-  作者回复: try不是在while外面吗？
+  作者回复: try 不是在 while 外面吗？
 
   **2
 
@@ -380,13 +380,13 @@ while (true) {
 
   2019-07-13
 
-  老师，你好。有个场景不太明白。我做个假设，比如说我的模式是自动提交，自动提交间隔是20秒一次，那我消费了10个消息，很快一秒内就结束。但是这时候我自动提交时间还没到（那是不是意味着不会提交offer），然后这时候我又去poll获取消息，会不会导致一直获取上一批的消息？
+  老师，你好。有个场景不太明白。我做个假设，比如说我的模式是自动提交，自动提交间隔是 20 秒一次，那我消费了 10 个消息，很快一秒内就结束。但是这时候我自动提交时间还没到（那是不是意味着不会提交 offer），然后这时候我又去 poll 获取消息，会不会导致一直获取上一批的消息？
 
-  还是说如果consumer消费完了，自动提交时间还没到，如果你去poll，这时候会自动提交，就不会出现重复消费的情况。
+  还是说如果 consumer 消费完了，自动提交时间还没到，如果你去 poll，这时候会自动提交，就不会出现重复消费的情况。
 
   展开**
 
-  作者回复: 不会的。consumer内部维护了一个指针，能够探测到下一条要消费的数据
+  作者回复: 不会的。consumer 内部维护了一个指针，能够探测到下一条要消费的数据
 
   **
 
@@ -398,9 +398,9 @@ while (true) {
 
   2019-07-13
 
-  有同学问offset是否在内存控制等问题，可能是没用过kafka，kafka的消费者启动时候可以设置参数从什么位置开始读，有的是从最新的开始读，有的是从最老的开始读，从最新位置读就是从上次提交的位移读，所以提交的offset是用作下一次程序启动或重新平衡后读取的位置的。同样像老师这种先异步再同步提交数据的场景如果一次拉500条数据，消费到200条之后异常了，同步提交是提交500条的，我觉得是不是可以类似下面分批提交的方法提交不知道此方法有同步的吗？有的话应该会比较完美解决。
+  有同学问 offset 是否在内存控制等问题，可能是没用过 kafka，kafka 的消费者启动时候可以设置参数从什么位置开始读，有的是从最新的开始读，有的是从最老的开始读，从最新位置读就是从上次提交的位移读，所以提交的 offset 是用作下一次程序启动或重新平衡后读取的位置的。同样像老师这种先异步再同步提交数据的场景如果一次拉 500 条数据，消费到 200 条之后异常了，同步提交是提交 500 条的，我觉得是不是可以类似下面分批提交的方法提交不知道此方法有同步的吗？有的话应该会比较完美解决。
 
-  对于老师的问题，想不重复只有自己在程序中保留offsetid.如果后端系统有数据库类似数据库主建机制，可以用这个方法判断，插入报约束冲突就忽视…
+  对于老师的问题，想不重复只有自己在程序中保留 offsetid.如果后端系统有数据库类似数据库主建机制，可以用这个方法判断，插入报约束冲突就忽视…
 
   展开**
 
@@ -430,7 +430,7 @@ while (true) {
 
   2019-07-13
 
-  Consumer自己记录一下最近一次已消费的offset
+  Consumer 自己记录一下最近一次已消费的 offset
 
   展开**
 
@@ -444,7 +444,7 @@ while (true) {
 
   2019-07-13
 
-  自动提交也可能出现消息丢失的情况，如果拉取消息和处理消息是两个线程去处理的就可能发生拉取线程拉取了两次，处理线程第一次的消息没处理完，崩溃恢复后再消费导致可能丢失某些消息。不过我觉得这不能怪kafka了，这种丢失超出kafka的责任边界了
+  自动提交也可能出现消息丢失的情况，如果拉取消息和处理消息是两个线程去处理的就可能发生拉取线程拉取了两次，处理线程第一次的消息没处理完，崩溃恢复后再消费导致可能丢失某些消息。不过我觉得这不能怪 kafka 了，这种丢失超出 kafka 的责任边界了
 
   展开**
 
@@ -458,6 +458,6 @@ while (true) {
 
   2019-07-13
 
-  关于业务去重的逻辑，可以考虑在业务字段里加一个txid，用consumer的offset值表示事务id，如果有这个id表示被处理过了，如果没有，则表示还没处理过，这样可以利用mysql或者MongoDB来实现避免重复消费
+  关于业务去重的逻辑，可以考虑在业务字段里加一个 txid，用 consumer 的 offset 值表示事务 id，如果有这个 id 表示被处理过了，如果没有，则表示还没处理过，这样可以利用 mysql 或者 MongoDB 来实现避免重复消费
 
   

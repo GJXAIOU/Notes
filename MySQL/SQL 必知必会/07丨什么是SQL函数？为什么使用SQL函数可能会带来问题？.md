@@ -259,7 +259,7 @@ mysql> SELECT AVG(hp_max), AVG(mp_max), MAX(attack_max) FROM heros WHERE DATE(bi
 计算英雄的最大生命平均值：
 SELECT AVG(hp_max) FROM heros;
 
-显示所有在2017年之前上线的英雄：
+显示所有在 2017 年之前上线的英雄：
 SELECT name FROM heros WHERE birthdate IS NOT NULL AND YEAR(birthdate) < 2017;
 
 作者回复: 正确

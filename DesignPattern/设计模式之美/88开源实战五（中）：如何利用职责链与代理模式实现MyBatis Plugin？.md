@@ -174,7 +174,7 @@
 
  复制代码
 
-1.  // 借助Java InvocationHandler实现的动态代理模式
+1.  // 借助 Java InvocationHandler 实现的动态代理模式
 
 2.  public class Plugin implements InvocationHandler {
 
@@ -198,9 +198,9 @@
 >
 > 12
 
-1.  // wrap()静态方法，用来生成target的动态代理，
+1.  // wrap()静态方法，用来生成 target 的动态代理，
 
-2.  // 动态代理对象=target对象+interceptor对象。
+2.  // 动态代理对象=target 对象+interceptor 对象。
 
 3.  public static Object wrap(Object target, Interceptor interceptor) {
 
@@ -228,9 +228,9 @@
 >
 > 27
 
-1.  // 调用target上的f()方法，会触发执行下面这个方法。
+1.  // 调用 target 上的 f()方法，会触发执行下面这个方法。
 
-2.  // 这个方法包含：执行interceptor的intecept()方法 + 执行target上f()方法。
+2.  // 这个方法包含：执行 interceptor 的 intecept()方法 + 执行 target 上 f()方法。
 
 3.  @Override
 

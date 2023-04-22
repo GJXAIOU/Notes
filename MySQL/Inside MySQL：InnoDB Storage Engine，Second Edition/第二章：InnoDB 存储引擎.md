@@ -101,7 +101,7 @@ mysql> show variables like 'innodb_buffer_pool_instances';
 
 **LRU 列表中加入了 midpoint 位置（默认在列表长度的 5/8 处）**，也可以通过 `innodb_old_blocks_pct` 参数进行调整 New 和 old 比例（值默认为 37，即大致是距离尾端的位置  3/8  处）。新读取到的页，虽然是最新访问的页，但并不是直接放入到 LRU 列表的首部，而是放入到 LRU 列表的 midpoint 位置【midpoint insertion strategy 算法】。midpoint 之后的列表称为 old 列表， 之前列表为 new 列表（该列表中的页都是最为活跃的热点数据）。
 
-**原因**：**因为若直接将读取到的页放入到 LRU 的首部， 那么某些 SQL 操作（如索引或数据的扫描操作）可能会使缓冲池中的页被刷新出，从而影响缓冲池的效率**。这类操作需要访问表中的许多页，甚至是全部的页，而这些页通常来说又仅在这次查询操作中需要，并不是活跃的热点数据。 如果页被放入LRU 列表的首部，可能将需要的热点数据页从 LRU 列表中移除，从而访问热点数据页时候 InnoDB 存储擎需要再次访问磁盘。
+**原因**：**因为若直接将读取到的页放入到 LRU 的首部， 那么某些 SQL 操作（如索引或数据的扫描操作）可能会使缓冲池中的页被刷新出，从而影响缓冲池的效率**。这类操作需要访问表中的许多页，甚至是全部的页，而这些页通常来说又仅在这次查询操作中需要，并不是活跃的热点数据。 如果页被放入 LRU 列表的首部，可能将需要的热点数据页从 LRU 列表中移除，从而访问热点数据页时候 InnoDB 存储擎需要再次访问磁盘。
 
 **解决方式**：通过参数 `innodb_old_blocks_time` （默认为 1000），该参数表示页读取到 mid 位置后需要等待多久才会被加入到 LRU 列表的热端。因此当需要执行上述所说的扫描 SQL 操作之前， 通过`SET GLOBAL innodb_old_blocks_time=lOOO（或其他值）;` 或者通过上面参数将 midpoint 位置往后移。以尽可能减少列表中热点数据被刷出。相当于阻塞一段时间，操作执行完成之后再执行一遍该语句，将值换成 0 即可。
 
@@ -143,7 +143,7 @@ I/O sum[0]:cur[0], unzip sum[0]:cur[0]
 
 **压缩页**：
 
-INNODB 支持压缩页，即将原本 16KB 的页压缩为 1KB、2KB、4KB 和8KB。**对于非 16KB 的页，是通过 unzip_LRU 列表进行管理的。（LRU 中的页包含了 unzip_LRU 列表中的页）**。`SHOW ENGINE INNODB STATUS\G;`可查看两者数量。`LRU len: 966, unzip_LRU len: 0`
+INNODB 支持压缩页，即将原本 16KB 的页压缩为 1KB、2KB、4KB 和 8KB。**对于非 16KB 的页，是通过 unzip_LRU 列表进行管理的。（LRU 中的页包含了 unzip_LRU 列表中的页）**。`SHOW ENGINE INNODB STATUS\G;`可查看两者数量。`LRU len: 966, unzip_LRU len: 0`
 
 unzip_LRU 列表中对不同压缩页大小的页进行分别管理并在缓存池中分配内存。其次，通过伙伴算法进行内存的分配。例如对需要从缓冲池中申请页为 4KB 的大小，其过程如下：
 
@@ -179,7 +179,7 @@ mysql> show variables like 'innodb_log_buffer_size';
 
 - 每个事务提交时会将重做日志缓冲刷新到重做日志文件；
 
-- 当重做日志缓冲池剩余空间小于1/2 时， 重做日志缓冲刷新到重做日志文件。
+- 当重做日志缓冲池剩余空间小于 1/2 时， 重做日志缓冲刷新到重做日志文件。
 
 #### 4.额外的内存池
 
@@ -201,11 +201,11 @@ Checkpoint（检查点）目的是解决以下几个问题：
 
 - 缓冲池不够用时，将脏页刷新到磁盘
 
-    当缓冲池不够用时，根据 LRU 算法会溢出最近最少使用的页，若此页为脏页，那么需要强制执行Checkpoint，将脏页刷回磁盘。
+    当缓冲池不够用时，根据 LRU 算法会溢出最近最少使用的页，若此页为脏页，那么需要强制执行 Checkpoint，将脏页刷回磁盘。
 
 - 重做日志不可用时，刷新脏页
 
-    重做日志出现不可用的情况是因为当前事务数据库系统对重做日志的设计都是循环使用的，并不是让其无限增大的。重做日志可以被重用的部分是指这些重做日志已经不再需要，即当数据库发生右机时，数据库恢复操不需要这部分的重做日志，因此这部分就可以被覆盖重用。若此时重做日志还需要使用，那么必须强制产生Checkpoint,将缓冲池中的页至少刷新到当前重做日志的位置。
+    重做日志出现不可用的情况是因为当前事务数据库系统对重做日志的设计都是循环使用的，并不是让其无限增大的。重做日志可以被重用的部分是指这些重做日志已经不再需要，即当数据库发生右机时，数据库恢复操不需要这部分的重做日志，因此这部分就可以被覆盖重用。若此时重做日志还需要使用，那么必须强制产生 Checkpoint,将缓冲池中的页至少刷新到当前重做日志的位置。
 
 对于 lnnoDB 通过 LSN（Log Sequence Number）来标记版本的。而 LSN 是 8 字节的数字，其单位是字节。每个页、重做日志、Checkpoint 中都有 LSN。
 
@@ -250,7 +250,7 @@ InnoDB 中有两种 Checkpoint：区别在于：每次刷新多少页到磁盘�
     若每个重做日志文件的大小为 1 GB, 并且定义了两个重做日志文件， 则重做日志文件的总大小为 2GB。那么 `async_water_ mark= 1. 5GB, sync_ water_ mark= 1. 8GB`。则：
 
     - 当 `checkpoint_age < async water_ mark` 时， 不需要刷新任何脏页到磁盘：
-    - 当 `async_water_ mark < checkpoint_age < sync_ water_mark` 时触发 `Async Flush`, 从Flush 列表中刷新足够的脏页回磁盘， 使得刷新后满足 `checkpoint_age < async water_mark`;
+    - 当 `async_water_ mark < checkpoint_age < sync_ water_mark` 时触发 `Async Flush`, 从 Flush 列表中刷新足够的脏页回磁盘， 使得刷新后满足 `checkpoint_age < async water_mark`;
     - `checkpoint_age > sync_water_mark` 这种情况一般很少发生， 除非设置的重做日志文件太小， 并且在进行类似 LOAD DATA 的 BULKINSERT 操作。此时触发 SyncFlush 操作， 从 Flush 列表中刷新足够的脏页回磁盘， 使得刷新后满足 `checkpoint_age < async_water_mark`。
 
 - Dirty Page too much Checkpoint=》保障缓冲池中有足够可用的页
@@ -276,7 +276,7 @@ InnoDB 存储引擎的主要工作都是在一个单独的后台线程 Master Th
 
 #### Loop（主循环）
 
-Loop 被称为主循环，因为大多数的操作是在这个循环中，其中有两大部分的操作：每秒钟的操作和每 10秒的操作。伪代码如下：
+Loop 被称为主循环，因为大多数的操作是在这个循环中，其中有两大部分的操作：每秒钟的操作和每 10 秒的操作。伪代码如下：
 
 ```c
 void master thread() {
@@ -326,13 +326,13 @@ goto loop;
 - 删除无用的 Undo 页【总是】：
 - 合并 20 个插入缓冲【总是】；
 - 跳回到主循环【总是】；
-- 不断刷新100个页直到符合条件（可能，跳转到 flushloop)
+- 不断刷新 100 个页直到符合条件（可能，跳转到 flushloop)
 
-若 flush loop 中也没有什么事情可以做，InnoDB 会切换到 `suspend_loop`, 将 Master Thread 挂起，等待事件的发生。若用户启用(enable)了 InnoDB 存储引擎，却没有使用任何 InnoDB 存储引擎的表，那么Master Thread 总是处于挂起的状态。
+若 flush loop 中也没有什么事情可以做，InnoDB 会切换到 `suspend_loop`, 将 Master Thread 挂起，等待事件的发生。若用户启用(enable)了 InnoDB 存储引擎，却没有使用任何 InnoDB 存储引擎的表，那么 Master Thread 总是处于挂起的状态。
 
 ### （二）1.2.X 之前的 Master Thread
 
-问题1：之前对 IO 的限制都是硬编码，则磁盘性能的提升并不能利用充分。同时操作的次数和每次刷新页数都是硬编码，当写入密集的时候，脏页无法及时刷新到磁盘中，则当宕机产生的时候由于很多数据还没有刷新会磁盘会导致恢复的时间很久。
+问题 1：之前对 IO 的限制都是硬编码，则磁盘性能的提升并不能利用充分。同时操作的次数和每次刷新页数都是硬编码，当写入密集的时候，脏页无法及时刷新到磁盘中，则当宕机产生的时候由于很多数据还没有刷新会磁盘会导致恢复的时间很久。
 
 加入参数 `innodb_io_capacity` 来表示磁盘 IO 的吞吐量，默认值为 200，可以根据磁盘性能自定义。则刷新回磁盘的页数量规则修改如下：
 

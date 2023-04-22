@@ -24,7 +24,7 @@
 
 - where 子句操作符：`= `、`<>`、`!=`、`<`、`<=`、`>`、`>=`、`between A and B`；
 
-    其中 `between A  and  B ` 是包括 A B的，即相当于 `>= A and <= B`。
+    其中 `between A  and  B ` 是包括 A B 的，即相当于 `>= A and <= B`。
 
 - **MySQL 执行匹配时候默认不区分大小写；**
 
@@ -99,7 +99,7 @@ where name REGEXP '\\.' // 表示匹配.,其他转义符 - 以及 |以及[]
 |{n,m} |  匹配数目的范围（m不超过255）|
 
 `select prod_name from products where prod_name regexp '\\([0-9]sticks?\\)' order by prod_name;`  # 返回了'TNT (1 stick)'和'TNT (5 sticks)'
-`select prod_name from products where prod_name regexp '[[:digit:]]{4}'order by prod_name;`  # [[:digit:]]{4}匹配连在一起的任意4位数字
+`select prod_name from products where prod_name regexp '[[:digit:]]{4}'order by prod_name;`  # [[:digit:]]{4}匹配连在一起的任意 4 位数字
 
 #### （四）定位符
 |元字符 | 说明|
@@ -349,7 +349,7 @@ now() AS now2,sysdate() AS  date2
     当 success_cnt 为 null 值的时候，将返回 1，否则将返回 success_cnt 的真实值。
 
     `select coalesce(success_cnt,period,1) from tableA`
-    当 success_cnt 不为 null，那么无论 period 是否为 null，都将返回 success_cnt 的真实值（因为success_cnt 是第一个参数），当 success_cnt 为 null，而 period 不为 null 的时候，返回 period 的真实值。只有当 success_cnt 和 period 均为 null 的时候，将返回1。
+    当 success_cnt 不为 null，那么无论 period 是否为 null，都将返回 success_cnt 的真实值（因为 success_cnt 是第一个参数），当 success_cnt 为 null，而 period 不为 null 的时候，返回 period 的真实值。只有当 success_cnt 和 period 均为 null 的时候，将返回 1。
 
 - 组合聚类函数 
     4 个聚集计算:物品的数目，产品价格的最高、最低以及平均值 
@@ -399,7 +399,7 @@ now() AS now2,sysdate() AS  date2
     - 示例：
         按 vend_id **排序并分组**数据
         `SELECT vend_id, COUNT(*) AS num_prods FROM products GROUP BY vend_id;`
-        使用 WITH ROLLUP 关键字，可以得到每个分组以及每个分组汇总级别（针对每个分组）的值，下述语句得到所有分组COUNT(*)的和14 ，比上面显示结果在最后一栏加入一行所有的数据总数；
+        使用 WITH ROLLUP 关键字，可以得到每个分组以及每个分组汇总级别（针对每个分组）的值，下述语句得到所有分组 COUNT(*)的和 14 ，比上面显示结果在最后一栏加入一行所有的数据总数；
         `SELECT vend_id, COUNT(*) AS num_prods FROM products GROUP BY vend_id WITH ROLLUP;`
 
 - HAVING 子句 过滤分组 
@@ -413,7 +413,7 @@ now() AS now2,sysdate() AS  date2
     `SELECT vend_id,COUNT(*) AS num_prods FROM products WHERE prod_price >=10 GROUP BY vend_id HAVING COUNT(*)>=2;`
 
 - 分组和排序 
-    检索总计订单价格大于等于50的订单的订单号和总计订单价格
+    检索总计订单价格大于等于 50 的订单的订单号和总计订单价格
     `SELECT order_num,SUM(quantity * item_price) AS ordertotal FROM orderitems GROUP BY order_num HAVING SUM(quantity * item_price) >=50;`
 
     按总计订单价格排序输出
@@ -489,7 +489,7 @@ now() AS now2,sysdate() AS  date2
 
 #### （一）创建联结 
 
-- 方式一： WHERE子句联结 （等值/内部联结）
+- 方式一： WHERE 子句联结 （等值/内部联结）
 
     ```mysql
     SELECT vend_name,prod_name,prod_price 
@@ -636,12 +636,12 @@ GROUP BY customers.cust_id;
 
 - 使用 union 
     下面两个单条语句，使用 union 进行组合查询；
-    价格小于等于5的所有物品
+    价格小于等于 5 的所有物品
     `SELECT vend_id,prod_id,prod_price FROM products WHERE prod_price <=5;`
-    供应商1001和1002生产的所有物品
+    供应商 1001 和 1002 生产的所有物品
     `SELECT vend_id,prod_id,prod_price FROM products WHERE vend_id in (1001,1002);`
 
-价格小于等于5的所有物品的列表，而且包括供应商1001和1002生产的所有物品（不考虑价格）
+价格小于等于 5 的所有物品的列表，而且包括供应商 1001 和 1002 生产的所有物品（不考虑价格）
 
 ```sql
 --  方式一：使用 union
@@ -694,13 +694,13 @@ ORDER BY vend_id,prod_price;
 - 进行全文本搜索  **默认不区分大小写**
     **Match() 指定被搜索的列，against()指定要使用的搜索表达式**，传递给 match()的值必须与 fulltext 中定义的相同，如果指定多个列，则必须列出它们且次序正确；
     `SELECT note_text FROM productnotes WHERE match(note_text) against('rabbit');`
-    如果上面方法用like语句 
+    如果上面方法用 like 语句 
     `SELECT note_text FROM productnotes WHERE note_text like '%rabbit%';`
 
 **使用全文搜索返回以文本匹配的良好程度排序的数据，其对结果进行排序，较高优先级的行先返回；** 优先级较高：搜索的关键字在文本中的位置靠前，或者出现的次数较多；等级是由 MySQL 根据行中词的数目、唯一词的数据、整个索引中词的总数以及包含该词的行的数目进行计算；如果有多个搜索项，则匹配包含多数匹配词的搜索项等级值较高；
 
-**注意**：RANK (R)在mysql 8.0.2 (reserved)版本中为keyword保留字
-当字段名与MySQL保留字冲突时,可以用字符`‘’`将字段名括起来或者改为其他名字，比如AS rank1等
+**注意**：RANK (R)在 mysql 8.0.2 (reserved)版本中为 keyword 保留字
+当字段名与 MySQL 保留字冲突时,可以用字符`‘’`将字段名括起来或者改为其他名字，比如 AS rank1 等
 即`SELECT note_text, match(note_text) against('rabbit') AS 'rank' FROM productnotes; `
 
 - 使用查询扩展 
@@ -735,26 +735,26 @@ ORDER BY vend_id,prod_price;
     | `*`        | 词尾的通配符(截断操作符)                                     |
     | `“ ” `     | 定义一个短语（与单个词的列表不一样，它匹配整个短语一边包含或排除这个短语） |
 
-- 示例：全文本搜索检索包含词heavy的所有行
-    使用了关键字IN BOOLEAN MODE，但是实际上没有指定布尔操作符，其结果与没有指定布尔方式的结果相同
+- 示例：全文本搜索检索包含词 heavy 的所有行
+    使用了关键字 IN BOOLEAN MODE，但是实际上没有指定布尔操作符，其结果与没有指定布尔方式的结果相同
     `SELECT note_text FROM productnotes WHERE match(note_text) against('heavy' in boolean mode);`
 
-- 排除包含 `rope*`（任何以rope开始的词，包括ropes）的行【* 理解为截断操作符，即是一个用于词尾的通配符】
+- 排除包含 `rope*`（任何以 rope 开始的词，包括 ropes）的行【* 理解为截断操作符，即是一个用于词尾的通配符】
     `SELECT note_text FROM productnotes WHERE match(note_text) against('heavy -rope*' in boolean mode);`
 
-- 匹配包含词rabbit和bait的行
+- 匹配包含词 rabbit 和 bait 的行
     `SELECT note_text FROM productnotes WHERE match(note_text) against('+rabbit +bait' in boolean mode);`
 
-- 不指定操作符，搜索匹配包含rabbit和bait中的至少一个词的行
+- 不指定操作符，搜索匹配包含 rabbit 和 bait 中的至少一个词的行
     `SELECT note_text FROM productnotes WHERE match(note_text) against('rabbit bait' in boolean mode);`
 
-- 搜索匹配短语rabbit bait而不是匹配两个词rabbit和bait。 
+- 搜索匹配短语 rabbit bait 而不是匹配两个词 rabbit 和 bait。 
     `SELECT note_text FROM productnotes WHERE match(note_text) against('"rabbit bait"' in boolean mode);`
 
-- 匹配rabbit和carrot，增加前者的等级，降低后者的等级
+- 匹配 rabbit 和 carrot，增加前者的等级，降低后者的等级
     `SELECT note_text FROM productnotes WHERE match(note_text) against('>rabbit <carrot' in boolean mode);`
 
-- 必须匹配词safe和combination，降低后者的等级
+- 必须匹配词 safe 和 combination，降低后者的等级
     `SELECT note_text FROM productnotes WHERE match(note_text) against('+safe +(<combination)' in boolean mode);`
 
 
@@ -773,7 +773,7 @@ ORDER BY vend_id,prod_price;
 **简单但不安全，如果原来表列结构调整，会有问题** 
 **自动增量的列不进行赋值的话，可以指定值为：NULL**
 
-- 插入一个新客户到customers表
+- 插入一个新客户到 customers 表
   
     ```mysql
     -- 方式一：明确指定列名，推荐使用
@@ -791,7 +791,7 @@ ORDER BY vend_id,prod_price;
 
 ### （二）插入多个行 
 
-- 方法1： 提交多个insert 语句
+- 方法 1： 提交多个 insert 语句
 
     ```mysql
     insert into customers(cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country) values('Pep E. LaPew','100 Main Street','LosAngeles','CA','90046','USA');
@@ -799,8 +799,8 @@ ORDER BY vend_id,prod_price;
     values('M. Martian','42 Galaxy Way','New York','NY','11213','USA');
     ```
 
-- 方法2： 只要每条INSERT语句中的列名（和次序）相同，可以如下组合各语句
-    单条INSERT语句有多组值，每组值用一对圆括号括起来，用逗号分隔
+- 方法 2： 只要每条 INSERT 语句中的列名（和次序）相同，可以如下组合各语句
+    单条 INSERT 语句有多组值，每组值用一对圆括号括起来，用逗号分隔
 
     ```mysql
     insert into customers(cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
@@ -809,7 +809,7 @@ ORDER BY vend_id,prod_price;
 
 - 插入检索出来的值 
     **INSERT 和 SELECT 语句中的列名不要求一定匹配**，MySQL 不会关系 SELECT 返回的列名，仅仅使用对应的列进行对应填充即可；
-    新建custnew表（非书本内容）
+    新建 custnew 表（非书本内容）
 
     ```mysql
     CREATE TABLE custnew (
@@ -826,15 +826,15 @@ ORDER BY vend_id,prod_price;
     ) ENGINE=InnoDB;
     ```
 
-- 在表custnew中插入一行数据 （非书本内容）
+- 在表 custnew 中插入一行数据 （非书本内容）
 
     ```mysql
     insert into custnew (cust_id,cust_contact,cust_email,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
     values(null,null,'mysql carsh course@learning.com','Y.CARY','BAKE WAY','NEW YORK','NY','112103','USA');
     ```
 
-- 将custnew中内容插入到customers表中 
-    同书本代码不同，这里省略了custs_id,这样MySQL就会生成新值。
+- 将 custnew 中内容插入到 customers 表中 
+    同书本代码不同，这里省略了 custs_id,这样 MySQL 就会生成新值。
 
     ```mysql
     insert into customers (cust_contact,cust_email,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country)
@@ -846,9 +846,9 @@ ORDER BY vend_id,prod_price;
 
 ### （一）更新数据
 
-update语句 : 删除或更新指定列 
+update 语句 : 删除或更新指定列 
 - 更新单列： 
-    客户10005现在有了电子邮件地址
+    客户 10005 现在有了电子邮件地址
     `update customers set cust_email = 'elmer@fudd.com' WHERE cust_id = 10005;`
     
 - 更新多列： 
@@ -871,7 +871,7 @@ update语句 : 删除或更新指定列
 
 **使用 delete 仅仅是从表中删除行，即使删除所有行也不会删除表本身；**
 
-- truncate table语句 
+- truncate table 语句 
     **如果想从表中删除所有行，不要使用DELETE，可使用TRUNCATE TABLE语句，TRUNCATE 实际是删除原来的表并重新创建一个表，而不是逐行删除表中的数据**。
 
 ## 第 21 章 创建和操纵表  
@@ -937,7 +937,7 @@ update语句 : 删除或更新指定列
 
 ### （一）基本概念
 
-- 视图（需要 MySQL5.0 以上）提供了一种MySQL的SELECT语句层次的封装，可用来简化数据处理以及重新格式化基础数据或保护基础数据。 
+- 视图（需要 MySQL5.0 以上）提供了一种 MySQL 的 SELECT 语句层次的封装，可用来简化数据处理以及重新格式化基础数据或保护基础数据。 
 
 - **视图是虚拟的表，它不包含表中应该有的任何列或者数据，视图只包含使用时动态检索数据的 SQL 查询**；
 
@@ -956,7 +956,7 @@ update语句 : 删除或更新指定列
     *   与表一样，视图必须唯一命名
     *   对于可以创建的视图数目没有限制
     *   创建视图，必须具有足够的访问权限。这些权限通常由数据库管理人员授予
-    *   视图可以嵌套，即可以利用从其他视图中检索数据的查询来构造视图。所允许的嵌套层数在不同的DBMS 中有所不同（嵌套视图可能会严重降低查询的性能，因此在产品环境中使用之前，应该对其进行全面测试）
+    *   视图可以嵌套，即可以利用从其他视图中检索数据的查询来构造视图。所允许的嵌套层数在不同的 DBMS 中有所不同（嵌套视图可能会严重降低查询的性能，因此在产品环境中使用之前，应该对其进行全面测试）
     *   视图不能索引，也不能有关联的触发器或默认值
 
 ### （二）使用
@@ -964,13 +964,13 @@ update语句 : 删除或更新指定列
 - 创建视图 `create view`
 - 创建视图的语句 `show create view viewname`
 - 删除视图 `drop view viewname`
-- 更新视图 先drop后create 或者直接用`create or repalce view`
+- 更新视图 先 drop 后 create 或者直接用`create or repalce view`
 
 #### 可以使用视图简化复杂的联结
 
 **一次编写基础的 SQL，多次使用；**
 
-- 创建一个名为productcustomers的视图，联结了三张表，返回订购任意产品的所有用户列表；
+- 创建一个名为 productcustomers 的视图，联结了三张表，返回订购任意产品的所有用户列表；
 
 ```sql
 create view productcustomers as
@@ -980,14 +980,14 @@ where customers.cust_id = orders.cust_id
 and orders.order_num = orderitems.order_num;
 ```
 
-- 检索订购了产品TNT2的客户
+- 检索订购了产品 TNT2 的客户
     `select cust_name,cust_contact from productcustomers where prod_id = 'TNT2';`
     **上面分析：** MySQL 处理这个查询的时候会将指定的 where 子句添加到视图查询中的已有的 where 子句中，从而正确的过滤数据；
 
 
 #### 用视图重新格式化检索出的数据
 
-- (来自第10章）在单个组合计算列中返回供应商名和位置
+- (来自第 10 章）在单个组合计算列中返回供应商名和位置
     `select concat(rtrim(vend_name),' (',rtrim(vend_country),')') as vend_title from vendors order by vend_name;`
     若经常使用上述格式组合，可以创建视图 
     `create view vendorlocations as select concat(rtrim(vend_name),' (',rtrim(vend_country),')') as vend_title from vendors order by vend_name;`
@@ -997,7 +997,7 @@ and orders.order_num = orderitems.order_num;
 
 #### 用视图过滤不想要的数据
 
-- 定义customeremaillist视图，它过滤没有电子邮件地址的客户
+- 定义 customeremaillist 视图，它过滤没有电子邮件地址的客户
 
 ```sql
 create view customeremaillist as 
@@ -1009,12 +1009,12 @@ select * from customeremaillist;
 
 #### 使用视图与计算字段
 
-(来自第10章）检索某个特定订单中的物品，计算每种物品的总价格
+(来自第 10 章）检索某个特定订单中的物品，计算每种物品的总价格
 `select prod_id,quantity,item_price,quantity*item_price as expanded_price from orderitems where order_num = 20005;`
 **使用视图的做法为：**
 将其转换为一个视图
 `create view orderitemsexpanded as select order_num,prod_id,quantity,item_price,quantity*item_price as expanded_price from orderitems;`
-创建视图的时候select添加了列名order_num,否则无法按照order_num进行过滤查找 
+创建视图的时候 select 添加了列名 order_num,否则无法按照 order_num 进行过滤查找 
 `select * from orderitemsexpanded where order_num = 20005;`
 
 
@@ -1047,13 +1047,13 @@ select * from customeremaillist;
 *   通过把处理封装在一个易用的单元中，可以**简化**复杂的操作
 *   由于不要求反复建立一系列处理步骤，因而保证了**数据的一致性**。可以防止错误。需要执行的步骤越多，出错的可能性就越大。
 *   简化对变动的管理。提高**安全**性。通过存储过程限制对基础数据的访问，减少了数据讹误（无意识的或别的原因所导致的数据讹误）的机会
-*   存储过程通常以编译过的形式存储，所以DBMS处理命令的工作较少，提高了**性能**
-*   存在一些只能用在单个请求中的SQL元素和特性，存储过程可以使用它们来编写功能更强更**灵活**的代码
+*   存储过程通常以编译过的形式存储，所以 DBMS 处理命令的工作较少，提高了**性能**
+*   存在一些只能用在单个请求中的 SQL 元素和特性，存储过程可以使用它们来编写功能更强更**灵活**的代码
 
 **存储过程的缺点**
 
-*   不同DBMS中的存储过程语法有所不同。可移植性差
-*   编写存储过程比编写基本SQL语句复杂，需要更高的技能，更丰富的经验
+*   不同 DBMS 中的存储过程语法有所不同。可移植性差
+*   编写存储过程比编写基本 SQL 语句复杂，需要更高的技能，更丰富的经验
 
 
 - 创建存储过程 
@@ -1105,7 +1105,7 @@ select * from customeremaillist;
     
     ```
 
-    为调用上述存储过程，必须指定3个变量名
+    为调用上述存储过程，必须指定 3 个变量名
 
     `call productpricing(@pricelow,@pricehigh,@priceaverage);`
 
@@ -1119,7 +1119,7 @@ select * from customeremaillist;
 
 - 使用参数 in 和 out
 
-     使用IN和OUT参数,存储过程ordertotal接受订单号并返回该订单的合计
+     使用 IN 和 OUT 参数,存储过程 ordertotal 接受订单号并返回该订单的合计
 
     ```mysql
     delimiter //
@@ -1138,7 +1138,7 @@ select * from customeremaillist;
     delimiter ;
     ```
 
-    给ordertotal传递两个参数；
+    给 ordertotal 传递两个参数；
 
      第一个参数为订单号，第二个参数为包含计算出来的合计的变量名
 
@@ -1203,7 +1203,7 @@ call ordertotal(20005,1,@total);
 select @total;
 
 
- 显示用来创建一个存储过程的CREATE语句
+ 显示用来创建一个存储过程的 CREATE 语句
 
 show create procedure ordertotal;
 
@@ -1224,7 +1224,7 @@ show procedure status like 'ordertotal';
 
 - 创建、打开、关闭游标 
 
-     定义名为ordernumbers的游标，检索所有订单
+     定义名为 ordernumbers 的游标，检索所有订单
 
     ```mysql
     delimiter //
@@ -1246,7 +1246,7 @@ show procedure status like 'ordertotal';
 
 -  使用游标数据 
 
- 例1：检索 当前行 的order_num列，对数据不做实际处理
+ 例 1：检索 当前行 的 order_num 列，对数据不做实际处理
 
 ```mysql
 delimiter //
@@ -1264,7 +1264,7 @@ END //
 delimiter ;
 ```
 
- 例2：循环检索数据，从第一行到最后一行，对数据不做实际处理
+ 例 2：循环检索数据，从第一行到最后一行，对数据不做实际处理
 
 ```mysql
 delimiter //
@@ -1296,7 +1296,7 @@ delimiter ;
 
 
 
-例3：循环检索数据，从第一行到最后一行，对取出的数据进行某种实际的处理
+例 3：循环检索数据，从第一行到最后一行，对取出的数据进行某种实际的处理
 
 ```mysql
 delimiter //
@@ -1346,7 +1346,7 @@ select * from ordertotals;
 
     `create trigger newproduct after insert on products for each row select 'product added' into @new_pro;`
 
-    mysql 5.0以上版本在TRIGGER中不能返回结果集，定义了变量 @new_pro;
+    mysql 5.0 以上版本在 TRIGGER 中不能返回结果集，定义了变量 @new_pro;
 
     ```mysql
     - insert into products(prod_id,vend_id,prod_name,prod_price) values ('ANVNEW','1005','3 ton anvil','6.09'); # 插入一行 
@@ -1359,7 +1359,7 @@ select * from ordertotals;
     `drop trigger newproduct;`
 
 - 使用触发器 
-    -  insert触发器
+    -  insert 触发器
 
         ```mysql
         create trigger neworder after insert on orders for each row select new.order_num into @order_num;
@@ -1369,9 +1369,9 @@ select * from ordertotals;
         select @order_num;
         ```
 
-    -  delete触发器
+    -  delete 触发器
 
-         使用OLD保存将要被删除的行到一个存档表中 
+         使用 OLD 保存将要被删除的行到一个存档表中 
 
         ```mysql
         delimiter //
@@ -1386,7 +1386,7 @@ select * from ordertotals;
         delimiter ;
         ```
 
-    - update触发器
+    - update 触发器
 
         ```mysql
         #在更新vendors表中的vend_state值时，插入前先修改为大写格式 
@@ -1410,7 +1410,7 @@ select * from ordertotals;
 
 - 回退 rollback 指撤销指定 sql 语句的过程
 
-- 提交 commit 指将未存储的sql语句结果写入数据库表
+- 提交 commit 指将未存储的 sql 语句结果写入数据库表
 
 - 保留点 savepoint 指事务处理中设置的临时占位符，可以对它发布回退（与回退整个事务处理不同）
 
@@ -1457,7 +1457,7 @@ select * from ordertotals;
 
 - 更改默认的提交行为 
 
-    `set autocommit = 0;`  # 设置autocommit为0（假）指示MySQL不自动提交更改
+    `set autocommit = 0;`  # 设置 autocommit 为 0（假）指示 MySQL 不自动提交更改
 
 
 ## 第 27 章 全球化和本地化
@@ -1485,7 +1485,7 @@ select * from ordertotals;
     ) default character set hebrew  collate hebrew_general_ci;
     ```
 
-- 除了能指定字符集和校对的表范围外，MySQL还允许对每个列设置它们
+- 除了能指定字符集和校对的表范围外，MySQL 还允许对每个列设置它们
 
     ```mysql
     create table mytable(
@@ -1497,7 +1497,7 @@ select * from ordertotals;
 
 - 校对 collate 在对用 ORDER BY 子句排序时起重要的作用
 
-     如果要用与创建表时不同的校对顺序排序，可在 SELECT语句中说明 
+     如果要用与创建表时不同的校对顺序排序，可在 SELECT 语句中说明 
 
     `select * from customers order by lastname,firstname collate latin1_general_cs;`
 

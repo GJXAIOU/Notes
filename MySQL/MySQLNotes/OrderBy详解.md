@@ -104,7 +104,7 @@ select * from information_schema.optimizer_trace
 
 ### rowid 排序
 
-rowid 排序就是，只把查询 SQL **需要用于排序的字段和主键 id**，放到 `sort_buffer` 中。那怎么确定走的是全字段排序还是rowid 排序排序呢？
+rowid 排序就是，只把查询 SQL **需要用于排序的字段和主键 id**，放到 `sort_buffer` 中。那怎么确定走的是全字段排序还是 rowid 排序排序呢？
 
 通过 `max_length_for_sort_data` 参数来区分，它表示 MySQL 用于排序行数据的长度的一个参数，如果单行的长度超过这个值，MySQL 就认为单行太大，就换 rowid 排序。我们可以通过命令看下这个参数取值。
 
@@ -159,7 +159,7 @@ select * from information_schema.optimizer_trace
 - 全字段排序：`sort_buffer` 内存不够的话，就需要用到磁盘临时文件，造成**磁盘访问**。
 - rowid 排序：`sort_buffer` 可以放更多数据，但是需要再回到原表去取数据，比全字段排序多一次**回表**。
 
-一般情况下，对于 InnoDB 存储引擎，会优先使**用全字段**排序。可以发现 `max_length_for_sort_data` 参数设置为1024，这个数比较大的。一般情况下，排序字段不会超过这个值，也就是都会走**全字段**排序。
+一般情况下，对于 InnoDB 存储引擎，会优先使**用全字段**排序。可以发现 `max_length_for_sort_data` 参数设置为 1024，这个数比较大的。一般情况下，排序字段不会超过这个值，也就是都会走**全字段**排序。
 
 ## 三、order by 的一些优化思路
 
@@ -210,7 +210,7 @@ explain select name,age,city from staff where city = '深圳' order by age limit
 
 ### 调整参数优化
 
-我们还可以通过调整参数，去优化 order b y的执行。比如可以调整 `sort_buffer_size` 的值。因为 `sort_buffer` 值太小，数据量大的话，会借助磁盘临时文件排序。如果 MySQL 服务器配置高的话，可以使用稍微调整大点。
+我们还可以通过调整参数，去优化 order b y 的执行。比如可以调整 `sort_buffer_size` 的值。因为 `sort_buffer` 值太小，数据量大的话，会借助磁盘临时文件排序。如果 MySQL 服务器配置高的话，可以使用稍微调整大点。
 
 我们还可以调整 `max_length_for_sort_data` 的值，这个值太小的话，order by 会走 rowid 排序，会回表，降低查询性能。所以 `max_length_for_sort_data` 可以适当大一点。
 
@@ -259,7 +259,7 @@ select name,age from staff  order by age ,name desc limit 10;
 
 ![图片](OrderBy详解.resource/640-164934849969933.png)
 
-这是因为，`idx_age_name` 索引树中，age 从小到大排序，如果 `age` 相同，再按 `name` 从小到大排序。而 order by 中，是按age 从小到大排序，如果 age 相同，再按 name 从大到小排序。即索引存储顺序与 order by 不一致。
+这是因为，`idx_age_name` 索引树中，age 从小到大排序，如果 `age` 相同，再按 `name` 从小到大排序。而 order by 中，是按 age 从小到大排序，如果 age 相同，再按 name 从大到小排序。即索引存储顺序与 order by 不一致。
 
 我们怎么优化呢？如果 MySQL 是 8.0 版本，支持 `Descending Indexes`，可以这样修改索引：
 
@@ -285,7 +285,7 @@ select * from staff where city in ('深圳') order by age limit 10;
 
 ![图片](OrderBy详解.resource/640-164934875350136.png)
 
-但是，如果使用in条件，并且有多个条件时，就会有排序过程。
+但是，如果使用 in 条件，并且有多个条件时，就会有排序过程。
 
 ```
  explain select * from staff where city in ('深圳','上海') order by age limit 10;
@@ -293,5 +293,5 @@ select * from staff where city in ('深圳') order by age limit 10;
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1Pmpwlj1dDtegxsHWfNCSQev65mBZzGBAC5xu0PZoPndgHwrV9ELiaibMg07wiaHMc1C9U3suZkOLGniaKnQ/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
 
-这是因为:in有两个条件，在满足深圳时，age是排好序的，但是把满足上海的age也加进来，就不能保证满足所有的age都是排好序的。因此需要Using filesort。
+这是因为:in 有两个条件，在满足深圳时，age 是排好序的，但是把满足上海的 age 也加进来，就不能保证满足所有的 age 都是排好序的。因此需要 Using filesort。
 

@@ -14,15 +14,15 @@
 
 
 
-上节课，我给你介绍了Redis Cluster节点处理命令的过程。现在你知道，在这个过程中，节点会调用**getNodeByQuery函数**检查访问的key所属的节点，如果收到命令的节点并不是key所属的节点，那么当前节点就会生成CLUSTER\_REDIR\_MOVED或者CLUSTER\_REDIR\_ASK的报错信息，并给客户端返回MOVED或ASK命令。
+上节课，我给你介绍了 Redis Cluster 节点处理命令的过程。现在你知道，在这个过程中，节点会调用**getNodeByQuery函数**检查访问的 key 所属的节点，如果收到命令的节点并不是 key 所属的节点，那么当前节点就会生成 CLUSTER\_REDIR\_MOVED 或者 CLUSTER\_REDIR\_ASK 的报错信息，并给客户端返回 MOVED 或 ASK 命令。
 
 
 
-其实，这两个报错信息就对应了Redis Cluster的数据迁移。数据迁移是分布式存储集群经常会遇到的一个问题，当集群节点承担的负载压力不均衡时，或者有新节点加入或是已有节点下线时，那么，数据就需要在不同的节点间进行迁移。所以，**如何设计和实现数据迁移也是在集群开发过程中，我们需要考虑的地方。**
+其实，这两个报错信息就对应了 Redis Cluster 的数据迁移。数据迁移是分布式存储集群经常会遇到的一个问题，当集群节点承担的负载压力不均衡时，或者有新节点加入或是已有节点下线时，那么，数据就需要在不同的节点间进行迁移。所以，**如何设计和实现数据迁移也是在集群开发过程中，我们需要考虑的地方。**
 
 
 
-那么今天这节课，我就来介绍下Redis Cluster是如何实现数据迁移的。从源码层面掌握这部分内容，可以帮助你了解数据迁移对集群节点正常处理命令的影响，这样你就可以选择合适时机进行迁移。而且，掌握Redis的数据迁移实现，也能为你自己开发集群提供一个不错的参考示例。
+那么今天这节课，我就来介绍下 Redis Cluster 是如何实现数据迁移的。从源码层面掌握这部分内容，可以帮助你了解数据迁移对集群节点正常处理命令的影响，这样你就可以选择合适时机进行迁移。而且，掌握 Redis 的数据迁移实现，也能为你自己开发集群提供一个不错的参考示例。
 
 
 
@@ -34,13 +34,13 @@
 
 ## 记录数据迁移的数据结构
 
-首先你要知道，Redis Cluster是先把键值对映射到哈希槽（slots）中，然后通过给不同集群节点分配slots这样的方法，来完成数据在集群节点间的分配的。关于这部分的知识，你也可以去看看第一季的[第9讲](<https://time.geekbang.org/column/article/276545>)。
+首先你要知道，Redis Cluster 是先把键值对映射到哈希槽（slots）中，然后通过给不同集群节点分配 slots 这样的方法，来完成数据在集群节点间的分配的。关于这部分的知识，你也可以去看看第一季的[第9讲](<https://time.geekbang.org/column/article/276545>)。
 
 
 
-那么，在源码实现层面，Redis Cluster的每个集群节点都对应了一个**clusterNode的结构体**（在[cluster.h](<https://github.com/redis/redis/tree/5.0/src/cluster.h>)文件中）。这个结构体中包含了一个char类型的数组，用来记录当前节点在负责哪些slots。
+那么，在源码实现层面，Redis Cluster 的每个集群节点都对应了一个**clusterNode的结构体**（在[cluster.h](<https://github.com/redis/redis/tree/5.0/src/cluster.h>)文件中）。这个结构体中包含了一个 char 类型的数组，用来记录当前节点在负责哪些 slots。
 
-这个数组的定义如下所示，它的长度是宏定义CLUSTER\_SLOTS除以8，而CLUSTER\_SLOTS宏定义的值是16384，表示的是Redis Cluster的slots总个数。这个值除以8之后，就意味着数组每个元素的每一位表示1个slot。如果数组元素某一位的值是1，那么就表明当前节点负责这一位对应的slot。
+这个数组的定义如下所示，它的长度是宏定义 CLUSTER\_SLOTS 除以 8，而 CLUSTER\_SLOTS 宏定义的值是 16384，表示的是 Redis Cluster 的 slots 总个数。这个值除以 8 之后，就意味着数组每个元素的每一位表示 1 个 slot。如果数组元素某一位的值是 1，那么就表明当前节点负责这一位对应的 slot。
 
 ```plain
 typedef struct clusterNode {
@@ -50,7 +50,7 @@ typedef struct clusterNode {
 }
 ```
 
-但是，如果只是用clusterNodes中的slots数组，并不能记录数据迁入迁出的情况，所以，Redis Cluster针对整个集群设计了**clusterState结构体**（在cluster.h文件中）。这个结构体中包含了三个clusterNode类型的数组和一个rax类型的字典树。这三个数组的大小，都是集群slots的总个数16384，如下所示：
+但是，如果只是用 clusterNodes 中的 slots 数组，并不能记录数据迁入迁出的情况，所以，Redis Cluster 针对整个集群设计了**clusterState结构体**（在 cluster.h 文件中）。这个结构体中包含了三个 clusterNode 类型的数组和一个 rax 类型的字典树。这三个数组的大小，都是集群 slots 的总个数 16384，如下所示：
 
 ```plain
 typedef struct clusterState {
@@ -65,10 +65,10 @@ typedef struct clusterState {
 
 这几个结构主要是被用来记录数据迁入迁出的情况，它们的含义如下。
 
-- **migrating\_slots\_to数组**：表示当前节点负责的slot正在迁往哪个节点。比如，migrating\_slots\_to[K] = node1，这就表示当前节点负责的slot K，正在迁往node1。
-- **importing\_slots\_from数组**：表示当前节点正在从哪个节点迁入某个slot。比如，importing\_slots\_from[L] = node3，这就表示当前节点正从node3迁入slot L。
-- **slots数组**：表示16384个slot分别是由哪个节点负责的。比如，slots[M] = node2，这就表示slot M是由node2负责的。
-- **slots\_to\_keys字典树**：用来记录slot和key的对应关系，可以通过它快速找到slot上有哪些keys。
+- **migrating\_slots\_to数组**：表示当前节点负责的 slot 正在迁往哪个节点。比如，migrating\_slots\_to[K] = node1，这就表示当前节点负责的 slot K，正在迁往 node1。
+- **importing\_slots\_from数组**：表示当前节点正在从哪个节点迁入某个 slot。比如，importing\_slots\_from[L] = node3，这就表示当前节点正从 node3 迁入 slot L。
+- **slots数组**：表示 16384 个 slot 分别是由哪个节点负责的。比如，slots[M] = node2，这就表示 slot M 是由 node2 负责的。
+- **slots\_to\_keys字典树**：用来记录 slot 和 key 的对应关系，可以通过它快速找到 slot 上有哪些 keys。
 
 <!-- -->
 
@@ -80,10 +80,10 @@ typedef struct clusterState {
 
 ## 数据迁移过程的设计与实现
 
-Redis Cluster迁移数据的整个过程可以分成五个大步骤，分别是：
+Redis Cluster 迁移数据的整个过程可以分成五个大步骤，分别是：
 
 - 标记迁入、迁出节点；
-- 获取迁出的keys；
+- 获取迁出的 keys；
 - 源节点实际迁移数据；
 - 目的节点处理迁移数据；
 - 标记迁移结果。
@@ -98,31 +98,31 @@ Redis Cluster迁移数据的整个过程可以分成五个大步骤，分别是�
 
 ### 标记迁入、迁出节点
 
-在Redis Cluster中迁移数据时，我们需要先使用CLUSTER SETSLOT命令，在待迁入数据的目的节点上标记待迁出数据的源节点，使用的命令如下所示：
+在 Redis Cluster 中迁移数据时，我们需要先使用 CLUSTER SETSLOT 命令，在待迁入数据的目的节点上标记待迁出数据的源节点，使用的命令如下所示：
 
 ```plain
 CLUSTER&nbsp; SETSLOT&nbsp; <slot>&nbsp; IMPORTING&nbsp; <node> //<slot>表示要迁入的哈希槽，<node>表示当前负责<slot>的节点
 ```
 
-然后，我们需要使用CLUSTER SETSLOT命令，在待迁出数据的源节点上标记将要迁入数据的目的节点，使用的命令如下所示：
+然后，我们需要使用 CLUSTER SETSLOT 命令，在待迁出数据的源节点上标记将要迁入数据的目的节点，使用的命令如下所示：
 
 ```plain
 CLUSTER&nbsp; SETSLOT&nbsp; <slot>&nbsp; MIGRATING&nbsp; <node> //<slot>表示要迁出的哈希槽，<node>表示<slot>要迁往的目的节点
 ```
 
-为了便于你理解，我来举个例子。假设slot 3在节点A上，现在我们要把slot 3从节点A上迁移到节点B上，那么，此时节点A就是待迁出数据的源节点，而节点B就是待迁入数据的目的节点。我们要先在节点B上执行如下命令，用来标记源节点。
+为了便于你理解，我来举个例子。假设 slot 3 在节点 A 上，现在我们要把 slot 3 从节点 A 上迁移到节点 B 上，那么，此时节点 A 就是待迁出数据的源节点，而节点 B 就是待迁入数据的目的节点。我们要先在节点 B 上执行如下命令，用来标记源节点。
 
 ```plain
 CLUSTER&nbsp; SETSLOT&nbsp; slot3&nbsp; IMPORTING&nbsp; nodeA
 ```
 
-然后，我们在节点A上执行如下命令，用来标记目的节点。
+然后，我们在节点 A 上执行如下命令，用来标记目的节点。
 
 ```plain
 CLUSTER&nbsp; SETSLOT&nbsp; slot3&nbsp; MIGRATING&nbsp; nodeB
 ```
 
-对于CLUSTER命令来说，它的处理函数是**clusterCommand**（在[cluster.c](<https://github.com/redis/redis/tree/5.0/src/cluster.c>)文件中）。在这个函数中，它会根据CLUSTER命令携带的不同选项，执行不同的代码分支。因此，对于刚才介绍的标记slot迁入、迁出的SETSLOT选项，它们在clusterCommand函数中对应的代码分支如下所示：
+对于 CLUSTER 命令来说，它的处理函数是**clusterCommand**（在[cluster.c](<https://github.com/redis/redis/tree/5.0/src/cluster.c>)文件中）。在这个函数中，它会根据 CLUSTER 命令携带的不同选项，执行不同的代码分支。因此，对于刚才介绍的标记 slot 迁入、迁出的 SETSLOT 选项，它们在 clusterCommand 函数中对应的代码分支如下所示：
 
 ```plain
 void clusterCommand(client *c) {
@@ -140,31 +140,31 @@ else if (!strcasecmp(c->argv[1]->ptr,"setslot") && c->argc >= 4) {
 }
 ```
 
-这里，我们来看一下处理migrating和importing标记的具体逻辑。其实，clusterCommand函数对这两个标记的处理逻辑基本都是分成三步。
+这里，我们来看一下处理 migrating 和 importing 标记的具体逻辑。其实，clusterCommand 函数对这两个标记的处理逻辑基本都是分成三步。
 
-**第一步**，对于数据迁出来说，该函数会判断迁出的slot是否在当前节点；而对于数据迁入来说，该函数会判断迁入的slot是否在当前节点。如果迁出的slot不在当前节点，或者迁入的slot已在当前节点，那么clusterCommand函数就**返回报错信息**了。这是因为，在这两种情况下节点无法执行slot迁移。
+**第一步**，对于数据迁出来说，该函数会判断迁出的 slot 是否在当前节点；而对于数据迁入来说，该函数会判断迁入的 slot 是否在当前节点。如果迁出的 slot 不在当前节点，或者迁入的 slot 已在当前节点，那么 clusterCommand 函数就**返回报错信息**了。这是因为，在这两种情况下节点无法执行 slot 迁移。
 
-**第二步**，如果迁出的slot在当前节点，或者迁入的slot不在当前节点，那么，clusterCommand函数就会**调用clusterLookupNode函数**（在cluster.c文件中），来查询CLUSTER SETSLOT命令中包含的<node>。这主要是依赖于clusterLookupNode函数根据输入的节点ID，在全局变量server的cluster-&gt;nodes数组中，查找并返回对应节点。</node>
+**第二步**，如果迁出的 slot 在当前节点，或者迁入的 slot 不在当前节点，那么，clusterCommand 函数就会**调用clusterLookupNode函数**（在 cluster.c 文件中），来查询 CLUSTER SETSLOT 命令中包含的<node>。这主要是依赖于 clusterLookupNode 函数根据输入的节点 ID，在全局变量 server 的 cluster-&gt;nodes 数组中，查找并返回对应节点。</node>
 
-**第三步**，clusterCommand函数会把migrating\_slots\_to数组中迁出slot，或者importing\_slots\_from数组中迁入slot对应的节点，设置为clusterLookupNode函数查找的结果。
+**第三步**，clusterCommand 函数会把 migrating\_slots\_to 数组中迁出 slot，或者 importing\_slots\_from 数组中迁入 slot 对应的节点，设置为 clusterLookupNode 函数查找的结果。
 
-我也画了两张图，分别展示了clusterCommand函数处理CLUSTER SETSLOT命令的migrating和importing标记的基本逻辑，你可以再看下。
+我也画了两张图，分别展示了 clusterCommand 函数处理 CLUSTER SETSLOT 命令的 migrating 和 importing 标记的基本逻辑，你可以再看下。
 
 ![图片](<https://static001.geekbang.org/resource/image/f2/f0/f2e684ceb12727da52786f6479390ff0.jpg?wh=1920x1080> "处理migrating标记")
 
 ![图片](<https://static001.geekbang.org/resource/image/6a/cc/6af04dbe699ee54b11fe3640a51cb0cc.jpg?wh=1920x1080> "处理importing标记")
 
-这样一来，当在Redis Cluster中标记完迁入和迁出的节点后，我们就可以使用CLUSTER GETKEYSINSLOT命令，来获取要迁出的keys了。下面我们来看下这步操作的实现。
+这样一来，当在 Redis Cluster 中标记完迁入和迁出的节点后，我们就可以使用 CLUSTER GETKEYSINSLOT 命令，来获取要迁出的 keys 了。下面我们来看下这步操作的实现。
 
 ### 获取待迁出的keys
 
-我们用来获取待迁出的keys的具体命令如下所示，其中<slot>表示要迁移的slot，而<count>表示要迁移的key的数量。</count></slot>
+我们用来获取待迁出的 keys 的具体命令如下所示，其中<slot>表示要迁移的 slot，而<count>表示要迁移的 key 的数量。</count></slot>
 
 ```plain
 CLUSTER&nbsp; GETKEYSINSLOT&nbsp; <slot>&nbsp; <count>
 ```
 
-因为这里我们用的还是CLUSTER命令，所以，获取待迁出keys的命令处理也还是在**clusterCommand函数**中，对应了GETKEYSINSLOT选项的代码分支，如下所示：
+因为这里我们用的还是 CLUSTER 命令，所以，获取待迁出 keys 的命令处理也还是在**clusterCommand函数**中，对应了 GETKEYSINSLOT 选项的代码分支，如下所示：
 
 ```plain
 void clusterCommand(client *c) {
@@ -176,7 +176,7 @@ else if (!strcasecmp(c->argv[1]->ptr,"getkeysinslot") && c->argc == 4) {...}
 
 这个代码分支的处理逻辑也比较简单，它主要可以分成三步。
 
-**首先**，这个代码分支会**调用getLongLongFromObjectOrReply函数**（在[object.c](<https://github.com/redis/redis/tree/5.0/src/object.c>)文件中），从CLUSTER GETKEYSINSLOT命令中获取<slot>和<count>参数，这里的<count>参数会被赋值给maxkeys变量，如下所示：</count></count></slot>
+**首先**，这个代码分支会**调用getLongLongFromObjectOrReply函数**（在[object.c](<https://github.com/redis/redis/tree/5.0/src/object.c>)文件中），从 CLUSTER GETKEYSINSLOT 命令中获取<slot>和<count>参数，这里的<count>参数会被赋值给 maxkeys 变量，如下所示：</count></count></slot>
 
 ```plain
 //解析获取slot参数
@@ -187,7 +187,7 @@ if (getLongLongFromObjectOrReply(c,c->argv[3],&maxkeys,NULL)!= C_OK)
 &nbsp; &nbsp; &nbsp; return;
 ```
 
-**然后**，clusterCommand函数会**调用countKeysInSlot函数**（在[db.c](<https://github.com/redis/redis/tree/5.0/src/db.c>)文件中），获取待迁移slot中实际的key的数量。如果刚才从命令中获取的key的迁移数量maxkeys，大于实际的key数量，那么maxkeys的值会被更新为实际的key数量。紧接着，clusterCommand函数会给这些key分配空间。
+**然后**，clusterCommand 函数会**调用countKeysInSlot函数**（在[db.c](<https://github.com/redis/redis/tree/5.0/src/db.c>)文件中），获取待迁移 slot 中实际的 key 的数量。如果刚才从命令中获取的 key 的迁移数量 maxkeys，大于实际的 key 数量，那么 maxkeys 的值会被更新为实际的 key 数量。紧接着，clusterCommand 函数会给这些 key 分配空间。
 
 ```plain
 unsigned int keys_in_slot = countKeysInSlot(slot);  //获取迁移slot中实际的key数量
@@ -195,7 +195,7 @@ if (maxkeys > keys_in_slot) maxkeys = keys_in_slot; //如果实际的key数量�
 keys = zmalloc(sizeof(robj*)*maxkeys); //给key分配空间
 ```
 
-**最后**，这个代码分支会**调用getKeysInSlot函数**（在db.c文件中），从迁移slot中获取实际的key，并将这些key返回给客户端，如下所示：
+**最后**，这个代码分支会**调用getKeysInSlot函数**（在 db.c 文件中），从迁移 slot 中获取实际的 key，并将这些 key 返回给客户端，如下所示：
 
 ```plain
 numkeys = getKeysInSlot(slot, keys, maxkeys); //获取实际的key
@@ -206,34 +206,34 @@ for (j = 0; j < numkeys; j++) {
 }
 ```
 
-好了，到这里，客户端就通过CLUSTER GETKEYSINSLOT命令，获得了一定数量的要迁移的key。接下来，我们就要开始执行实际的迁移操作了，我们来具体看下。
+好了，到这里，客户端就通过 CLUSTER GETKEYSINSLOT 命令，获得了一定数量的要迁移的 key。接下来，我们就要开始执行实际的迁移操作了，我们来具体看下。
 
 ### 源节点实际迁移数据
 
-在实际迁移数据时，我们需要在待迁出数据的源节点上**执行MIGRATE命令**。其实，MIGRATE命令既支持迁移单个key，也支持一次迁移多个key，它们的基本处理流程是相同的，都是在**migrateCommand函数**中实现的。
+在实际迁移数据时，我们需要在待迁出数据的源节点上**执行MIGRATE命令**。其实，MIGRATE 命令既支持迁移单个 key，也支持一次迁移多个 key，它们的基本处理流程是相同的，都是在**migrateCommand函数**中实现的。
 
-这里，我以一次迁移多个key的MIGRATE命令为例，这个命令的选项中包含了目的节点的IP、端口号、数据库编号，以及要迁移的多个key、迁移超时时间，它的格式如下所示：
+这里，我以一次迁移多个 key 的 MIGRATE 命令为例，这个命令的选项中包含了目的节点的 IP、端口号、数据库编号，以及要迁移的多个 key、迁移超时时间，它的格式如下所示：
 
 ```plain
 MIGRATE host port "" dbid timeout [COPY | REPLACE] KEYS key1 key2 ... keyN
 ```
 
-从这个命令中，你也可以看到，它还包括了COPY或REPLACE选项，这两个选项的含义如下。
+从这个命令中，你也可以看到，它还包括了 COPY 或 REPLACE 选项，这两个选项的含义如下。
 
-- **COPY**：如果目的节点已经存在待迁移的key，则报错；如果目的节点不存在待迁移的key，那么就正常迁移，并在迁移后，删除源节点上的key。
-- **REPLACE**：无论目的节点是否存在待迁移的key，都会正常执行迁移，并覆盖已经存在的key。
+- **COPY**：如果目的节点已经存在待迁移的 key，则报错；如果目的节点不存在待迁移的 key，那么就正常迁移，并在迁移后，删除源节点上的 key。
+- **REPLACE**：无论目的节点是否存在待迁移的 key，都会正常执行迁移，并覆盖已经存在的 key。
 
 <!-- -->
 
-好，了解了MIGRATE命令的含义后，我们就来看下migrateCommand函数的基本处理流程，这个函数的执行过程主要可以分成四步。
+好，了解了 MIGRATE 命令的含义后，我们就来看下 migrateCommand 函数的基本处理流程，这个函数的执行过程主要可以分成四步。
 
 **第一步，命令参数检查**
 
-migrateCommand函数首先会检查MIGRATE命令携带的参数，比如是否有COPY或REPLACE标记、dbid和timeout是否能正常读取等。在这一步，migrateCommand函数如果检查到timeout值小于等于0了，它就会把timeout值设置为1000毫秒，用于迁移过程中的超时判断。
+migrateCommand 函数首先会检查 MIGRATE 命令携带的参数，比如是否有 COPY 或 REPLACE 标记、dbid 和 timeout 是否能正常读取等。在这一步，migrateCommand 函数如果检查到 timeout 值小于等于 0 了，它就会把 timeout 值设置为 1000 毫秒，用于迁移过程中的超时判断。
 
 **第二步，读取要迁移的key和value**
 
-检查完命令参数后，migrateCommand函数会分配两个数组ov和kv，它们的初始大小等于MIGRATE命令中要迁移的key的数量。然后，migrateCommand函数会调用lookupKeyRead函数（在db.c文件中），逐一检查要迁移的key是否存在。这是因为有的key在迁移时可能正好过期了，所以就不用迁移这些key了。这一步的最后，migrateCommand函数会根据实际存在的key数量，来设置要迁移的key数量。
+检查完命令参数后，migrateCommand 函数会分配两个数组 ov 和 kv，它们的初始大小等于 MIGRATE 命令中要迁移的 key 的数量。然后，migrateCommand 函数会调用 lookupKeyRead 函数（在 db.c 文件中），逐一检查要迁移的 key 是否存在。这是因为有的 key 在迁移时可能正好过期了，所以就不用迁移这些 key 了。这一步的最后，migrateCommand 函数会根据实际存在的 key 数量，来设置要迁移的 key 数量。
 
 下面的代码展示了这一步的基本逻辑，你可以看下。
 
@@ -253,14 +253,14 @@ num_keys = oi;  //要迁移的key数量等于实际存在的key数量
 
 **第三步，填充迁移用的命令、key和value**
 
-接下来，migrateCommand函数就开始为迁移数据做准备了。这一步骤中的操作主要包括：
+接下来，migrateCommand 函数就开始为迁移数据做准备了。这一步骤中的操作主要包括：
 
-- 调用migrateGetSocket函数（在cluster.c文件中），和目的节点建立连接；
-- 调用rioInitWithBuffer函数初始化一块缓冲区，然后调用rioWriteBulkString、rioWriteBulkLongLong等函数（在[rio.c](<https://github.com/redis/redis/tree/5.0/src/rio.c>)文件中），往这个缓冲区中填充要发送给目的节点的命令、key和value。
+- 调用 migrateGetSocket 函数（在 cluster.c 文件中），和目的节点建立连接；
+- 调用 rioInitWithBuffer 函数初始化一块缓冲区，然后调用 rioWriteBulkString、rioWriteBulkLongLong 等函数（在[rio.c](<https://github.com/redis/redis/tree/5.0/src/rio.c>)文件中），往这个缓冲区中填充要发送给目的节点的命令、key 和 value。
 
 <!-- -->
 
-下面的代码也展示了在这一步中主要填充的命令、key和value，你可以看下。
+下面的代码也展示了在这一步中主要填充的命令、key 和 value，你可以看下。
 
 ```plain
 rioInitWithBuffer(&cmd,sdsempty()); //初始化buffer
@@ -284,13 +284,13 @@ for (j = 0; j < num_keys; j++) {
 }
 ```
 
-这里，你需要注意的是，migrateCommand函数会调用createDumpPayload函数（在cluster.c文件中）将迁移key的value序列化，以便于传输。在序列化的结果中，**createDumpPayload函数会增加RDB版本号和CRC校验和**。等目的节点收到迁移数据后，也会检查这两部分内容，我稍后还会给你介绍。<br>
+这里，你需要注意的是，migrateCommand 函数会调用 createDumpPayload 函数（在 cluster.c 文件中）将迁移 key 的 value 序列化，以便于传输。在序列化的结果中，**createDumpPayload函数会增加RDB版本号和CRC校验和**。等目的节点收到迁移数据后，也会检查这两部分内容，我稍后还会给你介绍。<br>
 
- 当在缓冲区中填充完要发送给目的节点的命令、key和value后，migrateCommand函数就开始发送这个缓冲区中的内容了。
+ 当在缓冲区中填充完要发送给目的节点的命令、key 和 value 后，migrateCommand 函数就开始发送这个缓冲区中的内容了。
 
 **第四步，发送迁移用的命令和数据，并读取返回结果**
 
-migrateCommand函数会调用syncWrite函数（在[syncio.c](<https://github.com/redis/redis/tree/5.0/src/syncio.c>)文件中），把缓冲区中的内容按照64KB的粒度发送给目的节点，如下所示：
+migrateCommand 函数会调用 syncWrite 函数（在[syncio.c](<https://github.com/redis/redis/tree/5.0/src/syncio.c>)文件中），把缓冲区中的内容按照 64KB 的粒度发送给目的节点，如下所示：
 
 ```plain
 while ((towrite = sdslen(buf)-pos) > 0) {
@@ -301,7 +301,7 @@ while ((towrite = sdslen(buf)-pos) > 0) {
 }
 ```
 
-然后，针对发送给目的节点的每个键值对，migrateCommand函数会调用syncReadLine函数（在syncio.c文件中），读取目的节点的返回结果。如果返回结果中有报错信息，那么它就会进行相应的处理。这部分的逻辑并不复杂，但是针对各种出错情况的处理会比较多，你可以进一步阅读源码来进行学习。
+然后，针对发送给目的节点的每个键值对，migrateCommand 函数会调用 syncReadLine 函数（在 syncio.c 文件中），读取目的节点的返回结果。如果返回结果中有报错信息，那么它就会进行相应的处理。这部分的逻辑并不复杂，但是针对各种出错情况的处理会比较多，你可以进一步阅读源码来进行学习。
 
 ```plain
 //针对迁移的每个键值对，调用syncReadLine函数读取目的节点返回结果
@@ -311,19 +311,19 @@ for (j = 0; j < num_keys; j++) {
 }
 ```
 
-好了，到这里，你就了解了MIGRATE命令的执行基本过程，我把它执行过程的四大步骤也画在了下面的这张图中，你可以再回顾下。
+好了，到这里，你就了解了 MIGRATE 命令的执行基本过程，我把它执行过程的四大步骤也画在了下面的这张图中，你可以再回顾下。
 
 ![图片](<https://static001.geekbang.org/resource/image/61/ec/61caafdf1f4d5a5f6432b9182e549dec.jpg?wh=1920x1080>)
 
-其实在迁移数据的过程中，**目的节点对迁移命令的处理也是迁移过程的一个重要环节**。所以，下面我们就来看下，目的节点在收到RESTORE-ASKING命令后的处理过程。
+其实在迁移数据的过程中，**目的节点对迁移命令的处理也是迁移过程的一个重要环节**。所以，下面我们就来看下，目的节点在收到 RESTORE-ASKING 命令后的处理过程。
 
 ### 目的节点处理迁移数据
 
-目的节点在收到源节点发送的RESTORE-ASKING命令后，这个命令的实际处理函数是**restoreCommand**（在cluster.c文件中）。这个函数的处理逻辑并不复杂，主要可以分成三步。
+目的节点在收到源节点发送的 RESTORE-ASKING 命令后，这个命令的实际处理函数是**restoreCommand**（在 cluster.c 文件中）。这个函数的处理逻辑并不复杂，主要可以分成三步。
 
-**首先**，它会解析收到的命令参数，包括是否覆盖数据的标记replace、key过期时间标记ttl、key的LRU标记idletime、key的LFU标记freq。接着，它就会根据这些标记执行一系列检查。
+**首先**，它会解析收到的命令参数，包括是否覆盖数据的标记 replace、key 过期时间标记 ttl、key 的 LRU 标记 idletime、key 的 LFU 标记 freq。接着，它就会根据这些标记执行一系列检查。
 
-这其中就包括，如果检测到没有replace标记的话，它会调用lookupKeyWrite函数（在db.c文件中），检查目的节点数据库中是否有迁移的key，如果已经存在待迁移key的话，它就会返回报错信息，如下所示。此外，它还会检查TTL值是否小于0。
+这其中就包括，如果检测到没有 replace 标记的话，它会调用 lookupKeyWrite 函数（在 db.c 文件中），检查目的节点数据库中是否有迁移的 key，如果已经存在待迁移 key 的话，它就会返回报错信息，如下所示。此外，它还会检查 TTL 值是否小于 0。
 
 ```plain
 //如果没有replace标记，并且数据库中存在待迁移的key&nbsp;
@@ -333,7 +333,7 @@ if (!replace && lookupKeyWrite(c->db,c->argv[1]) != NULL) {
 &nbsp;}
 ```
 
-**然后**，restoreCommand函数会检查迁移key的value的序列化结果，就像我刚才介绍的，migrateCommand函数在实际迁移value时，会把value序列化后再传输。而序列化后的结果中包含了RDB版本和CRC校验和，restoreCommand函数会**调用verifyDumpPayload函数**（在cluster.c文件中），检测RDB版本和CRC校验和。如果这两部分内容不正确，它就会返回报错信息。
+**然后**，restoreCommand 函数会检查迁移 key 的 value 的序列化结果，就像我刚才介绍的，migrateCommand 函数在实际迁移 value 时，会把 value 序列化后再传输。而序列化后的结果中包含了 RDB 版本和 CRC 校验和，restoreCommand 函数会**调用verifyDumpPayload函数**（在 cluster.c 文件中），检测 RDB 版本和 CRC 校验和。如果这两部分内容不正确，它就会返回报错信息。
 
 ```plain
 //检查value序列化结果中的RDB版本和CRC校验和
@@ -344,11 +344,11 @@ if (verifyDumpPayload(c->argv[3]->ptr,sdslen(c->argv[3]->ptr)) == C_ERR)
 }
 ```
 
-紧接着，restoreCommand函数会调用rdbLoadObjectType函数和rdbLoadObject函数（在[rdb.c](<https://github.com/redis/redis/tree/5.0/src/rdb.c>)文件中），从序列化结果中解析出实际的value类型和value实际值。
+紧接着，restoreCommand 函数会调用 rdbLoadObjectType 函数和 rdbLoadObject 函数（在[rdb.c](<https://github.com/redis/redis/tree/5.0/src/rdb.c>)文件中），从序列化结果中解析出实际的 value 类型和 value 实际值。
 
-**最后**，restoreCommand函数会调用dbAdd函数，把解析得到key和value写入目的节点的数据库中。这里，你要注意的是，**如果迁移命令中带有REPLACE标记**，那么，restoreCommand函数会先调用dbDelete函数，删除在目的节点数据库中已经存在的迁移key，然后再调用dbAdd函数写入迁移key。此外，restoreCommand函数还会设置迁移key的过期时间，以及LRU或LFU信息，并最终返回成功信息。
+**最后**，restoreCommand 函数会调用 dbAdd 函数，把解析得到 key 和 value 写入目的节点的数据库中。这里，你要注意的是，**如果迁移命令中带有REPLACE标记**，那么，restoreCommand 函数会先调用 dbDelete 函数，删除在目的节点数据库中已经存在的迁移 key，然后再调用 dbAdd 函数写入迁移 key。此外，restoreCommand 函数还会设置迁移 key 的过期时间，以及 LRU 或 LFU 信息，并最终返回成功信息。
 
-下面的代码展示了restoreCommand函数最后一步的处理逻辑，你可以看下。
+下面的代码展示了 restoreCommand 函数最后一步的处理逻辑，你可以看下。
 
 ```plain
 //如果有REPLACE标记，在目的节点数据库中删除已存在的迁移key
@@ -369,17 +369,17 @@ addReply(c,shared.ok);  //返回成功信息
 
 ![图片](<https://static001.geekbang.org/resource/image/19/2a/198d0629f86c440d9afee8678302252a.jpg?wh=1920x1080>)
 
-好了，到这里，你就了解了源节点发送迁移数据，以及目的节点接收迁移数据的基本过程实现了。最后，当迁移slot中的key全部完成迁移后，我们还需要执行CLUSTER SETSLOT命令，来标记迁移的最终结果，下面我们来看下。
+好了，到这里，你就了解了源节点发送迁移数据，以及目的节点接收迁移数据的基本过程实现了。最后，当迁移 slot 中的 key 全部完成迁移后，我们还需要执行 CLUSTER SETSLOT 命令，来标记迁移的最终结果，下面我们来看下。
 
 ### 标记迁移结果
 
-在数据迁移完成后，我们需要先在目的节点上**执行CLUSTER SETSLOT命令**，向目的节点标记迁移slot的最终所属节点，如下所示。然后，我们需要在源节点上执行相同的命令，用来向源节点标记迁移slot的最终所属节点。
+在数据迁移完成后，我们需要先在目的节点上**执行CLUSTER SETSLOT命令**，向目的节点标记迁移 slot 的最终所属节点，如下所示。然后，我们需要在源节点上执行相同的命令，用来向源节点标记迁移 slot 的最终所属节点。
 
 ```plain
 CLUSTER SETSLOT <slot> NODE <node>
 ```
 
-因为这个命令还是CLUSTER命令，所以它的处理仍然在**clusterCommand函数**中实现的。这个命令的选项是SETSLOT，并带有NODE标记，所以它对应的代码分支如下所示：
+因为这个命令还是 CLUSTER 命令，所以它的处理仍然在**clusterCommand函数**中实现的。这个命令的选项是 SETSLOT，并带有 NODE 标记，所以它对应的代码分支如下所示：
 
 ```plain
 void clusterCommand(client *c) {
@@ -395,18 +395,18 @@ void clusterCommand(client *c) {
 }
 ```
 
-在刚才介绍的处理NODE标记的代码分支中，主要的工作是清除节点上migrating\_slots\_to数组和importing\_slots\_from数组中的标记。
+在刚才介绍的处理 NODE 标记的代码分支中，主要的工作是清除节点上 migrating\_slots\_to 数组和 importing\_slots\_from 数组中的标记。
 
-**对于migrating\_slots\_to数组来说**，在源节点上，这个数组中迁移slot所对应的元素，记录了目的节点。那么，在源节点上执行迁移结果标记命令时，处理NODE标记的代码分支，就会调用**countKeysInSlot函数**（在db.c文件中）检查迁移slot中是否还有key。如果没有key了，那么migrating\_slots\_to数组中迁移slot所对应的元素会被置为NULL，也就是取消了源节点上的迁出标记。
+**对于migrating\_slots\_to数组来说**，在源节点上，这个数组中迁移 slot 所对应的元素，记录了目的节点。那么，在源节点上执行迁移结果标记命令时，处理 NODE 标记的代码分支，就会调用**countKeysInSlot函数**（在 db.c 文件中）检查迁移 slot 中是否还有 key。如果没有 key 了，那么 migrating\_slots\_to 数组中迁移 slot 所对应的元素会被置为 NULL，也就是取消了源节点上的迁出标记。
 
 ```plain
 if (countKeysInSlot(slot) == 0 && server.cluster->migrating_slots_to[slot]) //如果有迁出标记， 并且迁移slot中已经没有key
 &nbsp; &nbsp; server.cluster->migrating_slots_to[slot] = NULL; //将迁出标记置为NULL
 ```
 
-**而对于importing\_slots\_from数组来说**，在目的节点上，这个数组中迁移slot所对应的元素记录了源节点。那么，在目的节点上执行迁移结果标记命令时，处理NODE标记的代码分支会**检查命令参数中的<node>是否就是目的节点自身</node>
+**而对于importing\_slots\_from数组来说**，在目的节点上，这个数组中迁移 slot 所对应的元素记录了源节点。那么，在目的节点上执行迁移结果标记命令时，处理 NODE 标记的代码分支会**检查命令参数中的<node>是否就是目的节点自身</node>
 
-**。如果是的话，importing\_slots\_from数组中迁移slot所对应的元素会被置为NULL，这就是取消了目的节点上的迁入标记。
+**。如果是的话，importing\_slots\_from 数组中迁移 slot 所对应的元素会被置为 NULL，这就是取消了目的节点上的迁入标记。
 
 ```plain
 //如果命令参数中的节点是当前节点，并且有迁入标记
@@ -416,37 +416,37 @@ if (countKeysInSlot(slot) == 0 && server.cluster->migrating_slots_to[slot]) //�
 }
 ```
 
-最后，处理NODE标记的代码分支，会调用clusterDelSlot和clusterAddSlot函数（在cluster.c文件中），分别更新slot迁移前和迁移后所属节点的slots数组，你可以去进一步阅读这两个函数的代码进行了解。
+最后，处理 NODE 标记的代码分支，会调用 clusterDelSlot 和 clusterAddSlot 函数（在 cluster.c 文件中），分别更新 slot 迁移前和迁移后所属节点的 slots 数组，你可以去进一步阅读这两个函数的代码进行了解。
 
-到这里，Redis Cluster中数据迁移的整个过程也就完成了。
+到这里，Redis Cluster 中数据迁移的整个过程也就完成了。
 
 ## 小结
 
-在今天的课程中，我给你介绍了Redis Cluster数据迁移过程的代码实现，你要掌握以下两个要点。
+在今天的课程中，我给你介绍了 Redis Cluster 数据迁移过程的代码实现，你要掌握以下两个要点。
 
-**首先是记录集群状态的数据结构clusterState。**这个结构中是使用了migrating\_slots\_to和importing\_slots\_from两个数组，来记录数据迁出迁入情况，使用了slots数组记录每个slot所属的节点，以及使用slots\_to\_keys字典树记录slots中的keys。你需要掌握这几个数据结构的含义，因为在你阅读集群源码时，这几个结构是会频繁使用到的。
+**首先是记录集群状态的数据结构 clusterState。**这个结构中是使用了 migrating\_slots\_to 和 importing\_slots\_from 两个数组，来记录数据迁出迁入情况，使用了 slots 数组记录每个 slot 所属的节点，以及使用 slots\_to\_keys 字典树记录 slots 中的 keys。你需要掌握这几个数据结构的含义，因为在你阅读集群源码时，这几个结构是会频繁使用到的。
 
 **然后是数据迁移过程的五大步骤。**分别是：
 
 - 标记迁入、迁出节点；
-- 获取待迁出的keys；
+- 获取待迁出的 keys；
 - 源节点实际迁移数据；
 - 目的节点处理迁移数据；
 - 标记迁移结果。
 
 <!-- -->
 
-这五个步骤对应了CLUSTER命令的不同选项、MIGRATE命令以及RESTORE命令，所以，它们的实现逻辑就主要对应在clusterCommand、migrateCommand和restoreCommand函数中。如果你想了解数据迁移的更多细节，你可以从这几个函数入手进一步学习。
+这五个步骤对应了 CLUSTER 命令的不同选项、MIGRATE 命令以及 RESTORE 命令，所以，它们的实现逻辑就主要对应在 clusterCommand、migrateCommand 和 restoreCommand 函数中。如果你想了解数据迁移的更多细节，你可以从这几个函数入手进一步学习。
 
 最后，我也想再**提醒你两个关键点**。
 
-一是，Redis Cluster在执行数据迁移时，会调用syncWrite和syncReadLine函数，向目的节点同步发送迁移数据，以及同步读取回复结果。而这个同步写和同步读的过程，会阻塞源节点正常处理请求。所以，你在迁移数据时要**控制迁移的key数量和key大小**，避免一次性迁移过多的key或是过大的key，而导致Redis阻塞。
+一是，Redis Cluster 在执行数据迁移时，会调用 syncWrite 和 syncReadLine 函数，向目的节点同步发送迁移数据，以及同步读取回复结果。而这个同步写和同步读的过程，会阻塞源节点正常处理请求。所以，你在迁移数据时要**控制迁移的key数量和key大小**，避免一次性迁移过多的 key 或是过大的 key，而导致 Redis 阻塞。
 
-二是，我们在实际应用中，会用到**redis-cli工具**，或者是Ruby开发的Redis Cluster集群**运维工具redis-trib**，来执行数据迁移。这些工具最终也会调用这节课中，我们介绍的命令来完成数据的实际迁移。所以，学习今天课程的内容，对于你在实际应用中，从代码层面排查redis-cli、redis-trib这些工具的问题也是有所帮助的。
+二是，我们在实际应用中，会用到**redis-cli工具**，或者是 Ruby 开发的 Redis Cluster 集群**运维工具redis-trib**，来执行数据迁移。这些工具最终也会调用这节课中，我们介绍的命令来完成数据的实际迁移。所以，学习今天课程的内容，对于你在实际应用中，从代码层面排查 redis-cli、redis-trib 这些工具的问题也是有所帮助的。
 
 
 
 ## 每课一问
 
-在维护Redis Cluster集群状态的数据结构clusterState中，有一个字典树slots\_to\_keys。当在数据库中插入key时它会被更新，你能在Redis源码文件db.c中，找到更新slots\_to\_keys字典树的相关函数调用吗？
+在维护 Redis Cluster 集群状态的数据结构 clusterState 中，有一个字典树 slots\_to\_keys。当在数据库中插入 key 时它会被更新，你能在 Redis 源码文件 db.c 中，找到更新 slots\_to\_keys 字典树的相关函数调用吗？
 

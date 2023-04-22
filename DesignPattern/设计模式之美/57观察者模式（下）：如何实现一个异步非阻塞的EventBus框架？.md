@@ -112,7 +112,7 @@ public class RegNotificationObserver {
 }
 ```
 
-利用 EventBus 框架实现的观察者模式，跟从零开始编写的观察者模式相比，从大的流程上来说，实现思路大致一样，都需要定义 Observer，并且通过 register() 函数注册 Observer，也都需要通过调用某个函数（比如，EventBus 中的 post() 函数）来给Observer 发送消息（在 EventBus 中消息被称作事件 event）。
+利用 EventBus 框架实现的观察者模式，跟从零开始编写的观察者模式相比，从大的流程上来说，实现思路大致一样，都需要定义 Observer，并且通过 register() 函数注册 Observer，也都需要通过调用某个函数（比如，EventBus 中的 post() 函数）来给 Observer 发送消息（在 EventBus 中消息被称作事件 event）。
 
 但在实现细节方面，它们又有些区别。基于 EventBus，我们不需要定义 Observer 接口，任意类型的对象都可以注册到 EventBus 中，通过 @Subscribe 注解来标明类中哪个函数可以接收被观察者发送的消息。
 
@@ -300,7 +300,7 @@ public class ObserverRegistry {
 
 ### 4.EventBus
 
-EventBus 实现的是阻塞同步的观察者模式。看代码你可能会有些疑问，这明明就用到了线程池 Executor 啊。实际上，MoreExecutors.directExecutor() 是 Google Guava 提供的工具类，看似是多线程，实际上是单线程。之所以要这么实现，主要还是为了跟AsyncEventBus 统一代码逻辑，做到代码复用。
+EventBus 实现的是阻塞同步的观察者模式。看代码你可能会有些疑问，这明明就用到了线程池 Executor 啊。实际上，MoreExecutors.directExecutor() 是 Google Guava 提供的工具类，看似是多线程，实际上是单线程。之所以要这么实现，主要还是为了跟 AsyncEventBus 统一代码逻辑，做到代码复用。
 
 ```java
 public class EventBus {
@@ -351,36 +351,36 @@ public class AsyncEventBus extends EventBus {
 
 ## 课堂讨论
 
-在今天内容的第二个模块“EventBus 框架功能需求介绍”中，我们用 Guava EventBus 重新实现了 UserController，实际上，代码还是不够解耦。UserController 还是耦合了很多跟观察者模式相关的非业务代码，比如创建线程池、注册 Observer。为了让UserController 更加聚焦在业务功能上，你有什么重构的建议吗？
+在今天内容的第二个模块“EventBus 框架功能需求介绍”中，我们用 Guava EventBus 重新实现了 UserController，实际上，代码还是不够解耦。UserController 还是耦合了很多跟观察者模式相关的非业务代码，比如创建线程池、注册 Observer。为了让 UserController 更加聚焦在业务功能上，你有什么重构的建议吗？
 
 **精选留言**：
 
 - Guava EventBus 对我来说简直是一份大礼。里面解耦功能使本来的旧项目又不可维护逐渐转化为可维护。
 
-    EventBus作为一个总线，还考虑了递归传送事件的问题，可以选择广度优先传播和深度优先传播，遇到事件死循环的时候还会报错。Guava的项目对这个模块的封装非常值得学习；
+    EventBus 作为一个总线，还考虑了递归传送事件的问题，可以选择广度优先传播和深度优先传播，遇到事件死循环的时候还会报错。Guava 的项目对这个模块的封装非常值得学习；
 
 - 课后题：
 
-    代理模式，使用一个代理类专门来处理EventBus相关逻辑。作用：
+    代理模式，使用一个代理类专门来处理 EventBus 相关逻辑。作用：
 
     1.将业务与非业务逻辑分离
 
-    2.后续替换EventBus实现方式直接改写代理类，满足拓展需求
+    2.后续替换 EventBus 实现方式直接改写代理类，满足拓展需求
 
 - 重构使用代理模式，将非业务代码放到代理类中。
 
-    另外试了争哥讲的EventBut类，在定义观察者的入参要修改成\*Long\*类型，如果使用lon g，这个方法是无法注册的，代码执行收不到通知。应该是ObserverRegistry类需要完善一下。
+    另外试了争哥讲的 EventBut 类，在定义观察者的入参要修改成\*Long\*类型，如果使用 lon g，这个方法是无法注册的，代码执行收不到通知。应该是 ObserverRegistry 类需要完善一下。
 
 - 老师，我们主要做物流方面的业务系统，类似仓储，港口这样的，流程繁杂。平时主要就是写增删改查，然后通过一个状态字段变化控制流程，所有业务代码流程中每一步操作都写满了各种状态验证，判断。后期稍微需求变动一点点，涉及到状态改动，要调整流程的话，都是一场灾难。针对我们这种系统，有办法将流程状态解耦出来吗？今天看到这篇事件总线的文章，好像看到希望，但是没想清具体怎么操作。不知道老师怎么看
 
-- 对于这个问题,在UserCntroller中,我们应该只保留post函数() 发送的相关逻辑,而将注册Ob server,初始化EventBus相关逻辑剔除,如果非要使用EventBus来实现的话,我们需要有人帮我们去进行注册和初始化,这时候就可以立马想到之前讲的工厂模式的DI框架,我们可以让所有观察者都被DI框架所管理,并且对EventBus创建一个装饰器类,在这个装饰器类中,由开发者选择注入线程池实现异步发送还是直接使用同步发送的,并且在init函数中 从DI框架管…
+- 对于这个问题,在 UserCntroller 中,我们应该只保留 post 函数() 发送的相关逻辑,而将注册 Ob server,初始化 EventBus 相关逻辑剔除,如果非要使用 EventBus 来实现的话,我们需要有人帮我们去进行注册和初始化,这时候就可以立马想到之前讲的工厂模式的 DI 框架,我们可以让所有观察者都被 DI 框架所管理,并且对 EventBus 创建一个装饰器类,在这个装饰器类中,由开发者选择注入线程池实现异步发送还是直接使用同步发送的,并且在 init 函数中 从 DI 框架管…
 
-- 在例子中当eventbus调用post传递的参数中是long userId,而两个observer被subcriber注解的方法参数都一样，此时这两个方法都会被调用到吗？
+- 在例子中当 eventbus 调用 post 传递的参数中是 long userId,而两个 observer 被 subcriber 注解的方法参数都一样，此时这两个方法都会被调用到吗？
 
-- 为了让 UserController 更加聚焦在业务功能上，我的想法是将耦合的EventBus代码抽取出来形成一个单独的服务类，通过注入的方式注入到UserController类中使用。这样使其两者的职责单一，而新抽取出来的服务类可被其他业务场景复用。
+- 为了让 UserController 更加聚焦在业务功能上，我的想法是将耦合的 EventBus 代码抽取出来形成一个单独的服务类，通过注入的方式注入到 UserController 类中使用。这样使其两者的职责单一，而新抽取出来的服务类可被其他业务场景复用。
 
-    今天也加深了对Guava Eventbus的认识，虽然之前专栏也介绍过这个类库的使用。结合Jd k提供的java.util.Observable&Observer观察者模式API，与EventBus进行比对，如果…
+    今天也加深了对 Guava Eventbus 的认识，虽然之前专栏也介绍过这个类库的使用。结合 Jd k 提供的 java.util.Observable&Observer 观察者模式 API，与 EventBus 进行比对，如果…
 
-- UserController 还是耦合了很多跟观察者模式相关的非业务代码，比如创建线程池、注册Observer。为了让 UserController 更加聚焦在业务功能上，你有什么重构的建议吗？
+- UserController 还是耦合了很多跟观察者模式相关的非业务代码，比如创建线程池、注册 Observer。为了让 UserController 更加聚焦在业务功能上，你有什么重构的建议吗？
 
-    创建一个UserSubject类,将线程创建和注册Observer逻辑封装在进该类型,再通过依赖注入方式注入到UserController,最后UserController只需UserSubject的post函数就可以发送消息了.
+    创建一个 UserSubject 类,将线程创建和注册 Observer 逻辑封装在进该类型,再通过依赖注入方式注入到 UserController,最后 UserController 只需 UserSubject 的 post 函数就可以发送消息了.
