@@ -18,7 +18,7 @@ DeviceID, Pressure, Temperature, Humidity, TimeStamp
 
 俗话说，“知己知彼，百战百胜”，我们就先从时间序列数据的读写特点开始，看看到底应该采用什么样的数据类型来保存吧。
 
-## 时间序列数据的读写特点
+## 一、时间序列数据的读写特点
 
 在实际应用中，时间序列数据通常是持续高并发写入的，例如，需要连续记录数万个设备的实时状态值。同时，时间序列数据的写入主要就是插入新数据，而不是更新一个已存在的数据，也就是说，一个时间序列数据被记录后通常就不会变了，因为它就代表了一个设备在某个时刻的状态值（例如，一个设备在某个时刻的温度测量值，一旦记录下来，这个值本身就不会再变了）。
 
@@ -36,7 +36,7 @@ DeviceID, Pressure, Temperature, Humidity, TimeStamp
 
 接下来，我们先学习下第一种方案。
 
-## 基于Hash和Sorted Set保存时间序列数据
+## 二、基于Hash和Sorted Set保存时间序列数据
 
 Hash 和 Sorted Set 组合的方式有一个明显的好处：它们是 Redis 内在的数据类型，代码成熟和性能稳定。所以，基于这两个数据类型保存时间序列数据，系统稳定性是可以预期的。
 
@@ -46,7 +46,7 @@ Hash 和 Sorted Set 组合的方式有一个明显的好处：它们是 Redis �
 
 可以看下用 Hash 集合记录设备的温度值的示意图：
 
-![](<https://static001.geekbang.org/resource/image/f2/be/f2e7bc4586be59aa5e7e78a5599830be.jpg>)
+<img src="14_%E5%A6%82%E4%BD%95%E5%9C%A8Redis%E4%B8%AD%E4%BF%9D%E5%AD%98%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%95%B0%E6%8D%AE%EF%BC%9F.resource/f2e7bc4586be59aa5e7e78a5599830be.jpg" style="zoom:33%;" />
 
 当我们想要查询某个时间点或者是多个时间点上的温度数据时，直接使用 HGET 命令或者 HMGET 命令，就可以分别获得 Hash 集合中的一个 key 和多个 key 的 value 值了。
 
@@ -64,13 +64,13 @@ HMGET device:temperature 202008030905 202008030907 202008030908
 
 你看，用 Hash 类型来实现单键的查询很简单。但是，**Hash类型有个短板：它并不支持对数据进行范围查询。**
 
-虽然时间序列数据是按时间递增顺序插入 Hash 集合中的，但 Hash 类型的底层结构是哈希表，并没有对数据进行有序索引。所以，如果要对 Hash 类型进行范围查询的话，就需要扫描 Hash 集合中的所有数据，再把这些数据取回到客户端进行排序，然后，才能在客户端得到所查询范围内的数据。显然，查询效率很低。
+虽然时间序列数据是按时间递增顺序插入 Hash 集合中的，**但 Hash 类型的底层结构是哈希表，并没有对数据进行有序索引**。所以，如果要对 Hash 类型进行范围查询的话，就需要扫描 Hash 集合中的所有数据，再把这些数据取回到客户端进行排序，然后，才能在客户端得到所查询范围内的数据。显然，查询效率很低。
 
 为了能同时支持按时间戳范围的查询，可以用 Sorted Set 来保存时间序列数据，因为它能够根据元素的权重分数来排序。我们可以把时间戳作为 Sorted Set 集合的元素分数，把时间点上记录的数据作为元素本身。
 
 我还是以保存设备温度的时间序列数据为例，进行解释。下图显示了用 Sorted Set 集合保存的结果。
 
-![](<https://static001.geekbang.org/resource/image/9e/7a/9e1214dbd5b42c5b3452ea73efc8c67a.jpg>)
+<img src="14_%E5%A6%82%E4%BD%95%E5%9C%A8Redis%E4%B8%AD%E4%BF%9D%E5%AD%98%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%95%B0%E6%8D%AE%EF%BC%9F.resource/9e1214dbd5b42c5b3452ea73efc8c67a.jpg" style="zoom:33%;" />
 
 使用 Sorted Set 保存数据后，我们就可以使用 ZRANGEBYSCORE 命令，按照输入的最大时间戳和最小时间戳来查询这个时间范围内的温度值了。如下所示，我们来查询一下在 2020 年 8 月 3 日 9 点 7 分到 9 点 10 分间的所有温度值：
 
@@ -95,7 +95,7 @@ ZRANGEBYSCORE device:temperature 202008030907 202008030910
 
 你可以看下下面这张示意图，命令 1 到命令 N 是在 MULTI 命令后、EXEC 命令前发送的，它们会被一起执行，保证原子性。
 
-![](<https://static001.geekbang.org/resource/image/c0/62/c0e2fd5834113cef92f2f68e7462a262.jpg>)
+<img src="14_%E5%A6%82%E4%BD%95%E5%9C%A8Redis%E4%B8%AD%E4%BF%9D%E5%AD%98%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%95%B0%E6%8D%AE%EF%BC%9F.resource/c0e2fd5834113cef92f2f68e7462a262.jpg" style="zoom:33%;" />
 
 以保存设备状态信息的需求为例，我们执行下面的代码，把设备在 2020 年 8 月 3 日 9 时 5 分的温度，分别用 HSET 命令和 ZADD 命令写入 Hash 集合和 Sorted Set 集合。
 
@@ -134,7 +134,7 @@ RedisTimeSeries 支持直接在 Redis 实例上进行聚合计算。还是以刚
 
 好了，接下来，我们就来具体学习下 RedisTimeSeries。
 
-## 基于RedisTimeSeries模块保存时间序列数据
+## 三、基于RedisTimeSeries模块保存时间序列数据
 
 RedisTimeSeries 是 Redis 的一个扩展模块。它专门面向时间序列数据提供了数据类型和访问接口，并且支持在 Redis 实例上直接对数据进行按时间范围的聚合计算。
 
