@@ -12,17 +12,17 @@
 
 你好，我朱晔，是[《Java业务开发常见错误100例》](<https://time.geekbang.org/column/intro/294>)专栏课程的作者。
 
-《OAuth 2.0实战课》上线之后，我也第一时间关注了这门课。在开篇词中，我看到有一些同学留言问道：“如何使用Spring Security来实现OAuth 2.0？”这时，我想到之前自己写过一篇相关的文章，于是就直接在开篇词下留了言。后面我很快收到了不少用户的点赞和肯定，紧接着极客时间编辑也邀请我从自己的角度为专栏写篇加餐。好吧，功不唐捐，于是我就将之前我写的那篇老文章再次迭代、整理为今天的这一讲内容，希望可以帮助你掌握OAuth 2.0。
+《OAuth 2.0 实战课》上线之后，我也第一时间关注了这门课。在开篇词中，我看到有一些同学留言问道：“如何使用 Spring Security 来实现 OAuth 2.0？”这时，我想到之前自己写过一篇相关的文章，于是就直接在开篇词下留了言。后面我很快收到了不少用户的点赞和肯定，紧接着极客时间编辑也邀请我从自己的角度为专栏写篇加餐。好吧，功不唐捐，于是我就将之前我写的那篇老文章再次迭代、整理为今天的这一讲内容，希望可以帮助你掌握 OAuth 2.0。
 
-如果你熟悉Spring Security的话，肯定知道它因为功能多、组件抽象程度高、配置方式多样，导致了强大且复杂的特性。也因此，Spring Security的学习成本几乎是Spring家族中最高的。但不仅于此，在结合实际的复杂业务场景使用Spring Security时，我们还要去理解一些组件的工作原理和流程，不然需要自定义和扩展框架的时候就会手足无措。这就让使用Spring Security的门槛更高了。
+如果你熟悉 Spring Security 的话，肯定知道它因为功能多、组件抽象程度高、配置方式多样，导致了强大且复杂的特性。也因此，Spring Security 的学习成本几乎是 Spring 家族中最高的。但不仅于此，在结合实际的复杂业务场景使用 Spring Security 时，我们还要去理解一些组件的工作原理和流程，不然需要自定义和扩展框架的时候就会手足无措。这就让使用 Spring Security 的门槛更高了。
 
-因此，在决定使用Spring Security搭建整套安全体系（授权、认证、权限、审计）之前，我们还需要考虑的是：将来我们的业务会多复杂，徒手写一套安全体系来得划算，还是使用Spring Security更好？我相信，这也是王老师给出课程配套代码中，并没有使用Spring Security来演示OAuth 2.0流程的原因之一。
+因此，在决定使用 Spring Security 搭建整套安全体系（授权、认证、权限、审计）之前，我们还需要考虑的是：将来我们的业务会多复杂，徒手写一套安全体系来得划算，还是使用 Spring Security 更好？我相信，这也是王老师给出课程配套代码中，并没有使用 Spring Security 来演示 OAuth 2.0 流程的原因之一。
 
 <!-- [[[read_end]]] -->
 
-反过来说，如果你的应用已经使用了Spring Security来做鉴权、认证和权限管理的话，那么仍然使用Spring Security来实现OAuth的成本是很低的。而且，在学习了OAuth 2.0的流程打下扎实的基础之后，我们再使用Spring Security来配置OAuth 2.0就不会那么迷茫了。这也是我在工作中使用Spring Security来实现OAuth 2.0的直观感受。
+反过来说，如果你的应用已经使用了 Spring Security 来做鉴权、认证和权限管理的话，那么仍然使用 Spring Security 来实现 OAuth 的成本是很低的。而且，在学习了 OAuth 2.0 的流程打下扎实的基础之后，我们再使用 Spring Security 来配置 OAuth 2.0 就不会那么迷茫了。这也是我在工作中使用 Spring Security 来实现 OAuth 2.0 的直观感受。
 
-所以，我就结合自己的实践和积累，带你使用Spring Security来一步一步地搭建一套基于JWT的OAuth 2.0授权体系。这些内容会涉及OAuth 2.0的三角色（客户端、授权服务、受保护资源），以及资源拥有者凭据许可、客户端凭据许可和授权码许可这三种常用的授权许可类型（隐式许可类型，不太安全也不太常用）。同时，我还会演示OAuth 2.0的权限控制，以及使用OAuth 2.0实现SSO单点登录体系。
+所以，我就结合自己的实践和积累，带你使用 Spring Security 来一步一步地搭建一套基于 JWT 的 OAuth 2.0 授权体系。这些内容会涉及 OAuth 2.0 的三角色（客户端、授权服务、受保护资源），以及资源拥有者凭据许可、客户端凭据许可和授权码许可这三种常用的授权许可类型（隐式许可类型，不太安全也不太常用）。同时，我还会演示 OAuth 2.0 的权限控制，以及使用 OAuth 2.0 实现 SSO 单点登录体系。
 
 这样一来，今天这一讲涉及到的流程就会比较多，内容也会很长。不过不用担心，我会手把手带你从零开始，完成整个程序的搭建，并给出所有流程的演示。
 
@@ -30,7 +30,7 @@
 
 实战之前，我们先来搭建项目父依赖和初始化数据库结构，为后面具体的编码做准备。
 
-首先，我们来创建一个父POM，内含三个模块：
+首先，我们来创建一个父 POM，内含三个模块：
 
 - springsecurity101-cloud-oauth2-client，用来扮演客户端角色；
 - springsecurity101-cloud-oauth2-server，用来扮演授权服务器角色；
@@ -98,13 +98,13 @@
 </project>
 ```
 
-然后，我们来创建一个oauth数据库，初始化将来会用到的5个表。
+然后，我们来创建一个 oauth 数据库，初始化将来会用到的 5 个表。
 
-- authorities表：记录账号的权限，需要我们在后面配置。
-- oauth\_approvals表：记录授权批准的状态。
-- oauth\_client\_details表：记录OAuth的客户端，需要我们在后面做配置。
-- oauth\_code表：记录授权码。
-- users表：记录账号，需要我们在后面做初始化。
+- authorities 表：记录账号的权限，需要我们在后面配置。
+- oauth\_approvals 表：记录授权批准的状态。
+- oauth\_client\_details 表：记录 OAuth 的客户端，需要我们在后面做配置。
+- oauth\_code 表：记录授权码。
+- users 表：记录账号，需要我们在后面做初始化。
 
 <!-- -->
 
@@ -179,13 +179,13 @@ CREATE TABLE `users` (
 SET FOREIGN_KEY_CHECKS = 1;
 ```
 
-这5个表是Spring Security OAuth需要用到的存储表，我们不要去修改既有的表结构。这里可以看到，我们并没有在数据库中创建相应的表，来存放访问令牌和刷新令牌。这是因为，我们之后的实现会使用JWT来传输令牌信息，以便进行本地校验，所以并不一定要将其存放到数据库中。基本上所有的这些表都是可以自己扩展的，只需要继承实现Spring的一些既有类即可，这里不做展开。
+这 5 个表是 Spring Security OAuth 需要用到的存储表，我们不要去修改既有的表结构。这里可以看到，我们并没有在数据库中创建相应的表，来存放访问令牌和刷新令牌。这是因为，我们之后的实现会使用 JWT 来传输令牌信息，以便进行本地校验，所以并不一定要将其存放到数据库中。基本上所有的这些表都是可以自己扩展的，只需要继承实现 Spring 的一些既有类即可，这里不做展开。
 
 接下来，我们开始搭建授权服务器和受保护资源服务器。
 
 ## 搭建授权服务器
 
-我们先创建第一个模块，也就是授权服务器。首先创建POM，配置依赖：
+我们先创建第一个模块，也就是授权服务器。首先创建 POM，配置依赖：
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -226,11 +226,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 </project>
 ```
 
-这里，我们使用了Spring Cloud的spring-cloud-starter-oauth2组件，而不是直接使用的Spring Security，因为前者做了一些自动化配置的工作，使用起来会更方便。
+这里，我们使用了 Spring Cloud 的 spring-cloud-starter-oauth2 组件，而不是直接使用的 Spring Security，因为前者做了一些自动化配置的工作，使用起来会更方便。
 
-此外，我们还在POM中加入了数据访问、Web等依赖，因为我们的受保护资源服务器需要使用数据库来保存客户端的信息、用户信息等数据，同时也会引入thymeleaf模板引擎依赖，来稍稍美化一下登录页面。
+此外，我们还在 POM 中加入了数据访问、Web 等依赖，因为我们的受保护资源服务器需要使用数据库来保存客户端的信息、用户信息等数据，同时也会引入 thymeleaf 模板引擎依赖，来稍稍美化一下登录页面。
 
-然后创建一个配置文件application.yml实现程序配置：
+然后创建一个配置文件 application.yml 实现程序配置：
 
 ```
 server:
@@ -246,9 +246,9 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 ```
 
-可以看到，我们配置了oauth数据库的连接字符串，定义了授权服务器的监听端口是8080。
+可以看到，我们配置了 oauth 数据库的连接字符串，定义了授权服务器的监听端口是 8080。
 
-最后，使用keytool工具生成密钥对，把密钥文件jks保存到资源目录下，并要导出一个公钥留作以后使用。
+最后，使用 keytool 工具生成密钥对，把密钥文件 jks 保存到资源目录下，并要导出一个公钥留作以后使用。
 
 以上完成了项目框架搭建工作，接下来，我们正式开始编码。
 
@@ -371,9 +371,9 @@ public class OAuth2ServerConfiguration extends AuthorizationServerConfigurerAdap
 }
 ```
 
-第二步，还记得吗，刚才在第一步的代码中我们还用到了一个自定义的Token增强器，把用户信息嵌入到JWT Token中去（如果使用的是客户端凭据许可类型，这段代码无效，因为和用户没关系）。
+第二步，还记得吗，刚才在第一步的代码中我们还用到了一个自定义的 Token 增强器，把用户信息嵌入到 JWT Token 中去（如果使用的是客户端凭据许可类型，这段代码无效，因为和用户没关系）。
 
-这是一个常见需求。因为，默认情况下Token中只会有用户名这样的基本信息，我们往往需要把关于用户的更多信息返回给客户端（在实际应用中，你可能会从数据库或外部服务查询更多的用户信息加入到JWT Token中去）。这个时候，我们就可以自定义增强器来丰富Token的内容：
+这是一个常见需求。因为，默认情况下 Token 中只会有用户名这样的基本信息，我们往往需要把关于用户的更多信息返回给客户端（在实际应用中，你可能会从数据库或外部服务查询更多的用户信息加入到 JWT Token 中去）。这个时候，我们就可以自定义增强器来丰富 Token 的内容：
 
 ```
 public class CustomTokenEnhancer implements TokenEnhancer {
@@ -438,7 +438,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-第四步，在资源目录下创建一个templates文件夹，然后创建一个login.html登录页：
+第四步，在资源目录下创建一个 templates 文件夹，然后创建一个 login.html 登录页：
 
 ```
 <body class="uk-height-1-1">
@@ -476,7 +476,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 接下来，我们搭建一个用户服务模拟资源提供者（受保护资源服务器）。我们先看看项目初始化工作。
 
-这次创建的POM没有什么特殊，依赖了spring-cloud-starter-oauth2：
+这次创建的 POM 没有什么特殊，依赖了 spring-cloud-starter-oauth2：
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -505,14 +505,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 </project>
 ```
 
-配置文件非常简单，只是声明了资源服务端口为8081：
+配置文件非常简单，只是声明了资源服务端口为 8081：
 
 ```
 server:
   port: 8081
 ```
 
-同时，还要记得把我们之前在项目准备工作时生成的密钥对的公钥命名为public.cert，并放到资源文件下。这样，资源服务器可以本地校验JWT的合法性。内容大概是这样的：
+同时，还要记得把我们之前在项目准备工作时生成的密钥对的公钥命名为 public.cert，并放到资源文件下。这样，资源服务器可以本地校验 JWT 的合法性。内容大概是这样的：
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -528,7 +528,7 @@ LciRTa884uQnkFwSguOEUYf3ni8GNRJauIuW0rVXhMOs78pKvCKmo53M0tqeC6ul
 
 好了，让我们正式开始编码吧。
 
-第一步，创建一个可以匿名访问的接口GET /hello，用来测试无需登录就可以访问的服务端资源：
+第一步，创建一个可以匿名访问的接口 GET /hello，用来测试无需登录就可以访问的服务端资源：
 
 ```
 @RestController
@@ -540,11 +540,11 @@ public class HelloController {
 }
 ```
 
-第二步，创建三个需要登录+授权才能访问到的接口。我们通过@PreAuthorize在方法执行前进行权限控制：
+第二步，创建三个需要登录+授权才能访问到的接口。我们通过@PreAuthorize 在方法执行前进行权限控制：
 
-- GET /user/name接口，读权限或写权限可访问，返回登录用户名；
-- GET /user接口，读权限或写权限可访问，返回登录用户信息；
-- POST /user接口，只有写权限可以访问，返回访问令牌中的额外信息（也就是自定义的Token增强器CustomTokenEnhancer加入到访问令牌中的额外信息，Key是userDetails），这里也演示了使用TokenStore来解析Token的方式。
+- GET /user/name 接口，读权限或写权限可访问，返回登录用户名；
+- GET /user 接口，读权限或写权限可访问，返回登录用户信息；
+- POST /user 接口，只有写权限可以访问，返回访问令牌中的额外信息（也就是自定义的 Token 增强器 CustomTokenEnhancer 加入到访问令牌中的额外信息，Key 是 userDetails），这里也演示了使用 TokenStore 来解析 Token 的方式。
 
 <!-- -->
 
@@ -595,8 +595,8 @@ public class UserController {
 
 第三步，创建核心的资源服务器配置类。这里我们需要注意下面两点：
 
-- 我们硬编码了资源服务器的ID为userservice；
-- 现在我们使用的是不落数据库的JWT方式+非对称加密，需要通过本地公钥进行验证，因此在这里我们配置了公钥的路径。
+- 我们硬编码了资源服务器的 ID 为 userservice；
+- 现在我们使用的是不落数据库的 JWT 方式+非对称加密，需要通过本地公钥进行验证，因此在这里我们配置了公钥的路径。
 
 <!-- -->
 
@@ -657,22 +657,22 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 }
 ```
 
-到这里，我们来想一下，如果授权服务器产生Token的话，受保护资源服务器必须要有一种办法来验证Token，那如果这里的Token不是JWT的方式，我们可以怎么办呢？
+到这里，我们来想一下，如果授权服务器产生 Token 的话，受保护资源服务器必须要有一种办法来验证 Token，那如果这里的 Token 不是 JWT 的方式，我们可以怎么办呢？
 
 我来说下我的方法吧：
 
-- 首先，Token可以保存在数据库或Redis中，资源服务器和授权服务器共享底层的TokenStore来验证；
-- 然后，资源服务器可以使用RemoteTokenServices，来从授权服务器的/oauth/check\_token端点进行Token校验。
+- 首先，Token 可以保存在数据库或 Redis 中，资源服务器和授权服务器共享底层的 TokenStore 来验证；
+- 然后，资源服务器可以使用 RemoteTokenServices，来从授权服务器的/oauth/check\_token 端点进行 Token 校验。
 
 <!-- -->
 
-到这里，资源服务器就配置完成了，我们还在资源服务器中分别创建了两个控制器HelloController和UserController，用于分别测试可以匿名访问以及受到权限保护的资源。
+到这里，资源服务器就配置完成了，我们还在资源服务器中分别创建了两个控制器 HelloController 和 UserController，用于分别测试可以匿名访问以及受到权限保护的资源。
 
 ## 初始化数据配置
 
-在实现了授权服务器和受保护资源服务器代码后，我们再来初始化oauth数据库的数据就非常容易理解了。总结起来，我们需要配置用户、权限和客户端三部分。
+在实现了授权服务器和受保护资源服务器代码后，我们再来初始化 oauth 数据库的数据就非常容易理解了。总结起来，我们需要配置用户、权限和客户端三部分。
 
-1. 配置两个用户。其中，读用户reader具有读权限，密码为reader；写用户writer具有读写权限，密码为writer。还记得吗，密码我们使用的是BCryptPasswordEncoder加密（准确说是哈希）？
+1. 配置两个用户。其中，读用户 reader 具有读权限，密码为 reader；写用户 writer 具有读写权限，密码为 writer。还记得吗，密码我们使用的是 BCryptPasswordEncoder 加密（准确说是哈希）？
 
 <!-- -->
 
@@ -681,7 +681,7 @@ INSERT INTO `users` VALUES ('reader', '$2a$04$C6pPJvC1v6.enW6ZZxX.luTdpSI/1gcgTV
 INSERT INTO `users` VALUES ('writer', '$2a$04$M9t2oVs3/VIreBMocOujqOaB/oziWL0SnlWdt8hV4YnlhQrORA0fS', 1);
 ```
 
-2. 配置两个权限，也就是配置reader用户具有读权限，writer用户具有写权限：
+2. 配置两个权限，也就是配置 reader 用户具有读权限，writer 用户具有写权限：
 
 <!-- -->
 
@@ -690,7 +690,7 @@ INSERT INTO `authorities` VALUES ('reader', 'READ');
 INSERT INTO `authorities` VALUES ('writer', 'READ,WRITE');
 ```
 
-3. 配置三个客户端，其中客户端userservice1使用资源拥有者凭据许可类型，客户端userservice2使用客户端凭据许可类型，客户端userservice3使用授权码许可类型。
+3. 配置三个客户端，其中客户端 userservice1 使用资源拥有者凭据许可类型，客户端 userservice2 使用客户端凭据许可类型，客户端 userservice3 使用授权码许可类型。
 
 <!-- -->
 
@@ -702,21 +702,21 @@ INSERT INTO `oauth_client_details` VALUES ('userservice3', 'userservice', '1234'
 
 值得说明的是：
 
-- 三个客户端账号能使用的资源ID都是userservice，对应我们受保护资源服务器刚才配置的资源ID，也就是userservice，这两者需要一致。
-- 三个客户端账号的密码都是1234。
-- 三个客户端账号的授权范围都是FOO（并不是关键信息），它们可以拿到的权限是读写。不过，对于和用户相关的授权许可类型（比如资源拥有者凭据许可、授权码许可），最终拿到的权限还取决于客户端权限和用户权限的交集。
-- 通过grant\_types字段配置支持不同的授权许可类型。这里为了便于测试观察，我们给三个客户端账号各自配置了一种授权许可类型；在实际业务场景中，你完全可以为同一个客户端配置支持OAuth 2.0的四种授权许可类型。
-- userservice1和userservice2我们配置了用户自动批准授权（不会弹出一个页面要求用户进行授权）。
+- 三个客户端账号能使用的资源 ID 都是 userservice，对应我们受保护资源服务器刚才配置的资源 ID，也就是 userservice，这两者需要一致。
+- 三个客户端账号的密码都是 1234。
+- 三个客户端账号的授权范围都是 FOO（并不是关键信息），它们可以拿到的权限是读写。不过，对于和用户相关的授权许可类型（比如资源拥有者凭据许可、授权码许可），最终拿到的权限还取决于客户端权限和用户权限的交集。
+- 通过 grant\_types 字段配置支持不同的授权许可类型。这里为了便于测试观察，我们给三个客户端账号各自配置了一种授权许可类型；在实际业务场景中，你完全可以为同一个客户端配置支持 OAuth 2.0 的四种授权许可类型。
+- userservice1 和 userservice2 我们配置了用户自动批准授权（不会弹出一个页面要求用户进行授权）。
 
 <!-- -->
 
 ## 演示三种授权许可类型
 
-到这里，授权服务器和受保护资源服务器程序都搭建完成了，数据库也配置了用于测试的用户、权限和客户端。接下来，我们就使用Postman来手工测试一下OAuth 2.0的授权码许可、资源拥有者凭据许可、客户端凭据许可这三种授权许可类型吧。
+到这里，授权服务器和受保护资源服务器程序都搭建完成了，数据库也配置了用于测试的用户、权限和客户端。接下来，我们就使用 Postman 来手工测试一下 OAuth 2.0 的授权码许可、资源拥有者凭据许可、客户端凭据许可这三种授权许可类型吧。
 
 ### 资源拥有者凭据许可类型
 
-首先，我们测试的是资源拥有者凭据许可，POST请求地址是：
+首先，我们测试的是资源拥有者凭据许可，POST 请求地址是：
 
 ```
 http://localhost:8080/oauth/token?grant_type=password&client_id=userservice1&client_secret=1234&username=writer&password=writer
@@ -726,15 +726,15 @@ http://localhost:8080/oauth/token?grant_type=password&client_id=userservice1&cli
 
 ![](<https://static001.geekbang.org/resource/image/18/e4/18cd7b24ff152e28806b1176b0a560e4.png?wh=2548*1794>)
 
-再使用[JWT解析工具](<http://jwt.io/>)看下请求Token中的信息：
+再使用[JWT解析工具](<http://jwt.io/>)看下请求 Token 中的信息：
 
 ![](<https://static001.geekbang.org/resource/image/8e/7e/8e4c2dd1931a31197df55cc251b2a07e.png?wh=3006*1482>)
 
-可以看到，Token中果然包含了Token增强器加入的userDetails自定义信息。如果我们把公钥粘贴到页面的话，可以看到这个JWT校验成功了：
+可以看到，Token 中果然包含了 Token 增强器加入的 userDetails 自定义信息。如果我们把公钥粘贴到页面的话，可以看到这个 JWT 校验成功了：
 
 ![](<https://static001.geekbang.org/resource/image/4d/ae/4d701319144d3de7c5d743f59e4991ae.png?wh=3054*1408>)
 
-除了本地校验外，还可以访问授权服务器来校验JWT：
+除了本地校验外，还可以访问授权服务器来校验 JWT：
 
 ```
 http://localhost:8080/oauth/check_token?client_id=userservice1&client_secret=1234&token=...
@@ -746,21 +746,21 @@ http://localhost:8080/oauth/check_token?client_id=userservice1&client_secret=123
 
 ### 客户端授权许可类型
 
-我们再来测试下客户端授权许可类型。POST请求地址：
+我们再来测试下客户端授权许可类型。POST 请求地址：
 
 ```
 http://localhost:8080/oauth/token?grant_type=client_credentials&client_id=userservice2&client_secret=1234
 ```
 
-如下图所示，可以直接拿到Token：
+如下图所示，可以直接拿到 Token：
 
 ![](<https://static001.geekbang.org/resource/image/81/e9/81722855fd6935aea594ec62b64bf0e9.png?wh=2546*1014>)
 
-这里需要注意的是，并没有提供刷新令牌。这是因为，刷新令牌用于避免访问令牌失效后需要用户再次登录的问题，而客户端授权许可类型没有用户的概念，因此没有刷新令牌，也无法注入额外的userDetails信息。
+这里需要注意的是，并没有提供刷新令牌。这是因为，刷新令牌用于避免访问令牌失效后需要用户再次登录的问题，而客户端授权许可类型没有用户的概念，因此没有刷新令牌，也无法注入额外的 userDetails 信息。
 
 ![](<https://static001.geekbang.org/resource/image/fc/da/fcf2b1c1a53ecc33d3a0abc72b6d83da.png?wh=3024*1636>)
 
-也可以试一下，如果我们的授权服务器没有开启allowFormAuthenticationForClients参数（允许表单提交认证）的话，客户端的凭证需要通过Basic Auth传过去而不是通过Post：
+也可以试一下，如果我们的授权服务器没有开启 allowFormAuthenticationForClients 参数（允许表单提交认证）的话，客户端的凭证需要通过 Basic Auth 传过去而不是通过 Post：
 
 ![](<https://static001.geekbang.org/resource/image/ce/6f/ce391c3c93e2131e1cf8fb4e3324b66f.png?wh=2544*1330>)
 
@@ -774,7 +774,7 @@ http://localhost:8080/oauth/token?grant_type=client_credentials&client_id=userse
 http://localhost:8080/oauth/authorize?response_type=code&client_id=userservice3&redirect_uri=https://baidu.com
 ```
 
-注意，客户端跳转地址需要和数据库中配置的一致（百度的URL [https://baidu.com](<https://baidu.com>)
+注意，客户端跳转地址需要和数据库中配置的一致（百度的 URL [https://baidu.com](<https://baidu.com>)
 
 我们之前已经在数据库中有配置了）。访问后页面会直接跳转到登录界面，我们使用用户名“reader”、密码“reader”来登录：
 
@@ -798,7 +798,7 @@ https://www.baidu.com/?code=XKkHGY
 
 ![](<https://static001.geekbang.org/resource/image/ef/3e/eff235ff90aafb559d6e45b07a4d173e.png?wh=1344*254>)
 
-然后POST访问下面的地址（code参数替换为刚才获得的授权码）：
+然后 POST 访问下面的地址（code 参数替换为刚才获得的授权码）：
 
 ```
 http://localhost:8080/oauth/token?grant_type=authorization_code&client_id=userservice3&client_secret=1234&code=XKkHGY&redirect_uri=https://baidu.com
@@ -808,23 +808,23 @@ http://localhost:8080/oauth/token?grant_type=authorization_code&client_id=userse
 
 ![](<https://static001.geekbang.org/resource/image/ea/d7/ea401694bf55f83353f7db65d17ab6d7.png?wh=2544*1800>)
 
-虽然userservice3客户端可以有读权限和写权限，但是因为我们登录的用户reader只有读权限，所以最后拿到也只有读权限。
+虽然 userservice3 客户端可以有读权限和写权限，但是因为我们登录的用户 reader 只有读权限，所以最后拿到也只有读权限。
 
 ## 演示权限控制
 
 现在我们来测试一下之前定义的两个账号，也就是读账号和写账号，看看它们的权限控制是否有效。
 
-首先，测试一下我们的安全配置，访问/hello端点不需要认证可以匿名访问：
+首先，测试一下我们的安全配置，访问/hello 端点不需要认证可以匿名访问：
 
 ![](<https://static001.geekbang.org/resource/image/76/59/7646fe1e6e4cc9914f79881576126459.png?wh=790*220>)
 
-访问/user需要身份认证：
+访问/user 需要身份认证：
 
 ![](<https://static001.geekbang.org/resource/image/3b/f6/3b22a89392c92187960aecd4bc3cf8f6.png?wh=2302*436>)
 
 不管以哪种模式拿到访问令牌，我们用具有读权限的访问令牌访问资源服务器的如下地址
 
-（请求头加入Authorization: Bearer XXXXXXXXXX，其中XXXXXXXXXX代表访问令牌）：
+（请求头加入 Authorization: Bearer XXXXXXXXXX，其中 XXXXXXXXXX 代表访问令牌）：
 
 ```
 http://localhost:8081/user/
@@ -834,7 +834,7 @@ http://localhost:8081/user/
 
 ![](<https://static001.geekbang.org/resource/image/06/d5/0606fbb094de245d346ed17d9yycd6d5.png?wh=2504*1746>)
 
-以POST方式访问http://localhost:8081/user/，显然是失败的：
+以 POST 方式访问http://localhost:8081/user/，显然是失败的：
 
 ![](<https://static001.geekbang.org/resource/image/a7/88/a71bcef74da7577aa1529bf2d9546588.png?wh=2552*978>)
 
@@ -850,11 +850,11 @@ public Object write(OAuth2Authentication authentication) {
 
 ![](<https://static001.geekbang.org/resource/image/a7/fc/a754a6fdcb9666e07f1b820052a4e2fc.png?wh=2550*1230>)
 
-可以发现，果然访问成功了。这里输出的内容是Token中的userDetails额外信息，说明资源服务器的权限控制有效。
+可以发现，果然访问成功了。这里输出的内容是 Token 中的 userDetails 额外信息，说明资源服务器的权限控制有效。
 
 ## 搭建客户端程序
 
-在上面的演示中，我们使用的是Postman，也就是手动HTTP请求的方式来申请和使用Token。最后，我们来搭建一个OAuth客户端程序自动实现这个过程。
+在上面的演示中，我们使用的是 Postman，也就是手动 HTTP 请求的方式来申请和使用 Token。最后，我们来搭建一个 OAuth 客户端程序自动实现这个过程。
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -919,17 +919,17 @@ spring:
 #    ROOT: DEBUG
 ```
 
-客户端项目端口8082，几个需要说明的地方：
+客户端项目端口 8082，几个需要说明的地方：
 
-- 本地测试的时候有一个坑，也就是我们需要配置context-path，否则可能会出现客户端和授权服务器服务端Cookie干扰，导致CSRF防御触发的问题。这个问题出现后程序没有任何错误日志输出，只有开启DEBUG模式后才能看到DEBUG日志里有提示，因此这个问题非常难以排查。说实话，我也不知道Spring为什么不把这个信息作为WARN级别的日志输出。
-- 作为OAuth客户端，我们需要配置OAuth服务端获取Token的地址、授权（获取授权码）的地址，需要配置客户端的ID、密码和授权范围。
-- 因为使用的是JWT Token，我们需要配置公钥（当然，如果不在这里直接配置公钥的话，也可以配置从授权服务器服务端获取公钥）。
+- 本地测试的时候有一个坑，也就是我们需要配置 context-path，否则可能会出现客户端和授权服务器服务端 Cookie 干扰，导致 CSRF 防御触发的问题。这个问题出现后程序没有任何错误日志输出，只有开启 DEBUG 模式后才能看到 DEBUG 日志里有提示，因此这个问题非常难以排查。说实话，我也不知道 Spring 为什么不把这个信息作为 WARN 级别的日志输出。
+- 作为 OAuth 客户端，我们需要配置 OAuth 服务端获取 Token 的地址、授权（获取授权码）的地址，需要配置客户端的 ID、密码和授权范围。
+- 因为使用的是 JWT Token，我们需要配置公钥（当然，如果不在这里直接配置公钥的话，也可以配置从授权服务器服务端获取公钥）。
 
 <!-- -->
 
 接下来，我们可以开始编码了。
 
-第一步，实现MVC的配置：
+第一步，实现 MVC 的配置：
 
 ```
 @Configuration
@@ -960,8 +960,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 这里做了两件事情：
 
-1. 配置RequestContextListener，用于启用session scope的Bean；
-2. 配置了index路径的首页Controller。
+1. 配置 RequestContextListener，用于启用 session scope 的 Bean；
+2. 配置了 index 路径的首页 Controller。
 
 <!-- -->
 
@@ -988,7 +988,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-这里我们实现的是/路径和/login路径允许访问，其它路径需要身份认证后才能访问。
+这里我们实现的是/路径和/login 路径允许访问，其它路径需要身份认证后才能访问。
 
 第三步，我们来创建一个控制器：
 
@@ -1013,12 +1013,12 @@ public class DemoController {
 
 这里我们实现了两个功能：
 
-1. securedPage页面，实现的功能是，把用户信息作为模型传入了视图，这样打开页面后就能显示用户名和权限。
-2. remoteCall接口，实现的功能是，通过引入OAuth2RestTemplate，在登录后就可以使用凭据直接从受保护资源服务器拿资源，不需要繁琐地实现获得访问令牌、在请求头里加入访问令牌的过程。
+1. securedPage 页面，实现的功能是，把用户信息作为模型传入了视图，这样打开页面后就能显示用户名和权限。
+2. remoteCall 接口，实现的功能是，通过引入 OAuth2RestTemplate，在登录后就可以使用凭据直接从受保护资源服务器拿资源，不需要繁琐地实现获得访问令牌、在请求头里加入访问令牌的过程。
 
 <!-- -->
 
-第四步，配置一下刚才用到的OAuth2RestTemplate Bean，并启用OAuth2Sso功能：
+第四步，配置一下刚才用到的 OAuth2RestTemplate Bean，并启用 OAuth2Sso 功能：
 
 ```
 @Configuration
@@ -1051,7 +1051,7 @@ public class OAuthClientConfig {
 </body>
 ```
 
-以及登录后才能访问的securedPage页面：
+以及登录后才能访问的 securedPage 页面：
 
 ```
 <body>
@@ -1074,7 +1074,7 @@ public class OAuthClientConfig {
 http://localhost:8082/ui/securedPage
 ```
 
-可以看到，页面自动转到了授权服务器（8080端口）的登录页面：
+可以看到，页面自动转到了授权服务器（8080 端口）的登录页面：
 
 ![](<https://static001.geekbang.org/resource/image/05/81/05b76f316304e3ef2d1494bae501c381.png?wh=2074*1370>)
 
@@ -1082,11 +1082,11 @@ http://localhost:8082/ui/securedPage
 
 ![](<https://static001.geekbang.org/resource/image/7d/37/7d24bc73267506c15f9feyy546557237.png?wh=1162*454>)
 
-我们再启动另一个客户端网站，端口改为8083，然后访问同样的地址：
+我们再启动另一个客户端网站，端口改为 8083，然后访问同样的地址：
 
 ![](<https://static001.geekbang.org/resource/image/7a/46/7a50619ace3e40c8ff7c0aa860f11246.png?wh=1038*396>)
 
-可以看到直接是登录状态，单点登录测试成功。是不是很方便？其实，为了达成单点登录的效果，程序在背后自动实现了多次302重定向，整个流程为：
+可以看到直接是登录状态，单点登录测试成功。是不是很方便？其实，为了达成单点登录的效果，程序在背后自动实现了多次 302 重定向，整个流程为：
 
 ```
 http://localhost:8083/ui/securedPage ->
@@ -1098,7 +1098,7 @@ http://localhost:8083/ui/securedPage
 
 ## 演示客户端请求资源服务器资源
 
-还记得吗，在上一节“搭建客户端程序”中，我们还定义了一个remoteCall接口，直接使用OAuth2RestTemplate来访问远程资源服务器的资源。现在，我们来测试一下这个接口是否可以实现自动的OAuth流程。访问：
+还记得吗，在上一节“搭建客户端程序”中，我们还定义了一个 remoteCall 接口，直接使用 OAuth2RestTemplate 来访问远程资源服务器的资源。现在，我们来测试一下这个接口是否可以实现自动的 OAuth 流程。访问：
 
 ```
 http://localhost:8082/ui/remoteCall
@@ -1118,17 +1118,17 @@ public String name(OAuth2Authentication authentication) {
 }
 ```
 
-换一个writer用户登录试试，也能得到正确的输出：
+换一个 writer 用户登录试试，也能得到正确的输出：
 
 ![](<https://static001.geekbang.org/resource/image/yy/84/yy2bca66c45cefa56d2d727c3a136a84.png?wh=910*214>)
 
 ## 总结
 
-今天这一讲，我们完整演示了如何使用Spring Cloud的OAuth 2.0组件基于三个程序角色（授权服务器、受保护资源服务器和客户端）实现三种OAuth 2.0的授权许可类型（资源拥有者凭据许可、客户端凭据许可和授权码许可）。
+今天这一讲，我们完整演示了如何使用 Spring Cloud 的 OAuth 2.0 组件基于三个程序角色（授权服务器、受保护资源服务器和客户端）实现三种 OAuth 2.0 的授权许可类型（资源拥有者凭据许可、客户端凭据许可和授权码许可）。
 
-我们先演示了三种授权许可类型的手动流程，然后也演示了如何实现权限控制和单点登录，以及如何使用客户端程序来实现自动的OAuth 2.0流程。
+我们先演示了三种授权许可类型的手动流程，然后也演示了如何实现权限控制和单点登录，以及如何使用客户端程序来实现自动的 OAuth 2.0 流程。
 
-我把今天用到的所有代码都放到了GitHub上，你可以点击[这个链接](<https://github.com/JosephZhu1983/SpringSecurity101>)查看。
+我把今天用到的所有代码都放到了 GitHub 上，你可以点击[这个链接](<https://github.com/JosephZhu1983/SpringSecurity101>)查看。
 
-最后，我再提一下，将来Spring对于OAuth 2.0的支持可能会转移到[由社区推进的Spring Authorization Server项目上来继续运作](<https://spring.io/blog/2020/04/15/announcing-the-spring-authorization-server>)。如果你感兴趣的话，可以及时关注这个项目的进展。
+最后，我再提一下，将来 Spring 对于 OAuth 2.0 的支持可能会转移到[由社区推进的Spring Authorization Server项目上来继续运作](<https://spring.io/blog/2020/04/15/announcing-the-spring-authorization-server>)。如果你感兴趣的话，可以及时关注这个项目的进展。
 
