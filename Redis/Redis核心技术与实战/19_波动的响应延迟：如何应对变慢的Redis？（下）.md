@@ -1,17 +1,5 @@
 # 19 \| 波动的响应延迟：如何应对变慢的Redis？（下）
 
-作者: 蒋德钧
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/3a/6f/3a9b3298f79b6234e025ea32a4b5be6f.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/ed/f6/ed576a29yyf497c4d213c3c630b935f6.mp3" type="audio/mpeg"></audio>
-
-你好，我是蒋德钧。
-
 上节课，我介绍了判断 Redis 变慢的两种方法，分别是响应延迟和基线性能。除此之外，我还给你分享了从 Redis 的自身命令操作层面排查和解决问题的两种方案。
 
 但是，如果在排查时，你发现 Redis 没有执行大量的慢查询命令，也没有同时删除大量过期 keys，那么，我们是不是就束手无策了呢？
@@ -26,19 +14,17 @@ Redis 会持久化保存数据到磁盘，这个过程要依赖文件系统来�
 
 那么，接下来，我再从这两个层面，继续给你介绍，如何进一步解决 Redis 变慢的问题。
 
-![](<https://static001.geekbang.org/resource/image/cd/06/cd026801924e197f5c79828c368cd706.jpg?wh=4242*3039>)
+<img src="19_%E6%B3%A2%E5%8A%A8%E7%9A%84%E5%93%8D%E5%BA%94%E5%BB%B6%E8%BF%9F%EF%BC%9A%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9%E5%8F%98%E6%85%A2%E7%9A%84Redis%EF%BC%9F%EF%BC%88%E4%B8%8B%EF%BC%89.resource/cd026801924e197f5c79828c368cd706.jpg" style="zoom: 25%;" />
 
 ## 文件系统：AOF模式
 
 你可能会问，Redis 是个内存数据库，为什么它的性能还和文件系统有关呢？
 
-<!-- [[[read_end]]] -->
-
 我在前面讲过，为了保证数据可靠性，Redis 会采用 AOF 日志或 RDB 快照。其中，AOF 日志提供了三种日志写回策略：no、everysec、always。这三种写回策略依赖文件系统的两个系统调用完成，也就是 write 和 fsync。
 
 write 只要把日志记录写到内核缓冲区，就可以返回了，并不需要等待日志实际写回到磁盘；而 fsync 需要把日志记录写回到磁盘后才能返回，时间较长。下面这张表展示了三种写回策略所执行的系统调用。
 
-![](<https://static001.geekbang.org/resource/image/9f/a4/9f1316094001ca64c8dfca37c2c49ea4.jpg?wh=2720*598>)
+![](<19_%E6%B3%A2%E5%8A%A8%E7%9A%84%E5%93%8D%E5%BA%94%E5%BB%B6%E8%BF%9F%EF%BC%9A%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9%E5%8F%98%E6%85%A2%E7%9A%84Redis%EF%BC%9F%EF%BC%88%E4%B8%8B%EF%BC%89.resource/9f1316094001ca64c8dfca37c2c49ea4.jpg>)
 
 当写回策略配置为 everysec 和 always 时，Redis 需要调用 fsync 把日志写回磁盘。但是，这两种写回策略的具体执行情况还不太一样。
 
@@ -54,13 +40,13 @@ write 只要把日志记录写到内核缓冲区，就可以返回了，并不�
 
 为了帮助你理解，我再画一张图来展示下在磁盘压力小和压力大的时候，fsync 后台子线程和主线程受到的影响。
 
-![](<https://static001.geekbang.org/resource/image/2a/a6/2a47b3f6fd7beaf466a675777ebd28a6.jpg?wh=3000*1557>)
+![](<19_%E6%B3%A2%E5%8A%A8%E7%9A%84%E5%93%8D%E5%BA%94%E5%BB%B6%E8%BF%9F%EF%BC%9A%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9%E5%8F%98%E6%85%A2%E7%9A%84Redis%EF%BC%9F%EF%BC%88%E4%B8%8B%EF%BC%89.resource/2a47b3f6fd7beaf466a675777ebd28a6.jpg>)
 
 好了，说到这里，你已经了解了，由于 fsync 后台子线程和 AOF 重写子进程的存在，主 IO 线程一般不会被阻塞。但是，如果在重写日志时，AOF 重写子进程的写入量比较大，fsync 线程也会被阻塞，进而阻塞主线程，导致延迟增加。现在，我来给出排查和解决建议。
 
 首先，你可以检查下 Redis 配置文件中的 appendfsync 配置项，该配置项的取值表明了 Redis 实例使用的是哪种 AOF 日志写回策略，如下所示：
 
-![](<https://static001.geekbang.org/resource/image/ba/e9/ba770d1f25ffae79a101c13b9f8aa9e9.jpg?wh=2738*601>)
+![](<19_%E6%B3%A2%E5%8A%A8%E7%9A%84%E5%93%8D%E5%BA%94%E5%BB%B6%E8%BF%9F%EF%BC%9A%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9%E5%8F%98%E6%85%A2%E7%9A%84Redis%EF%BC%9F%EF%BC%88%E4%B8%8B%EF%BC%89.resource/ba770d1f25ffae79a101c13b9f8aa9e9.jpg>)
 
 如果 AOF 写回策略使用了 everysec 或 always 配置，请先确认下业务方对数据可靠性的要求，明确是否需要每一秒或每一个操作都记日志。有的业务方不了解 Redis AOF 机制，很可能就直接使用数据可靠性最高等级的 always 配置了。其实，在有些场景中（例如 Redis 用于缓存），数据丢了还可以从后端数据库中获取，并不需要很高的数据可靠性。
 
@@ -98,8 +84,6 @@ Redis 是内存数据库，内存使用量大，如果没有控制好内存的�
 
 - Redis 实例自身使用了大量的内存，导致物理机器的可用内存不足；
 - 和 Redis 实例在同一台机器上运行的其他进程，在进行大量的文件读写操作。文件读写本身会占用系统内存，这会导致分配给 Redis 实例的内存量变少，进而触发 Redis 发生 swap。
-
-<!-- -->
 
 针对这个问题，我也给你提供一个解决思路：**增加机器的内存或者使用Redis集群**。
 
@@ -187,8 +171,6 @@ echo never /sys/kernel/mm/transparent_hugepage/enabled
 7. 在 Redis 实例的运行环境中，是否启用了透明大页机制？如果是的话，直接关闭内存大页机制就行了。
 8. 是否运行了 Redis 主从集群？如果是的话，把主库实例的数据量大小控制在 2\~4GB，以免主从复制时，从库因加载大的 RDB 文件而阻塞。
 9. 是否使用了多核 CPU 或 NUMA 架构的机器运行 Redis 实例？使用多核 CPU 时，可以给 Redis 实例绑定物理核；使用 NUMA 架构时，注意把 Redis 实例和网络中断处理程序运行在同一个 CPU Socket 上。
-
-<!-- -->
 
 实际上，影响系统性能的因素还有很多，这两节课给你讲的都是应对最常见问题的解决方案。
 

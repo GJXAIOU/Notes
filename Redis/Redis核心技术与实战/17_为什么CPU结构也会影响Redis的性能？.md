@@ -1,17 +1,5 @@
 # 17 \| 为什么CPU结构也会影响Redis的性能？
 
-作者: 蒋德钧
-
-完成时间:
-
-总结时间:
-
-![](<https://static001.geekbang.org/resource/image/18/5b/18bb8358dc42ee9016b8367ca1c85f5b.jpg>)
-
-<audio><source src="https://static001.geekbang.org/resource/audio/1e/6c/1e6bc30079078d1598c077262d1a3b6c.mp3" type="audio/mpeg"></audio>
-
-你好，我是蒋德钧。
-
 很多人都认为 Redis 和 CPU 的关系很简单，就是 Redis 的线程在 CPU 上运行，CPU 快，Redis 处理请求的速度也很快。
 
 这种认知其实是片面的。CPU 的多核架构以及多 CPU 架构，也会影响到 Redis 的性能。如果不了解 CPU 对 Redis 的影响，在对 Redis 的性能进行调优时，就可能会遗漏一些调优方法，不能把 Redis 的性能发挥到极限。
@@ -26,11 +14,9 @@
 
 这里提到了一个概念，就是物理核的私有缓存。它其实是指缓存空间只能被当前的这个物理核使用，其他的物理核无法对这个核的缓存空间进行数据存取。我们来看一下 CPU 物理核的架构。
 
-![](<https://static001.geekbang.org/resource/image/c2/3a/c2d620c012a82e825570df631a7fbc3a.jpg>)
+<img src="17_%E4%B8%BA%E4%BB%80%E4%B9%88CPU%E7%BB%93%E6%9E%84%E4%B9%9F%E4%BC%9A%E5%BD%B1%E5%93%8DRedis%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F.resource/c2d620c012a82e825570df631a7fbc3a.jpg" style="zoom:33%;" />
 
 因为 L1 和 L2 缓存是每个物理核私有的，所以，当数据或指令保存在 L1、L2 缓存时，物理核访问它们的延迟不超过 10 纳秒，速度非常快。那么，如果 Redis 把要运行的指令或存取的数据保存在 L1 和 L2 缓存的话，就能高速地访问这些指令和数据。
-
-<!-- [[[read_end]]] -->
 
 但是，这些 L1 和 L2 缓存的大小受限于处理器的制造技术，一般只有 KB 级别，存不下太多的数据。如果 L1、L2 缓存中没有所需的数据，应用程序就需要访问内存来获取数据。而应用程序的访存延迟一般在百纳秒级别，是访问 L1、L2 缓存的延迟的近 10 倍，不可避免地会对性能造成影响。
 
@@ -40,13 +26,13 @@
 
 为了方便你理解，我用一张图展示一下物理核和逻辑核，以及一级、二级缓存的关系。
 
-![](<https://static001.geekbang.org/resource/image/d9/09/d9689a38cbe67c3008d8ba99663c2f09.jpg>)
+<img src="17_%E4%B8%BA%E4%BB%80%E4%B9%88CPU%E7%BB%93%E6%9E%84%E4%B9%9F%E4%BC%9A%E5%BD%B1%E5%93%8DRedis%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F.resource/d9689a38cbe67c3008d8ba99663c2f09.jpg" style="zoom:33%;" />
 
 在主流的服务器上，一个 CPU 处理器会有 10 到 20 多个物理核。同时，为了提升服务器的处理能力，服务器上通常还会有多个 CPU 处理器（也称为多 CPU Socket），每个处理器有自己的物理核（包括 L1、L2 缓存），L3 缓存，以及连接的内存，同时，不同处理器间通过总线连接。
 
 下图显示的就是多 CPU Socket 的架构，图中有两个 Socket，每个 Socket 有两个物理核。
 
-![](<https://static001.geekbang.org/resource/image/5c/3d/5ceb2ab6f61c064284c8f8811431bc3d.jpg>)
+<img src="17_%E4%B8%BA%E4%BB%80%E4%B9%88CPU%E7%BB%93%E6%9E%84%E4%B9%9F%E4%BC%9A%E5%BD%B1%E5%93%8DRedis%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F.resource/5ceb2ab6f61c064284c8f8811431bc3d.jpg" style="zoom:33%;" />
 
 **在多CPU架构上，应用程序可以在不同的处理器上运行**。在刚才的图中，Redis 可以先在 Socket 1 上运行一段时间，然后再被调度到 Socket 2 上运行。
 
@@ -58,8 +44,6 @@
 
 - L1、L2 缓存中的指令和数据的访问速度很快，所以，充分利用 L1、L2 缓存，可以有效缩短应用程序的执行时间；
 - 在 NUMA 架构下，如果应用程序从一个 Socket 上调度到另一个 Socket 上，就可能会出现远端内存访问的情况，这会直接增加应用程序的执行时间。
-
-<!-- -->
 
 接下来，我们就先来了解下 CPU 多核是如何影响 Redis 性能的。
 
@@ -99,7 +83,7 @@ taskset -c 0 ./redis-server
 
 我们来看一下绑核前后的 Redis 的 99%尾延迟。
 
-![](<https://static001.geekbang.org/resource/image/eb/57/eb72b9f58052d6a6023d3e1dac522157.jpg>)
+![](<17_%E4%B8%BA%E4%BB%80%E4%B9%88CPU%E7%BB%93%E6%9E%84%E4%B9%9F%E4%BC%9A%E5%BD%B1%E5%93%8DRedis%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F.resource/eb72b9f58052d6a6023d3e1dac522157.jpg>)
 
 可以看到，在 CPU 多核的环境下，通过绑定 Redis 实例和 CPU 核，可以有效降低 Redis 的尾延迟。当然，绑核不仅对降低尾延迟有好处，同样也能降低平均延迟、提升吞吐率，进而提升 Redis 性能。
 
@@ -113,13 +97,13 @@ taskset -c 0 ./redis-server
 
 我们先来看下 Redis 实例和网络中断程序的数据交互：网络中断处理程序从网卡硬件中读取数据，并把数据写入到操作系统内核维护的一块内存缓冲区。内核会通过 epoll 机制触发事件，通知 Redis 实例，Redis 实例再把数据从内核的内存缓冲区拷贝到自己的内存空间，如下图所示：
 
-![](<https://static001.geekbang.org/resource/image/87/d2/8753ce6985fd08bb9cf9a3813c8b2cd2.jpg>)
+![](<17_%E4%B8%BA%E4%BB%80%E4%B9%88CPU%E7%BB%93%E6%9E%84%E4%B9%9F%E4%BC%9A%E5%BD%B1%E5%93%8DRedis%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F.resource/8753ce6985fd08bb9cf9a3813c8b2cd2.jpg>)
 
 那么，在 CPU 的 NUMA 架构下，当网络中断处理程序、Redis 实例分别和 CPU 核绑定后，就会有一个潜在的风险：**如果网络中断处理程序和Redis实例各自所绑的CPU核不在同一个CPU Socket上，那么，Redis实例读取网络数据时，就需要跨CPU Socket访问内存，这个过程会花费较多时间。**
 
 这么说可能有点抽象，我再借助一张图来解释下。
 
-![](<https://static001.geekbang.org/resource/image/30/b0/30cd42yy86debc0eb6e7c5b069533ab0.jpg>)
+![](<17_%E4%B8%BA%E4%BB%80%E4%B9%88CPU%E7%BB%93%E6%9E%84%E4%B9%9F%E4%BC%9A%E5%BD%B1%E5%93%8DRedis%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F.resource/30cd42yy86debc0eb6e7c5b069533ab0.jpg>)
 
 可以看到，图中的网络中断处理程序被绑在了 CPU Socket 1 的某个核上，而 Redis 实例则被绑在了 CPU Socket 2 上。此时，网络中断处理程序读取到的网络数据，被保存在 CPU Socket 1 的本地内存中，当 Redis 实例要访问网络数据时，就需要 Socket 2 通过总线把内存访问命令发送到 Socket 1 上，进行远程访问，时间开销比较大。
 
@@ -127,7 +111,7 @@ taskset -c 0 ./redis-server
 
 所以，为了避免 Redis 跨 CPU Socket 访问网络数据，我们最好把网络中断程序和 Redis 实例绑在同一个 CPU Socket 上，这样一来，Redis 实例就可以直接从本地内存读取网络数据了，如下图所示：
 
-![](<https://static001.geekbang.org/resource/image/41/79/41f02b2afb08ec54249680e8cac30179.jpg>)
+![](<17_%E4%B8%BA%E4%BB%80%E4%B9%88CPU%E7%BB%93%E6%9E%84%E4%B9%9F%E4%BC%9A%E5%BD%B1%E5%93%8DRedis%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F.resource/41f02b2afb08ec54249680e8cac30179.jpg>)
 
 不过，需要注意的是，**在CPU的NUMA架构下，对CPU核的编号规则，并不是先把一个CPU Socket中的所有逻辑核编完，再对下一个CPU Socket中的逻辑核编码，而是先给每个CPU Socket中每个物理核的第一个逻辑核依次编号，再给每个CPU Socket中的物理核的第二个逻辑核依次编号。**
 
@@ -190,16 +174,12 @@ taskset -c 0,12 ./redis-server
 - CPU\_SET 函数：以 CPU 逻辑核编号和 cpu\_set\_t 位图为参数，把位图中和输入的逻辑核编号对应的位设置为 1。
 - sched\_setaffinity 函数：以进程/线程 ID 号和 cpu\_set\_t 为参数，检查 cpu\_set\_t 中哪一位为 1，就把输入的 ID 号所代表的进程/线程绑在对应的逻辑核上。
 
-<!-- -->
-
 那么，怎么在编程时把这三个函数结合起来实现绑核呢？很简单，我们分四步走就行。
 
 - 第一步：创建一个 cpu\_set\_t 结构的位图变量；
 - 第二步：使用 CPU\_ZERO 函数，把 cpu\_set\_t 结构的位图所有的位都设置为 0；
 - 第三步：根据要绑定的逻辑核编号，使用 CPU\_SET 函数，把 cpu\_set\_t 结构的位图相应位设置为 1；
 - 第四步：使用 sched\_setaffinity 函数，把程序绑定在 cpu\_set\_t 结构位图中为 1 的逻辑核上。
-
-<!-- -->
 
 下面，我就具体介绍下，分别把后台线程、子进程绑到不同的核上的做法。
 
@@ -251,8 +231,6 @@ int main(){
 
 - rdb.c 文件：rdbSaveBackground 函数；
 - aof.c 文件：rewriteAppendOnlyFileBackground 函数。
-
-<!-- -->
 
 这两个函数中都调用了 fork 创建子进程，所以，我们可以在子进程代码部分加上绑核的四步操作。
 
