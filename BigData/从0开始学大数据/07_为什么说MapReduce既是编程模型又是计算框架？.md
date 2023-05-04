@@ -1,6 +1,6 @@
 # 07 | 为什么说MapReduce既是编程模型又是计算框架？
 
-在 Hadoop 问世之前，其实已经有了分布式计算，只是那个时候的分布式计算都是专用的系统，只能专门处理某一类计算，比如进行大规模数据的排序。很显然，这样的系统无法复用到其他的大数据计算场景，每一种应用都需要开发与维护专门的系统。而 Hadoop MapReduce 的出现，使得大数据计算通用编程成为可能。我们只要遵循 MapReduce 编程模型编写业务处理逻辑代码，就可以运行在 Hadoop 分布式集群上，无需关心分布式计算是如何完成的。也就是说，我们只需要关心业务逻辑，不用关心系统调用与运行环境，这和我们目前的主流开发方式是一致的。
+在 Hadoop 问世之前，其实已经有了分布式计算，只是那个时候的分布式计算都是专用的系统，只能专门处理某一类计算，比如进行大规模数据的排序。很显然，这样的系统无法复用到其他的大数据计算场景，每一种应用都需要开发与维护专门的系统。**而 Hadoop MapReduce 的出现，使得大数据计算通用编程成为可能。我们只要遵循 MapReduce 编程模型编写业务处理逻辑代码，就可以运行在 Hadoop 分布式集群上，无需关心分布式计算是如何完成的**。也就是说，我们只需要关心业务逻辑，不用关心系统调用与运行环境，这和我们目前的主流开发方式是一致的。
 
 请你先回忆一下，在前面[专栏第 4 期](http://time.geekbang.org/column/article/65106)我们讨论过，大数据计算的核心思路是移动计算比移动数据更划算。既然计算方法跟传统计算方法不一样，移动计算而不是移动数据，那么用传统的编程模型进行大数据计算就会遇到很多困难，因此 Hadoop 大数据计算使用了一种叫作 MapReduce 的编程模型。
 
@@ -20,7 +20,7 @@
 
 WordCount 主要解决的是文本处理中词频统计的问题，就是统计文本中每一个单词出现的次数。如果只是统计一篇文章的词频，几十 KB 到几 MB 的数据，只需要写一个程序，将数据读入内存，建一个 Hash 表记录每个词出现的次数就可以了。这个统计过程你可以看下面这张图。
 
-![img](07_%E4%B8%BA%E4%BB%80%E4%B9%88%E8%AF%B4MapReduce%E6%97%A2%E6%98%AF%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E5%8F%88%E6%98%AF%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%EF%BC%9F.resource/image-20230416185822814.png)
+![img](07_%E4%B8%BA%E4%BB%80%E4%B9%88%E8%AF%B4MapReduce%E6%97%A2%E6%98%AF%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E5%8F%88%E6%98%AF%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%EF%BC%9F.resource/image-20230416185822814-1682821255938-3.png)
 
 如果用 Python 语言，单机处理 WordCount 的代码是这样的。
 
@@ -45,14 +45,12 @@ WordCount 的 MapReduce 程序如下。
 ```java
 public class WordCount {
  
-  public static class TokenizerMapper
-       extends Mapper<Object, Text, Text, IntWritable>{
+  public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable>{
  
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
  
-    public void map(Object key, Text value, Context context
-                    ) throws IOException, InterruptedException {
+    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
       StringTokenizer itr = new StringTokenizer(value.toString());
       while (itr.hasMoreTokens()) {
         word.set(itr.nextToken());
@@ -99,7 +97,7 @@ public void reduce(Text key, Iterable<IntWritable> values, Context context )
 
 reduce 函数的计算过程是，将这个集合里的 1 求和，再将单词（word）和这个和（sum）组成一个 <Key, Value>，也就是 <word, sum> 输出。每一个输出就是一个单词和它的词频统计总和。
 
-一个 map 函数可以针对一部分数据进行运算，这样就可以将一个大数据切分成很多块（这也正是 HDFS 所做的），MapReduce 计算框架为每个数据块分配一个 map 函数去计算，从而实现大数据的分布式计算。
+**一个 map 函数可以针对一部分数据进行运算，这样就可以将一个大数据切分成很多块（这也正是 HDFS 所做的），MapReduce 计算框架为每个数据块分配一个 map 函数去计算，从而实现大数据的分布式计算**。
 
 假设有两个数据块的文本数据需要进行词频统计，MapReduce 计算过程如下图所示。
 
@@ -144,7 +142,6 @@ reduce 函数的计算过程是，将这个集合里的 1 求和，再将单词�
 
 ```
 SELECT pageid, age, count(1) FROM pv_users GROUP BY pageid, age;
-复制代码
 ```
 
 TIPS：如何用 MapReduce 实现 SQL 计算，我们在后面还会进一步讨论。

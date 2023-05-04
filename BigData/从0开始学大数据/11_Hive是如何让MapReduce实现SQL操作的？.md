@@ -4,7 +4,7 @@
 
 在给出答案前，我们先看看如何用 MapReduce 实现 SQL 数据分析。
 
-## MapReduce 实现 SQL 的原理
+## 一、MapReduce 实现 SQL 的原理
 
 坚持学习到这里的同学一定还记得，我在专栏第 7 期留了一道思考题，对于常见的一条 SQL 分析语句，MapReduce 如何编程实现？
 
@@ -32,9 +32,9 @@ map 函数的输出经过 shuffle 以后，相同的 Key 及其对应的 Value �
 
 这样一条很有实用价值的 SQL 就被很简单的 MapReduce 计算过程处理好了。
 
-在数据仓库中，SQL 是最常用的分析工具，既然一条 SQL 可以通过 MapReduce 程序实现，那么有没有工具能够自动将 SQL 生成 MapReduce 代码呢？这样数据分析师只要输入 SQL，就可以自动生成 MapReduce 可执行的代码，然后提交 Hadoop 执行，也就完美解决了我们最开始提出的问题。问题的答案，也就是这个神奇的工具就是 Hadoop 大数据仓库 Hive。
+**在数据仓库中，SQL 是最常用的分析工具，既然一条 SQL 可以通过 MapReduce 程序实现，那么有没有工具能够自动将 SQL 生成 MapReduce 代码呢？这样数据分析师只要输入 SQL，就可以自动生成 MapReduce 可执行的代码，然后提交 Hadoop 执行，也就完美解决了我们最开始提出的问题。问题的答案，也就是这个神奇的工具就是 Hadoop 大数据仓库 Hive**。
 
-## Hive 的架构
+## 二、Hive 的架构
 
 Hive 能够直接处理我们输入的 SQL 语句（Hive 的 SQL 语法和数据库标准 SQL 略有不同），调用 MapReduce 计算框架完成数据分析操作。下面是它的架构图，我们结合架构图来看看 Hive 是如何实现将 SQL 生成 MapReduce 可执行代码的。
 
@@ -56,7 +56,7 @@ SELECT * FROM status_updates WHERE status LIKE ‘michael jackson’;
 
 Hive 内部预置了很多函数，Hive 的执行计划就是根据 SQL 语句生成这些函数的 DAG（有向无环图），然后封装进 MapReduce 的 map 和 reduce 函数中。这个例子中，map 函数调用了三个 Hive 内置函数 TableScanOperator、FilterOperator、FileOutputOperator，就完成了 map 计算，而且无需 reduce 函数。
 
-## Hive 如何实现 join 操作
+## 三、Hive 如何实现 join 操作
 
 除了上面这些简单的聚合（group by）、过滤（where）操作，Hive 还能执行连接（join on）操作。文章开头的例子中，pv_users 表的数据在实际中是无法直接得到的，因为 pageid 数据来自用户访问日志，每个用户进行一次页面浏览，就会生成一条访问记录，保存在 page_view 表中。而 age 年龄信息则记录在用户表 user 中。
 
@@ -64,9 +64,10 @@ Hive 内部预置了很多函数，Hive 的执行计划就是根据 SQL 语句�
 
 这两张表都有一个相同的字段 userid，根据这个字段可以将两张表连接起来，生成前面例子的 pv_users 表，SQL 命令是
 
-```
-SELECT pv.pageid, u.age FROM page_view pv JOIN user u ON (pv.userid = u.userid);
-复制代码
+```hive
+SELECT pv.pageid, u.age 
+FROM page_view pv JOIN user u 
+ON (pv.userid = u.userid);
 ```
 
 同样，这个 SQL 命令也可以转化为 MapReduce 计算，连接的过程如下图所示。
@@ -109,73 +110,17 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
 - 
 
-  诺侠
-
-  2018-11-22
-
-  **22
-
-  jupyter notebook 应该算是一个。
-
-  展开**
-
-- 
-
-  李
-
-  2018-11-22
-
-  **18
-
-  此教程适合有一定大数据基础的人，如果是新人，那么肯定是懵懂的
-
-  展开**
-
-- 
-
-  Panmax
-
-  2018-11-22
-
-  **12
-
   Linux 命令中最常用的管道符 | ，就是运用嫁接最多的地方吧。
 
-  展开**
-
-- 
-
-  李志博
-
-  2018-11-22
-
-  **9
-
-  技术嫁接，我还真搞过 2 个，1 个是 selenium + 网上找的代码改本机 host 实现 自动测试线上的每台机器的功能，另外 1 个是 java agent + jd-core （一个反编译软件的底层库）实现 profile 监控同时能显示线上跑的真实的代码内容
+- 技术嫁接，我还真搞过 2 个，1 个是 selenium + 网上找的代码改本机 host 实现 自动测试线上的每台机器的功能，另外 1 个是 java agent + jd-core （一个反编译软件的底层库）实现 profile 监控同时能显示线上跑的真实的代码内容
 
   展开**
 
   作者回复: 赞
 
-- 
+- Jekins 之类的持续集成工具，集成了非常多的工具及模块，比如 sonar,git,mail 等
 
-  sunlight00...
-
-  2018-11-22
-
-  **7
-
-  Jekins 之类的持续集成工具，集成了非常多的工具及模块，比如 sonar,git,mail 等
-
-- 
-
-  西贝木土
-
-  2018-11-22
-
-  **5
-
-  package com.company.sparkcore
+- package com.company.sparkcore
 
   import org.apache.log4j.{Level, Logger}
   import org.apache.spark.{SparkConf, SparkContext}
@@ -210,35 +155,19 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
     // (2,25)
     joinRes.collect().foreach(println)
 
-  
+
    }
 
-  
+
   }
 
   展开**
 
   作者回复: 赞
 
-- 
+  
 
-  阿神
-
-  2018-11-22
-
-  **5
-
-  老师，您好！hive on spark 跟 spark sql on hive 性能上会一样吗，这两种方案怎么选型
-
-- 
-
-  朱国伟
-
-  2018-12-15
-
-  **3
-
-  李老师 在跟着学的过程中 基本上都是现学的 比如 hive
+- 李老师 在跟着学的过程中 基本上都是现学的 比如 hive
   https://cwiki.apache.org/confluence/display/Hive/GettingStarted
 
   在学习课程的过程中 是不是先不用对涉及到的这些大数据技术 如 hdfs yarn hive 等去做深入了解 只需跑一下 GettingStared 即可 即有个概念
@@ -247,153 +176,35 @@ Cloudera 开发了 Impala，这是一种运行在 HDFS 上的 MPP 架构的 SQL 
 
   作者回复: 非常好的学习方法
 
-- 
-
-  落叶飞逝的...
-
-  2018-11-22
-
-  **2
-
-  多种技术组合而成的软件产品太多了，比如:语音识别技术与搜索引擎技术组合成语音识别技术，比如 iphone 上的 siri 。还有人脸识别技术与监控技术结合及公安系统组合，就可以马路闯红灯，直接暴露闯红灯的身份。
+- 多种技术组合而成的软件产品太多了，比如:语音识别技术与搜索引擎技术组合成语音识别技术，比如 iphone 上的 siri 。还有人脸识别技术与监控技术结合及公安系统组合，就可以马路闯红灯，直接暴露闯红灯的身份。
 
   展开**
 
-- 
-
-  不似旧日
-
-  2019-01-19
-
-  **1
-
-  大数据框架可以执行 sql,能执行 sql 的框架有 hadoop 的 hive spark 的 sparkSQL,sparkSQL 的执行速度要快于 hive,
+- 大数据框架可以执行 sql,能执行 sql 的框架有 hadoop 的 hive spark 的 sparkSQL,sparkSQL 的执行速度要快于 hive,
   由于大数据框架能执行 sql 那么是不是可以把这个框架当做数据库来看待?java 就能调用大数据服务操作数据了?
 
   作者回复: 可以呀，hive 就有 jdbc 供 java 调用
 
-- 
+- 当初接触到 ajax 时就觉得很神奇，了解其实现原理后发现就是已有的两个技术（Javascript+xml）相结合后产生的技术魅力，这就是 1+1>2 的效果
 
-  在路上
-
-  2019-01-08
-
-  **1
-
-  当初接触到 ajax 时就觉得很神奇，了解其实现原理后发现就是已有的两个技术（Javascript+xml）相结合后产生的技术魅力，这就是 1+1>2 的效果
-
-- 
-
-  hua168
-
-  2018-11-23
-
-  **1
-
-  openstack 把各个功粘合在一起，话说 openstack 我们要学吗？怎么判断一个工具需要不需要学习？还有一个特迷茫的事，30 多岁学编程，大数据，没经验，能找到工作吗？😂😂
+- openstack 把各个功粘合在一起，话说 openstack 我们要学吗？怎么判断一个工具需要不需要学习？还有一个特迷茫的事，30 多岁学编程，大数据，没经验，能找到工作吗？😂😂
 
   展开**
 
-- 
-
-  Zach_
-
-  2018-11-23
-
-  **1
-
-  springboot 内置了 tomcat 我们无需再为应用配置一个 tomcat ，把 tomcat 嫁接到 springboot 上。 我看最新的 http3.0 就是用基于 UDP 协议的…… 这也算是一种嫁接吧
+- springboot 内置了 tomcat 我们无需再为应用配置一个 tomcat ，把 tomcat 嫁接到 springboot 上。 我看最新的 http3.0 就是用基于 UDP 协议的…… 这也算是一种嫁接吧
 
   展开**
 
   作者回复: 是的
 
-- 
-
-  Zach_
-
-  2018-11-23
-
-  **1
-
-  智能手机就是嘛！ 以前的手机只能打电话，现在可以拍照、打电话、录音，也可以远程操控家电……等等 把操控其他事物的技术嫁接到手机上……
-
-  作者回复: 😁
-
-- 
-
-  Albert
-
-  2018-11-22
-
-  **1
-
-  Spring Cloud 将各种微服务的基础设施集成在一起，Spring Boot 简化应用配置和管理依赖，这两者结合在一起，使得微服务应用能够快速开发和构建
-
-- 
-
-  三木子
-
-  2018-11-22
-
-  **1
-
-  子弹短信，智能音响也算吧。
-
-  展开**
-
-  作者回复: 算
-
-- 
-
-  rains
-
-  2018-11-22
-
-  **1
-
-  拍照软件和图像编辑美化软件结合起来，变成萌拍，美颜相机
-
-  展开**
-
-  作者回复: 是的
-
-- 
-
-  冉
-
-  2019-04-20
-
-  **
-
-  李老师，我之前买过您的《大型网站技术架构案例》并学习过，我想问下，对于一个程序员说，技术功底应该达到什么程度才可以去接触、学习和实践架构方面得东西呢？
+- 李老师，我之前买过您的《大型网站技术架构案例》并学习过，我想问下，对于一个程序员说，技术功底应该达到什么程度才可以去接触、学习和实践架构方面得东西呢？
 
   展开**
 
   作者回复: 任何时候都可以接触、学习、实践架构方面的东西。但是即使被人称作资深架构师了，也不要忘了提升自己的技术功底。
 
-- 
-
-  一
-
-  2019-04-18
-
-  **
-
-  “在我们工作中也可以借鉴一下这种将两种技术嫁接到一起产生极大应用创新性的手段，说不定下一个做出类似 Hive 这种具有巨大应用价值的产品的人就是你！”老师的这句话好振奋人心啊！
+- “在我们工作中也可以借鉴一下这种将两种技术嫁接到一起产生极大应用创新性的手段，说不定下一个做出类似 Hive 这种具有巨大应用价值的产品的人就是你！”老师的这句话好振奋人心啊！
 
   展开**
 
   作者回复: 加油~
-
-- 
-
-  mt11912
-
-  2019-04-18
-
-  **
-
-  postgresql 数据库支持 json 数据类型，将结构化数据和非结构化数据整合在一起。
-
-收藏
