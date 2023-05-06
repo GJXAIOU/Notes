@@ -26,6 +26,8 @@
 
     反例：定义为基本数据类型 Boolean isDeleted；的属性，它的方法也是 isDeleted()，RPC 框架在反向解析的时候，“以为”对应的属性名称是 deleted，导致属性获取不到，进而抛出异常。
 
+    > 如果使用 IDEA 自动生成方式，会生成 getDeleted() 和 setDeleted() 方法，如果使用 lombook 的 @Data 会自动生成 getIsDeleted() 和 setIsDeleted() 方法，所以默认这两种情况都不会生成 isDeleted() 方法，除非手动主动生成。
+
     说明：在本文MySQL规约中的建表约定第一条，表达是与否的变量采用 `is_xxx` 的命名方式，所以，需要在 `<resultMap>` 设置从 `is_xxx` 到 `xxx` 的映射关系。
 
 - 【强制】**包名统一使用小写，点分隔符之间有且仅有一个自然语义的英语单词**。**包名统一使用单数形式，但是类名如果有复数含义，类名可以使用复数形式。**
