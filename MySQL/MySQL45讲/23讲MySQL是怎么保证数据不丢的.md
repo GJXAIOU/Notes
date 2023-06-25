@@ -1,14 +1,20 @@
 # 23讲MySQL是怎么保证数据不丢的
 
-今天这篇文章，我会继续和你介绍在业务高峰期临时提升性能的方法。今天介绍的方法，跟数据的可靠性有关。
+本文重点介绍在业务高峰期临时提升性能的方法-跟数据的可靠性有关。
 
 在专栏前面文章和答疑篇中，着重介绍了 WAL 机制（可以再回顾下[第2篇](https://time.geekbang.org/column/article/68633)、[第9篇](https://time.geekbang.org/column/article/70848)、[第12篇](https://time.geekbang.org/column/article/71806)和[第15篇](https://time.geekbang.org/column/article/73161)文章中的相关内容），得到的结论是：**只要 redo log 和 binlog 保证持久化到磁盘，就能确保 MySQL 异常重启后，数据可以恢复。**
 
 评论区有同学又继续追问，redo log 的写入流程是怎么样的，如何保证 redo log 真实地写入了磁盘。那么今天再一起看看 MySQL 写入 binlog 和 redo log 的流程。
 
+> undo log：回滚日志，用于实现事务的回滚操作；
+>
+> redo log：重做日志，用于实现事务的持久性；
+>
+> binlog：归档日志，用于记录数据库的逻辑变更；
+
 ## 一、binlog 的写入机制
 
-**binlog 的写入逻辑比较简单：事务执行过程中，先把日志写到 binlog cache，事务提交的时候，再把 binlog cache 写到 binlog 文件中。**
+==**binlog 的写入逻辑比较简单：事务执行过程中，先把日志写到 binlog cache，事务提交的时候，再把 binlog cache 写到 binlog 文件中。**==
 
 一个事务的 binlog 是不能被拆开的，因此不论这个事务多大，也要确保一次性写入。这就涉及到了 binlog cache 的保存问题。
 
