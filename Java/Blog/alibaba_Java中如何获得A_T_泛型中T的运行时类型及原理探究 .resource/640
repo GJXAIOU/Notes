@@ -1,0 +1,144 @@
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentstyletype="text/css" height="170px" preserveAspectRatio="none" style="width:1290px;height:170px;background:#FFFFFF;" version="1.1" viewBox="0 0 1290 170" width="1290px" zoomAndPan="magnify">
+   <defs>
+   </defs>
+   <g>
+    <g>
+     <rect codeline="1" fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="176" x="523" y="7">
+     </rect>
+     <ellipse cx="538" cy="23" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;">
+     </ellipse>
+     <path d="M533.9219,18.7656 L533.9219,16.6094 L541.3125,16.6094 L541.3125,18.7656 L538.8438,18.7656 L538.8438,26.8438 L541.3125,26.8438 L541.3125,29 L533.9219,29 L533.9219,26.8438 L536.3906,26.8438 L536.3906,18.7656 L533.9219,18.7656 Z " fill="#000000">
+     </path>
+     <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="144" x="552" y="27.8467">
+      
+      
+      
+      java.lang.reflect.Type
+     </text>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="524" x2="698" y1="39" y2="39">
+     </line>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="524" x2="698" y1="47" y2="47">
+     </line>
+    </g>
+    <g>
+     <rect codeline="8" fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="132" x="7" y="115">
+     </rect>
+     <ellipse cx="22" cy="131" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;">
+     </ellipse>
+     <path d="M24.9688,136.6406 Q24.3906,136.9375 23.75,137.0781 Q23.1094,137.2344 22.4063,137.2344 Q19.9063,137.2344 18.5781,135.5938 Q17.2656,133.9375 17.2656,130.8125 Q17.2656,127.6875 18.5781,126.0313 Q19.9063,124.375 22.4063,124.375 Q23.1094,124.375 23.75,124.5313 Q24.4063,124.6875 24.9688,124.9844 L24.9688,127.7031 Q24.3438,127.125 23.75,126.8594 Q23.1563,126.5781 22.5313,126.5781 Q21.1875,126.5781 20.5,127.6563 Q19.8125,128.7188 19.8125,130.8125 Q19.8125,132.9063 20.5,133.9844 Q21.1875,135.0469 22.5313,135.0469 Q23.1563,135.0469 23.75,134.7813 Q24.3438,134.5 24.9688,133.9219 L24.9688,136.6406 Z " fill="#000000">
+     </path>
+     <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="100" x="36" y="135.8467">
+      
+      
+      
+      java.lang.Class
+     </text>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="8" x2="138" y1="147" y2="147">
+     </line>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="8" x2="138" y1="155" y2="155">
+     </line>
+    </g>
+    <g>
+     <rect codeline="9" fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="264" x="174" y="115">
+     </rect>
+     <ellipse cx="189" cy="131" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;">
+     </ellipse>
+     <path d="M184.9219,126.7656 L184.9219,124.6094 L192.3125,124.6094 L192.3125,126.7656 L189.8438,126.7656 L189.8438,134.8438 L192.3125,134.8438 L192.3125,137 L184.9219,137 L184.9219,134.8438 L187.3906,134.8438 L187.3906,126.7656 L184.9219,126.7656 Z " fill="#000000">
+     </path>
+     <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="232" x="203" y="135.8467">
+      
+      
+      
+      java.lang.reflect.GenericArrayType
+     </text>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="175" x2="437" y1="147" y2="147">
+     </line>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="175" x2="437" y1="155" y2="155">
+     </line>
+    </g>
+    <g>
+     <rect codeline="10" fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="276" x="473" y="115">
+     </rect>
+     <ellipse cx="488" cy="131" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;">
+     </ellipse>
+     <path d="M483.9219,126.7656 L483.9219,124.6094 L491.3125,124.6094 L491.3125,126.7656 L488.8438,126.7656 L488.8438,134.8438 L491.3125,134.8438 L491.3125,137 L483.9219,137 L483.9219,134.8438 L486.3906,134.8438 L486.3906,126.7656 L483.9219,126.7656 Z " fill="#000000">
+     </path>
+     <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="244" x="502" y="135.8467">
+      
+      
+      
+      java.lang.reflect.ParameterizedType
+     </text>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="474" x2="748" y1="147" y2="147">
+     </line>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="474" x2="748" y1="155" y2="155">
+     </line>
+    </g>
+    <g>
+     <rect codeline="11" fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="230" x="784" y="115">
+     </rect>
+     <ellipse cx="799" cy="131" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;">
+     </ellipse>
+     <path d="M794.9219,126.7656 L794.9219,124.6094 L802.3125,124.6094 L802.3125,126.7656 L799.8438,126.7656 L799.8438,134.8438 L802.3125,134.8438 L802.3125,137 L794.9219,137 L794.9219,134.8438 L797.3906,134.8438 L797.3906,126.7656 L794.9219,126.7656 Z " fill="#000000">
+     </path>
+     <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="198" x="813" y="135.8467">
+      
+      
+      
+      java.lang.reflect.TypeVariable
+     </text>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="785" x2="1013" y1="147" y2="147">
+     </line>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="785" x2="1013" y1="155" y2="155">
+     </line>
+    </g>
+    <g>
+     <rect codeline="12" fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="234" x="1049" y="115">
+     </rect>
+     <ellipse cx="1064" cy="131" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;">
+     </ellipse>
+     <path d="M1059.9219,126.7656 L1059.9219,124.6094 L1067.3125,124.6094 L1067.3125,126.7656 L1064.8438,126.7656 L1064.8438,134.8438 L1067.3125,134.8438 L1067.3125,137 L1059.9219,137 L1059.9219,134.8438 L1062.3906,134.8438 L1062.3906,126.7656 L1059.9219,126.7656 Z " fill="#000000">
+     </path>
+     <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="202" x="1078" y="135.8467">
+      
+      
+      
+      java.lang.reflect.WildcardType
+     </text>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="1050" x2="1282" y1="147" y2="147">
+     </line>
+     <line style="stroke:#181818;stroke-width:0.5;" x1="1050" x2="1282" y1="155" y2="155">
+     </line>
+    </g>
+    <g>
+     <path d="M502.946,48.9 C410.403,64.0437 273.817,87.9874 156,115 C150.462,116.2698 144.739,117.6694 139.008,119.1323 " fill="none" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;">
+     </path>
+     <polygon fill="none" points="502.007,41.961,522.871,45.664,504.252,55.78,502.007,41.961" style="stroke:#181818;stroke-width:1.0;">
+     </polygon>
+    </g>
+    <g>
+     <path d="M525.811,61.607 C477.263,78.4791 417.33,99.3082 372.314,114.9531 " fill="none" style="stroke:#181818;stroke-width:1.0;">
+     </path>
+     <polygon fill="none" points="523.63,54.954,544.82,55,528.226,68.1782,523.63,54.954" style="stroke:#181818;stroke-width:1.0;">
+     </polygon>
+    </g>
+    <g>
+     <path d="M611,75.0236 C611,88.5792 611,103.0381 611,114.6784 " fill="none" style="stroke:#181818;stroke-width:1.0;">
+     </path>
+     <polygon fill="none" points="604,75.0005,611,55,618,75.0004,604,75.0005" style="stroke:#181818;stroke-width:1.0;">
+     </polygon>
+    </g>
+    <g>
+     <path d="M692.324,61.932 C737.918,78.7129 793.928,99.3275 836.134,114.8617 " fill="none" style="stroke:#181818;stroke-width:1.0;">
+     </path>
+     <polygon fill="none" points="689.843,68.4777,673.492,55,694.679,55.339,689.843,68.4777" style="stroke:#181818;stroke-width:1.0;">
+     </polygon>
+    </g>
+    <g>
+     <path d="M719.1,52.646 C813.918,70.7556 951.476,97.0278 1048.89,115.6322 " fill="none" style="stroke:#181818;stroke-width:1.0;">
+     </path>
+     <polygon fill="none" points="717.58,59.482,699.248,48.855,720.206,45.731,717.58,59.482" style="stroke:#181818;stroke-width:1.0;">
+     </polygon>
+    </g>
+   </g>
+  </svg>

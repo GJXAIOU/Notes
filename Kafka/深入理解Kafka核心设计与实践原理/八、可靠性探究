@@ -1,0 +1,293 @@
+# 可靠性探究
+
+Kafka 中采用了多副本的机制，来实现水平扩展、提供容灾能力、提升可用性和可靠性等。我们对此可以引申出一系列的疑问：Kafka 多副本之间如何进行数据同步，尤其是在发生异常时候的处理机制又是什么？多副本间的数据一致性如何解决，基于的一致性协议又是什么？如何确保 Kafka 的可靠性？Kafka 中的可靠性和可用性之间的关系又如何？
+
+本节开始从副本的角度切入来深挖 Kafka 中的数据一致性、数据可靠性等问题，主要包括副本剖析、日志同步机制和可靠性分析等内容。
+
+## 一、副本剖析
+
+副本（Replica）是[分布式](https://so.csdn.net/so/search?q=分布式&spm=1001.2101.3001.7020)系统中常见的概念之一，指的是分布式系统对数据和服务提供的一种冗余方式。在常见的分布式系统中，为了对外提供可用的服务，我们往往会**对数据和服务进行副本处理**。数据副本是指在不同的节点上持久化同一份数据，当某一个节点上存储的数据丢失时，可以从副本上读取该数据，这是解决分布式系统数据丢失问题最有效的手段。另一类副本是服务副本，指多个节点提供同样的服务，每个节点都有能力接收来自外部的请求并进行相应的处理。
+
+组成分布式系统的所有计算机都有可能发生任何形式的故障。一个被大量工程实践所检验过的“黄金定理”：**任何在设计阶段考虑到的异常情况，一定会在系统实际运行中发生，并且在系统实际运行过程中还会遇到很多在设计时未能考虑到的异常故障**。所以，除非需求指标允许，否则在系统设计时不能放过任何异常情况。
+
+Kafka 从 0.8 版本开始**为分区引入了多副本机制**，通过增加副本数量来提升数据[容灾](https://so.csdn.net/so/search?q=容灾&spm=1001.2101.3001.7020)能力。同时，Kafka 通过多副本机制实现故障自动转移，在 Kafka 集群中某个 broker 节点失效的情况下仍然保证服务可用。这里先简要的整理下副本以及与副本相关的 AR、ISR、HW 和 LEO的概念：
+
+- **副本是相对于分区而言的，即副本是特定分区的副本**。
+- 一个分区中包含一个或多个副本，其中一个为 leader 副本，其余为 follower 副本，各个副本位于不同的 broker 节点中。只有 leader 副本对外提供服务，follower 副本只负责数据同步。
+- 分区中的所有副本统称为 AR，而 ISR 是指与 leader 副本保持同步状态的副本集合，当然 leader 副本本身也是这个集合中的一员。
+- LEO 标识每个分区中最后一条消息的下一个位置，分区的每个副本都有自己的 LEO，ISR 中最小的 LEO 即为 HW，俗称高水位，消费者只能拉取到 HW 之前的消息。
+
+**从生产者发出的一条消息首先会被写入分区的 leader 副本，不过还需要等待 ISR 集合中的所有 follower 副本都同步完之后才能被认为已经提交，之后才会更新分区的 HW，进而消费者可以消费到这条消息**。
+
+### （一）失效副本
+
+正常情况下，分区的所有副本都处于 ISR 集合中，但是难免会有异常情况发生，从而某些副本被剥离出 ISR 集合中。在 ISR 集合之外，也就是处于同步失效或功能失效（比如副本处于非存活状态）的副本统称为失效副本，失效副本对应的分区也就称为同步失效分区，即 under-replicated 分区。
+
+正常情况下，我们通过 kafka-topics.sh 脚本的 under-replicated-partitions 参数来显示主题中包含失效副本的分区时结果会返回空。比如我们来查看一下主题 topic-partitions 的相关信息：
+
+```shell
+[root@node1 kafka_2.11-2.0.0]# bin/kafka-topics.sh --zookeeper localhost: 2181/kafka --describe --topic topic-partitions --under-replicated-partitions
+```
+
+上面的示例中返回为空。紧接着我们将集群中的 brokerId 为 2 的节点关闭，再来执行同样的命令，结果显示如下：
+
+```shell
+[root@node1 kafka_2.11-2.0.0]# bin/kafka-topics.sh --zookeeper localhost:2181/ kafka --describe --topic topic-partitions --under-replicated-partitions 
+
+     Topic: topic-partitions	Partition: 0	Leader: 1	Replicas: 1,2,0	Isr: 1,0
+     Topic: topic-partitions	Partition: 1	Leader: 0	Replicas: 2,0,1	Isr: 0,1
+     Topic: topic-partitions	Partition: 2	Leader: 0	Replicas: 0,1,2	Isr: 0,1
+```
+
+可以看到主题 topic-partitions 中的三个分区都为 under-replicated 分区，因为它们都有副本处于下线状态，即处于功能失效状态。
+
+前面提及失效副本不仅是指处于功能失效状态的副本，处于同步失效状态的副本也可以看作失效副本。怎么判定一个分区是否有副本处于同步失效的状态呢？Kafka 从 0.9.x 版本开始就通过唯一的 broker 端参数 `replica.lag.time.max.ms` 来抉择，当 ISR 集合中的一个 follower 副本滞后 leader 副本的时间超过此参数指定的值时则判定为同步失败，需要将此 follower 副本剔除出 ISR 集合，具体可以参考下图。`replica.lag.time.max.ms` 参数的默认值为10000。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683022879234-1.png" alt="8-1" style="zoom:50%;" />
+
+具体的实现原理也很容易理解，当 follower 副本将 leader 副本 LEO（LogEndOffset）之前的日志**全部同步**时，则认为该 follower 副本已经追赶上 leader 副本，此时更新该副本的 lastCaughtUpTimeMs 标识。Kafka 的副本管理器会启动一个副本过期检测的定时任务，而这个定时任务会定时检查当前时间与副本的 lastCaughtUpTimeMs 差值是否大于参数 replica.lag.time.max.ms 指定的值。
+
+千万**不要错误地认为 follower 副本只要拉取 leader 副本的数据就会更新 lastCaughtUpTimeMs**。试想一下，当 leader 副本中消息的流入速度大于 follower 副本中拉取的速度时，就算 follower 副本一直不断地拉取 leader 副本的消息也不能与 leader 副本同步。如果还将此 follower 副本置于 ISR 集合中，那么当 leader 副本下线而选取此 follower 副本为新的 leader 副本时就会造成消息的严重丢失。
+
+Kafka 源码注释中说明了一般有两种情况会导致副本失效：
+
+- follower 副本进程卡住，在一段时间内根本没有向 leader 副本发起同步请求，比如频繁的 Full GC。
+- follower 副本进程同步过慢，在一段时间内都无法追赶上 leader 副本，比如 I/O 开销过大。
+
+在这里再补充一点，如果通过工具增加了副本因子，那么新增加的副本在赶上 leader 副本之前也都是处于失效状态的。如果一个 follower 副本由于某些原因（比如宕机）而下线，之后又上线，在追赶上 leader 副本之前也处于失效状态。
+
+在 0.9.x 版本之前，Kafka 中还有另一个参数 `replica.lag.max.messages`（默认值为4000），它也是用来判定失效副本的，当一个 follower 副本滞后 leader 副本的消息数超过 replica.lag.max.messages 的大小时，则判定它处于同步失效的状态。它与 replica.lag.time.max.ms 参数判定出的失效副本取并集组成一个失效副本的集合，从而进一步剥离出分区的 ISR 集合。
+
+不过这个 replica.lag.max.messages 参数很难给定一个合适的值，若设置得太大，则这个参数本身就没有太多意义，若设置得太小则会让 follower 副本反复处于同步、未同步、同步的死循环中，进而又造成 ISR 集合的频繁伸缩。而且这个参数是 broker 级别的，也就是说，对 broker 中的所有主题都生效。以默认的值4000为例，对于消息流入速度很低的主题（比如 TPS 为10），这个参数并无用武之地；而对于消息流入速度很高的主题（比如 TPS 为20000），这个参数的取值又会引入 ISR 的频繁变动。所以从 0.9.x 版本开始，Kafka 就彻底移除了这一参数，相关的资料还可以参考[KIP16](https://link.juejin.cn/?target=https%3A%2F%2Fcwiki.apache.org%2Fconfluence%2Fdisplay%2FKAFKA%2FKIP-16%2B-%2BAutomated%2BReplica%2BLag%2BTuning)。
+
+具有失效副本的分区可以从侧面反映出 Kafka 集群的很多问题，毫不夸张地说：如果只用一个指标来衡量 Kafka，那么同步失效分区（具有失效副本的分区）的个数必然是首选。
+
+### （二）ISR的伸缩
+
+Kafka 在启动的时候会开启两个与ISR相关的定时任务，名称分别为 isr-expiration 和 isr-change-propagation。isr-expiration 任务会周期性地检测**每个分区是否需要缩减其 ISR 集合**。这个周期和 `replica.lag.time.max.ms` 参数有关，大小是这个参数值的一半，默认值为 5000ms。当检测到 ISR 集合中有失效副本时，就会收缩 ISR 集合。如果某个分区的 ISR 集合发生变更，则会将变更后的数据记录到 ZooKeeper 对应的 `/brokers/topics/<topic>/partition/<parititon>/state` 节点中。节点中的数据示例如下：
+
+```cobol
+{"controller_epoch":26,"leader":0,"version":1,"leader_epoch":2,"isr":[0,1]}
+```
+
+其中 controller_epoch 表示当前 Kafka 控制器的 epoch，leader 表示当前分区的 leader 副本所在的 broker 的 id 编号，version 表示版本号（当前版本固定为1），leader_epoch 表示当前分区的 leader 纪元，isr 表示变更后的 ISR 列表。
+
+除此之外，当 ISR 集合发生变更时还会将变更后的记录缓存到 isrChangeSet 中，isr-change-propagation 任务会周期性（固定值为 2500ms）地检查 isrChangeSet，如果发现 isrChangeSet 中有 ISR 集合的变更记录，那么它会在 ZooKeeper 的 /isr_change_notification 路径下创建一个以 isr_change_ 开头的持久顺序节点（比如 /isr_change_notification/isr_change_0000000000），并将 isrChangeSet 中的信息保存到这个节点中。
+
+Kafka 控制器为 /isr_change_notification 添加了一个 Watcher，当这个节点中有子节点发生变化时会触发 Watcher 的动作，以此通知控制器更新相关元数据信息并向它管理的 broker 节点发送更新元数据的请求，最后删除 /isr_change_notification 路径下已经处理过的节点。
+
+ 频繁地触发 Watcher 会影响 Kafka 控制器、ZooKeeper 甚至其他 broker 节点的性能。为了避免这种情况，Kafka 添加了限定条件，当检测到分区的 ISR 集合发生变化时，还需要检查以下两个条件：
+
+1. 上一次 ISR 集合发生变化距离现在已经超过5s。
+2. 上一次写入 ZooKeeper 的时间距离现在已经超过60s。
+
+满足以上两个条件之一才可以将 ISR 集合的变化写入目标节点。
+
+有缩减对应就会有扩充，那么 Kafka 又是何时扩充 ISR 的呢？
+
+随着 follower 副本不断与 leader 副本进行消息同步，follower 副本的 LEO 也会逐渐后移，并最终追赶上 leader 副本，此时该 follower 副本就有资格进入 ISR 集合。追赶上 leader 副本的判定准则是此副本的 LEO 是否不小于 leader 副本的 HW，注意这里并不是和 leader 副本的 LEO 相比。ISR 扩充之后同样会更新 ZooKeeper 中的 `/brokers/topics/<topic>/partition/<parititon>/state` 节点和 isrChangeSet，之后的步骤就和 ISR 收缩时的相同。
+
+当 ISR 集合发生增减时，或者 ISR 集合中任一副本的 LEO 发生变化时，都可能会影响整个分区的 HW。
+
+如下图所示，leader 副本的 LEO 为9，follower1 副本的 LEO 为7，而 follower2 副本的 LEO 为6，如果判定这3个副本都处于 ISR 集合中，那么这个分区的 HW 为6；如果 follower3 已经被判定为失效副本被剥离出 ISR 集合，那么此时分区的 HW 为 leader 副本和 follower1 副本中 LEO 的最小值，即为7。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683021007291-1-1683023107889-3.png" alt="8-2" style="zoom:50%;" />
+
+
+
+> 冷门知识：很多读者对 Kafka 中的 HW 的概念并不陌生，但是却并不知道还有一个 LW 的概念。LW 是 Low Watermark 的缩写，俗称“低水位”，代表 AR 集合中最小的 logStartOffset 值。副本的拉取请求（FetchRequest，它有可能触发新建日志分段而旧的被清理，进而导致 logStartOffset 的增加）和删除消息请求（DeleteRecordRequest）都有可能促使LW的增长。
+
+### （三）LEO与HW
+
+对于副本而言，还有两个概念：本地副本（Local Replica）和远程副本（Remote Replica），本地副本是指对应的 Log分配在当前的 broker 节点上，远程副本是指对应的Log分配在其他的 broker 节点上。在 Kafka 中，同一个分区的信息会存在多个 broker 节点上，并被其上的副本管理器所管理，这样在逻辑层面**每个 broker 节点上的分区就有了多个副本，但是只有本地副本才有对应的日志**。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683021007291-2-1683023214945-5.png" alt="8-3" style="zoom:50%;" />
+
+如上图所示，某个分区有3个副本分别位于 broker0、broker1 和 broker2 节点中，其中带阴影的方框表示本地副本。假设 broker0 上的副本1为当前分区的 leader 副本，那么副本2和副本3就是 follower 副本，整个消息追加的过程可以概括如下：
+
+1. 生产者客户端发送消息至 leader 副本（副本1）中。
+2. 消息被追加到 leader 副本的本地日志，并且会更新日志的偏移量。
+3. follower 副本（副本2和副本3）向 leader 副本请求同步数据。
+4. leader 副本所在的服务器读取本地日志，并更新对应拉取的 follower 副本的信息。
+5. leader 副本所在的服务器将拉取结果返回给 follower 副本。
+6. follower 副本收到 leader 副本返回的拉取结果，将消息追加到本地日志中，并更新日志的偏移量信息。
+
+了解了这些内容后，我们再来分析在这个过程中各个副本 LEO 和 HW 的变化情况。下面的示例采用同上图中相同的环境背景，如下图（左）所示，生产者一直在往 leader 副本（带阴影的方框）中写入消息。某一时刻，leader 副本的 LEO 增加至5，并且所有副本的 HW 还都为0。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683021007291-3.png" alt="8-4 8-5" style="zoom:50%;" />
+
+之后 follower 副本（不带阴影的方框）向 leader 副本拉取消息，在拉取的请求中会带有自身的 LEO 信息，这个 LEO 信息对应的是 FetchRequest 请求中的 fetch_offset。leader 副本返回给 follower 副本相应的消息，并且还带有自身的 HW 信息，如上图（右）所示，这个 HW 信息对应的是 FetchResponse 中的 high_watermark。
+
+此时两个 follower 副本各自拉取到了消息，并更新各自的 LEO 为3和4。与此同时，follower 副本还会更新自己的 HW，更新 HW 的算法是比较当前 LEO 和 leader 副本中传送过来的HW的值，取较小值作为自己的 HW 值。当前两个 follower 副本的 HW 都等于0（min(0,0) = 0）。
+
+接下来 follower 副本再次请求拉取 leader 副本中的消息，如下图（左）所示。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683021007292-4-1683023310916-7.png" alt="8-6 8-7" style="zoom:50%;" />
+
+此时 leader 副本收到来自 follower 副本的 FetchRequest 请求，其中带有 LEO 的相关信息，选取其中的最小值作为新的 HW，即 min(15,3,4)=3。然后连同消息和 HW 一起返回 FetchResponse 给 follower 副本，如上图（右）所示。注意 leader 副本的 HW 是一个很重要的东西，因为它直接影响了分区数据对消费者的可见性。
+
+两个 follower 副本在收到新的消息之后更新 LEO 并且更新自己的 HW 为3（min(LEO,3)=3）。
+
+在一个分区中，leader 副本所在的节点会记录所有副本的 LEO，而 follower 副本所在的节点只会记录自身的 LEO，而不会记录其他副本的 LEO。对 HW 而言，各个副本所在的节点都只记录它自身的 HW。变更本节第3张图，使其带有相应的 LEO 和 HW 信息，如下图所示。leader 副本中带有其他 follower 副本的 LEO，那么它们是什么时候更新的呢？leader 副本收到 follower 副本的 FetchRequest 请求之后，它首先会从自己的日志文件中读取数据，然后在返回给 follower 副本数据前先更新 follower 副本的 LEO。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683021007292-5-1683023325055-9.png" alt="8-8" style="zoom:50%;" />
+
+在第1节中，Kafka 的根目录下有 cleaner-offset-checkpoint、log-start-offset-checkpoint、recovery-point-offset-checkpoint 和 replication-offset-checkpoint 四个检查点文件，除了在第4节中提及了 cleaner-offset-checkpoint，其余章节都没有做过多的说明。
+
+recovery-point-offset-checkpoint 和 replication-offset-checkpoint 这两个文件分别对应了 LEO 和 HW。Kafka 中会有一个定时任务负责将所有分区的 LEO 刷写到恢复点文件 recovery-point-offset-checkpoint 中，定时周期由broker端参数 log.flush.offset.checkpoint.interval.ms 来配置，默认值为60000。
+
+还有一个定时任务负责将所有分区的 HW 刷写到复制点文件 replication-offset-checkpoint 中，定时周期由 broker 端参数 replica.high.watermark.checkpoint.interval.ms 来配置，默认值为5000。
+
+log-start-offset-checkpoint 文件对应 logStartOffset（注意不能缩写为 LSO，因为在 Kafka 中 LSO 是 LastStableOffset 的缩写），这个在第4节中就讲过，在 FetchRequest 和 FetchResponse 中也有它的身影，它用来标识日志的起始偏移量。各个副本在变动 LEO 和 HW 的过程中，logStartOffset 也有可能随之而动。Kafka也有一个定时任务来负责将所有分区的 logStartOffset 书写到起始点文件 log-start-offset-checkpoint 中，定时周期由 broker 端参数 log.flush.start.offset.checkpoint.interval.ms 来配置，默认值为60000。
+
+### （四）Leader Epoch的介入
+
+上一节的内容所陈述的都是在正常情况下的 leader 副本与 follower 副本之间的同步过程，如果 leader 副本发生切换，那么同步过程又该如何处理呢？在 0.11.0.0 版本之前，[Kafka](https://so.csdn.net/so/search?q=Kafka&spm=1001.2101.3001.7020) 使用的是基于 HW 的同步机制，但这样有可能出现数据丢失或 leader 副本和 follower 副本数据不一致的问题。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png.png" alt="8-9" style="zoom:50%;" />
+
+首先我们来看一下数据丢失的问题，如上图所示，Replica B 是当前的 leader 副本（用 L 标记），Replica A 是 follower 副本。参照上一节中的过程来进行分析：在某一时刻，B 中有2条消息 m1 和 m2，A 从 B 中同步了这两条消息，此时 A 和 B 的 LEO 都为2，同时 HW 都为1；之后 A 再向 B 中发送请求以拉取消息，FetchRequest 请求中带上了 A 的 LEO 信息，B 在收到请求之后更新了自己的 HW 为2；B 中虽然没有更多的消息，但还是在延时一段时间之后返回 FetchResponse，并在其中包含了 HW 信息；最后 A 根据 FetchResponse 中的 HW 信息更新自己的 HW 为2。
+
+![8-10](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376453-11.png)
+
+可以看到整个过程中两者之间的 HW 同步有一个间隙，在 A 写入消息 m2 之后（LEO 更新为2）需要再一轮的 FetchRequest/FetchResponse 才能更新自身的 HW 为2。如上图所示，如果在这个时候 A 宕机了，那么在 A 重启之后会根据之前HW位置（这个值会存入本地的复制点文件 replication-offset-checkpoint）进行日志截断，这样便会将 m2 这条消息删除，此时 A 只剩下 m1 这一条消息，之后 A 再向 B 发送 FetchRequest 请求拉取消息。
+
+![8-11](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376453-12.png)
+
+ 此时若 B 再宕机，那么 A 就会被选举为新的 leader，如上图所示。B 恢复之后会成为 follower，由于 follower 副本 HW 不能比 leader 副本的 HW 高，所以还会做一次日志截断，以此将 HW 调整为1。这样一来 m2 这条消息就丢失了（就算B不能恢复，这条消息也同样丢失）。
+
+对于这种情况，也有一些解决方法，比如等待所有 follower 副本都更新完自身的 HW 之后再更新 leader 副本的 HW，这样会增加多一轮的 FetchRequest/FetchResponse 延迟，自然不够妥当。还有一种方法就是 follower 副本恢复之后，在收到 leader 副本的 FetchResponse 前不要截断 follower 副本（follower 副本恢复之后会做两件事情：截断自身和向 leader 发送 FetchRequest 请求），不过这样也避免不了数据不一致的问题。
+
+![8-12](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376454-13.png)
+
+ 如上图所示，当前 leader 副本为 A，follower 副本为 B，A 中有2条消息 m1 和 m2，并且 HW 和 LEO 都为2，B 中有1条消息 m1，并且 HW 和 LEO 都为1。假设 A 和 B 同时“挂掉”，然后 B 第一个恢复过来并成为 leader，如下图所示。
+
+![8-13](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376454-14.png)
+
+之后 B 写入消息 m3，并将 LEO 和 HW 更新至2（假设所有场景中的 min.insync.replicas 参数配置为1）。此时 A 也恢复过来了，根据前面数据丢失场景中的介绍可知它会被赋予 follower 的角色，并且需要根据 HW 截断日志及发送 FetchRequest 至 B，不过此时 A 的 HW 正好也为2，那么就可以不做任何调整了，如下图所示。
+
+![8-14](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376454-15.png)
+
+如此一来 A 中保留了 m2 而 B 中没有，B 中新增了 m3 而 A 也同步不到，这样 A 和 B 就出现了数据不一致的情形。
+
+为了解决上述两种问题，Kafka 从 0.11.0.0 开始引入了 leader epoch 的概念，在需要截断数据的时候使用 leader epoch 作为参考依据而不是原本的 HW。leader epoch 代表 leader 的纪元信息（epoch），初始值为0。每当 leader 变更一次，leader epoch 的值就会加1，相当于为 leader 增设了一个版本号。
+
+与此同时，每个副本中还会增设一个矢量 <LeaderEpoch => StartOffset>，其中 StartOffset 表示当前 LeaderEpoch 下写入的第一条消息的偏移量。每个副本的 Log 下都有一个 leader-epoch-checkpoint 文件，在发生 leader epoch 变更时，会将对应的矢量对追加到这个文件中。在讲述 v2 版本的消息格式时就提到了消息集中的 partition leader epoch 字段，而这个字段正对应这里讲述的 leader epoch。
+
+下面我们再来看一下引入 leader epoch 之后如何应付前面所说的数据丢失和数据不一致的场景。首先讲述应对数据丢失的问题，如下图所示，这里只是多了 LE（LeaderEpoch 的缩写，当前 A 和 B 中的 LE 都为0）。
+
+![8-15](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376454-16.png)
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376454-17.png" alt="8-16" style="zoom:50%;" />
+
+同样A发生重启，之后A不是先忙着截断日志而是先发送OffsetsForLeaderEpochRequest请求给B（OffsetsForLeaderEpochRequest请求体结构如上图所示，其中包含A当前的LeaderEpoch值），B作为目前的leader在收到请求之后会返回当前的LEO（LogEndOffset，注意图中LE0和LEO的不同），与请求对应的响应为OffsetsForLeaderEpochResponse，对应的响应体结构可以参考下面第一张图，整个过程可以参考下面第二张图。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376454-18.png" alt="8-17" style="zoom:50%;" />
+
+![8-18](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376454-19.png)
+
+如果 A 中的 LeaderEpoch（假设为 LE_A）和 B 中的不相同，那么 B 此时会查找 LeaderEpoch 为 LE_A+1 对应的 StartOffset 并返回给 A，也就是 LE_A 对应的 LEO，所以我们可以将 OffsetsForLeaderEpochRequest 的请求看作用来查找 follower 副本当前 LeaderEpoch 的 LEO。
+
+如上图所示，A 在收到2之后发现和目前的 LEO 相同，也就不需要截断日志了。之后 B 发生了宕机，A 成为新的 leader，那么对应的 LE=0 也变成了 LE=1，对应的消息 m2 此时就得到了保留，这是原本所不能的，如下图所示。之后不管 B 有没有恢复，后续的消息都可以以 LE1 为 LeaderEpoch 陆续追加到 A 中。
+
+![8-19](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376455-20.png)
+
+​    下面我们再来看一下 leader epoch 如何应对数据不一致的场景。如下图所示，当前 A 为 leader，B 为 follower，A 中有2条消息 m1 和 m2，而 B 中有1条消息 m1。假设 A 和 B 同时“挂掉”，然后 B 第一个恢复过来并成为新的 leader。
+
+![8-20](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376455-21.png)
+
+   之后 B 写入消息 m3，并将 LEO 和 HW 更新至2，如下图所示。注意此时的 LeaderEpoch 已经从 LE0 增至 LE1 了。
+
+![8-21](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376455-22.png)
+
+   紧接着 A 也恢复过来成为 follower 并向 B 发送 OffsetsForLeaderEpochRequest 请求，此时 A 的 LeaderEpoch 为 LE0。B 根据 LE0 查询到对应的 offset 为1并返回给 A，A 就截断日志并删除了消息 m2，如下图所示。之后 A 发送 FetchRequest 至 B 请求来同步数据，最终A和B中都有两条消息 m1 和 m3，HW 和 LEO都为2，并且 LeaderEpoch 都为 LE1，如此便解决了数据不一致的问题。
+
+![8-22](%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376455-23.png)
+
+### （五）为什么不支持读写分离
+
+**Kafka 中，生产者写入消息、消费者读取消息的操作都是与 leader 副本进行交互的，从而实现的是一种主写主读的生产消费模型**。数据库、Redis 等都具备主写主读的功能，与此同时还支持主写从读的功能，主写从读也就是读写分离，为了与主写主读对应，这里就以主写从读来称呼。Kafka 并不支持主写从读，这是为什么呢？
+
+从代码层面上来说，虽然增加了代码复杂度，但在 Kafka 中这种功能完全可以支持。对于这个问题，我们可以从“收益点”这个角度来做具体分析。主写从读可以让从节点去分担主节点的负载压力，预防主节点负载过重而从节点却空闲的情况发生。但是**主写从读也有2个很明显的缺点**：
+
+1. 数据一致性问题。数据从主节点转到从节点必然会有一个延时的时间窗口，这个时间窗口会导致主从节点之间的数据不一致。某一时刻，在主节点和从节点中 A 数据的值都为 X，之后将主节点中 A 的值修改为 Y，那么在这个变更通知到从节点之前，应用读取从节点中的 A 数据的值并不为最新的 Y，由此便产生了数据不一致的问题。
+2. 延时问题。类似 Redis 这种组件，数据从写入主节点到同步至从节点中的过程需要经历网络→主节点内存→网络→从节点内存这几个阶段，整个过程会耗费一定的时间。而在 Kafka 中，主从同步会比 Redis 更加耗时，它需要经历网络→主节点内存→主节点磁盘→网络→从节点内存→从节点磁盘这几个阶段。对延时敏感的应用而言，主写从读的功能并不太适用。
+
+现实情况下，很多应用既可以忍受一定程度上的延时，也可以忍受一段时间内的数据不一致的情况，那么对于这种情况，Kafka 是否有必要支持主写从读的功能呢？
+
+**主写从读可以均摊一定的负载却不能做到完全的负载均衡**，比如对于数据写压力很大而读压力很小的情况，从节点只能分摊很少的负载压力，而绝大多数压力还是在主节点上。而在 Kafka 中却可以达到很大程度上的负载均衡，而且这种均衡是在主写主读的架构上实现的。我们来看一下 Kafka 的生产消费模型，如下图所示。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683023376455-24-1683023376456-39" alt="8-23" style="zoom: 67%;" />
+
+如上图所示，在 Kafka 集群中有3个分区，每个分区有3个副本，正好均匀地分布在3个 broker 上，灰色阴影的代表 leader 副本，非灰色阴影的代表 follower 副本，虚线表示 follower 副本从 leader 副本上拉取消息。当生产者写入消息的时候都写入 leader 副本，对于上图中的情形，每个 broker 都有消息从生产者流入；当消费者读取消息的时候也是从 leader 副本中读取的，对于上图中的情形，每个 broker 都有消息流出到消费者。
+
+每个 broker 上的读写负载都是一样的，这就说明 **Kafka 可以通过主写主读实现主写从读实现不了的负载均衡**。有以下几种情况（包含但不仅限于）会造成一定程度上的负载不均衡：
+
+1. broker 端的分区分配不均。当创建主题的时候可能会出现某些 broker 分配到的分区数多而其他 broker 分配到的分区数少，那么自然而然地分配到的 leader 副本也就不均。
+2. 生产者写入消息不均。生产者可能只对某些 broker 中的 leader 副本进行大量的写入操作，而对其他 broker 中的 leader 副本不闻不问。
+3. 消费者消费消息不均。消费者可能只对某些 broker 中的 leader 副本进行大量的拉取操作，而对其他 broker 中的 leader 副本不闻不问。
+4. leader 副本的切换不均。在实际应用中可能会由于broker宕机而造成主从副本的切换，或者分区副本的重分配等，这些动作都有可能造成各个 broker 中 leader 副本的分配不均。
+
+针对第一种情况，在主题创建的时候尽可能使分区分配得均衡，好在Kafka中相应的分配算法也是在极力地追求这一目标，如果是开发人员自定义的分配，则需要注意这方面的内容。对于第二和第三种情况，主写从读也无法解决。对于第四种情况，Kafka提供了优先副本的选举来达到leader副本的均衡，与此同时，也可以配合相应的监控、告警和运维平台来实现均衡的优化。
+
+在实际应用中，配合监控、告警、运维相结合的生态平台，在绝大多数情况下 Kafka 都能做到很大程度上的负载均衡。总的来说，Kafka 只支持主写主读有几个优点：可以简化代码的实现逻辑，减少出错的可能；将负载粒度细化均摊，与主写从读相比，不仅负载效能更好，而且对用户可控；没有延时的影响；在副本稳定的情况下，不会出现数据不一致的情况。为此，Kafka 又何必再去实现对它而言毫无收益的主写从读的功能呢？这一切都得益于 Kafka 优秀的架构设计，从某种意义上来说，主写从读是由于设计上的缺陷而形成的权宜之计。
+
+## 二、日志同步机制
+
+在分布式系统中，**日志同步机制既要保证数据的一致性，也要保证数据的顺序性**。虽然有许多方式可以实现这些功能，但最简单高效的方式还是从集群中选出一个 leader 来负责处理数据写入的顺序性。只要 leader 还处于存活状态，那么 follower 只需按照 leader 中的写入顺序来进行同步即可。
+
+通常情况下，只要 leader 不宕机我们就不需要关心 follower 的同步问题。不过当 leader 宕机时，我们就要从 follower 中选举出一个新的 leader。follower 的同步状态可能落后 leader 很多，甚至还可能处于宕机状态，所以必须确保选择具有最新日志消息的 follower 作为新的 leader。日志同步机制的一个基本原则就是：**如果告知客户端已经成功提交了某条消息，那么即使 leader 宕机，也要保证新选举出来的 leader 中能够包含这条消息**。这里就有一个需要权衡（tradeoff）的地方，如果 leader 在消息被提交前需要等待更多的 follower 确认，那么在它宕机之后就可以有更多的 follower 替代它，不过这也会造成性能的下降。
+
+对于这种 tradeoff，一种常见的做法是“少数服从多数”，它可以用来负责提交决策和选举决策。虽然 **Kafka 不采用这种方式**，但可以拿来探讨和理解 tradeoff 的艺术。在这种方式下，如果我们有 2f+1 个副本，那么在提交之前必须保证有 f+1 个副本同步完消息。同时为了保证能正确选举出新的 leader，至少要保证有 f+1 个副本节点完成日志同步并从同步完成的副本中选举出新的 leader 节点。并且在不超过 f 个副本节点失败的情况下，新的 leader 需要保证不会丢失已经提交过的全部消息。这样在任意组合的 f+1 个副本中，理论上可以确保至少有一个副本能够包含已提交的全部消息，这个副本的日志拥有最全的消息，因此会有资格被选举为新的 leader 来对外提供服务。
+
+“少数服从多数”的方式有一个很大的优势，系统的延迟取决于最快的几个节点，比如副本数为3，那么延迟就取决于最快的那个 follower 而不是最慢的那个（除了 leader，只需要另一个 follower 确认即可）。不过它也有一些劣势，为了保证 leader 选举的正常进行，它所能容忍的失败 follower 数比较少，如果要容忍1个 follower 失败，那么至少要有3个副本，如果要容忍2个 follower 失败，必须要有5个副本。也就是说，**在生产环境下为了保证较高的容错率，必须要有大量的副本，而大量的副本又会在大数据量下导致性能的急剧下降。这也就是“少数服从多数”的这种 Quorum 模型常被用作共享集群配置（比如 ZooKeeper），而很少用于主流的数据存储中的原因。**
+
+与“少数服从多数”相关的一致性协议有很多，比如 Zab、Raft 和 Viewstamped Replication 等。而 Kafka 使用的更像是微软的 PacificA 算法。
+
+在 Kafka 中动态维护着一个 ISR 集合，处于 ISR 集合内的节点保持与 leader 相同的高水位（HW），只有位列其中的副本（unclean.leader.election.enable 配置为 false）才有资格被选为新的 leader。写入消息时只有等到所有ISR集合中的副本都确认收到之后才能被认为已经提交。位于 ISR 中的任何副本节点都有资格成为 leader，选举过程简单、开销低，这也是 Kafka 选用此模型的重要因素。Kafka 中包含大量的分区，leader 副本的均衡保障了整体负载的均衡，所以这一因素也极大地影响 Kafka 的性能指标。
+
+在采用 ISR 模型和（f+1）个副本数的配置下，一个 Kafka 分区能够容忍最大f个节点失败，相比于“少数服从多数”的方式所需的节点数大幅减少。实际上，为了能够容忍 f 个节点失败，“少数服从多数”的方式和 ISR 的方式都需要相同数量副本的确认信息才能提交消息。比如，为了容忍1个节点失败，“少数服从多数”需要3个副本和1个 follower 的确认信息，采用 ISR 的方式需要2个副本和1个 follower 的确认信息。在需要相同确认信息数的情况下，采用 ISR 的方式所需要的副本总数变少，复制带来的集群开销也就更低，“少数服从多数”的优势在于它可以绕开最慢副本的确认信息，降低提交的延迟，而对 Kafka 而言，这种能力可以交由客户端自己去选择。
+
+另外，一般的同步策略依赖于稳定的存储系统来做数据恢复，也就是说，在数据恢复时日志文件不可丢失且不能有数据上的冲突。不过它们忽视了两个问题：首先，磁盘故障是会经常发生的，在持久化数据的过程中并不能完全保证数据的完整性；其次，即使不存在硬件级别的故障，我们也不希望在每次写入数据时执行同步刷盘（fsync）的动作来保证数据的完整性，这样会极大地影响性能。而 Kafka 不需要宕机节点必须从本地数据日志中进行恢复，Kafka 的同步方式允许宕机副本重新加入 ISR 集合，但在进入 ISR 之前必须保证自己能够重新同步完 leader 中的所有数据。
+
+## 三、可靠性分析
+
+很多人问过笔者类似这样的一些问题：怎样可以确保 Kafka 完全可靠？如果这样做就可以确保消息不丢失了吗？笔者认为：就可靠性本身而言，它并不是一个可以用简单的“是”或“否”来衡量的一个指标，而一般是采用几个9来衡量的。任何东西不可能做到完全的可靠，即使能应付单机故障，也难以应付集群、数据中心等集体故障，即使躲得过天灾也未必躲得过人祸。就可靠性而言，我们可以基于一定的假设前提来做分析。**本节要讲述的是：在只考虑 Kafka 本身使用方式的前提下如何最大程度地提高可靠性。**
+
+**就 Kafka 而言，越多的副本数越能够保证数据的可靠性**，副本数可以在创建主题时配置，也可以在后期修改，不过副本数越多也会引起磁盘、网络带宽的浪费，同时会引起性能的下降。一般而言，设置副本数为3即可满足绝大多数场景对可靠性的要求，而对可靠性要求更高的场景下，可以适当增大这个数值，比如国内部分银行在使用 Kafka 时就会设置副本数为5。与此同时，如果能够在分配分区副本的时候引入基架信息（broker.rack 参数），那么还要应对机架整体宕机的风险。
+
+仅依靠副本数来支撑可靠性是远远不够的，大多数人还会想到**生产者客户端参数 acks**。在2.3节中我们就介绍过这个参数：相比于0和1，acks = -1（客户端还可以配置为 all，它的含义与-1一样，以下只以-1来进行陈述）可以最大程度地提高消息的可靠性。
+
+**对于 acks = 1 的配置，生产者将消息发送到 leader 副本，leader 副本在成功写入本地日志之后会告知生产者已经成功提交**，如下图所示。如果此时 ISR 集合的 follower 副本还没来得及拉取到 leader 中新写入的消息，leader 就宕机了，那么此次发送的消息就会丢失。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683024430338-55.png" alt="8-24" style="zoom:50%;" />
+
+**对于 ack = -1 的配置，生产者将消息发送到 leader 副本，leader 副本在成功写入本地日志之后还要等待 ISR 中的 follower 副本全部同步完成才能够告知生产者已经成功提交，即使此时 leader 副本宕机，消息也不会丢失，如下图所示**。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683024430338-56.png" alt="8-25" style="zoom:50%;" />
+
+同样对于 acks = -1 的配置，如果在消息成功写入 leader 副本之后，并且在被 ISR 中的所有副本同步之前 leader 副本宕机了，那么生产者会收到异常以此告知此次发送失败，如下图所示。
+
+<img src="%E5%85%AB%E3%80%81%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8E%A2%E7%A9%B6.resource/format,png-1683024430338-57.png" alt="8-26" style="zoom:67%;" />
+
+消息发送有3种模式，即发后即忘、同步和异步。对于发后即忘的模式，不管消息有没有被成功写入，生产者都不会收到通知，那么即使消息写入失败也无从得知，因此发后即忘的模式不适合高可靠性要求的场景。如果要提升可靠性，那么生产者可以采用同步或异步的模式，在出现异常情况时可以及时获得通知，以便可以做相应的补救措施，比如**选择重试发送（可能会引起消息重复）**。
+
+有些发送异常属于**可重试异常**，比如 NetworkException，这个可能是由瞬时的网络故障而导致的，一般通过重试就可以解决。对于这类异常，如果直接抛给客户端的使用方也未免过于兴师动众，客户端内部本身提供了重试机制来应对这种类型的异常，**通过 retries 参数即可配置**。
+
+默认情况下，retries 参数设置为0，即不进行重试，对于高可靠性要求的场景，需要将这个值设置为大于0的值，与 retries 参数相关的还有一个 `retry.backoff.ms` 参数，它用来设定两次重试之间的时间间隔，以此避免无效的频繁重试。在配置 retries 和 retry.backoff.ms 之前，最好先估算一下可能的异常恢复时间，这样可以设定总的重试时间大于这个异常恢复时间，以此来避免生产者过早地放弃重试。如果不知道 retries 参数应该配置为多少，则可以参考 KafkaAdminClient，在 KafkaAdminClient 中 retries 参数的默认值为 5。
+
+注意**如果配置的 retries 参数值大于0，则可能引起一些负面的影响**。首先由于默认的 `max.in.flight.requests.per.connection` 参数值为5，这样可能会影响消息的顺序性，对此要么放弃客户端内部的重试功能，要么将 `max.in.flight.requests.per.connection` 参数设置为1，这样也就放弃了吞吐。其次，有些应用对于时延的要求很高，很多时候都是需要快速失败的，设置 retries> 0 会增加客户端对于异常的反馈时延，如此可能会对应用造成不良的影响。
+
+我们回头再来看一下 acks = -1 的情形，它要求 ISR 中所有的副本都收到相关的消息之后才能够告知生产者已经成功提交。试想一下这样的情形，leader 副本的消息流入速度很快，而 follower 副本的同步速度很慢，在某个临界点时所有的 follower 副本都被剔除出了 ISR 集合，那么 ISR 中只有一个 leader 副本，最终 acks = -1 演变为 acks = 1 的情形，如此也就加大了消息丢失的风险。
+
+Kafka 也考虑到了这种情况，并为此提供了 `min.insync.replicas` 参数（默认值为1）来作为辅助（配合 acks = -1 来使用），这个参数指定了 ISR 集合中最小的副本数，如果不满足条件就会抛出 NotEnoughReplicasException 或 NotEnoughReplicasAfterAppendException。在正常的配置下，需要满足 副本数 > min.insync.replicas 参数的值。一个典型的配置方案为：副本数配置为3，min.insync.replicas 参数值配置为2。注意 min.insync.replicas 参数在提升可靠性的时候会从侧面影响可用性。试想如果 ISR 中只有一个 leader 副本，那么最起码还可以使用，而此时如果配置 min.insync.replicas>1，则会使消息无法写入。
+
+与可靠性和 ISR 集合有关的还有一个参数——unclean.leader.election.enable。这个参数的默认值为 false，如果设置为 true 就意味着当 leader 下线时候可以从非 ISR 集合中选举出新的 leader，这样有可能造成数据的丢失。如果这个参数设置为 false，那么也会影响可用性，非 ISR 集合中的副本虽然没能及时同步所有的消息，但最起码还是存活的可用副本。随着 Kafka 版本的变更，有的参数被淘汰，也有新的参数加入进来，而传承下来的参数一般都很少会修改既定的默认值，而 unclean.leader.election.enable 就是这样一个反例，从 0.11.0.0 版本开始，unclean.leader.election.enable 的默认值由原来的 true 改为了 false，可以看出 **Kafka 的设计者愈发地偏向于可靠性的提升**。
+
+在 broker 端还有两个参数 `log.flush.interval.messages` 和 `log.flush.interval.ms`，用来调整同步刷盘的策略，默认是不做控制而交由操作系统本身来进行处理。同步刷盘是增强一个组件可靠性的有效方式，Kafka 也不例外，但**笔者对同步刷盘有一定的疑问—绝大多数情景下，一个组件（尤其是大数据量的组件）的可靠性不应该由同步刷盘这种极其损耗性能的操作来保障，而应该采用多副本的机制来保障**。
+
+对于消息的可靠性，很多人都会忽视消费端的重要性，如果一条消息成功地写入 Kafka，并且也被 Kafka 完好地保存，而在消费时由于某些疏忽造成没有消费到这条消息，那么对于应用来说，这条消息也是丢失的。
+
+`enable.auto.commit` 参数的默认值为 true，即开启自动位移提交的功能，虽然这种方式非常简便，但它会带来重复消费和消息丢失的问题，对于高可靠性要求的应用来说显然不可取，所以需要将 `enable.auto.commit` 参数设置为 false 来执行手动位移提交。在执行手动位移提交的时候也要遵循一个原则：如果消息没有被成功消费，那么就不能提交所对应的消费位移。**对于高可靠要求的应用来说，宁愿重复消费也不应该因为消费异常而导致消息丢失**。有时候，由于应用解析消息的异常，可能导致部分消息一直不能够成功被消费，那么这个时候为了不影响整体消费的进度，可以将这类消息暂存到死信队列中，以便后续的故障排除。
+
+对于消费端，Kafka 还提供了一个可以兜底的功能，即回溯消费，通过这个功能可以让我们能够有机会对漏掉的消息相应地进行回补，进而可以进一步提高可靠性。

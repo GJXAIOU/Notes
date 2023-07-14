@@ -1,0 +1,26 @@
+# ClickHouse SQL 语句
+
+语句表示可以使用 SQL 查询执行的各种操作。每种类型的语句都有自己的语法和用法详细信息，这些语法和用法详细信息单独描述如下所示:
+
+- [SELECT](https://clickhouse.com/docs/zh/sql-reference/statements/select)
+- [INSERT INTO](https://clickhouse.com/docs/zh/sql-reference/statements/insert-into)
+- [CREATE](https://clickhouse.com/docs/zh/sql-reference/statements/create)
+- [ALTER](https://clickhouse.com/docs/zh/sql-reference/statements/alter/overview)
+- [SYSTEM](https://clickhouse.com/docs/zh/sql-reference/statements/system)
+- [SHOW](https://clickhouse.com/docs/zh/sql-reference/statements/show)
+- [GRANT](https://clickhouse.com/docs/zh/sql-reference/statements/grant)
+- [REVOKE](https://clickhouse.com/docs/zh/sql-reference/statements/revoke)
+- [ATTACH](https://clickhouse.com/docs/zh/sql-reference/statements/attach)
+- [CHECK TABLE](https://clickhouse.com/docs/zh/sql-reference/statements/check-table)
+- [DESCRIBE TABLE](https://clickhouse.com/docs/zh/sql-reference/statements/describe-table)
+- [DETACH](https://clickhouse.com/docs/zh/sql-reference/statements/detach)
+- [DROP](https://clickhouse.com/docs/zh/sql-reference/statements/drop)
+- [EXISTS](https://clickhouse.com/docs/zh/sql-reference/statements/exists)
+- [KILL](https://clickhouse.com/docs/zh/sql-reference/statements/kill)
+- [OPTIMIZE](https://clickhouse.com/docs/zh/sql-reference/statements/optimize)
+- [RENAME](https://clickhouse.com/docs/zh/sql-reference/statements/rename)
+- [SET](https://clickhouse.com/docs/zh/sql-reference/statements/set)
+- [SET ROLE](https://clickhouse.com/docs/zh/sql-reference/statements/set-role)
+- [TRUNCATE](https://clickhouse.com/docs/zh/sql-reference/statements/truncate)
+- [USE](https://clickhouse.com/docs/zh/sql-reference/statements/use)
+- [EXPLAIN](https://clickhouse.com/docs/zh/sql-reference/statements/explain)

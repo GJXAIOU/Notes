@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 MyBatis执行流程.svg Page-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="8.26772in" height="11.6929in"
+		viewBox="0 0 595.276 841.89" xml:space="preserve" color-interpolation-filters="sRGB" class="st11">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false">
+		<v:userDefs>
+			<v:ud v:nameU="msvSubprocessMaster" v:prompt="" v:val="VT4(Rectangle)"/>
+			<v:ud v:nameU="msvNoAutoConnect" v:val="VT0(1):26"/>
+		</v:userDefs>
+	</v:documentProperties>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffffff;stroke:#000000;stroke-width:0.25}
+		.st2 {fill:#000000;font-family:Calibri;font-size:0.833336em}
+		.st3 {font-family:黑体;font-size:1em}
+		.st4 {fill:#000000;font-family:黑体;font-size:0.833336em}
+		.st5 {font-family:Calibri;font-size:1em}
+		.st6 {font-size:1em}
+		.st7 {marker-end:url(#mrkr4-71);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st8 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st9 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st10 {fill:#000000;font-family:黑体;font-size:0.666664em}
+		.st11 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-71" class="st8" v:arrowType="4" v:arrowSize="2" v:setback="7.04" refX="-7.04" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<v:userDefs>
+			<v:ud v:nameU="msvThemeOrder" v:val="VT0(0):26"/>
+		</v:userDefs>
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="shape1-1" v:mID="1" v:groupContext="shape" transform="translate(205.512,-788.031)">
+			<title>矩形</title>
+			<desc>Resources 加载全局配置文件</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="33.82" y="831.04" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Resources <tspan
+						class="st3">加载全局配置文件</tspan></text>		</g>
+		<g id="shape2-5" v:mID="2" v:groupContext="shape" transform="translate(205.512,-738.425)">
+			<title>矩形.2</title>
+			<desc>实例化 sqlSessionFactoryBuilder 构建器</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="12.95" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>实例化<tspan class="st5"> </tspan><tspan
+						class="st5">sqlSessionFactoryBuilder </tspan>构建器</text>		</g>
+		<g id="shape3-10" v:mID="3" v:groupContext="shape" transform="translate(205.512,-688.819)">
+			<title>矩形.3</title>
+			<desc>由 XMLConfigBuilder 解析配置文件流</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="16.98" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>由<tspan class="st5"> </tspan><tspan
+						class="st5">XMLConfigBuilder </tspan>解析配置文件流</text>		</g>
+		<g id="shape4-15" v:mID="4" v:groupContext="shape" transform="translate(205.512,-688.819)">
+			<title>矩形.4</title>
+			<desc>由 XMLConfigBuilder 解析配置文件流</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="16.98" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>由<tspan class="st5"> </tspan><tspan
+						class="st5">XMLConfigBuilder </tspan>解析配置文件流</text>		</g>
+		<g id="shape5-20" v:mID="5" v:groupContext="shape" transform="translate(205.512,-632.126)">
+			<title>矩形.5</title>
+			<desc>把配置信息存放在 Configuration 中</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="20.6" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>把配置信息存放在<tspan
+						class="st5"> </tspan><tspan class="st5">Configuration </tspan>中</text>		</g>
+		<g id="shape6-25" v:mID="6" v:groupContext="shape" transform="translate(205.512,-575.433)">
+			<title>矩形.6</title>
+			<desc>实例化 SqlSessionFactory 实现类 DefaultSqlSessionFactory</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="27.1" y="825.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>实例化<tspan class="st5"> </tspan><tspan
+						class="st5">SqlSessionFactory </tspan>实现类<tspan class="st5"> </tspan><tspan x="44.43" dy="1.233em"
+						class="st5">DefaultSqlSessionFactory</tspan></text>		</g>
+		<g id="shape7-32" v:mID="7" v:groupContext="shape" transform="translate(205.512,-518.74)">
+			<title>矩形.7</title>
+			<desc>由 TransactionFactory 创建一个 Transaction 事务对象</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="4.65" y="824.39" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>由<tspan class="st5"> </tspan><tspan
+						class="st5">TransactionFactory </tspan>创建一个<tspan class="st5"> </tspan><tspan class="st5">Transaction </tspan><tspan
+						x="75.67" dy="1.331em" class="st6">事务对象</tspan></text>		</g>
+		<g id="shape8-40" v:mID="8" v:groupContext="shape" transform="translate(205.512,-462.047)">
+			<title>矩形.8</title>
+			<desc>创建执行器 Executor</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="51.65" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>创建执行器<tspan
+						class="st5"> </tspan><tspan class="st5">Executor</tspan></text>		</g>
+		<g id="shape9-45" v:mID="9" v:groupContext="shape" transform="translate(205.512,-405.354)">
+			<title>矩形.9</title>
+			<desc>创建 SqlSession 接口实现类 DefaultSqlSession</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="37.23" y="825.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>创建<tspan class="st5"> </tspan><tspan
+						class="st5">SqlSession </tspan>接口实现类<tspan class="st5"> </tspan><tspan x="59.56" dy="1.233em" class="st5">DefaultSqlSession</tspan></text>		</g>
+		<g id="shape10-52" v:mID="10" v:groupContext="shape" transform="translate(205.512,-334.488)">
+			<title>矩形.10</title>
+			<desc>实现 CURD</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="72.87" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>实现<tspan class="st5"> </tspan><tspan
+						class="st5">CURD</tspan></text>		</g>
+		<g id="shape11-57" v:mID="11" v:groupContext="shape" transform="translate(205.512,-263.622)">
+			<title>菱形</title>
+			<desc>执行是否成功</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="818.676" width="191.34" height="46.4269"/>
+			<path d="M95.67 841.89 L191.34 818.68 L95.67 795.46 L0 818.68 L95.67 841.89 Z" class="st1"/>
+			<text x="65.67" y="822" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>执行是否成功</text>		</g>
+		<g id="shape12-60" v:mID="12" v:groupContext="shape" transform="translate(205.512,-210.836)">
+			<title>矩形.12</title>
+			<desc>事务提交</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="75.67" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>事务提交</text>		</g>
+		<g id="shape13-63" v:mID="13" v:groupContext="shape" transform="translate(205.512,-158.051)">
+			<title>矩形.13</title>
+			<desc>关闭</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="95.6693" cy="827.717" width="191.34" height="28.3465"/>
+			<rect x="0" y="813.543" width="191.339" height="28.3465" class="st1"/>
+			<text x="85.67" y="831.04" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>关闭</text>		</g>
+		<g id="shape14-66" v:mID="14" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-263.622)">
+			<title>动态连接线</title>
+			<desc>是</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="854.109" width="40" height="18.6536"/>
+			<path d="M7.09 841.89 L7.09 859.29" class="st7"/>
+			<rect v:rectContext="textBkgnd" x="3.08655" y="848.785" width="7.99997" height="10.6501" class="st9"/>
+			<text x="3.09" y="856.77" class="st10" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>是</text>		</g>
+		<g id="shape15-74" v:mID="15" v:groupContext="shape" v:layerMember="0" transform="translate(198.425,-286.835)">
+			<title>动态连接线.15</title>
+			<desc>否</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-3.54331" cy="718.851" width="40" height="18.6536"/>
+			<path d="M7.09 841.89 L-3.54 841.89 L-3.54 595.81 L0.05 595.81" class="st7"/>
+			<rect v:rectContext="textBkgnd" x="-7.54337" y="713.526" width="7.99997" height="10.6501" class="st9"/>
+			<text x="-7.54" y="721.51" class="st10" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>否</text>		</g>
+		<g id="shape16-81" v:mID="16" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-334.488)">
+			<title>动态连接线.16</title>
+			<path d="M7.09 841.89 L7.09 859.29" class="st7"/>
+		</g>
+		<g id="shape17-86" v:mID="17" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-788.031)">
+			<title>动态连接线.17</title>
+			<path d="M7.09 841.89 L7.09 856.11" class="st7"/>
+		</g>
+		<g id="shape18-91" v:mID="18" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-738.425)">
+			<title>动态连接线.18</title>
+			<path d="M7.09 841.89 L7.09 856.11" class="st7"/>
+		</g>
+		<g id="shape19-96" v:mID="19" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-688.819)">
+			<title>动态连接线.19</title>
+			<path d="M7.09 841.89 L7.09 863.2" class="st7"/>
+		</g>
+		<g id="shape20-101" v:mID="20" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-632.126)">
+			<title>动态连接线.20</title>
+			<path d="M7.09 841.89 L7.09 863.2" class="st7"/>
+		</g>
+		<g id="shape21-106" v:mID="21" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-575.433)">
+			<title>动态连接线.21</title>
+			<path d="M7.09 841.89 L7.09 863.2" class="st7"/>
+		</g>
+		<g id="shape22-111" v:mID="22" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-518.74)">
+			<title>动态连接线.22</title>
+			<path d="M7.09 841.89 L7.09 863.2" class="st7"/>
+		</g>
+		<g id="shape23-116" v:mID="23" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-462.047)">
+			<title>动态连接线.23</title>
+			<path d="M7.09 841.89 L7.09 863.2" class="st7"/>
+		</g>
+		<g id="shape24-121" v:mID="24" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-405.354)">
+			<title>动态连接线.24</title>
+			<path d="M7.09 841.89 L7.09 877.37" class="st7"/>
+		</g>
+		<g id="shape25-126" v:mID="25" v:groupContext="shape" v:layerMember="0" transform="translate(294.094,-210.836)">
+			<title>动态连接线.25</title>
+			<path d="M7.09 841.89 L7.09 859.29" class="st7"/>
+		</g>
+	</g>
+</svg>
