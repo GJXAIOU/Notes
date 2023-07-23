@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="ie-stand">
+    <title>ERP登录</title>
+    <!-- E DNS预解析 -->
+    <link href="/static/css/sso_login.css?v=20230706041028" type="text/css" rel="stylesheet"/>
+    <link href="/static/css/login.min.css?v=20230706041028" type="text/css" rel="stylesheet"/>
+    <link href="/static/css/reg_fp.css?v=20230706041028" type="text/css" rel="stylesheet"/>
+        <script src="https://storage.jd.com/fido-source/fido/pro/fido.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<div class="login">
+    <div class="valign_wrap">
+        <!-- +.withqrc 切换 -->
+        <div class="login_pop">
+            <div class="login_pop_inner login_withpc" style="height: auto;padding-top:40px;padding-bottom: 20px">
+                <!--[if lt IE 8]><span class="login_withpc_logo"></span><![endif]-->
+                <form class="login_form"  method="post" name="login_form" id="login_form" onsubmit="return login()">
+                    <input type="hidden" id="fp" name="fp">
+                    <!-- +.warn +.focus +.hide -->
+                    <div class="login_form_row account" id="accountDiv"><label class="login_form_label"><i class="login_form_icon"></i>
+                        <div class="login_form_inp"><input class="login_form_inp_input" type="text" id="username" name="username" placeholder="ERP账号">
+                        </div>
+                    </label></div>
+                    <div class="login_form_row password" id="pwdDiv"><label class="login_form_label"><i class="login_form_icon"></i>
+                        <div class="login_form_inp">
+                            <input class="login_form_inp_input" type="password" id="password" placeholder="密码" ssoPublicKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCH9k3+bGk4lR0Lsy2xmQCqnapImmLQA4JC/ctV7AN3H2KWrn+u3cv3geM8t7tiVbR/XMduLAIWT4Hzzasa9+ttEp27jkN04xmuaM/xtylxt6WM+Cr0jcqX7eXOm+c8PzYmMwYY1k2yJeU3rv90eC6xGtSAzEZNNM61kgF8R9R9swIDAQAB">
+                        </div>
+                    </label></div>
+
+                    <input type="hidden" name="password" id="enPwd">
+                    <input type="hidden" id="uuid" name="uuid" value="a72671669ff246da8ae4db40d2dd9ee8"/>
+                    <input type="hidden" id="loginType" name="loginType" value="1">
+                    <input type="hidden" name="fidoInfo" id="fidoInfo">
+                    <input type="hidden" name="hioXAesKey" id="hioXAesKey" value="A/uJeyuVwA832rOFdKO4uZoZ7mdbyyZygGlDwTK1y7su4BTXBzhpp3b+qMf86GZfQgnm6ZDTgIbWu8nkedxjRD/ZT+MHUFUfqKbZfWX39EMEDw95AFEp9CddBIuG6/56X9/2fMiopiRL7mT2e6jOxo+r/IMchCk9J36uhC5HRKg=">
+                    <input type="hidden" name="hioResponseBody" id="hioResponseBody" value="MjliOGFmODBmYTk0ZGIxYjdmN2QyMGQwMmRlNGE1YmE4MjM5ZjYwNjNhYmUzZGM3NzlhOTA2ZTMxNjhiMGY3YzQxMWQ1NmQ3ZWNkMDYwMTdkMThjNTMwMDg2NWIxNjlhMWU3NzVkNDlkNjlmOGY5MDMyNGM5YjczNzg0ZWI5NTA5MzJkMjdiM2QyZjdmZGU1ODJkMTkwN2Q2ZjU1MDhlZDExOTEzZDBiYmI0MmIyZDY3NDQzNTRiMzYwNWM1YzYzMDU4YTIxYjA4OWEzNmRkZmQ2MDA1MjU3MDE4ZDY5Mjg2YzUxODEyYmM3OGEzYWUzOGE5YzUyZDNjYWJhOTU4OTUwNzM4ZDMxMjljMDgyZmJlMzU0OTBkNGViZmE4ZDhhZmY3MTg1OGEwMmJmZTEyNjcwOGRjMjMwOWQ5MTNjNDY="/>
+
+                    <div id="checkCodeDiv" style="display: none;font-size: 18px" class="login_form_row account">
+                        <div style="width: 100%;text-align: center;">登录账号：<span style="font-weight:bold"></span> </div>
+                        <br>
+                        <div>请在您的<span style="color: red;font-weight:bold">京Me</span>上确认，登录验证码<br><span style="text-align: center;display:-moz-inline-box;display:inline-block;width:90px;color: red;font-weight:bold;font-size: 22px;"></span>，请在<span style="color: red;font-weight:bold">分钟内</span>完成操作！</div>
+                        <input type="hidden" id="checkCode" name="checkCode?if_exists" value=""/>
+                        <br>
+                        <div class="device"  style="text-align: center;">
+                            <div class="login_form_row formsubmit"><input class="formsubmit_btn" type="button" onclick="refreshPage()"  value="重新登录"></div>
+                        </div>
+                        <div class="login_form_row warntip" style="margin-left: -5px;"><i class="warntip_icon"></i><span style="color: black">请在 “京东ME-身份安全中心-Web登录认证”中确认</span>
+                        </div>
+                    </div>
+                    <div id="reSubmitDiv" style="display: none;font-size: 18px" class="login_form_row account">
+                        <div style="width: 100%;text-align: center;">您的账号<span style="font-weight:bold"></span>，本次登录已超时，请重新登录！ </div>
+                        <br>
+                        <div class="login_form_row formsubmit"><input class="formsubmit_btn" type="button" onclick="refreshPage()"  value="重新登录"></div>
+
+                    </div>
+                    <div id="errorDiv" style="display: none;font-size: 18px" class="login_form_row account">
+                        <div style="width: 100%;text-align: center;">您的账号<span style="font-weight:bold"></span>，本次登录存在异常情况，请重新登录！ </div>
+                        <br>
+                        <div class="login_form_row formsubmit"><input class="formsubmit_btn" type="button" onclick="refreshPage()"  value="重新登录"></div>
+                    </div>
+                    <div id="loginDiv" style="display: none;font-size: 18px" class="login_form_row account">
+                        <div style="width: 100%;text-align: center;">您的账号<span style="font-weight:bold"></span>，已被拒绝登录，请重新登录！ </div>
+                        <br>
+                        <div class="login_form_row formsubmit"><input class="formsubmit_btn" type="button" onclick="refreshPage()" value="重新登录"></div>
+                    </div>
+
+                </form>
+                <a class="login_style to_qrcode" href="javascript:;" toLoginType="2" title="切换到扫码登录"></a>
+            </div>
+            <!-- +.succ -->
+            <div class="login_pop_inner login_withqrc" style="padding-top:40px">
+                <div class="login_withqrc_wrap">
+                    <div class="login_withqrc_tit">用京东ME 扫码安全登录</div>
+                    <div class="login_withqrc_code"><img id="qr_image" src="" width="180" height="180" onload="startCheck();">
+                    </div>
+                    <div class="login_withqrc_tip"><a id="refresh_code" href="javascript:;">刷新二维码</a> <span class="login_withqrc_tip_sep">|</span>
+                        京东ME-消息-右上角➕-扫一扫
+                    </div>
+                </div>
+                <div class="login_withqrc_result">
+                    <div class="login_withqrc_doge"></div>
+                    <div class="login_withqrc_succ">扫描成功！</div>
+                    <div class="login_withqrc_tip">请在手机上确认是否登录</div>
+                </div>
+                <a class="login_style to_password" href="javascript:;" toLoginType="1" title="切换到密码登录"></a>
+            </div>
+            <div id = "otherDiv" class="login_pop_inner" style="height: auto;padding-top:20px;padding-bottom: 20px">
+                <div style="text-align: center">
+                    <div class="login-way" id="passwordDiv" title="密码登录">
+                        <img id="passwordImg" src="/static/css/i/password-hover.png" type="1" origin="/static/css/i/password.png"
+                             onhover="/static/css/i/password-hover.png" style="transform:scale(1.2) translateY(2px)"/>
+                        <div>密码登录</div>
+                    </div>
+                    <div class="login-way" id="qrcodeDiv" title="扫码登录">
+                        <img id="qrcodeImg" src="/static/css/i/qrcode-hover.png" type="2" origin="/static/css/i/qrcode.png"
+                             onhover="/static/css/i/qrcode-hover.png"/>
+                        <div>扫码登录</div>
+                    </div>
+                </div>
+                <div class="login_form_row formsubmit"><input class="formsubmit_btn" type="button" id="formsubmitButton"
+                                                              value="登&nbsp;&nbsp;录"></div>
+                <div class="login_form_row findback" id="forgetPwdDiv"><a href="/sso/findpwd/index">忘记密码？</a></div>
+                <div class="login_form_row warntip hide" style="margin-top: 10px"><i class="warntip_icon"></i><span class="warntip_text"></span>
+                </div>
+                <div class="login-language">
+                    <span class="lan-title">语言选择</span>
+                    <div class="lan-part">
+                        <select class="lanselect" id="lanSelect" onchange="selectLan()">
+                            <option value="zh_CN">中文</option>
+                            <option value="en_US">English</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div style="color: red;font-size: 16px;text-align: center;margin:20px 0 0 0;">
+        <div>安全提醒：严禁盗用、借用或共享ERP帐号！因出借ERP导致关联的违规行为，ERP本人要负同等责任。</div>
+        <div id="nopwd_notice" style="display: none">注意：您现在使用无密码登录功能，只需要京Me确认验证码即可登录，在登录页面时可不需要输入密码。如需帮助，请参见<a href="/static/statics/help.htm" target="_blank">帮助文档</a>详细说明。</div>
+        <div>如遇到单点登录问题，请咚咚联系：<a title="咚咚联系IT小姐姐" href="timline://chat/?topin=xnit02">IT小姐姐</a>或拨打电话400-618-3638</div>
+    </div>
+</div>
+<div class="disabledfp-wrap">
+
+</div>
+<div id="overTopMark" class="overTop" style="display: none"><div><span><a href="https://ssa.jd.com/sso/login?autoClose=1&reloadOpener=1" target="_blank">登录会话超时，请重新登录</a></span></div></div>
+    <script src="/static/js/jquery.min.js?v=20230706041028" type="text/javascript"></script>
+    <script src="/static/tools/md5.min.js?v=20230706041028" type="text/javascript"></script>
+    <script src="/static/tools/jsencrypt/jsencrypt.min.js?v=20230706041028" type="text/javascript"></script>
+    <script src="//gias.jd.com/js/beetle.min.js?v=20230706041028" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var ctx = '';
+        var MAX_TIMES = 300;
+        var returnUrl = "https://cf.jd.com/download/attachments/1139440908/image2022-11-27_10-26-20.png?version=1&amp;modificationDate=1669515979000&amp;api=v2";
+        returnUrl = returnUrl.replace(/&amp;/g, "&");
+        var locked = false;
+        var warning = false;
+        var warning_message = "";
+        var ssoReloadInIframe = true;
+        var httpsInIframe = false;
+        var chromeBrowser = false;
+        var toParentWindowMessage = {"beforeUrl":"https://cf.jd.com/download/attachments/1139440908/image2022-11-27_10-26-20.png?version=1&modificationDate=1669515979000&api=v2","loginUrl":"https://ssa.jd.com/sso/login?ReturnUrl=https%3A%2F%2Fcf.jd.com%2Fdownload%2Fattachments%2F1139440908%2Fimage2022-11-27_10-26-20.png%3Fversion%3D1%26modificationDate%3D1669515979000%26api%3Dv2","reloadUrl":"https://ssa.jd.com/sso/login?autoClose=1&reloadOpener=1","eventName":"login"};
+    </script>
+    <script src="/static/js/sso/login.js?v=20230706041028" type="text/javascript"></script>
+</body>
+</html>
